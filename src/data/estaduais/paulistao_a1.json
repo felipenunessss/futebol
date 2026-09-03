@@ -3,22 +3,16 @@
   "nome": "Campeonato Paulista - Série A1",
   "estado": "SP",
   "nivel": 1,
-  "ano_referencia": 2027,
+  "ano_referencia": 2026,
   "formato": {
-    "fase_grupos": {
-      "num_grupos": 4,
-      "times_por_grupo": 4,
-      "ida_e_volta": false,
-      "classificam_por_grupo": 2
-    },
-    "fase_quadrangular": {
-      "ativa": true,
-      "num_grupos": 2,
-      "times_por_grupo": 4,
-      "classificam_por_grupo": 2
+    "fase_suica": {
+      "num_potes": 4,
+      "times_por_pote": 4,
+      "jogos_por_time": 9,
+      "classificam_mata_mata": 8
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": ["quartas", "semifinal", "final"],
       "ida_e_volta": true
     }
   },
@@ -37,10 +31,17 @@
     "palmeiras",
     "sao_paulo",
     "santos",
+    "sao_bernardo",
+    "novorizontino",
     "red_bull_bragantino",
+    "mirassol",
     "guarani",
     "ponte_preta",
-    "novorizontino",
-    "mirassol"
+    "velo_clube",
+    "portuguesa",
+    "botafogo_sp",
+    "primavera",
+    "noroeste",
+    "capivariano"
   ]
 }

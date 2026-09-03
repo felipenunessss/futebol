@@ -17,5 +17,6 @@ export interface Club {
   fundacao?: number;
   estadio?: string;
   divisao_nacional?: DivisaoNacional;
-  forca_financeira: ForcaFinanceira;
+  /** Ausente quando o clube não tem dados financeiros conhecidos ainda (comum em clubes menores). */
+  forca_financeira?: ForcaFinanceira;
 }

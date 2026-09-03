@@ -1,0 +1,39 @@
+{
+  "id": "paulistao_a3",
+  "nome": "Campeonato Paulista - Série A3",
+  "estado": "SP",
+  "nivel": 3,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 16,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "bandeirante",
+    "catanduva",
+    "desportivo_brasil",
+    "francana",
+    "itapirense",
+    "marilia",
+    "paulista_jundiai",
+    "portuguesa_santista",
+    "rio_branco_americana",
+    "rio_claro",
+    "rio_preto",
+    "uniao_barbarense",
+    "uniao_sao_joao",
+    "ec_sao_bernardo",
+    "uniao_suzano",
+    "xv_de_jau"
+  ]
+}

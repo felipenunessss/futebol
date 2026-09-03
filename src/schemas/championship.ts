@@ -31,6 +31,17 @@ export interface FinalEstadual {
 }
 
 /**
+ * Fase "suíça" por potes, adotada pelo Paulistão A1 a partir de 2026:
+ * turno único, cada time joga um subconjunto dos outros times (não todos-contra-todos).
+ */
+export interface FaseSuica {
+  num_potes: number;
+  times_por_pote: number;
+  jogos_por_time: number;
+  classificam_mata_mata: number;
+}
+
+/**
  * Blocos de formato opcionais — cada estado ativa só os que usa de verdade,
  * conforme doc seção 2.2.
  */
@@ -39,6 +50,7 @@ export interface FormatoEstadual {
   returno?: FaseUnica;
   fase_grupos?: FaseGrupos;
   fase_quadrangular?: FaseQuadrangular;
+  fase_suica?: FaseSuica;
   mata_mata?: MataMata;
   final_estadual?: FinalEstadual;
 }
@@ -47,6 +59,7 @@ export interface Premiacao {
   vaga_copa_do_brasil?: number;
   vaga_libertadores?: number;
   vaga_sulamericana?: number;
+  acesso_proxima_divisao?: number;
   rebaixamento_proxima_divisao?: number;
 }
 

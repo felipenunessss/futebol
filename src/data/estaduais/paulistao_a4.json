@@ -1,0 +1,39 @@
+{
+  "id": "paulistao_a4",
+  "nome": "Campeonato Paulista - Série A4",
+  "estado": "SP",
+  "nivel": 4,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 16,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 2
+    },
+    "mata_mata": {
+      "fases": ["final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "inter_de_bebedouro",
+    "sao_caetano",
+    "penapolense",
+    "sao_carlense",
+    "barretos",
+    "taquaritinga",
+    "jacarei",
+    "lemense",
+    "ecus",
+    "comercial_ribeirao_preto",
+    "tanabi",
+    "jabaquara",
+    "vocem",
+    "colorado_caieiras",
+    "nacional_catanduva",
+    "aracatuba"
+  ]
+}

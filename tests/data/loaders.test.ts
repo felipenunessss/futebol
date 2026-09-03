@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { loadClubes, loadEstaduais, validarReferenciasDeTimes } from "../../src/data/loaders/index.js";
+import {
+  encontrarIdsDuplicados,
+  loadClubes,
+  loadEstaduais,
+  validarReferenciasDeTimes,
+} from "../../src/data/loaders/index.js";
 
 describe("dados de clubes e estaduais", () => {
   it("carrega os clubes do Brasil", () => {
@@ -12,9 +17,8 @@ describe("dados de clubes e estaduais", () => {
     expect(estaduais.length).toBeGreaterThan(0);
   });
 
-  it("ids de clube são únicos", () => {
-    const ids = loadClubes().map((c) => c.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it("ids de clube são únicos entre todos os arquivos de clubes/", () => {
+    expect(encontrarIdsDuplicados(loadClubes())).toEqual([]);
   });
 
   it("ids de estadual são únicos", () => {

@@ -1,0 +1,66 @@
+# Dados a verificar
+
+Rastreamento das pendências de qualidade de dados abertas durante o povoamento dos
+clubes e estaduais (Tier 1: SP, RJ, MG, RS, BA, PE). Critério aplicado: só entra na
+base um clube/fato confirmado por pelo menos uma fonte razoável; qualquer coisa
+duvidosa fica de fora dos arquivos de dados e listada aqui.
+
+## Resolvidos
+
+- **"EC São Bernardo"** vs **"São Bernardo FC"**: confirmados como dois clubes
+  distintos e reais, ambos de São Bernardo do Campo — Wikipédia inglesa tem
+  páginas separadas e a página do São Bernardo FC diz explicitamente "Not to
+  be confused with Esporte Clube São Bernardo". EC São Bernardo (fundado
+  1928, estádio 1º de Maio) disputa a A3; São Bernardo FC (fundado 2004,
+  também joga a Série B nacional) disputa a A1. Ambos adicionados à base.
+- **União Suzano** (fundado 1969, estádio Francisco Marques Figueira) e
+  **XV de Jaú** (fundado 1924, estádio Zezinho Magalhães) — confirmados por
+  múltiplas fontes (Wikipédia, Futebol Interior) disputando a A3 2026.
+  Adicionados; a A3 agora tem os 16 times reais da divisão.
+
+## Divisões ainda não modeladas (lista de clubes não encontrada com confiança)
+
+- **Campeonato Carioca — Série B1** (3ª divisão do RJ): existência e formato
+  confirmados, mas não achei lista oficial completa da edição 2025 dentro do
+  tempo de pesquisa.
+- **Campeonato Carioca — Série B2** (4ª divisão): a lista de 12 clubes encontrada
+  é da edição **2026**, não 2025 — não deve ser usada como se fosse do ano
+  correto. Também não está confirmado quais 9 dos 12 clubes originais
+  permaneceram na disputa (3 desistiram).
+- **Campeonato Carioca — Série C** (5ª divisão): existência e formato
+  confirmados (Taça Waldir Amaral, 13 clubes), lista de clubes não encontrada.
+- Não há evidência de uma "Série D" carioca ativa hoje — a hierarquia atual
+  parece ir só até a Série C.
+
+## Detalhes pendentes em clubes já incluídos
+
+A maioria dos clubes novos em `src/data/clubes/sp_estadual.json` e
+`rj_estadual.json` tem `fundacao` e `estadio` ausentes — não foram
+verificados individualmente nesta rodada (confirmei só nome/cidade). Exceções
+já confirmadas: União Barbarense, ECUS, VOCEM (SP) e Bangu, Madureira, Nova
+Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
+
+- **Maricá Futebol Clube**: fundação incerta (fontes divergem entre 2001 e
+  2003) — campo `fundacao` deixado de fora de propósito.
+- **Boavista Sport Club**: história de fundação complexa (refundado em 2004,
+  origem em 1961 como outro nome) — campo `fundacao` deixado de fora até
+  decidir qual ano usar.
+
+## Regras de formato ainda não confirmadas com o regulamento oficial
+
+- **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
+  potes de 4, turno único, top 8 avança ao mata-mata; a fonte foi vaga sobre
+  exatamente contra quem cada time joga fora do próprio pote (menciona "9
+  jogos" mas a composição exata dos confrontos não fechou com clareza).
+- **Paulistão A2**: a segunda fase (2 quadrangulares após os 8 classificados)
+  e a "final de acesso" entre líderes foram confirmadas na estrutura, mas o
+  número exato de vagas de acesso à A1 não foi encontrado — `premiacao` não
+  tem `acesso_proxima_divisao` preenchido nesse arquivo por esse motivo.
+- **Paulistão A3**: número de rebaixados à A4 não confirmado — `premiacao`
+  ficou vazio nesse arquivo.
+
+## Como resolver
+
+Cada item acima deveria ser confirmado contra a fonte primária (site da FPF
+para São Paulo, FERJ para o Rio) antes de ser promovido de "a verificar" para
+os arquivos de dados definitivos.

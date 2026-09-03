@@ -3,7 +3,7 @@
   "nome": "Campeonato Carioca - Série A",
   "estado": "RJ",
   "nivel": 1,
-  "ano_referencia": 2027,
+  "ano_referencia": 2025,
   "formato": {
     "turno": {
       "nome": "Taça Guanabara",
@@ -30,5 +30,18 @@
     { "time_a": "flamengo", "time_b": "vasco_da_gama", "nome": "Clássico dos Milhões", "peso_midia": 5 },
     { "time_a": "vasco_da_gama", "time_b": "botafogo", "nome": "Clássico da Amizade", "peso_midia": 3 }
   ],
-  "times": ["flamengo", "fluminense", "vasco_da_gama", "botafogo"]
+  "times": [
+    "flamengo",
+    "fluminense",
+    "vasco_da_gama",
+    "botafogo",
+    "bangu",
+    "boavista_rj",
+    "madureira",
+    "marica",
+    "nova_iguacu",
+    "portuguesa_rj",
+    "sampaio_correa_rj",
+    "volta_redonda"
+  ]
 }

@@ -1,0 +1,47 @@
+{
+  "id": "paulistao_a2",
+  "nome": "Campeonato Paulista - Série A2",
+  "estado": "SP",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 16,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 8
+    },
+    "fase_quadrangular": {
+      "ativa": true,
+      "num_grupos": 2,
+      "times_por_grupo": 4,
+      "classificam_por_grupo": 1
+    },
+    "final_estadual": {
+      "criterio": "lideres_dos_quadrangulares_disputam_final_de_acesso",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "agua_santa",
+    "ferroviaria",
+    "gremio_prudente",
+    "inter_de_limeira",
+    "ituano",
+    "juventus_sp",
+    "linense",
+    "monte_azul",
+    "osasco_sporting",
+    "santo_andre",
+    "sao_bento",
+    "sao_jose_sp",
+    "sertaozinho",
+    "taubate",
+    "votuporanguense",
+    "xv_de_piracicaba"
+  ]
+}

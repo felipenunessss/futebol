@@ -8,8 +8,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, "..");
 
 export function loadClubes(): Club[] {
-  const raw = readFileSync(join(DATA_DIR, "clubes", "brasil.json"), "utf-8");
-  return JSON.parse(raw) as Club[];
+  const dir = join(DATA_DIR, "clubes");
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".json"))
+    .flatMap((f) => JSON.parse(readFileSync(join(dir, f), "utf-8")) as Club[]);
 }
 
 export function loadEstaduais(): CampeonatoEstadual[] {
@@ -17,6 +19,17 @@ export function loadEstaduais(): CampeonatoEstadual[] {
   return readdirSync(dir)
     .filter((f) => f.endsWith(".json"))
     .map((f) => JSON.parse(readFileSync(join(dir, f), "utf-8")) as CampeonatoEstadual);
+}
+
+/** Retorna os ids de clube que aparecem em mais de um arquivo/fonte da base. */
+export function encontrarIdsDuplicados(clubes: Club[]): string[] {
+  const vistos = new Set<string>();
+  const duplicados = new Set<string>();
+  for (const clube of clubes) {
+    if (vistos.has(clube.id)) duplicados.add(clube.id);
+    vistos.add(clube.id);
+  }
+  return [...duplicados];
 }
 
 /**

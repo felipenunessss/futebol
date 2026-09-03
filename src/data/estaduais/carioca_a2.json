@@ -1,0 +1,35 @@
+{
+  "id": "carioca_a2",
+  "nome": "Campeonato Carioca - Série A2",
+  "estado": "RJ",
+  "nivel": 2,
+  "ano_referencia": 2025,
+  "formato": {
+    "turno": {
+      "nome": "Taça Santos Dumont",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "america_rj",
+    "americano",
+    "araruama",
+    "audax_rio",
+    "bangu",
+    "duque_de_caxias",
+    "olaria",
+    "perolas_negras",
+    "petropolis",
+    "resende",
+    "sao_goncalo_ec"
+  ]
+}
