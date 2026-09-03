@@ -1,0 +1,35 @@
+{
+  "id": "baiano_b",
+  "nome": "Campeonato Baiano - Série B",
+  "estado": "BA",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "leonico",
+    "barreiras_fc",
+    "camacari",
+    "ecpp_vitoria_conquista",
+    "feira_fc",
+    "fluminense_de_feira",
+    "grapiuna",
+    "jacobina",
+    "redencao",
+    "ssa_fc"
+  ]
+}

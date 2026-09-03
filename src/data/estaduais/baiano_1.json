@@ -1,0 +1,37 @@
+{
+  "id": "baiano_a1",
+  "nome": "Campeonato Baiano - Série A1",
+  "estado": "BA",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "bahia", "time_b": "vitoria", "nome": "Ba-Vi", "peso_midia": 5 }
+  ],
+  "times": [
+    "bahia",
+    "vitoria",
+    "galicia",
+    "atletico_alagoinhas",
+    "bahia_de_feira",
+    "jacuipense",
+    "jequie",
+    "juazeirense",
+    "porto_ba",
+    "barcelona_ilheus"
+  ]
+}

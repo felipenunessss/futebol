@@ -83,6 +83,22 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 - Nenhum clube com risco real de duplicata/identidade ambígua foi encontrado
   nesta rodada (diferente dos casos São Bernardo/Patrocinense).
 
+## Bahia — detalhes pendentes
+
+- **Porto Sport Club** (A1): ano de fundação não encontrado — campo
+  `fundacao` deixado de fora.
+- **ECPP (Vitória da Conquista), Fluminense de Feira, Redenção, SSA FC**
+  (Série B): estádio não confirmado — campo `estadio` deixado de fora.
+- **Feira de Santana tem 3 clubes reais e distintos** no Baianão: Bahia de
+  Feira (A1), Fluminense de Feira e Feira FC (ambos Série B) — confirmado que
+  não são o mesmo clube, apesar do nome de cidade em comum.
+- **Baianão A1**: formato de mata-mata confirmado como "jogo único" só para a
+  semifinal na fonte consultada; assumi jogo único também na final por
+  ausência de indicação em contrário — vale confirmar contra o regulamento
+  oficial da FBF.
+- Vagas de Copa do Brasil/Libertadores da Série A1 não pesquisadas —
+  `premiacao` só tem o rebaixamento confirmado (2 times).
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
