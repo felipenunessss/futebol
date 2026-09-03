@@ -1,0 +1,39 @@
+{
+  "id": "paranaense_1",
+  "nome": "Campeonato Paranaense",
+  "estado": "PR",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 2,
+      "times_por_pote": 6,
+      "jogos_por_time": 6,
+      "classificam_mata_mata": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "athletico_pr", "time_b": "coritiba", "nome": "Atletiba", "peso_midia": 5 }
+  ],
+  "times": [
+    "athletico_pr",
+    "coritiba",
+    "londrina",
+    "operario_ferroviario",
+    "foz_do_iguacu",
+    "fc_cascavel",
+    "cianorte",
+    "azuriz",
+    "sao_joseense",
+    "maringa_fc",
+    "andraus",
+    "galo_maringa"
+  ]
+}

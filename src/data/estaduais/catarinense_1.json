@@ -1,0 +1,39 @@
+{
+  "id": "catarinense_1",
+  "nome": "Campeonato Catarinense - Série A",
+  "estado": "SC",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 2,
+      "times_por_pote": 6,
+      "jogos_por_time": 6,
+      "classificam_mata_mata": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 3
+  },
+  "classicos": [
+    { "time_a": "avai", "time_b": "figueirense", "nome": "Clássico Avaí-Figueirense", "peso_midia": 4 }
+  ],
+  "times": [
+    "avai",
+    "chapecoense",
+    "criciuma",
+    "figueirense",
+    "carlos_renaux",
+    "joinville",
+    "santa_catarina_ec",
+    "brusque_fc",
+    "camboriu_fc",
+    "concordia_ac",
+    "marcilio_dias",
+    "barra_fc"
+  ]
+}

@@ -126,6 +126,38 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   nesta rodada — nenhum foi adicionado por falta de confirmação do nome
   oficial de cada rivalidade.
 
+## Paraná e Santa Catarina — detalhes pendentes
+
+- **"Andraus" x "Galo Maringá"**: a pesquisa inicial levantou dúvida se
+  seriam o mesmo clube com nome composto. Verificado por fonte: são dois
+  clubes reais e distintos — Andraus (Campo Largo, fundado 2003) e Galo
+  Maringá (Maringá) — e há de fato um terceiro clube de Maringá, o Maringá
+  FC (fundado 2010), tornando a cidade única no campeonato por ter dois
+  representantes.
+- **"Barra FC" (Catarinense)**: a pesquisa inicial errou a cidade (disse
+  Barra Velha). Verificado: o Barra FC que disputa a Série A 2026 é de
+  Balneário Camboriú, fundado em 2013 — corrigido antes de gravar.
+- **Carlos Renaux x Brusque FC**: ambos clubes de Brusque-SC, e o Brusque FC
+  nasceu de uma fusão em 1987 entre o antigo Carlos Renaux e o Paysandu de
+  Brusque — mas a fonte da lista de participantes 2026 os trata como dois
+  clubes atualmente distintos e ativos. Não investiguei a fundo como o
+  Carlos Renaux voltou a existir separadamente após a fusão de 1987;
+  incluí os dois por estarem confirmados como participantes separados da
+  Série A 2026, mas vale checar essa história com mais cuidado.
+- **Operário Ferroviário** e **Londrina**: ambos jogam Série B nacional —
+  movidos para `brasil.json`.
+- **Azuriz**: ano de fundação não encontrado — campo `fundacao` deixado de
+  fora.
+- **Paranaense**: formato de mata-mata e relegação é mais complexo do que o
+  schema representa (grupo de 4 times em "Torneio da Morte" à parte da
+  fase principal) — modelei de forma aproximada; o resultado final
+  confirmado (2 rebaixados: Andraus e Galo Maringá) bate, mas o mecanismo
+  intermediário não está representado.
+- **Catarinense**: mecanismo real de rebaixamento é um quadrangular especial
+  em que o 5º colocado de uma das chaves entra com 1 ponto de vantagem —
+  não representado no schema; usei só o resultado final confirmado (3
+  rebaixados).
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
