@@ -1,0 +1,19 @@
+{
+  "name": "futebol-carreira",
+  "version": "0.1.0",
+  "description": "Simulador de carreira de futebol (base Copero + Brasfoot + Pro Clubs)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
