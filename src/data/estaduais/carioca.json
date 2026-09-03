@@ -1,0 +1,34 @@
+{
+  "id": "carioca_a",
+  "nome": "Campeonato Carioca - Série A",
+  "estado": "RJ",
+  "nivel": 1,
+  "ano_referencia": 2027,
+  "formato": {
+    "turno": {
+      "nome": "Taça Guanabara",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 4
+    },
+    "returno": {
+      "nome": "Taça Rio",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 4
+    },
+    "final_estadual": {
+      "criterio": "campeoes_turno_returno_ou_melhor_campanha",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 4,
+    "vaga_libertadores": 1,
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [
+    { "time_a": "flamengo", "time_b": "fluminense", "nome": "Fla-Flu", "peso_midia": 5 },
+    { "time_a": "flamengo", "time_b": "vasco_da_gama", "nome": "Clássico dos Milhões", "peso_midia": 5 },
+    { "time_a": "vasco_da_gama", "time_b": "botafogo", "nome": "Clássico da Amizade", "peso_midia": 3 }
+  ],
+  "times": ["flamengo", "fluminense", "vasco_da_gama", "botafogo"]
+}

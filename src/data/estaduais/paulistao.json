@@ -1,0 +1,46 @@
+{
+  "id": "paulistao_a1",
+  "nome": "Campeonato Paulista - Série A1",
+  "estado": "SP",
+  "nivel": 1,
+  "ano_referencia": 2027,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 4,
+      "times_por_grupo": 4,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 2
+    },
+    "fase_quadrangular": {
+      "ativa": true,
+      "num_grupos": 2,
+      "times_por_grupo": 4,
+      "classificam_por_grupo": 2
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 4,
+    "vaga_libertadores": 1,
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "corinthians", "time_b": "palmeiras", "nome": "Derby Paulista", "peso_midia": 5 },
+    { "time_a": "sao_paulo", "time_b": "santos", "nome": "Clássico da Vovó", "peso_midia": 4 },
+    { "time_a": "corinthians", "time_b": "sao_paulo", "nome": "Majestoso", "peso_midia": 4 }
+  ],
+  "times": [
+    "corinthians",
+    "palmeiras",
+    "sao_paulo",
+    "santos",
+    "red_bull_bragantino",
+    "guarani",
+    "ponte_preta",
+    "novorizontino",
+    "mirassol"
+  ]
+}

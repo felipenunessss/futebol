@@ -1,0 +1,28 @@
+{
+  "id": "gauchao_a",
+  "nome": "Campeonato Gaúcho",
+  "estado": "RS",
+  "nivel": 1,
+  "ano_referencia": 2027,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 3,
+      "ida_e_volta": true,
+      "classificam_por_grupo": 2
+    },
+    "mata_mata": {
+      "fases": ["final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 2,
+    "vaga_libertadores": 1,
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [
+    { "time_a": "gremio", "time_b": "internacional", "nome": "Grenal", "peso_midia": 5 }
+  ],
+  "times": ["gremio", "internacional", "juventude"]
+}
