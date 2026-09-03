@@ -1,0 +1,39 @@
+{
+  "id": "gauchao_a",
+  "nome": "Campeonato Gaúcho",
+  "estado": "RS",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 2,
+      "times_por_pote": 6,
+      "jogos_por_time": 6,
+      "classificam_mata_mata": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "gremio", "time_b": "internacional", "nome": "Grenal", "peso_midia": 5 }
+  ],
+  "times": [
+    "gremio",
+    "internacional",
+    "juventude",
+    "avenida",
+    "caxias",
+    "guarany_bage",
+    "inter_santa_maria",
+    "monsoon",
+    "novo_hamburgo",
+    "sao_jose_rs",
+    "sao_luiz",
+    "ypiranga_rs"
+  ]
+}

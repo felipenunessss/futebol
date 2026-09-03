@@ -68,6 +68,21 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   classificação cruzada entre grupos. Pode não bater exatamente com o
   regulamento em anos de desempenho desbalanceado entre os grupos.
 
+## Rio Grande do Sul — detalhes pendentes
+
+- **Monsoon Futebol Clube** (1ª divisão): clube real (fundado 2021), mas mudou
+  a sede de Porto Alegre para Capão da Canoa em 2026 — o estádio atual não
+  foi confirmado, campo `estadio` deixado de fora.
+- **8 clubes da Série A2** (Apafut, Brasil-Farroupilha, Esportivo Bento
+  Gonçalves, Sport Clube Gaúcho, Glória, Gramadense, Guarani-VA, União
+  Frederiquense): existência e participação na temporada 2026 confirmadas
+  pela Wikipédia oficial da competição, mas `fundacao`/`estadio` não foram
+  pesquisados individualmente ainda.
+- **Gauchão (1ª divisão)**: vagas de Copa do Brasil/Libertadores não
+  pesquisadas — `premiacao` só tem o rebaixamento confirmado (2 times).
+- Nenhum clube com risco real de duplicata/identidade ambígua foi encontrado
+  nesta rodada (diferente dos casos São Bernardo/Patrocinense).
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

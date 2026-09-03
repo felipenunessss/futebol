@@ -1,0 +1,41 @@
+{
+  "id": "gauchao_a2",
+  "nome": "Campeonato Gaúcho - Série A2",
+  "estado": "RS",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 4,
+      "times_por_grupo": 4,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 2
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "aimore",
+    "apafut",
+    "gremio_bage",
+    "brasil_pelotas",
+    "brasil_farroupilha",
+    "esportivo_bento_goncalves",
+    "sc_gaucho",
+    "gloria",
+    "gramadense",
+    "guarani_va",
+    "lajeadense",
+    "passo_fundo",
+    "pelotas",
+    "santa_cruz_rs",
+    "uniao_frederiquense",
+    "veranopolis"
+  ]
+}
