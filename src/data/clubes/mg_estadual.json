@@ -1,0 +1,22 @@
+[
+  { "id": "urt", "nome": "União Recreativa dos Trabalhadores", "nome_popular": "URT", "pais": "BR", "estado": "MG", "cidade": "Patos de Minas", "fundacao": 1939, "estadio": "Zama Maciel" },
+  { "id": "uberlandia_ec", "nome": "Uberlândia Esporte Clube", "nome_popular": "Uberlândia", "pais": "BR", "estado": "MG", "cidade": "Uberlândia", "fundacao": 1922, "estadio": "Parque do Sabiá" },
+  { "id": "democrata_gv", "nome": "Esporte Clube Democrata", "nome_popular": "Democrata-GV", "pais": "BR", "estado": "MG", "cidade": "Governador Valadares", "fundacao": 1932, "estadio": "José Mammoud Abbas" },
+  { "id": "pouso_alegre", "nome": "Pouso Alegre Futebol Clube", "nome_popular": "Pouso Alegre", "pais": "BR", "estado": "MG", "cidade": "Pouso Alegre", "fundacao": 1913, "estadio": "Municipal Irmão Gino Maria Rossi" },
+  { "id": "north_ec", "nome": "North Esporte Clube", "nome_popular": "North", "pais": "BR", "estado": "MG", "cidade": "Montes Claros", "fundacao": 2022, "estadio": "Juvêncio Augusto Soares" },
+  { "id": "itabirito", "nome": "Itabirito Futebol Clube", "nome_popular": "Itabirito", "pais": "BR", "estado": "MG", "cidade": "Itabirito", "fundacao": 2022 },
+  { "id": "betim_fc", "nome": "Betim Futebol Clube", "nome_popular": "Betim", "pais": "BR", "estado": "MG", "cidade": "Betim", "estadio": "Arena Vera Cruz" },
+
+  { "id": "boa_esporte", "nome": "Boa Esporte Clube", "nome_popular": "Boa Esporte", "pais": "BR", "estado": "MG", "cidade": "Varginha", "fundacao": 1947, "estadio": "Municipal Prefeito Luiz Dilzon de Melo" },
+  { "id": "patrocinense", "nome": "Clube Atlético Patrocinense", "nome_popular": "Patrocinense", "pais": "BR", "estado": "MG", "cidade": "Patrocínio", "fundacao": 1954, "estadio": "Pedro Alves do Nascimento" },
+  { "id": "caldense", "nome": "Associação Atlética Caldense", "nome_popular": "Caldense", "pais": "BR", "estado": "MG", "cidade": "Poços de Caldas", "fundacao": 1925, "estadio": "Municipal Ronaldo Junqueira" },
+  { "id": "guarani_mg", "nome": "Guarani Esporte Clube", "nome_popular": "Guarani-MG", "pais": "BR", "estado": "MG", "cidade": "Divinópolis", "fundacao": 1930, "estadio": "Waldemar Teixeira de Faria" },
+  { "id": "mamore", "nome": "Esporte Clube Mamoré", "nome_popular": "Mamoré", "pais": "BR", "estado": "MG", "cidade": "Patos de Minas", "fundacao": 1949, "estadio": "Bernardo Rubinger de Queiroz" },
+  { "id": "uberaba_sc", "nome": "Uberaba Sport Club", "nome_popular": "Uberaba", "pais": "BR", "estado": "MG", "cidade": "Uberaba", "fundacao": 1917, "estadio": "Municipal João Guido" },
+  { "id": "coimbra_ec", "nome": "Coimbra Esporte Clube", "nome_popular": "Coimbra", "pais": "BR", "estado": "MG", "cidade": "Contagem", "fundacao": 1986 },
+  { "id": "democrata_sl", "nome": "Democrata Futebol Clube", "nome_popular": "Democrata-SL", "pais": "BR", "estado": "MG", "cidade": "Sete Lagoas", "fundacao": 1914, "estadio": "Joaquim Henrique Nogueira" },
+  { "id": "aymores", "nome": "Sport Club Aymorés", "nome_popular": "Aymorés", "pais": "BR", "estado": "MG", "cidade": "Ubá", "fundacao": 1926 },
+  { "id": "valeriodoce", "nome": "Valeriodoce Esporte Clube", "nome_popular": "Valeriodoce", "pais": "BR", "estado": "MG", "cidade": "Itabira", "fundacao": 1942, "estadio": "Israel Pinheiro" },
+  { "id": "villa_nova", "nome": "Villa Nova Atlético Clube", "nome_popular": "Villa Nova", "pais": "BR", "estado": "MG", "cidade": "Nova Lima", "fundacao": 1908, "estadio": "Castor Cifuentes" },
+  { "id": "ipatinga_fc", "nome": "Ipatinga Futebol Clube", "nome_popular": "Ipatinga", "pais": "BR", "estado": "MG", "cidade": "Ipatinga", "fundacao": 1998, "estadio": "João Lamego Netto" }
+]

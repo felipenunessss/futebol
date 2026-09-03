@@ -35,5 +35,7 @@
   { "id": "novorizontino", "nome": "Grêmio Novorizontino", "nome_popular": "Novorizontino", "pais": "BR", "estado": "SP", "cidade": "Novo Horizonte", "fundacao": 1974, "estadio": "Jorjão", "divisao_nacional": "serie_b", "forca_financeira": "muito_baixa" },
   { "id": "mirassol", "nome": "Mirassol Futebol Clube", "nome_popular": "Mirassol", "pais": "BR", "estado": "SP", "cidade": "Mirassol", "fundacao": 1925, "estadio": "Campos Maia", "divisao_nacional": "serie_b", "forca_financeira": "muito_baixa" },
   { "id": "america_mg", "nome": "América Futebol Clube", "nome_popular": "América-MG", "pais": "BR", "estado": "MG", "cidade": "Belo Horizonte", "fundacao": 1912, "estadio": "Independência", "divisao_nacional": "serie_b", "forca_financeira": "baixa" },
+  { "id": "tombense", "nome": "Tombense Futebol Clube", "nome_popular": "Tombense", "pais": "BR", "estado": "MG", "cidade": "Tombos", "fundacao": 1914, "estadio": "Antônio Guimarães de Almeida", "divisao_nacional": "serie_b" },
+  { "id": "athletic_club_mg", "nome": "Athletic Club", "nome_popular": "Athletic", "pais": "BR", "estado": "MG", "cidade": "São João del-Rei", "fundacao": 1909, "estadio": "Arena Unimed", "divisao_nacional": "serie_b" },
   { "id": "remo", "nome": "Clube do Remo", "nome_popular": "Remo", "pais": "BR", "estado": "PA", "cidade": "Belém", "fundacao": 1905, "estadio": "Baenão", "divisao_nacional": "serie_b", "forca_financeira": "baixa" }
 ]

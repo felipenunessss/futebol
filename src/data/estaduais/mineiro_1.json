@@ -1,0 +1,43 @@
+{
+  "id": "mineiro_modulo_1",
+  "nome": "Campeonato Mineiro - Módulo I",
+  "estado": "MG",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 3,
+      "times_por_pote": 4,
+      "jogos_por_time": 8,
+      "classificam_mata_mata": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal"],
+      "ida_e_volta": true
+    },
+    "final_estadual": {
+      "criterio": "cruzamento_dos_classificados_da_fase_suica",
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "cruzeiro", "time_b": "atletico_mg", "nome": "Clássico Mineiro", "peso_midia": 5 }
+  ],
+  "times": [
+    "cruzeiro",
+    "atletico_mg",
+    "america_mg",
+    "urt",
+    "uberlandia_ec",
+    "democrata_gv",
+    "pouso_alegre",
+    "tombense",
+    "betim_fc",
+    "north_ec",
+    "itabirito",
+    "athletic_club_mg"
+  ]
+}

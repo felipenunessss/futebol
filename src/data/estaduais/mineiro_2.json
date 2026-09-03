@@ -1,0 +1,37 @@
+{
+  "id": "mineiro_modulo_2",
+  "nome": "Campeonato Mineiro - Módulo II",
+  "estado": "MG",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 2,
+      "times_por_grupo": 6,
+      "ida_e_volta": true,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "boa_esporte",
+    "patrocinense",
+    "caldense",
+    "guarani_mg",
+    "mamore",
+    "uberaba_sc",
+    "coimbra_ec",
+    "democrata_sl",
+    "aymores",
+    "valeriodoce",
+    "villa_nova",
+    "ipatinga_fc"
+  ]
+}

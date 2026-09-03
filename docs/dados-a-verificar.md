@@ -46,6 +46,28 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   origem em 1961 como outro nome) — campo `fundacao` deixado de fora até
   decidir qual ano usar.
 
+## Minas Gerais — detalhes pendentes
+
+- **Betim Futebol Clube** (Módulo I): há duas histórias de fundação conflitantes
+  nas fontes — um "Betim Futebol Clube" fundado em 2006, e uma entidade fundada
+  em 2008 como "Associação Mineira de Desenvolvimento Humano" que se tornou
+  "Betim Futebol" em 2019 e subiu ao Módulo I em 2024/2025. A existência e
+  participação atual do clube estão confirmadas; o campo `fundacao` foi
+  deixado de fora por não haver consenso de qual é o ano correto.
+- **Itabirito Futebol Clube** e **Sport Club Aymorés**: nome do estádio atual
+  incerto (fontes citam nomes diferentes, possivelmente por reforma/mudança
+  recente) — campo `estadio` deixado de fora.
+- **Coimbra Esporte Clube**: manda jogos ora no Independência (Belo
+  Horizonte), ora no estádio de Contagem — `cidade` ficou como Contagem
+  (sede do clube) mas `estadio` foi deixado de fora pela ambiguidade.
+- **Mineiro Módulo I**: vagas de Copa do Brasil/Libertadores não pesquisadas
+  — `premiacao` só tem o rebaixamento confirmado (2 times).
+- **Mineiro Módulo II**: a regra real de classificação é "melhores 8 no geral
+  entre os 2 grupos de 6", não necessariamente 4 de cada grupo — modelei como
+  `classificam_por_grupo: 4` por aproximação, já que o schema não representa
+  classificação cruzada entre grupos. Pode não bater exatamente com o
+  regulamento em anos de desempenho desbalanceado entre os grupos.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
