@@ -1,0 +1,35 @@
+{
+  "id": "pernambucano_a2",
+  "nome": "Campeonato Pernambucano - Série A2",
+  "estado": "PE",
+  "nivel": 2,
+  "ano_referencia": 2025,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 2,
+      "times_por_grupo": 5,
+      "ida_e_volta": true,
+      "classificam_por_grupo": 2
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "aguia_cumaru",
+    "america_pe",
+    "belo_jardim",
+    "caruaru_city",
+    "centro_limoeirense",
+    "ipojuca",
+    "porto_caruaru",
+    "vera_cruz_pe",
+    "vitoria_tabocas",
+    "ypiranga_pe"
+  ]
+}

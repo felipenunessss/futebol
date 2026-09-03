@@ -1,0 +1,33 @@
+{
+  "id": "pernambucano_a1",
+  "nome": "Campeonato Pernambucano - Série A1",
+  "estado": "PE",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 6
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "sport_recife",
+    "nautico",
+    "santa_cruz",
+    "maguary",
+    "jaguar",
+    "retro",
+    "decisao",
+    "vitoria_tabocas"
+  ]
+}

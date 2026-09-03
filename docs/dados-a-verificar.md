@@ -99,6 +99,33 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 - Vagas de Copa do Brasil/Libertadores da Série A1 não pesquisadas —
   `premiacao` só tem o rebaixamento confirmado (2 times).
 
+## Pernambuco — detalhes pendentes
+
+- **Reforma 2026/27**: a FPF vai fundir Série A1 e A2 num campeonato único
+  de 31 clubes a partir de outubro de 2026. Por isso `pernambucano_1.json`
+  usa a temporada 2026 (último ano no formato separado da A1) e
+  `pernambucano_2.json` usa 2025 (última edição completa da A2 antes da
+  fusão) — os dois arquivos têm `ano_referencia` diferentes de propósito.
+  O formato novo (31 clubes) não foi modelado ainda.
+- **Vitória das Tabocas**: fundação ambígua (origem 1990 vs. refundação
+  2008) — campo `fundacao` deixado de fora, igual ao caso do Boavista-RJ.
+- **Jaguar**: ano de fundação exato não confirmado (só referência relativa
+  de "15 anos" em 2026) — campo `fundacao` deixado de fora.
+- **6 clubes da Série A2** (Águia de Cumaru, América-PE, Caruaru City,
+  Ipojuca, Porto, Ypiranga-PE): fundação/estádio não pesquisados ainda.
+- **Pernambucano A1**: o formato real tem uma assimetria que o schema atual
+  não representa bem — 1º e 2º colocados do turno único avançam direto à
+  semifinal, enquanto só 3º-6º disputam quartas de final. Modelei como
+  `classificam_por_grupo: 6` seguido de quartas+semifinal+final genéricas,
+  o que perde a informação de quem tem passagem direta — a simulação
+  (Fase 2) vai precisar tratar isso à parte se for relevante.
+- **Pernambucano A2**: número de classificados por grupo para a semifinal
+  (assumi 2 por grupo = 4 no total) não foi reconfirmado explicitamente na
+  fonte, é inferência por padrão comum de outros estaduais.
+- Clássicos de Pernambuco (Sport x Náutico, etc.) não foram pesquisados
+  nesta rodada — nenhum foi adicionado por falta de confirmação do nome
+  oficial de cada rivalidade.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

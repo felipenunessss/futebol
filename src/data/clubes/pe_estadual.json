@@ -1,0 +1,17 @@
+[
+  { "id": "maguary", "nome": "Maguary", "nome_popular": "Maguary", "pais": "BR", "estado": "PE", "cidade": "Bonito", "fundacao": 1970, "estadio": "Arthur Tavares de Melo" },
+  { "id": "jaguar", "nome": "Jaguar", "nome_popular": "Jaguar", "pais": "BR", "estado": "PE", "cidade": "Jaboatão dos Guararapes", "estadio": "Arena Pernambuco" },
+  { "id": "retro", "nome": "Retrô Futebol Clube Brasil", "nome_popular": "Retrô", "pais": "BR", "estado": "PE", "cidade": "Camaragibe", "fundacao": 2016, "estadio": "Arena Pernambuco" },
+  { "id": "decisao", "nome": "Decisão", "nome_popular": "Decisão", "pais": "BR", "estado": "PE", "cidade": "Goiana", "estadio": "José Dionísio do Carmo" },
+  { "id": "vitoria_tabocas", "nome": "Associação Acadêmica e Desportiva Vitória das Tabocas", "nome_popular": "Vitória das Tabocas", "pais": "BR", "estado": "PE", "cidade": "Vitória de Santo Antão", "estadio": "Arena Pernambuco" },
+
+  { "id": "aguia_cumaru", "nome": "Águia de Cumaru", "nome_popular": "Águia", "pais": "BR", "estado": "PE", "cidade": "Cumaru" },
+  { "id": "america_pe", "nome": "América Futebol Clube (PE)", "nome_popular": "América-PE", "pais": "BR", "estado": "PE", "cidade": "Recife" },
+  { "id": "belo_jardim", "nome": "Belo Jardim Futebol Clube", "nome_popular": "Belo Jardim", "pais": "BR", "estado": "PE", "cidade": "Belo Jardim", "fundacao": 2005 },
+  { "id": "caruaru_city", "nome": "Caruaru City", "nome_popular": "Caruaru City", "pais": "BR", "estado": "PE", "cidade": "Caruaru" },
+  { "id": "centro_limoeirense", "nome": "Centro Limoeirense de Futebol", "nome_popular": "Centro Limoeirense", "pais": "BR", "estado": "PE", "cidade": "Limoeiro", "fundacao": 1913 },
+  { "id": "ipojuca", "nome": "Ipojuca", "nome_popular": "Ipojuca", "pais": "BR", "estado": "PE", "cidade": "Ipojuca" },
+  { "id": "porto_caruaru", "nome": "Porto", "nome_popular": "Porto", "pais": "BR", "estado": "PE", "cidade": "Caruaru" },
+  { "id": "vera_cruz_pe", "nome": "Vera Cruz Futebol Clube", "nome_popular": "Vera Cruz", "pais": "BR", "estado": "PE", "cidade": "Vitória de Santo Antão", "fundacao": 1960, "estadio": "Severino Cândido Carneiro" },
+  { "id": "ypiranga_pe", "nome": "Sociedade Esportiva Ypiranga Futebol Clube", "nome_popular": "Ypiranga-PE", "pais": "BR", "estado": "PE", "cidade": "Santa Cruz do Capibaribe" }
+]
