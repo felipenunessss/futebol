@@ -158,6 +158,32 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   não representado no schema; usei só o resultado final confirmado (3
   rebaixados).
 
+## Distrito Federal, Goiás, Mato Grosso e Mato Grosso do Sul — detalhes pendentes
+
+- **Ceilândia EC** e **Chapada FC**: ano de fundação incerto (fontes
+  divergem) — campo `fundacao` deixado de fora dos dois.
+- **Real Brasília**: fundação (1996) corresponde à entidade original "Dom
+  Pedro II", que passou por dois rebrandings (2009 e 2020) até o nome
+  atual — mantive 1996 por ser a origem, mas é uma escolha discutível.
+- **Primavera Atlético Clube**: herdou o estádio Cerradão do antigo
+  Primavera EC (dissolvido em 2011), mas a continuidade entre os dois
+  clubes não está 100% confirmada.
+- **Atlético Goianiense**: confirmado jogando Série B nacional 2026 —
+  movido para `brasil.json`, mas continua listado em `times` do
+  `goiano_1.json` por também disputar o estadual.
+- **Anápolis FC, CRAC, Goiatuba, Inhumas, Jataiense** (GO) e **Pantanal FC,
+  Águia Negra, Corumbaense, Costa Rica, CRA** (MS): fundação não
+  pesquisada — cidade e estádio (quando presente) confirmados.
+- **Matogrossense**: número de rebaixados não encontrado nas fontes
+  consultadas — `premiacao` ficou vazio nesse arquivo.
+- **Goiano**: regra real de rebaixamento tem um playoff condicional (10º x
+  11º só se a diferença de pontos for ≤ 6) que o schema não representa —
+  modelei só com `rebaixamento_proxima_divisao: 2` como aproximação.
+- Nenhum caso de clube duplicado/ambíguo do tipo São Bernardo/Patrocinense
+  encontrado — as duas coincidências reais (dois clubes em Várzea Grande-MT
+  dividindo o mesmo estádio; Capital CF e Paranoá EC dividindo o estádio JK
+  em Paranoá-DF) são situações genuínas confirmadas por fonte, não erros.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

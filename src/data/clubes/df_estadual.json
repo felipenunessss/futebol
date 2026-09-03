@@ -1,0 +1,12 @@
+[
+  { "id": "gama", "nome": "Sociedade Esportiva do Gama", "nome_popular": "Gama", "pais": "BR", "estado": "DF", "cidade": "Gama", "fundacao": 1975, "estadio": "Valmir Campelo Bezerra" },
+  { "id": "samambaia", "nome": "Samambaia Futebol Clube", "nome_popular": "Samambaia", "pais": "BR", "estado": "DF", "cidade": "Samambaia", "fundacao": 1993, "estadio": "Joaquim Domingos Roriz" },
+  { "id": "sobradinho", "nome": "Sobradinho Esporte Clube", "nome_popular": "Sobradinho", "pais": "BR", "estado": "DF", "cidade": "Sobradinho", "fundacao": 1975, "estadio": "Augustinho Lima" },
+  { "id": "ceilandia", "nome": "Ceilândia Esporte Clube", "nome_popular": "Ceilândia", "pais": "BR", "estado": "DF", "cidade": "Ceilândia", "estadio": "Abadião" },
+  { "id": "capital_cf", "nome": "Capital Clube de Futebol", "nome_popular": "Capital", "pais": "BR", "estado": "DF", "cidade": "Paranoá", "fundacao": 2005, "estadio": "JK" },
+  { "id": "brasiliense", "nome": "Brasiliense Futebol Clube", "nome_popular": "Brasiliense", "pais": "BR", "estado": "DF", "cidade": "Taguatinga", "fundacao": 2000, "estadio": "Elmo Serejo Farias" },
+  { "id": "real_brasilia", "nome": "Real Brasília Futebol Clube", "nome_popular": "Real Brasília", "pais": "BR", "estado": "DF", "cidade": "Brasília", "fundacao": 1996, "estadio": "Defelê" },
+  { "id": "paranoa", "nome": "Paranoá Esporte Clube", "nome_popular": "Paranoá", "pais": "BR", "estado": "DF", "cidade": "Paranoá", "fundacao": 2000, "estadio": "JK" },
+  { "id": "brasilia_fc", "nome": "Brasília Futebol Clube", "nome_popular": "Brasília", "pais": "BR", "estado": "DF", "cidade": "Brasília", "fundacao": 1975, "estadio": "Nacional Mané Garrincha" },
+  { "id": "aruc", "nome": "Associação Recreativa Cultural Unidos do Cruzeiro", "nome_popular": "ARUC", "pais": "BR", "estado": "DF", "cidade": "Brasília", "fundacao": 1999 }
+]

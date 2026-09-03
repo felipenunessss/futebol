@@ -1,0 +1,11 @@
+[
+  { "id": "operario_vg", "nome": "Clube Esportivo Operário Várzea-Grandense", "nome_popular": "Operário-VG", "pais": "BR", "estado": "MT", "cidade": "Várzea Grande", "fundacao": 1949, "estadio": "Dito Souza" },
+  { "id": "varzea_grande_ec", "nome": "Várzea Grande Esporte Clube", "nome_popular": "Várzea Grande", "pais": "BR", "estado": "MT", "cidade": "Várzea Grande", "fundacao": 2002, "estadio": "Dito Souza" },
+  { "id": "luverdense", "nome": "Luverdense Esporte Clube", "nome_popular": "Luverdense", "pais": "BR", "estado": "MT", "cidade": "Lucas do Rio Verde", "fundacao": 2004, "estadio": "Passo das Emas" },
+  { "id": "mixto", "nome": "Mixto Esporte Clube", "nome_popular": "Mixto", "pais": "BR", "estado": "MT", "cidade": "Cuiabá", "fundacao": 1934, "estadio": "Arena Pantanal" },
+  { "id": "nova_mutum", "nome": "Nova Mutum Esporte Clube", "nome_popular": "Nova Mutum", "pais": "BR", "estado": "MT", "cidade": "Nova Mutum", "fundacao": 1988, "estadio": "Valdir Doilho Wons" },
+  { "id": "sport_sinop", "nome": "Clube Sport Sinop", "nome_popular": "Sport Sinop", "pais": "BR", "estado": "MT", "cidade": "Sinop", "fundacao": 2021, "estadio": "Gigante do Norte" },
+  { "id": "primavera_ac", "nome": "Primavera Atlético Clube", "nome_popular": "Primavera", "pais": "BR", "estado": "MT", "cidade": "Primavera do Leste", "fundacao": 2022, "estadio": "Cerradão" },
+  { "id": "uniao_rondonopolis", "nome": "União Esporte Clube", "nome_popular": "União Rondonópolis", "pais": "BR", "estado": "MT", "cidade": "Rondonópolis", "fundacao": 1973, "estadio": "Engenheiro Luthero Lopes" },
+  { "id": "chapada_fc", "nome": "Chapada Futebol Clube", "nome_popular": "Chapada", "pais": "BR", "estado": "MT", "cidade": "Chapada dos Guimarães", "estadio": "Apolônio Bouret de Mello" }
+]

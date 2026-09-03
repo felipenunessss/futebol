@@ -1,0 +1,37 @@
+{
+  "id": "goiano_1",
+  "nome": "Campeonato Goiano",
+  "estado": "GO",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 3,
+      "times_por_pote": 4,
+      "jogos_por_time": 8,
+      "classificam_mata_mata": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "goias",
+    "vila_nova",
+    "atletico_goianiense",
+    "aparecidense",
+    "anapolina",
+    "abecat",
+    "centro_oeste_go",
+    "anapolis_fc",
+    "crac",
+    "goiatuba",
+    "inhumas",
+    "jataiense"
+  ]
+}

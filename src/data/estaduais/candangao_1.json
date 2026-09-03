@@ -1,0 +1,35 @@
+{
+  "id": "candangao_1",
+  "nome": "Campeonato Brasiliense",
+  "estado": "DF",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "gama",
+    "samambaia",
+    "sobradinho",
+    "ceilandia",
+    "capital_cf",
+    "brasiliense",
+    "real_brasilia",
+    "paranoa",
+    "brasilia_fc",
+    "aruc"
+  ]
+}

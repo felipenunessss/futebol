@@ -1,0 +1,11 @@
+[
+  { "id": "aparecidense", "nome": "Associação Atlética Aparecidense", "nome_popular": "Aparecidense", "pais": "BR", "estado": "GO", "cidade": "Aparecida de Goiânia", "fundacao": 1985, "estadio": "Aníbal Batista de Toledo" },
+  { "id": "anapolina", "nome": "Associação Atlética Anapolina", "nome_popular": "Anapolina", "pais": "BR", "estado": "GO", "cidade": "Anápolis", "fundacao": 1948, "estadio": "Jonas Duarte" },
+  { "id": "abecat", "nome": "Associação Beneficente e Esportiva Catalana e Ouvidorense", "nome_popular": "ABECAT", "pais": "BR", "estado": "GO", "cidade": "Ouvidor", "fundacao": 2016, "estadio": "Luiz Benedito" },
+  { "id": "centro_oeste_go", "nome": "Centro Oeste Futebol Clube", "nome_popular": "Centro Oeste", "pais": "BR", "estado": "GO", "cidade": "Senador Canedo", "fundacao": 2009, "estadio": "Jaime Guerra" },
+  { "id": "anapolis_fc", "nome": "Anápolis Futebol Clube", "nome_popular": "Anápolis FC", "pais": "BR", "estado": "GO", "cidade": "Anápolis", "estadio": "Jonas Duarte" },
+  { "id": "crac", "nome": "CRAC", "nome_popular": "CRAC", "pais": "BR", "estado": "GO", "cidade": "Catalão", "estadio": "Genervino da Fonseca" },
+  { "id": "goiatuba", "nome": "Goiatuba Esporte Clube", "nome_popular": "Goiatuba", "pais": "BR", "estado": "GO", "cidade": "Goiatuba", "estadio": "Divino Garcia Rosa" },
+  { "id": "inhumas", "nome": "Inhumas Esporte Clube", "nome_popular": "Inhumas", "pais": "BR", "estado": "GO", "cidade": "Inhumas", "estadio": "Zico Brandão" },
+  { "id": "jataiense", "nome": "Jataiense Esporte Clube", "nome_popular": "Jataiense", "pais": "BR", "estado": "GO", "cidade": "Jataí", "estadio": "Arapucão" }
+]

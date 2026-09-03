@@ -1,0 +1,33 @@
+{
+  "id": "matogrossense_1",
+  "nome": "Campeonato Matogrossense",
+  "estado": "MT",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 6
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "cuiaba",
+    "operario_vg",
+    "varzea_grande_ec",
+    "luverdense",
+    "mixto",
+    "nova_mutum",
+    "sport_sinop",
+    "primavera_ac",
+    "uniao_rondonopolis",
+    "chapada_fc"
+  ]
+}

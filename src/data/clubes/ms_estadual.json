@@ -1,0 +1,12 @@
+[
+  { "id": "operario_ms", "nome": "Operário Futebol Clube", "nome_popular": "Operário-MS", "pais": "BR", "estado": "MS", "cidade": "Campo Grande", "fundacao": 1938, "estadio": "Moreninhas" },
+  { "id": "pantanal_fc", "nome": "Pantanal Futebol Clube", "nome_popular": "Pantanal", "pais": "BR", "estado": "MS", "cidade": "Ladário" },
+  { "id": "aguia_negra", "nome": "Esporte Clube Águia Negra", "nome_popular": "Águia Negra", "pais": "BR", "estado": "MS", "cidade": "Rio Brilhante" },
+  { "id": "corumbaense", "nome": "Corumbaense Futebol Clube", "nome_popular": "Corumbaense", "pais": "BR", "estado": "MS", "cidade": "Corumbá" },
+  { "id": "costa_rica_ms", "nome": "Costa Rica Esporte Clube", "nome_popular": "Costa Rica", "pais": "BR", "estado": "MS", "cidade": "Costa Rica" },
+  { "id": "cra_aquidauana", "nome": "Clube de Regatas Aquidauana", "nome_popular": "CRA", "pais": "BR", "estado": "MS", "cidade": "Aquidauana" },
+  { "id": "bataguassu", "nome": "Associação Atlética Bataguassu", "nome_popular": "Bataguassu", "pais": "BR", "estado": "MS", "cidade": "Bataguassu", "fundacao": 2006 },
+  { "id": "naviraiense", "nome": "Clube Esportivo Naviraiense", "nome_popular": "Naviraiense", "pais": "BR", "estado": "MS", "cidade": "Naviraí", "fundacao": 2005 },
+  { "id": "dourados_ac", "nome": "Dourados Atlético Clube", "nome_popular": "DAC", "pais": "BR", "estado": "MS", "cidade": "Dourados" },
+  { "id": "ivinhema", "nome": "Ivinhema Futebol Clube", "nome_popular": "Ivinhema", "pais": "BR", "estado": "MS", "cidade": "Ivinhema", "fundacao": 2006 }
+]

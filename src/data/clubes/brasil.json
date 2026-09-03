@@ -39,5 +39,6 @@
   { "id": "athletic_club_mg", "nome": "Athletic Club", "nome_popular": "Athletic", "pais": "BR", "estado": "MG", "cidade": "São João del-Rei", "fundacao": 1909, "estadio": "Arena Unimed", "divisao_nacional": "serie_b" },
   { "id": "remo", "nome": "Clube do Remo", "nome_popular": "Remo", "pais": "BR", "estado": "PA", "cidade": "Belém", "fundacao": 1905, "estadio": "Baenão", "divisao_nacional": "serie_b", "forca_financeira": "baixa" },
   { "id": "operario_ferroviario", "nome": "Operário Ferroviário Esporte Clube", "nome_popular": "Operário-PR", "pais": "BR", "estado": "PR", "cidade": "Ponta Grossa", "fundacao": 1912, "estadio": "Germano Krüger", "divisao_nacional": "serie_b" },
-  { "id": "londrina", "nome": "Londrina Esporte Clube", "nome_popular": "Londrina", "pais": "BR", "estado": "PR", "cidade": "Londrina", "fundacao": 1956, "estadio": "Estádio do Café", "divisao_nacional": "serie_b" }
+  { "id": "londrina", "nome": "Londrina Esporte Clube", "nome_popular": "Londrina", "pais": "BR", "estado": "PR", "cidade": "Londrina", "fundacao": 1956, "estadio": "Estádio do Café", "divisao_nacional": "serie_b" },
+  { "id": "atletico_goianiense", "nome": "Atlético Clube Goianiense", "nome_popular": "Atlético-GO", "pais": "BR", "estado": "GO", "cidade": "Goiânia", "fundacao": 1937, "estadio": "Antônio Accioly", "divisao_nacional": "serie_b" }
 ]

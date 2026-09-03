@@ -1,0 +1,35 @@
+{
+  "id": "sul_matogrossense_1",
+  "nome": "Campeonato Sul-Mato-Grossense",
+  "estado": "MS",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 6
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "operario_ms",
+    "pantanal_fc",
+    "aguia_negra",
+    "corumbaense",
+    "costa_rica_ms",
+    "cra_aquidauana",
+    "bataguassu",
+    "naviraiense",
+    "dourados_ac",
+    "ivinhema"
+  ]
+}
