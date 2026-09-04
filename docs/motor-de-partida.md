@@ -43,6 +43,70 @@ finanças médias precisa ser competitivo na simulação.
   real pros clubes com cobertura e calibrar a fórmula de fallback pros
   demais — frente de pesquisa separada, tamanho parecido com o que já
   fizemos pra elenco/formato dos campeonatos.
+- **Status: parcialmente resolvida** — ver seção 1.1 abaixo pro relatório
+  da rodada de pesquisa que populou `rating_inicial` real pro Brasileirão
+  Série A e pras 9 primeiras divisões CONMEBOL.
+
+### 1.1. Pendência de dados — resolvida parcialmente (Série A + CONMEBOL)
+
+**Fonte usada**: [clubelo.com](https://clubelo.com) (Club Elo), snapshot do
+dia **2026-09-04**. A API dedicada (`api.clubelo.com`, CSV) não ficou
+acessível pro ambiente de pesquisa (timeout de rede); em vez disso, os
+ratings foram extraídos de uma tabela por país **embutida no HTML** da
+página `clubelo.com/Brazil` (o site carrega, na mesma resposta, um
+accordion de navegação com a tabela completa — clube, sigla, Elo — de
+90 países, incluindo os 10 alvo desta rodada). Escala usada é a nativa do
+Club Elo (mesma convenção de Elo de clube de futebol, tipicamente
+1000-2100 pra times de elite mundial) — os valores foram só arredondados
+pro inteiro mais próximo, sem normalização ou reescala.
+
+**Cobertura por competição** (clubes com `rating_inicial` populado / total
+de clubes na competição):
+
+| Competição | Confirmados |
+|---|---|
+| Brasileirão Série A | 20/20 |
+| Argentina — Liga Profesional | 30/30 |
+| Bolívia — Primera División | 16/16 |
+| Chile — Primera División | 16/16 |
+| Colômbia — Liga BetPlay (Primera A) | 19/20 |
+| Equador — LigaPro | 16/16 |
+| Paraguai — Primera División | 12/12 |
+| Peru — Liga 1 | 17/18 |
+| Uruguai — Primera División | 16/16 |
+| Venezuela — Liga FUTVE | 14/14 |
+| **Total** | **176/178** |
+
+**Casos de baixa confiança / ambiguidade ao casar nome da fonte com `id` da
+base** (documentados nos commits de cada país também):
+
+- **`internacional_de_bogota` (Colômbia)**: sem `rating_inicial` — não achei
+  entrada correspondente na fonte (clube pequeno/recém-promovido, sem
+  histórico suficiente pro Club Elo calcular rating).
+- **`juan_pablo_ii` (Peru)**: sem `rating_inicial` — a fonte lista **duas**
+  entradas com o nome truncado idêntico "Juan Pablo II Co" (1358 e 1349),
+  sem forma de saber qual delas é o clube certo. Não inventei qual usar.
+- **`alianza_valledupar` (Colômbia)**: casado com a entrada "Alianza
+  Petrolera" da fonte (rating 1482) — confirmado por busca que é o mesmo
+  clube (mesmo dono/CNPJ), que só se mudou de Barrancabermeja pra
+  Valledupar e trocou de nome/escudo em 2024. O Club Elo mantém o
+  histórico sob o nome antigo.
+- **`cusco_fc` e `deportivo_moquegua` (Peru)**: casados com entradas antigas
+  da fonte ("Real Garcilaso" 1510 e "UCV Moquegua" 1361) — confirmado por
+  busca que são o mesmo clube antes de renomear: Real Garcilaso virou
+  Cusco FC em 2019; UCV Moquegua (clube-satélite de Universidad César
+  Vallejo) virou Deportivo Moquegua em 2024.
+- **Nomes truncados a 16 caracteres** na tabela-fonte (ex: "Estudiantes (RC)"
+  aparece como "Río Cuarto" na fonte, "Ath Paranaense", "Argentinos Junio")
+  exigiram casar por sigla (TLC) e slug da URL do clube, não só pelo nome —
+  risco residual de erro nesses casos é baixo (sigla + contexto batem), mas
+  vale reconferir se algum resultado de simulação parecer estranho pra um
+  desses clubes específicos.
+
+**Cobertura fora do escopo desta rodada** (não mexi, fica pra próxima
+pesquisa se algum dia for necessário): 2ª divisões de todos os países,
+Copa do Brasil, Libertadores/Sul-Americana, e qualquer campeonato estadual
+brasileiro — todos continuam usando só o fallback de `calcularRatingFallback`.
 
 ## 2. Motor de partida — duelo por zona (estilo FM/Brasfoot)
 
