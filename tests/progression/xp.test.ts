@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { aplicarXpAtributo, calcularNotaPartida, calcularXpPartida, converterChancesEmDesempenho, type DesempenhoPartida } from "../../src/progression/xp.js";
+import {
+  aplicarXpAtributo,
+  aplicarXpPartidaAoJogador,
+  calcularNotaPartida,
+  calcularXpPartida,
+  converterChancesEmDesempenho,
+  type DesempenhoPartida,
+} from "../../src/progression/xp.js";
+import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import type { ChanceJogador } from "../../src/simulation/match.js";
 
 function desempenho(overrides: Partial<DesempenhoPartida> = {}): DesempenhoPartida {
@@ -124,5 +132,68 @@ describe("aplicarXpAtributo", () => {
     const semMultiplicador = aplicarXpAtributo(50, 100, 1);
     const comMultiplicador = aplicarXpAtributo(50, 100, 2);
     expect(comMultiplicador).toBeGreaterThan(semMultiplicador);
+  });
+});
+
+describe("aplicarXpPartidaAoJogador", () => {
+  const finalizador = buscarArquetipo("finalizador"); // prioritários: finalizacao, posicionamento_ofensivo, frieza
+
+  function jogadorBase(): Jogador {
+    return {
+      id: "j1",
+      nome: "Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 22,
+      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 50])),
+    };
+  }
+
+  it("sobe o atributo usado numa chance específica", () => {
+    const jogador = jogadorBase();
+    const chances: ChanceJogador[] = [chance({ subtipo: "cabeceio", sucesso: true, atributoUsado: "cabeceio" })];
+
+    const atributos = aplicarXpPartidaAoJogador(jogador, finalizador, chances, 100);
+
+    expect(atributos.cabeceio!).toBeGreaterThan(jogador.atributos.cabeceio!);
+  });
+
+  it("chance sem sucesso ainda rende XP pro atributo, só que menos que uma bem-sucedida", () => {
+    const jogador = jogadorBase();
+    const comSucesso = aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "cabeceio", sucesso: true })], 100);
+    const semSucesso = aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "cabeceio", sucesso: false })], 100);
+
+    expect(comSucesso.cabeceio!).toBeGreaterThan(semSucesso.cabeceio!);
+    expect(semSucesso.cabeceio!).toBeGreaterThan(jogador.atributos.cabeceio!); // ainda aprende algo com o erro
+  });
+
+  it("atributo prioritário do arquétipo cresce mais que um não-prioritário com o mesmo XP de chance", () => {
+    const jogador = jogadorBase();
+    const chancesPrioritario: ChanceJogador[] = [chance({ atributoUsado: "finalizacao" })]; // prioritário do Finalizador
+    const chancesNaoPrioritario: ChanceJogador[] = [chance({ atributoUsado: "velocidade" })]; // não é prioritário
+
+    const comPrioritario = aplicarXpPartidaAoJogador(jogador, finalizador, chancesPrioritario, 100);
+    const comNaoPrioritario = aplicarXpPartidaAoJogador(jogador, finalizador, chancesNaoPrioritario, 100);
+
+    const ganhoPrioritario = comPrioritario.finalizacao! - jogador.atributos.finalizacao!;
+    const ganhoNaoPrioritario = comNaoPrioritario.velocidade! - jogador.atributos.velocidade!;
+
+    expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
+  });
+
+  it("mesmo sem nenhuma chance, o XP geral ainda distribui crescimento pelos atributos da posição", () => {
+    const jogador = jogadorBase();
+    const atributos = aplicarXpPartidaAoJogador(jogador, finalizador, [], 100);
+
+    for (const atributo of ATRIBUTOS_POR_POSICAO.atacante) {
+      expect(atributos[atributo]!).toBeGreaterThan(jogador.atributos[atributo]!);
+    }
+  });
+
+  it("não muta o objeto de atributos original do jogador", () => {
+    const jogador = jogadorBase();
+    const valorOriginal = jogador.atributos.finalizacao;
+    aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "finalizacao" })], 100);
+    expect(jogador.atributos.finalizacao).toBe(valorOriginal);
   });
 });
