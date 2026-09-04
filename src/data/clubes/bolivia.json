@@ -4,6 +4,7 @@
   { "id": "blooming", "nome": "Club Blooming", "nome_popular": "Blooming", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
   { "id": "bolivar", "nome": "Club Bolívar", "nome_popular": "Bolívar", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
   { "id": "guabira", "nome": "Club Deportivo Guabirá", "nome_popular": "Guabirá", "pais": "BO", "cidade": "Montero", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "gv_san_jose", "nome": "Club Gualberto Villarroel Deportivo San José", "nome_popular": "GV San José", "pais": "BO", "cidade": "Oruro", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
   { "id": "independiente_petrolero", "nome": "Club Independiente Petrolero", "nome_popular": "Independiente Petrolero", "pais": "BO", "cidade": "Sucre", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
   { "id": "nacional_potosi", "nome": "Club Atlético Nacional Potosí", "nome_popular": "Nacional Potosí", "pais": "BO", "cidade": "Potosí", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
   { "id": "oriente_petrolero", "nome": "Club Deportivo Oriente Petrolero", "nome_popular": "Oriente Petrolero", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
