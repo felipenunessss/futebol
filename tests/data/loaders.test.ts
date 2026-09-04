@@ -50,7 +50,9 @@ describe("campeonatos nacionais", () => {
     expect(validarReferenciasDeTimes(clubes, nacionais)).toEqual([]);
   });
 
-  it("times de cada campeonato nacional têm o divisao_nacional correspondente", () => {
+  it("times de cada liga nacional têm o divisao_nacional correspondente", () => {
+    // nivel 0 é reservado para copas de mata-mata puro (ex: Copa do Brasil),
+    // que misturam clubes de várias séries de propósito — não entram nessa checagem.
     const clubes = loadClubes();
     const clubePorId = new Map(clubes.map((c) => [c.id, c]));
     const nivelParaDivisao: Record<number, string> = {
@@ -62,6 +64,7 @@ describe("campeonatos nacionais", () => {
 
     for (const nacional of loadCampeonatosNacionais()) {
       const divisaoEsperada = nivelParaDivisao[nacional.nivel];
+      if (!divisaoEsperada) continue;
       for (const timeId of nacional.times) {
         expect(clubePorId.get(timeId)?.divisao_nacional).toBe(divisaoEsperada);
       }

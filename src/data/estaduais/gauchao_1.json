@@ -22,7 +22,8 @@
   },
   "premiacao": {
     "rebaixamento_proxima_divisao": 2,
-    "vaga_serie_d": 1
+    "vaga_serie_d": 1,
+    "vaga_serie_d_criterio": "Melhor colocado sem competição nacional do Gaúcho 2025"
   },
   "classicos": [
     {

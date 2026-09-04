@@ -21,7 +21,8 @@
   },
   "premiacao": {
     "rebaixamento_proxima_divisao": 2,
-    "vaga_serie_d": 3
+    "vaga_serie_d": 3,
+    "vaga_serie_d_criterio": "Melhor(es) colocado(s) sem competição nacional do estadual 2025 — posição exata não confirmada"
   },
   "classicos": [],
   "times": [

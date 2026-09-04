@@ -21,7 +21,8 @@
     }
   },
   "premiacao": {
-    "vaga_serie_d": 1
+    "vaga_serie_d": 1,
+    "vaga_serie_d_criterio": "2º melhor colocado sem competição nacional do Matogrossense 2025"
   },
   "classicos": [],
   "times": [

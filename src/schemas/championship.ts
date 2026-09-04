@@ -64,10 +64,14 @@ export interface FormatoEstadual {
 
 export interface Premiacao {
   vaga_copa_do_brasil?: number;
+  /** Como as vagas de vaga_copa_do_brasil são distribuídas (texto livre, ex: "campeão e vice da 1ª divisão"). */
+  vaga_copa_do_brasil_criterio?: string;
   vaga_libertadores?: number;
   vaga_sulamericana?: number;
   /** Vagas na Série D nacional concedidas via resultado do estadual (critério varia por federação). */
   vaga_serie_d?: number;
+  /** Como as vagas de vaga_serie_d são distribuídas (texto livre; regra padrão quando não pesquisado: melhor(es) colocado(s) sem competição nacional). */
+  vaga_serie_d_criterio?: string;
   acesso_proxima_divisao?: number;
   rebaixamento_proxima_divisao?: number;
 }

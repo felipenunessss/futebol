@@ -12,19 +12,40 @@
       "classificam_mata_mata": 8
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
     "vaga_copa_do_brasil": 4,
     "vaga_libertadores": 1,
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 1,
+    "vaga_serie_d_criterio": "Regra padrão (não pesquisada especificamente): melhor colocado da 1ª divisão sem competição nacional"
   },
   "classicos": [
-    { "time_a": "corinthians", "time_b": "palmeiras", "nome": "Derby Paulista", "peso_midia": 5 },
-    { "time_a": "sao_paulo", "time_b": "santos", "nome": "Clássico da Vovó", "peso_midia": 4 },
-    { "time_a": "corinthians", "time_b": "sao_paulo", "nome": "Majestoso", "peso_midia": 4 }
+    {
+      "time_a": "corinthians",
+      "time_b": "palmeiras",
+      "nome": "Derby Paulista",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "sao_paulo",
+      "time_b": "santos",
+      "nome": "Clássico da Vovó",
+      "peso_midia": 4
+    },
+    {
+      "time_a": "corinthians",
+      "time_b": "sao_paulo",
+      "nome": "Majestoso",
+      "peso_midia": 4
+    }
   ],
   "times": [
     "corinthians",

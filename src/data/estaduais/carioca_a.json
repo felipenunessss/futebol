@@ -24,7 +24,8 @@
     "vaga_copa_do_brasil": 4,
     "vaga_libertadores": 1,
     "rebaixamento_proxima_divisao": 1,
-    "vaga_serie_d": 1
+    "vaga_serie_d": 1,
+    "vaga_serie_d_criterio": "2º melhor colocado sem competição nacional do Carioca 2025"
   },
   "classicos": [
     {

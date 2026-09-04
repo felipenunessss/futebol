@@ -12,15 +12,26 @@
       "classificam_por_grupo": 8
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 1,
+    "vaga_serie_d_criterio": "Regra padrão (não pesquisada especificamente): melhor colocado da 1ª divisão sem competição nacional"
   },
   "classicos": [
-    { "time_a": "vitoria_es", "time_b": "rio_branco_es", "nome": "Vi-Rio", "peso_midia": 5 }
+    {
+      "time_a": "vitoria_es",
+      "time_b": "rio_branco_es",
+      "nome": "Vi-Rio",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "rio_branco_es",

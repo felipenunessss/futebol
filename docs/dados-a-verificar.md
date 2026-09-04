@@ -317,6 +317,39 @@ nesta rodada (confirmei só nome/cidade).
   (4 semifinalistas + 2 vencedores de um playoff entre eliminados nas
   quartas) — aumentou de 4 para 6 nesta edição.
 
+## Copa do Brasil e lógica de resolução de vagas — o que foi construído
+
+- **Copa do Brasil 2026**: 126 clubes reais em 9 fases (entrada escalonada
+  por ranking CBF; Série A só entra na 5ª fase; campeões de Série C/D/
+  Copa Verde/Copa Nordeste entram na 3ª). Modelado com os 60 clubes de
+  confiança alta (todos os de Série A/B/C) em `times[]`; os ~66 restantes
+  (entradas via estadual, ranking CBF, Copa Verde, Copa Nordeste) não
+  foram pesquisados individualmente — dependem da mesma lógica de
+  resolução de vagas descrita abaixo, aplicada quando houver
+  classificação real dos estaduais.
+- **`nivel: 0`** foi reservado para competições de mata-mata puro fora da
+  hierarquia vertical A→B→C→D (hoje só a Copa do Brasil) — o teste que
+  confere `divisao_nacional` por nível pula esse caso de propósito.
+
+- **Lógica de resolução criada** (`src/data/loaders/vagas-nacionais.ts`,
+  função `resolverVagasEstaduais`): dado o número de vagas de um estadual
+  (`premiacao.vaga_serie_d` ou `vaga_copa_do_brasil`) e a classificação
+  final dessa competição, retorna os N melhores colocados que ainda não
+  disputam nenhuma competição nacional. Cobre tanto "só o campeão" quanto
+  "campeão e vice" sem precisar de um branch por critério — a posição
+  exata só muda o N. Testada com dados sintéticos (não há classificação
+  real ainda, isso depende do motor de simulação da Fase 2).
+- **`vaga_serie_d_criterio`** (novo campo, texto livre) documenta como
+  cada estadual distribui as vagas confirmadas por pesquisa; onde não foi
+  possível confirmar a posição exata, ficou registrado como "melhor(es)
+  colocado(s) sem competição nacional — posição exata não confirmada",
+  que é justamente o comportamento padrão da função de resolução.
+- **3 estaduais sem pesquisa dedicada de Série D** (`paulistao_a1`,
+  `candangao_1`, `capixaba_1`) receberam a regra padrão (1 vaga, melhor
+  colocado sem competição nacional) em vez de ficarem sem nada — vale
+  revisar contra fonte real depois, especialmente São Paulo, que
+  provavelmente tem mais de 1 vaga por ser um estado grande.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

@@ -21,7 +21,8 @@
   },
   "premiacao": {
     "rebaixamento_proxima_divisao": 2,
-    "vaga_serie_d": 4
+    "vaga_serie_d": 4,
+    "vaga_serie_d_criterio": "4 vagas confirmadas (Atlético de Alagoinhas, Jacuipense, Juazeirense, Porto) — critério exato de posição não determinado"
   },
   "classicos": [
     {
