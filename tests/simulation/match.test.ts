@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
-import { gerarPerfilTime, probabilidadeDeVencer, resolverChanceJogador, simularPartida, type PerfilTime } from "../../src/simulation/match.js";
+import {
+  gerarPerfilTime,
+  probabilidadeDeVencer,
+  resolverChanceJogador,
+  simularPartida,
+  type ParticipacaoJogador,
+  type PerfilTime,
+} from "../../src/simulation/match.js";
 
 describe("gerarPerfilTime", () => {
   it("com random determinístico em 0.5 (sem ruído), as 3 zonas ficam exatamente no rating", () => {
@@ -51,6 +58,65 @@ describe("simularPartida", () => {
     expect(resultado.chancesFora).toBeGreaterThanOrEqual(0);
     expect(resultado.golsCasa).toBeGreaterThanOrEqual(0);
     expect(resultado.golsFora).toBeGreaterThanOrEqual(0);
+  });
+
+  it("sem participação do jogador, chancesJogador fica vazio", () => {
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, () => 0.5);
+    expect(resultado.chancesJogador).toEqual([]);
+  });
+
+  it("com um atacante em campo e random sempre no início da faixa, todas as chances do lado dele viram chance individual", () => {
+    const finalizador = buscarArquetipo("finalizador");
+    const artilheiro: Jogador = {
+      id: "j1",
+      nome: "Artilheiro Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 24,
+      atributos: { finalizacao: 90, frieza: 80, posicionamento_ofensivo: 80 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador: artilheiro, estiloTecnico: "equilibrado" };
+
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, () => 0, participacao);
+
+    expect(resultado.chancesJogador).toHaveLength(resultado.chancesCasa);
+    // random sempre 0 força sucesso em cada duelo (ver resolverDuelo) — todo gol de casa veio do jogador
+    expect(resultado.golsCasa).toBe(resultado.chancesCasa);
+  });
+
+  it("goleiro nunca recebe chance de ataque, mesmo com peso de sorteio favorável (random sempre 0)", () => {
+    const muralha = buscarArquetipo("muralha");
+    const goleiro: Jogador = {
+      id: "g1",
+      nome: "Goleiro Teste",
+      posicao: "goleiro",
+      arquetipo_id: muralha.id,
+      idade: 28,
+      atributos: { reflexos: 90 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador: goleiro, estiloTecnico: "equilibrado" };
+
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, () => 0, participacao);
+
+    expect(resultado.chancesJogador).toEqual([]);
+  });
+
+  it("participação do jogador funciona igual quando ele está no time visitante", () => {
+    const finalizador = buscarArquetipo("finalizador");
+    const artilheiro: Jogador = {
+      id: "j1",
+      nome: "Artilheiro Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 24,
+      atributos: { finalizacao: 90 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "fora", jogador: artilheiro, estiloTecnico: "equilibrado" };
+
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, () => 0, participacao);
+
+    expect(resultado.chancesJogador).toHaveLength(resultado.chancesFora);
+    expect(resultado.golsFora).toBe(resultado.chancesFora);
   });
 });
 
