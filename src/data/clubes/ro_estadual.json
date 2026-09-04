@@ -1,0 +1,9 @@
+[
+  { "id": "porto_velho_ec", "nome": "Gazin Porto Velho Esporte Clube", "nome_popular": "Porto Velho", "pais": "BR", "estado": "RO", "cidade": "Porto Velho" },
+  { "id": "rondoniense_ro", "nome": "Rondoniense", "nome_popular": "Rondoniense", "pais": "BR", "estado": "RO", "cidade": "Porto Velho" },
+  { "id": "genus", "nome": "Genus Futebol Clube", "nome_popular": "Genus", "pais": "BR", "estado": "RO", "cidade": "Porto Velho" },
+  { "id": "barcelona_ro", "nome": "Barcelona Futebol Clube (RO)", "nome_popular": "Barcelona-RO", "pais": "BR", "estado": "RO", "cidade": "Porto Velho" },
+  { "id": "ji_parana", "nome": "Ji-Paraná Futebol Clube", "nome_popular": "Ji-Paraná", "pais": "BR", "estado": "RO", "cidade": "Ji-Paraná" },
+  { "id": "uniao_cacoalense", "nome": "União Cacoalense", "nome_popular": "União Cacoalense", "pais": "BR", "estado": "RO", "cidade": "Cacoal" },
+  { "id": "guapore_fc", "nome": "Guaporé Futebol Clube", "nome_popular": "Guaporé", "pais": "BR", "estado": "RO", "cidade": "Rolim de Moura", "estadio": "Cassolão" }
+]

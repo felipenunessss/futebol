@@ -1,0 +1,33 @@
+{
+  "id": "amazonense_1",
+  "nome": "Campeonato Amazonense",
+  "estado": "AM",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "amazonas_fc",
+    "manaus_fc",
+    "itacoatiara",
+    "nacional_am",
+    "manauara",
+    "parintins",
+    "princesa_do_solimoes",
+    "sao_raimundo_am"
+  ]
+}

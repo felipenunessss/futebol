@@ -1,0 +1,12 @@
+[
+  { "id": "bragantino_pa", "nome": "Bragantino Clube do Pará", "nome_popular": "Bragantino-PA", "pais": "BR", "estado": "PA", "cidade": "Bragança" },
+  { "id": "castanhal", "nome": "Castanhal Esporte Clube", "nome_popular": "Castanhal", "pais": "BR", "estado": "PA", "cidade": "Castanhal" },
+  { "id": "tuna_luso", "nome": "Tuna Luso Brasileira", "nome_popular": "Tuna Luso", "pais": "BR", "estado": "PA", "cidade": "Belém" },
+  { "id": "aguia_de_maraba", "nome": "Águia de Marabá Futebol Clube", "nome_popular": "Águia de Marabá", "pais": "BR", "estado": "PA", "cidade": "Marabá" },
+  { "id": "capitao_poco", "nome": "Capitão Poço Futebol Clube", "nome_popular": "Capitão Poço", "pais": "BR", "estado": "PA", "cidade": "Capitão Poço" },
+  { "id": "santa_rosa_pa", "nome": "Santa Rosa Esporte Clube", "nome_popular": "Santa Rosa", "pais": "BR", "estado": "PA", "cidade": "Belém" },
+  { "id": "cameta", "nome": "Cametá Esporte Clube", "nome_popular": "Cametá", "pais": "BR", "estado": "PA", "cidade": "Cametá" },
+  { "id": "sao_francisco_pa", "nome": "São Francisco Futebol Clube (PA)", "nome_popular": "São Francisco", "pais": "BR", "estado": "PA", "cidade": "Santarém" },
+  { "id": "sao_raimundo_pa", "nome": "São Raimundo Esporte Clube (PA)", "nome_popular": "São Raimundo-PA", "pais": "BR", "estado": "PA", "cidade": "Santarém" },
+  { "id": "amazonia_pa", "nome": "Amazônia Independente Futebol Clube", "nome_popular": "Amazônia", "pais": "BR", "estado": "PA", "cidade": "Santarém" }
+]

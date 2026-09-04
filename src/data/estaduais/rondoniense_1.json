@@ -1,0 +1,30 @@
+{
+  "id": "rondoniense_1",
+  "nome": "Campeonato Rondoniense",
+  "estado": "RO",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 7,
+      "ida_e_volta": true,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "porto_velho_ec",
+    "rondoniense_ro",
+    "genus",
+    "barcelona_ro",
+    "ji_parana",
+    "uniao_cacoalense",
+    "guapore_fc"
+  ]
+}

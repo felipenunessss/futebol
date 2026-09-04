@@ -1,0 +1,37 @@
+{
+  "id": "paraense_1",
+  "nome": "Campeonato Paraense",
+  "estado": "PA",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 2,
+      "times_por_pote": 6,
+      "jogos_por_time": 6,
+      "classificam_mata_mata": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [
+    { "time_a": "remo", "time_b": "paysandu", "nome": "Re-Pa", "peso_midia": 5 }
+  ],
+  "times": [
+    "remo",
+    "paysandu",
+    "bragantino_pa",
+    "castanhal",
+    "tuna_luso",
+    "aguia_de_maraba",
+    "capitao_poco",
+    "santa_rosa_pa",
+    "cameta",
+    "sao_francisco_pa",
+    "sao_raimundo_pa",
+    "amazonia_pa"
+  ]
+}

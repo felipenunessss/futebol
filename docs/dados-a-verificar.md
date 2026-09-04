@@ -198,6 +198,26 @@ nesta rodada (confirmei só nome/cidade).
 - Clássicos de Alagoas e Piauí não foram pesquisados/adicionados por falta
   de confirmação do nome oficial de cada rivalidade.
 
+## Pará, Amazonas, Tocantins e Rondônia — detalhes pendentes
+
+- **Paysandu** (PA) e **Amazonas FC** (AM): confirmados jogando Série C
+  nacional 2026 — movidos para `brasil.json`.
+- **Paraense**: duas fontes divergiram sobre a lista de 12 clubes (uma
+  citou "Caeté" e "Independente" em vez de "São Raimundo" e "Amazônia") —
+  usei a lista da fonte que citava explicitamente "Parazão 2026" e o
+  mecanismo de acesso via Série A2, mas vale checar contra o site oficial
+  da FPF antes de considerar definitivo. Número de rebaixados não
+  confirmado — `premiacao` ficou vazio.
+- **Amazonense**: rebaixamento modelado como 1 time por inferência (uma
+  fonte mencionou "Sete foi rebaixado" na edição anterior) — não é uma
+  confirmação direta da regra atual.
+- **Rondoniense**: só 7 clubes na 1ª divisão (número ímpar, incomum) —
+  confirmado por múltiplas fontes, não é engano. Vagas de Copa do Brasil/
+  Série D para campeão e vice não modeladas no schema.
+- Clássicos de Amazonas, Tocantins e Rondônia não foram pesquisados/
+  adicionados por falta de confirmação do nome oficial de cada rivalidade
+  (Re-Pa do Pará foi adicionado por ser amplamente conhecido).
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

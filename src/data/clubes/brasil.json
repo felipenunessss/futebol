@@ -463,5 +463,24 @@
     "estado": "AL",
     "cidade": "Maceió",
     "divisao_nacional": "serie_d"
+  },
+  {
+    "id": "paysandu",
+    "nome": "Paysandu Sport Club",
+    "nome_popular": "Paysandu",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Belém",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "amazonas_fc",
+    "nome": "Amazonas Futebol Clube",
+    "nome_popular": "Amazonas",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus",
+    "estadio": "Carlos Zamith",
+    "divisao_nacional": "serie_c"
   }
 ]
