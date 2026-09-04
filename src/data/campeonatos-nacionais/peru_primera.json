@@ -5,8 +5,9 @@
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
-    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
-    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
+    "tabela_acumulada": { "criterio": "soma_dos_pontos_de_apertura_e_clausura_define_playoffs_vagas_internacionais_e_rebaixamento" },
     "final_estadual": { "criterio": "playoffs_com_campeoes_do_apertura_clausura_e_melhores_da_tabela_acumulada", "ida_e_volta": true }
   },
   "premiacao": {},
