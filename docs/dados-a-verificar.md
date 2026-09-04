@@ -1015,12 +1015,44 @@ nesta rodada (confirmei só nome/cidade).
   perda de 6 pontos), a segunda vez em 5 anos — por isso o clube já
   estava corretamente fora de `times[]` de `equador_primera.json` mesmo
   antes desta rodada (a inconsistência identificada era só um alerta pra
-  conferir, não um erro real). Ele continua cadastrado em
-  `src/data/clubes/equador.json` sem `divisao_nacional`, já que a Serie B
-  do Equador não é modelada neste projeto — mantido assim.
+  conferir, não um erro real). **Atualização**: a Serie B do Equador foi
+  modelada (ver seção "2ª divisão CONMEBOL — Equador" abaixo) — El
+  Nacional agora tem `divisao_nacional: {"pais": "EC", "nivel": 2}` e
+  está em `times[]` de `equador_segunda.json`.
 - **Clássicos**: mantidos os 2 já cadastrados (Clásico del Astillero,
   Superclásico de Quito); não adicionei um terceiro por falta de fonte
   boa o suficiente dentro do tempo desta pesquisa.
+
+## 2ª divisão CONMEBOL — Equador (Serie B)
+
+- **Fonte**: fetch direto do HTML da Wikipédia ES ("Serie B de Ecuador
+  2026"), infobox + tabela "Información" (Equipo/Ciudad/Estadio) +
+  texto de "Sistema de juego", extraídos com parser de HTML em Python
+  (mesmo método usado no Chile/Colômbia).
+- **Elenco 2026: 12 de 12 clubes confirmados**. `el_nacional` já existia
+  na base (rebaixado da Serie A, ver acima) — só ganhou
+  `divisao_nacional` nivel 2. Os outros 11 são novos em
+  `equador.json`, incluindo `vinotinto_ecuador` (Vinotinto del Ecuador),
+  o outro clube rebaixado da Serie A junto com o El Nacional.
+- **Formato, alta confiança** (texto do regulamento direto na
+  Wikipédia): fase regular de pontos corridos (22 rodadas, todos contra
+  todos ida e volta) — os 6 primeiros mantêm pontos/saldo e disputam o
+  "Grupo Ascenso" (todos contra todos entre si, 10 rodadas); os 6
+  últimos mantêm pontos/saldo e disputam o "Grupo Descenso" (mesma
+  lógica, 10 rodadas). 1º e 2º do Grupo Ascenso sobem à Serie A 2027;
+  2 últimos do Grupo Descenso caem à Segunda Categoría (3ª nível, não
+  modelada). Modelado com `pontos_corridos` (22 rodadas) +
+  `fase_grupos` (2 grupos de 6, ida e volta, `classificam_por_grupo: 2`)
+  — aproximação: o schema não distingue que um grupo decide acesso e o
+  outro decide descenso (ambos usam o mesmo `classificam_por_grupo`, e
+  não há carregamento de pontos entre fases representado).
+- **Nota da fonte não modelada**: "equipos filiales" (clubes-satélite de
+  um clube maior) não podem ser promovidos mesmo se classificarem — não
+  identifiquei nenhum dos 12 clubes 2026 como filial, então não afeta o
+  elenco atual, só fica registrado.
+- **Cumbayá FC**: apesar do nome, manda jogos em Cayambe, não em
+  Cumbayá — confirmado pela tabela de localização da própria fonte, não
+  é erro de digitação.
 
 ## Expansão CONMEBOL — Paraguai (1ª divisão)
 

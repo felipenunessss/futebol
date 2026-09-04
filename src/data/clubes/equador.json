@@ -3,7 +3,7 @@
   { "id": "barcelona_sc", "nome": "Barcelona Sporting Club", "nome_popular": "Barcelona", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "delfin", "nome": "Delfín Sporting Club", "nome_popular": "Delfín", "pais": "EC", "cidade": "Manta", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "deportivo_cuenca", "nome": "Club Deportivo Cuenca", "nome_popular": "Deportivo Cuenca", "pais": "EC", "cidade": "Cuenca", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
-  { "id": "el_nacional", "nome": "Club Deportivo El Nacional", "nome_popular": "El Nacional", "pais": "EC", "cidade": "Quito" },
+  { "id": "el_nacional", "nome": "Club Deportivo El Nacional", "nome_popular": "El Nacional", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
   { "id": "emelec", "nome": "Club Sport Emelec", "nome_popular": "Emelec", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "guayaquil_city", "nome": "Guayaquil City Fútbol Club", "nome_popular": "Guayaquil City", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "independiente_del_valle", "nome": "Independiente del Valle", "nome_popular": "Independiente del Valle", "pais": "EC", "cidade": "Sangolquí", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
@@ -15,5 +15,16 @@
   { "id": "mushuc_runa", "nome": "Club Mushuc Runa", "nome_popular": "Mushuc Runa", "pais": "EC", "cidade": "Ambato", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "orense", "nome": "Orense Sporting Club", "nome_popular": "Orense", "pais": "EC", "cidade": "Machala", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
   { "id": "tecnico_universitario", "nome": "Club Técnico Universitario", "nome_popular": "Técnico Universitario", "pais": "EC", "cidade": "Ambato", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
-  { "id": "universidad_catolica_ec", "nome": "Club Deportivo Universidad Católica", "nome_popular": "Universidad Católica", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 1 } }
+  { "id": "universidad_catolica_ec", "nome": "Club Deportivo Universidad Católica", "nome_popular": "Universidad Católica", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 1 } },
+  { "id": "de_julio_22", "nome": "22 de Julio Fútbol Club", "nome_popular": "22 de Julio", "pais": "EC", "cidade": "Esmeraldas", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "de_octubre_9", "nome": "9 de Octubre Fútbol Club", "nome_popular": "9 de Octubre", "pais": "EC", "cidade": "La Troncal", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "atletico_rojiblanco", "nome": "Atlético Rojiblanco Fútbol Club", "nome_popular": "Atlético Rojiblanco", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "cuenca_juniors", "nome": "Club Deportivo Cuenca Juniors", "nome_popular": "Cuenca Juniors", "pais": "EC", "cidade": "Cuenca", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "cumbaya_fc", "nome": "Cumbayá Fútbol Club", "nome_popular": "Cumbayá", "pais": "EC", "cidade": "Cayambe", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "gualaceo", "nome": "Gualaceo Sporting Club", "nome_popular": "Gualaceo", "pais": "EC", "cidade": "Gualaceo", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "independiente_juniors_ec", "nome": "Club Deportivo Independiente Juniors", "nome_popular": "Independiente Juniors", "pais": "EC", "cidade": "Sangolquí", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "liga_portoviejo", "nome": "Liga Deportiva Universitaria de Portoviejo", "nome_popular": "Liga de Portoviejo", "pais": "EC", "cidade": "Portoviejo", "estadio": "Reales Tamarindos", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "san_antonio_ec", "nome": "San Antonio Fútbol Club", "nome_popular": "San Antonio", "pais": "EC", "cidade": "Ibarra", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "santo_domingo_ec", "nome": "Sociedad Deportivo Santo Domingo", "nome_popular": "Santo Domingo", "pais": "EC", "cidade": "Santo Domingo", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
+  { "id": "vinotinto_ecuador", "nome": "Vinotinto del Ecuador Fútbol Club", "nome_popular": "Vinotinto Ecuador", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 2 } }
 ]

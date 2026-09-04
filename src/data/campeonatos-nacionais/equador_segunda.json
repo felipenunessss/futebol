@@ -1,0 +1,21 @@
+{
+  "id": "equador_segunda",
+  "nome": "Serie B do Equador",
+  "pais": "EC",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 22 },
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 6, "ida_e_volta": true, "classificam_por_grupo": 2 }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2,
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "de_julio_22", "de_octubre_9", "atletico_rojiblanco", "cuenca_juniors", "cumbaya_fc",
+    "el_nacional", "gualaceo", "independiente_juniors_ec", "liga_portoviejo",
+    "san_antonio_ec", "santo_domingo_ec", "vinotinto_ecuador"
+  ]
+}
