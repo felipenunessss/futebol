@@ -24,7 +24,8 @@
     "pais": "BR",
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
-    "estadio": "Conselheiro Galvão"
+    "estadio": "Conselheiro Galvão",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "marica",
@@ -33,7 +34,8 @@
     "pais": "BR",
     "estado": "RJ",
     "cidade": "Maricá",
-    "estadio": "Municipal João Saldanha"
+    "estadio": "Municipal João Saldanha",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "nova_iguacu",

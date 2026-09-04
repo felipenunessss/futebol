@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "PE",
     "cidade": "Bonito",
-    "estadio": "Arthur Tavares de Melo"
+    "estadio": "Arthur Tavares de Melo",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "jaguar",
@@ -24,7 +25,8 @@
     "pais": "BR",
     "estado": "PE",
     "cidade": "Camaragibe",
-    "estadio": "Arena Pernambuco"
+    "estadio": "Arena Pernambuco",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "decisao",
@@ -33,7 +35,8 @@
     "pais": "BR",
     "estado": "PE",
     "cidade": "Goiana",
-    "estadio": "José Dionísio do Carmo"
+    "estadio": "José Dionísio do Carmo",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "vitoria_tabocas",
@@ -116,5 +119,15 @@
     "pais": "BR",
     "estado": "PE",
     "cidade": "Santa Cruz do Capibaribe"
+  },
+  {
+    "id": "central_pe",
+    "nome": "Central Sport Club",
+    "nome_popular": "Central",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Caruaru",
+    "estadio": "Lacerdão",
+    "divisao_nacional": "serie_d"
   }
 ]

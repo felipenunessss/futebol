@@ -14,7 +14,8 @@
     "pais": "BR",
     "estado": "PR",
     "cidade": "Cascavel",
-    "estadio": "Olímpico Regional Arnaldo Busatto"
+    "estadio": "Olímpico Regional Arnaldo Busatto",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "cianorte",
@@ -23,7 +24,8 @@
     "pais": "BR",
     "estado": "PR",
     "cidade": "Cianorte",
-    "estadio": "Albino Turbay"
+    "estadio": "Albino Turbay",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "azuriz",
@@ -32,7 +34,8 @@
     "pais": "BR",
     "estado": "PR",
     "cidade": "Pato Branco",
-    "estadio": "Os Pioneiros"
+    "estadio": "Os Pioneiros",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "sao_joseense",

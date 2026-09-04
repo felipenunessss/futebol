@@ -47,7 +47,8 @@
     "nome_popular": "Lagarto",
     "pais": "BR",
     "estado": "SE",
-    "cidade": "Lagarto"
+    "cidade": "Lagarto",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "falcon",
@@ -63,7 +64,8 @@
     "nome_popular": "Sergipe",
     "pais": "BR",
     "estado": "SE",
-    "cidade": "Aracaju"
+    "cidade": "Aracaju",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "desportiva_aracaju",

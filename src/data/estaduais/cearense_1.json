@@ -12,15 +12,24 @@
       "classificam_por_grupo": 3
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 4
   },
   "classicos": [
-    { "time_a": "ceara", "time_b": "fortaleza", "nome": "Clássico-Rei", "peso_midia": 5 }
+    {
+      "time_a": "ceara",
+      "time_b": "fortaleza",
+      "nome": "Clássico-Rei",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "ceara",

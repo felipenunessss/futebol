@@ -12,11 +12,16 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_serie_d": 4
+  },
   "classicos": [],
   "times": [
     "oeirense",

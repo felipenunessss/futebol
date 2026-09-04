@@ -264,6 +264,59 @@ nesta rodada (confirmei só nome/cidade).
   expansão (24 em 2027, 28 em 2028) — o formato vai mudar de novo em
   breve.
 
+## Campeonato Brasileiro Série D — detalhes pendentes
+
+- **Elenco incompleto**: a Série D real 2026 tem 96 clubes; modelamos 76
+  (79%). As ~20 vagas restantes ficaram de fora por não termos conseguido
+  confirmar com segurança quem as ocupa (times de SP, RJ, RS, MS, ES,
+  entre outros, além de grupos que nenhuma das duas pesquisas cobriu em
+  detalhe). `times[]` em `brasileirao_serie_d.json` reflete só o que foi
+  confirmado.
+- **Descompasso de temporada**: as vagas da Série D 2026 vêm, na maioria
+  dos casos, do resultado dos estaduais de **2025** — não da edição 2026
+  que modelamos em `src/data/estaduais/`. O campo `premiacao.vaga_serie_d`
+  foi preenchido mesmo assim nos arquivos 2026 atuais, tratando-os como
+  "template" do mecanismo/formato daquele estadual, não como o registro
+  histórico exato de quem ganhou a vaga em 2025. Isso é uma aproximação
+  deliberada, não um erro não percebido.
+- **Vagas que NÃO vêm do estadual** (por isso não entraram em
+  `vaga_serie_d` de nenhum arquivo, mas os clubes estão em
+  `brasileirao_serie_d.json.times`): `fc_cascavel`, `marcilio_dias`,
+  `agua_santa`, `marica`, `aparecidense`, `goiatuba`, `luverdense`
+  (direito de permanência da Série D anterior); `brasiliense`
+  (pontuação no ranking nacional da CBF); `brasil_pelotas` (Copa FGF);
+  `tombense` (origem não confirmada, mas participação em 2026
+  confirmada); `central_pe` (não disputou nem o Pernambucano 2026,
+  critério da vaga não documentado nas fontes encontradas);
+  `atletico_cearense` (clube novo adicionado à base, não veio do
+  Cearense modelado).
+- **`portuguesa` (SP) e `real_noroeste` (ES)**: participação na Série D
+  2026 confirmada, mas a fonte não deixou claro se a vaga veio do
+  respectivo estadual — por isso entraram em `times[]` da Série D mas
+  não contam em `vaga_serie_d` de `paulistao_a1`/`capixaba_1`.
+- **Distrito Federal**: as fontes citam "Metropolitano-DF" como origem
+  das vagas de `gama` e `capital_cf`, não "Campeonato Brasiliense" (que é
+  o que modelamos como `candangao_1`) — pode ser uma competição
+  diferente (talvez de base/amadora) que não modelamos. Por precaução,
+  `candangao_1.premiacao` não recebeu `vaga_serie_d`, apesar de os 4
+  clubes do DF (`gama`, `capital_cf`, `brasiliense`, `ceilandia`) estarem
+  no elenco nacional.
+- **Excluídos por ambiguidade real**: um clube "America" ligado à Copa Rio
+  2025 (RJ) — não ficou claro se é o mesmo clube já cadastrado
+  (`america_rj`) ou outro distinto, então ficou de fora; e um clube
+  "Blumenau" (SC, via Copa Santa Catarina) que não existe na base e teve
+  confirmação de só uma fonte fraca — também ficou de fora.
+- **Bahia**: uma fonte da pesquisa inicial citou "Jequié" como possível
+  3º representante baiano, mas verificação direta confirmou que os 4
+  reais são Atlético de Alagoinhas, Jacuipense, Juazeirense e Porto —
+  todos já cadastrados e usados no `times[]`.
+- **Formato**: 96 clubes em 16 grupos de 6 (turno e returno, confirmado
+  por duas fontes independentes — uma delas disse "turno único" mas a
+  contagem de rodadas, 10, só fecha com turno e returno), top 4 de cada
+  grupo avança ao mata-mata nacional. 6 vagas de acesso à Série C 2027
+  (4 semifinalistas + 2 vencedores de um playoff entre eliminados nas
+  quartas) — aumentou de 4 para 6 nesta edição.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

@@ -12,13 +12,23 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_serie_d": 4
+  },
   "classicos": [
-    { "time_a": "sampaio_correa_ma", "time_b": "moto_club", "nome": "Superclássico Maranhense", "peso_midia": 4 }
+    {
+      "time_a": "sampaio_correa_ma",
+      "time_b": "moto_club",
+      "nome": "Superclássico Maranhense",
+      "peso_midia": 4
+    }
   ],
   "times": [
     "mac",

@@ -12,15 +12,25 @@
       "classificam_mata_mata": 8
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 3
+    "rebaixamento_proxima_divisao": 3,
+    "vaga_serie_d": 1
   },
   "classicos": [
-    { "time_a": "avai", "time_b": "figueirense", "nome": "Clássico Avaí-Figueirense", "peso_midia": 4 }
+    {
+      "time_a": "avai",
+      "time_b": "figueirense",
+      "nome": "Clássico Avaí-Figueirense",
+      "peso_midia": 4
+    }
   ],
   "times": [
     "avai",

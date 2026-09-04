@@ -5,7 +5,8 @@
     "nome_popular": "ABC",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Natal"
+    "cidade": "Natal",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "america_rn",
@@ -13,7 +14,8 @@
     "nome_popular": "América-RN",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Natal"
+    "cidade": "Natal",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "globo_fc",
@@ -29,7 +31,8 @@
     "nome_popular": "Laguna",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Tibau do Sul"
+    "cidade": "Tibau do Sul",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "potiguar_mossoro",

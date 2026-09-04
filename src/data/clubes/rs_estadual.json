@@ -25,7 +25,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Bagé",
-    "estadio": "Antônio Magalhães Rossel"
+    "estadio": "Antônio Magalhães Rossel",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "inter_santa_maria",
@@ -114,7 +115,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Pelotas",
-    "estadio": "Bento Freitas"
+    "estadio": "Bento Freitas",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "brasil_farroupilha",

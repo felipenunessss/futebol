@@ -12,12 +12,16 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 2
   },
   "classicos": [],
   "times": [

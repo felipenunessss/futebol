@@ -5,7 +5,8 @@
     "nome_popular": "Manaus FC",
     "pais": "BR",
     "estado": "AM",
-    "cidade": "Manaus"
+    "cidade": "Manaus",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "itacoatiara",
@@ -21,7 +22,8 @@
     "nome_popular": "Nacional-AM",
     "pais": "BR",
     "estado": "AM",
-    "cidade": "Manaus"
+    "cidade": "Manaus",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "manauara",
@@ -29,7 +31,8 @@
     "nome_popular": "Manauara",
     "pais": "BR",
     "estado": "AM",
-    "cidade": "Manaus"
+    "cidade": "Manaus",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "parintins",

@@ -12,15 +12,24 @@
       "classificam_mata_mata": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 2
   },
   "classicos": [
-    { "time_a": "athletico_pr", "time_b": "coritiba", "nome": "Atletiba", "peso_midia": 5 }
+    {
+      "time_a": "athletico_pr",
+      "time_b": "coritiba",
+      "nome": "Atletiba",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "athletico_pr",

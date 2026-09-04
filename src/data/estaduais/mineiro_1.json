@@ -12,7 +12,9 @@
       "classificam_mata_mata": 4
     },
     "mata_mata": {
-      "fases": ["semifinal"],
+      "fases": [
+        "semifinal"
+      ],
       "ida_e_volta": true
     },
     "final_estadual": {
@@ -21,10 +23,16 @@
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 2
   },
   "classicos": [
-    { "time_a": "cruzeiro", "time_b": "atletico_mg", "nome": "Clássico Mineiro", "peso_midia": 5 }
+    {
+      "time_a": "cruzeiro",
+      "time_b": "atletico_mg",
+      "nome": "Clássico Mineiro",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "cruzeiro",

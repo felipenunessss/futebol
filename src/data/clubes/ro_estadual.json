@@ -5,7 +5,8 @@
     "nome_popular": "Porto Velho",
     "pais": "BR",
     "estado": "RO",
-    "cidade": "Porto Velho"
+    "cidade": "Porto Velho",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "rondoniense_ro",
@@ -54,6 +55,7 @@
     "pais": "BR",
     "estado": "RO",
     "cidade": "Rolim de Moura",
-    "estadio": "Cassolão"
+    "estadio": "Cassolão",
+    "divisao_nacional": "serie_d"
   }
 ]

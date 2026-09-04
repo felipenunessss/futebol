@@ -12,11 +12,17 @@
       "classificam_por_grupo": 6
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_serie_d": 1
+  },
   "classicos": [],
   "times": [
     "cuiaba",

@@ -5,7 +5,8 @@
     "nome_popular": "Monte Roraima",
     "pais": "BR",
     "estado": "RR",
-    "cidade": "Boa Vista"
+    "cidade": "Boa Vista",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "bare",
@@ -21,7 +22,8 @@
     "nome_popular": "São Raimundo-RR",
     "pais": "BR",
     "estado": "RR",
-    "cidade": "Boa Vista"
+    "cidade": "Boa Vista",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "rio_negro_rr",
@@ -45,7 +47,8 @@
     "nome_popular": "GAS",
     "pais": "BR",
     "estado": "RR",
-    "cidade": "Boa Vista"
+    "cidade": "Boa Vista",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "nautico_rr",

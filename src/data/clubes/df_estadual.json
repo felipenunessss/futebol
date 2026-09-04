@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "DF",
     "cidade": "Gama",
-    "estadio": "Valmir Campelo Bezerra"
+    "estadio": "Valmir Campelo Bezerra",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "samambaia",
@@ -33,7 +34,8 @@
     "pais": "BR",
     "estado": "DF",
     "cidade": "Ceilândia",
-    "estadio": "Abadião"
+    "estadio": "Abadião",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "capital_cf",
@@ -42,7 +44,8 @@
     "pais": "BR",
     "estado": "DF",
     "cidade": "Paranoá",
-    "estadio": "JK"
+    "estadio": "JK",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "brasiliense",
@@ -51,7 +54,8 @@
     "pais": "BR",
     "estado": "DF",
     "cidade": "Taguatinga",
-    "estadio": "Elmo Serejo Farias"
+    "estadio": "Elmo Serejo Farias",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "real_brasilia",

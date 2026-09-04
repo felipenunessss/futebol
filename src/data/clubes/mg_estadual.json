@@ -24,7 +24,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Governador Valadares",
-    "estadio": "José Mammoud Abbas"
+    "estadio": "José Mammoud Abbas",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "pouso_alegre",
@@ -59,7 +60,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Betim",
-    "estadio": "Arena Vera Cruz"
+    "estadio": "Arena Vera Cruz",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "boa_esporte",

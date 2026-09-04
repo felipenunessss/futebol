@@ -62,7 +62,8 @@
     "nome_popular": "Serra Branca",
     "pais": "BR",
     "estado": "PB",
-    "cidade": "Campina Grande"
+    "cidade": "Campina Grande",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "sousa",
@@ -70,7 +71,8 @@
     "nome_popular": "Sousa",
     "pais": "BR",
     "estado": "PB",
-    "cidade": "Sousa"
+    "cidade": "Sousa",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "treze",
@@ -78,6 +80,7 @@
     "nome_popular": "Treze",
     "pais": "BR",
     "estado": "PB",
-    "cidade": "Campina Grande"
+    "cidade": "Campina Grande",
+    "divisao_nacional": "serie_d"
   }
 ]

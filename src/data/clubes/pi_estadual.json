@@ -13,7 +13,8 @@
     "nome_popular": "Fluminense-PI",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Teresina"
+    "cidade": "Teresina",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "piaui_ec",
@@ -21,7 +22,8 @@
     "nome_popular": "Piauí",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Teresina"
+    "cidade": "Teresina",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "altos",
@@ -29,7 +31,8 @@
     "nome_popular": "Altos",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Altos"
+    "cidade": "Altos",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "corisabba",
@@ -53,7 +56,8 @@
     "nome_popular": "Parnahyba",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Parnaíba"
+    "cidade": "Parnaíba",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "cap_pi",

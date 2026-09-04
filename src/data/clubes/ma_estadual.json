@@ -15,7 +15,8 @@
     "pais": "BR",
     "estado": "MA",
     "cidade": "Imperatriz",
-    "estadio": "Frei Epifânio D'Abadia"
+    "estadio": "Frei Epifânio D'Abadia",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "iape",
@@ -24,7 +25,8 @@
     "pais": "BR",
     "estado": "MA",
     "cidade": "São Luís",
-    "estadio": "Nhozinho Santos"
+    "estadio": "Nhozinho Santos",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "sampaio_correa_ma",
@@ -33,7 +35,8 @@
     "pais": "BR",
     "estado": "MA",
     "cidade": "São Luís",
-    "estadio": "Castelão"
+    "estadio": "Castelão",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "moto_club",
@@ -41,7 +44,8 @@
     "nome_popular": "Moto Club",
     "pais": "BR",
     "estado": "MA",
-    "cidade": "São Luís"
+    "cidade": "São Luís",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "tuntum",

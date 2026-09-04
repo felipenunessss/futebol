@@ -66,6 +66,8 @@ export interface Premiacao {
   vaga_copa_do_brasil?: number;
   vaga_libertadores?: number;
   vaga_sulamericana?: number;
+  /** Vagas na Série D nacional concedidas via resultado do estadual (critério varia por federação). */
+  vaga_serie_d?: number;
   acesso_proxima_divisao?: number;
   rebaixamento_proxima_divisao?: number;
 }

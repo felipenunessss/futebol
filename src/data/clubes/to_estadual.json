@@ -5,7 +5,8 @@
     "nome_popular": "Araguaína",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Araguaína"
+    "cidade": "Araguaína",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "bela_vista_to",
@@ -54,7 +55,8 @@
     "nome_popular": "Tocantinópolis",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Tocantinópolis"
+    "cidade": "Tocantinópolis",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "uniao_to",

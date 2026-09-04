@@ -22,7 +22,8 @@
     "nome_popular": "Portuguesa",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São Paulo"
+    "cidade": "São Paulo",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "botafogo_sp",
@@ -63,7 +64,8 @@
     "nome_popular": "Água Santa",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Diadema"
+    "cidade": "Diadema",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "ferroviaria",

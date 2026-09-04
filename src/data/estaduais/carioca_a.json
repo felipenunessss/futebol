@@ -23,12 +23,28 @@
   "premiacao": {
     "vaga_copa_do_brasil": 4,
     "vaga_libertadores": 1,
-    "rebaixamento_proxima_divisao": 1
+    "rebaixamento_proxima_divisao": 1,
+    "vaga_serie_d": 1
   },
   "classicos": [
-    { "time_a": "flamengo", "time_b": "fluminense", "nome": "Fla-Flu", "peso_midia": 5 },
-    { "time_a": "flamengo", "time_b": "vasco_da_gama", "nome": "Clássico dos Milhões", "peso_midia": 5 },
-    { "time_a": "vasco_da_gama", "time_b": "botafogo", "nome": "Clássico da Amizade", "peso_midia": 3 }
+    {
+      "time_a": "flamengo",
+      "time_b": "fluminense",
+      "nome": "Fla-Flu",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "flamengo",
+      "time_b": "vasco_da_gama",
+      "nome": "Clássico dos Milhões",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "vasco_da_gama",
+      "time_b": "botafogo",
+      "nome": "Clássico da Amizade",
+      "peso_midia": 3
+    }
   ],
   "times": [
     "flamengo",

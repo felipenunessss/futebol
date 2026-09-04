@@ -21,7 +21,8 @@
     "nome_popular": "Tuna Luso",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Belém"
+    "cidade": "Belém",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "aguia_de_maraba",
@@ -29,7 +30,8 @@
     "nome_popular": "Águia de Marabá",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Marabá"
+    "cidade": "Marabá",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "capitao_poco",

@@ -25,7 +25,8 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Joinville",
-    "estadio": "Arena Joinville"
+    "estadio": "Arena Joinville",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "santa_catarina_ec",
@@ -69,7 +70,8 @@
     "nome_popular": "Marcílio Dias",
     "pais": "BR",
     "estado": "SC",
-    "cidade": "Itajaí"
+    "cidade": "Itajaí",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "barra_fc",

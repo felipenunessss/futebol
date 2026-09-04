@@ -12,15 +12,24 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": false
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "vaga_serie_d": 4
   },
   "classicos": [
-    { "time_a": "bahia", "time_b": "vitoria", "nome": "Ba-Vi", "peso_midia": 5 }
+    {
+      "time_a": "bahia",
+      "time_b": "vitoria",
+      "nome": "Ba-Vi",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "bahia",

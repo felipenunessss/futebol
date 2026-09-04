@@ -14,7 +14,8 @@
     "nome_popular": "Oratório",
     "pais": "BR",
     "estado": "AP",
-    "cidade": "Macapá"
+    "cidade": "Macapá",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "trem",
@@ -22,7 +23,8 @@
     "nome_popular": "Trem",
     "pais": "BR",
     "estado": "AP",
-    "cidade": "Macapá"
+    "cidade": "Macapá",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "independente_ap",

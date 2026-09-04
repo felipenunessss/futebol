@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Aparecida de Goiânia",
-    "estadio": "Aníbal Batista de Toledo"
+    "estadio": "Aníbal Batista de Toledo",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "anapolina",
@@ -24,7 +25,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Ouvidor",
-    "estadio": "Luiz Benedito"
+    "estadio": "Luiz Benedito",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "centro_oeste_go",
@@ -52,7 +54,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Catalão",
-    "estadio": "Genervino da Fonseca"
+    "estadio": "Genervino da Fonseca",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "goiatuba",
@@ -61,7 +64,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Goiatuba",
-    "estadio": "Divino Garcia Rosa"
+    "estadio": "Divino Garcia Rosa",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "inhumas",
@@ -70,7 +74,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Inhumas",
-    "estadio": "Zico Brandão"
+    "estadio": "Zico Brandão",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "jataiense",

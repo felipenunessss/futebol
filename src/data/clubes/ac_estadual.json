@@ -5,7 +5,8 @@
     "nome_popular": "Independência",
     "pais": "BR",
     "estado": "AC",
-    "cidade": "Rio Branco"
+    "cidade": "Rio Branco",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "santa_cruz_ac",
@@ -21,7 +22,8 @@
     "nome_popular": "Galvez",
     "pais": "BR",
     "estado": "AC",
-    "cidade": "Rio Branco"
+    "cidade": "Rio Branco",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "sao_francisco_ac",
@@ -46,7 +48,8 @@
     "nome_popular": "Humaitá",
     "pais": "BR",
     "estado": "AC",
-    "cidade": "Rio Branco"
+    "cidade": "Rio Branco",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "vasco_da_gama_ac",

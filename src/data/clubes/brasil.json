@@ -391,7 +391,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Tombos",
-    "estadio": "Antônio Guimarães de Almeida"
+    "estadio": "Antônio Guimarães de Almeida",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "athletic_club_mg",

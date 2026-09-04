@@ -5,7 +5,8 @@
     "nome_popular": "ASA",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Arapiraca"
+    "cidade": "Arapiraca",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "coruripe",
@@ -29,7 +30,8 @@
     "nome_popular": "CSE",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Palmeira dos Índios"
+    "cidade": "Palmeira dos Índios",
+    "divisao_nacional": "serie_d"
   },
   {
     "id": "murici",
