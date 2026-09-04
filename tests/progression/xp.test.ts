@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { aplicarXpAtributo, calcularNotaPartida, calcularXpPartida, type DesempenhoPartida } from "../../src/progression/xp.js";
+import { aplicarXpAtributo, calcularNotaPartida, calcularXpPartida, converterChancesEmDesempenho, type DesempenhoPartida } from "../../src/progression/xp.js";
+import type { ChanceJogador } from "../../src/simulation/match.js";
 
 function desempenho(overrides: Partial<DesempenhoPartida> = {}): DesempenhoPartida {
   return {
@@ -12,6 +13,62 @@ function desempenho(overrides: Partial<DesempenhoPartida> = {}): DesempenhoParti
     ...overrides,
   };
 }
+
+function chance(overrides: Partial<ChanceJogador>): ChanceJogador {
+  return { subtipo: "voleio", sucesso: true, atributoUsado: "finalizacao", ...overrides };
+}
+
+describe("converterChancesEmDesempenho", () => {
+  it("finalização bem-sucedida (voleio/cabeceio/chute de fora/jogada individual) vira gol", () => {
+    const chances: ChanceJogador[] = [
+      chance({ subtipo: "voleio", sucesso: true }),
+      chance({ subtipo: "cabeceio", sucesso: true }),
+      chance({ subtipo: "chute_de_fora", sucesso: true }),
+      chance({ subtipo: "jogada_individual", sucesso: true }),
+    ];
+
+    const desempenho = converterChancesEmDesempenho(chances, 90, 1);
+    expect(desempenho.gols).toBe(4);
+    expect(desempenho.chancesPerdidas).toBe(0);
+  });
+
+  it("finalização sem sucesso vira chance perdida, não gol", () => {
+    const desempenho = converterChancesEmDesempenho([chance({ subtipo: "voleio", sucesso: false })], 90, 1);
+    expect(desempenho.gols).toBe(0);
+    expect(desempenho.chancesPerdidas).toBe(1);
+  });
+
+  it("passe decisivo bem-sucedido vira assistência; sem sucesso vira chance perdida", () => {
+    const comSucesso = converterChancesEmDesempenho([chance({ subtipo: "passe_decisivo", sucesso: true })], 90, 1);
+    expect(comSucesso.assistencias).toBe(1);
+    expect(comSucesso.chancesPerdidas).toBe(0);
+
+    const semSucesso = converterChancesEmDesempenho([chance({ subtipo: "passe_decisivo", sucesso: false })], 90, 1);
+    expect(semSucesso.assistencias).toBe(0);
+    expect(semSucesso.chancesPerdidas).toBe(1);
+  });
+
+  it("desarme decisivo só soma quando bem-sucedido, e uma falha não conta como chance perdida", () => {
+    const comSucesso = converterChancesEmDesempenho([chance({ subtipo: "desarme_decisivo", sucesso: true })], 90, 1);
+    expect(comSucesso.desarmesBemSucedidos).toBe(1);
+
+    const semSucesso = converterChancesEmDesempenho([chance({ subtipo: "desarme_decisivo", sucesso: false })], 90, 1);
+    expect(semSucesso.desarmesBemSucedidos).toBe(0);
+    expect(semSucesso.chancesPerdidas).toBe(0);
+  });
+
+  it("preserva minutosJogados e importancia passados", () => {
+    const desempenho = converterChancesEmDesempenho([], 63, 2.5);
+    expect(desempenho.minutosJogados).toBe(63);
+    expect(desempenho.importancia).toBe(2.5);
+  });
+
+  it("compõe direto com calcularXpPartida", () => {
+    const chances: ChanceJogador[] = [chance({ subtipo: "voleio", sucesso: true })];
+    const desempenho = converterChancesEmDesempenho(chances, 90, 1);
+    expect(calcularXpPartida(desempenho)).toBeGreaterThan(0);
+  });
+});
 
 describe("calcularNotaPartida", () => {
   it("nota base (sem eventos, 90 minutos) fica no meio da escala", () => {
