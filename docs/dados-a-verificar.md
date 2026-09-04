@@ -689,6 +689,52 @@ nesta rodada (confirmei só nome/cidade).
   2026. Cuidado: a pesquisa inicial chegou a supor "Libertad x Nacional"
   pra esse clássico, o que é **errado** — foi corrigido antes de gravar.
 
+## Expansão CONMEBOL — Peru (1ª divisão) — auditoria de modelagem prévia
+
+Diferente de Bolívia/Equador/Paraguai (primeira modelagem completa), o Peru já
+tinha um `formato` razoável de uma correção anterior ("fix: model Peru 2026
+league format") — esta rodada foi auditoria (conferir o que já existia) mais
+preenchimento do que faltava (`premiacao` estava vazia), não reconstrução do
+zero.
+
+- **Formato**: a base já estava certa (Apertura + Clausura, 18 clubes, 17
+  rodadas cada). Precisou correção o `final_estadual`: a Liguilla final tem
+  **4 times** — os campeões do Apertura e do Clausura (só se também
+  estiverem entre os 7 primeiros da tabela acumulada) + os 2 melhores da
+  tabela acumulada geral. Caso especial confirmado: se o mesmo clube vencer
+  Apertura e Clausura, ele é **campeão direto, sem disputar a Liguilla**.
+  Fonte: América TV e Depor (formato oficial 2026). Se semifinal/final da
+  Liguilla são jogo único ou ida e volta **não foi especificado em nenhuma
+  fonte encontrada** — mantido `ida_e_volta: true` como estava antes, sem
+  confirmação real; fica como pendência.
+- **Rebaixamento**: **2 clubes** (17º e 18º da tabela acumulada), confirmado
+  pela Wikipédia ES da edição 2026 — sem sistema de médias plurianuais,
+  diferente de Bolívia/Argentina/Uruguai. Uma busca anterior sugeria "3
+  descensos", mas essa era uma referência à transição 2025→2026 (de 19 pra
+  18 clubes), não à regra vigente em 2026 — descartada em favor da fonte
+  mais específica.
+- **Vagas CONMEBOL**: 4 de Libertadores (Peru 1 = campeão da Liguilla
+  nacional; Peru 2/3/4 definidos por uma repescagem entre 2º, 3º e 4º
+  colocados da tabela acumulada — mecanismo de mata-mata entre esses 3
+  times não é representado em detalhe no schema, só o total e o critério
+  geral em texto livre) e 2 de Sul-Americana (7º e 8º colocados da tabela
+  acumulada, entre os que ainda não se classificaram para a Libertadores) —
+  fonte: RPP e Infobae. Nota: essas mesmas fontes mencionam Melgar,
+  Garcilaso, Alianza Atlético e Cienciano já qualificados pra Sul-Americana
+  2026 por outra via (resultado da temporada 2025, mesmo descompasso de
+  temporada já documentado pra Série D/Copa do Brasil) — isso não faz parte
+  do mecanismo de vagas da Liga 1 2026 em si, por isso não entrou em
+  `premiacao`.
+- **Elenco**: os 18 clubes já cadastrados foram conferidos contra a
+  Wikipédia ES da edição 2026 e batem exatamente (incluindo `sport_huancayo`,
+  que uma extração de página malfeita chegou a duplicar "Comerciantes
+  Unidos" no lugar dele — confirmado como erro de raspagem, não um clube
+  a menos). Nenhuma mudança em `times[]` ou em `src/data/clubes/peru.json`.
+- **Clássicos**: adicionado o "Clásico del Sur" (Cienciano x Melgar,
+  peso_midia 3) — rivalidade bem documentada entre os dois clubes mais
+  tradicionais fora de Lima, com cruzamentos até internacionais (Copa
+  Sul-Americana 2022 e 2026). Mantidos os 2 clássicos de Lima já existentes.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

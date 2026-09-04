@@ -8,12 +8,19 @@
     "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
     "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
     "tabela_acumulada": { "criterio": "soma_dos_pontos_de_apertura_e_clausura_define_playoffs_vagas_internacionais_e_rebaixamento" },
-    "final_estadual": { "criterio": "playoffs_com_campeoes_do_apertura_clausura_e_melhores_da_tabela_acumulada", "ida_e_volta": true }
+    "final_estadual": { "criterio": "liguilla_de_4_times_campeoes_do_apertura_e_clausura_que_estejam_entre_os_7_primeiros_do_acumulado_mais_os_2_melhores_do_acumulado_geral_se_o_mesmo_time_vence_apertura_e_clausura_e_campeao_direto_sem_playoff", "ida_e_volta": true }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "peru_1_campeao_da_liguilla_nacional_peru_2_3_e_4_definidos_por_repescagem_entre_2o_3o_e_4o_colocados_da_tabela_acumulada",
+    "vaga_sulamericana": 2,
+    "vaga_sulamericana_criterio": "7o_e_8o_colocados_da_tabela_acumulada_entre_os_que_ainda_nao_se_classificaram_para_a_libertadores",
+    "rebaixamento_proxima_divisao": 2
+  },
   "classicos": [
     { "time_a": "alianza_lima", "time_b": "universitario_peru", "nome": "Superclásico Peruano", "peso_midia": 5 },
-    { "time_a": "sporting_cristal", "time_b": "alianza_lima", "nome": "Clásico Lima", "peso_midia": 4 }
+    { "time_a": "sporting_cristal", "time_b": "alianza_lima", "nome": "Clásico Lima", "peso_midia": 4 },
+    { "time_a": "cienciano", "time_b": "melgar", "nome": "Clásico del Sur", "peso_midia": 3 }
   ],
   "times": ["alianza_atletico", "alianza_lima", "comerciantes_unidos", "cienciano", "chankas", "cusco_fc", "deportivo_garcilaso", "melgar", "sporting_cristal", "universitario_peru", "sport_huancayo", "utc", "adt_tarma", "sport_boys", "atletico_grau", "deportivo_moquegua", "fc_cajamarca", "juan_pablo_ii"]
 }
