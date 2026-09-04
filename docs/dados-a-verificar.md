@@ -813,19 +813,28 @@ nesta rodada (confirmei só nome/cidade).
 
 ## 2ª divisão CONMEBOL — Venezuela (Segunda División)
 
-- **Elenco 2026**: 17 clubes cadastrados em `venezuela.json` com
-  `divisao_nacional: {"pais": "VE", "nivel": 2}`, incluindo times "B"
-  (reserva) de clubes da Primera División — `monagas_b`,
-  `academia_puerto_cabello_b`, `zamora_b` — que é uma característica real
-  da divisão venezuelana (clubes grandes mandam equipe reserva pra
-  Segunda), não erro de duplicação.
-- **Formato aproximado, corrigido pra não afirmar divisão errada**: a
-  versão original modelava "2 grupos de 8" sem bater com os 17 clubes
-  reais — corrigido pra `fase_grupos` de 1 grupo único de 17 (todos contra
-  todos, ida e volta), já que não temos fonte confirmando se a divisão em
-  grupos existe de fato nem sua composição exata. Continua sendo uma
-  aproximação (Apertura/Clausura + esse "grupo único" + mata-mata) — vale
-  revisar contra fonte primária antes de considerar fechado.
+- **Elenco 2026 — 17 clubes, reconfirmado** (o usuário desconfiou que
+  fossem só 16): fui direto no HTML bruto da Wikipédia ES
+  ("Segunda División de Venezuela 2026") pra checar — a frase de abertura
+  do artigo diz "Un total de 16 equipos", mas isso **contradiz as
+  próprias tabelas de classificação** do mesmo artigo: Grupo Oriental tem
+  8 times jogando 14 partidas cada (turno e returno entre 8 = 14 jogos,
+  bate) e Grupo Occidental tem **9 times** jogando 16 partidas cada
+  (turno e returno entre 9 = 16 jogos, bate). 8+9 = 17, confirmando o
+  elenco que já tínhamos. A frase "16 equipos" no resumo do artigo está
+  desatualizada/errada — as tabelas de pontos corridos, que fecham
+  matematicamente pelo número de jogos, são a fonte mais confiável aqui,
+  não a prosa introdutória. Times "B" (reserva) de clubes da Primera
+  División — `monagas_b`, `academia_puerto_cabello_b`, `zamora_b` — são
+  uma característica real da divisão (clubes grandes mandam equipe
+  reserva pra Segunda), não erro de duplicação.
+- **Grupos reais são assimétricos (8 + 9), schema não representa isso**:
+  `fase_grupos` exige `times_por_grupo` único pros dois grupos — modelado
+  como `num_grupos: 2, times_por_grupo: 8` por aproximação (mais perto do
+  Grupo Oriental real), mas o Grupo Occidental de verdade tem 9 times, não
+  8. Top 4 de cada grupo avança à fase final — isso está confirmado por
+  fonte ("Los cuatro primeros equipos avanzan a la fase final") nos dois
+  grupos.
 - **Acesso**: 1 vaga à Primera División, campeão da final absoluta entre
   campeões do Apertura e Clausura (`acesso_proxima_divisao: 1`).
 - Esta seção foi escrita ao finalizar um trabalho que tinha ficado
