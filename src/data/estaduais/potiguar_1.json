@@ -1,0 +1,33 @@
+{
+  "id": "potiguar_1",
+  "nome": "Campeonato Potiguar",
+  "estado": "RN",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 6
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "abc_rn",
+    "america_rn",
+    "globo_fc",
+    "laguna",
+    "potiguar_mossoro",
+    "potyguar_seridoense",
+    "qfc",
+    "santa_cruz_rn"
+  ]
+}

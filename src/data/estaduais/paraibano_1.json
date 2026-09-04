@@ -1,0 +1,35 @@
+{
+  "id": "paraibano_1",
+  "nome": "Campeonato Paraibano",
+  "estado": "PB",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "atletico_cajazeirense",
+    "botafogo_pb",
+    "campinense",
+    "confianca_pb",
+    "esporte_pb",
+    "nacional_patos",
+    "pombal",
+    "serra_branca",
+    "sousa",
+    "treze"
+  ]
+}

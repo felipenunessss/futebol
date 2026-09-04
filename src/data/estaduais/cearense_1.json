@@ -1,0 +1,37 @@
+{
+  "id": "cearense_1",
+  "nome": "Campeonato Cearense",
+  "estado": "CE",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 2,
+      "times_por_grupo": 5,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 3
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "ceara", "time_b": "fortaleza", "nome": "Clássico-Rei", "peso_midia": 5 }
+  ],
+  "times": [
+    "ceara",
+    "fortaleza",
+    "ferroviario_ce",
+    "maracana_ce",
+    "horizonte",
+    "quixada",
+    "floresta",
+    "iguatu",
+    "tirol",
+    "maranguape"
+  ]
+}

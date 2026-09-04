@@ -444,5 +444,15 @@
     "cidade": "Goiânia",
     "estadio": "Antônio Accioly",
     "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "confianca",
+    "nome": "Sport Club Confiança",
+    "nome_popular": "Confiança",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju",
+    "estadio": "Lourival Baptista",
+    "divisao_nacional": "serie_c"
   }
 ]

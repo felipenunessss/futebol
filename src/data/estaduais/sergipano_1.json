@@ -1,0 +1,35 @@
+{
+  "id": "sergipano_1",
+  "nome": "Campeonato Sergipano",
+  "estado": "SE",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 7
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "confianca",
+    "america_propria",
+    "atletico_gloriense",
+    "dorense",
+    "guarany_porto_da_folha",
+    "itabaiana",
+    "lagarto",
+    "falcon",
+    "sergipe_fc",
+    "desportiva_aracaju"
+  ]
+}

@@ -157,6 +157,31 @@ nesta rodada (confirmei só nome/cidade).
   dividindo o mesmo estádio; Capital CF e Paranoá EC dividindo o estádio JK
   em Paranoá-DF) são situações genuínas confirmadas por fonte, não erros.
 
+## Ceará, Rio Grande do Norte, Paraíba e Sergipe — detalhes pendentes
+
+- **QFC (Potiguar)**: nome completo confirmado como "Quinho Futebol Clube"
+  após verificação — a pesquisa inicial só tinha a sigla.
+- **Atlético Gloriense** e **Dorense** (Sergipano): cidade não confirmada na
+  pesquisa inicial — verificado: Nossa Senhora da Glória e Nossa Senhora das
+  Dores, respectivamente (não Simão Dias, como a pesquisa inicial
+  especulou).
+- **Confiança (Sergipe)**: confirmado jogando Série C nacional 2026 —
+  movido para `brasil.json` (id `confianca`); o "Confiança" da Paraíba é um
+  clube diferente (id `confianca_pb`, Sapé).
+- **Cearense**: formato real tem uma 2ª fase de reclassificação (os 3
+  melhores de cada grupo da 1ª fase formam novos grupos) que o schema não
+  representa — modelei de forma simplificada (`fase_grupos` seguido direto
+  de `mata_mata` semifinal+final), perdendo o detalhe da reclassificação e
+  do jogo de 3º lugar.
+- **Potiguar/Paraibano/Sergipano**: formatos de mata-mata modelados por
+  aproximação a partir de resumos rápidos de fonte, sem checar o
+  regulamento oficial completo de cada federação.
+- **Sergipano**: campeão e 3º colocado ganham vaga na Série D nacional
+  2027 — fato não modelado no schema (`premiacao` não tem campo para vaga
+  em competição nacional a partir de estadual).
+- Clássicos de RN e PB não foram pesquisados/adicionados por falta de
+  confirmação do nome oficial de cada rivalidade.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
