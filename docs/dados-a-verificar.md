@@ -840,6 +840,54 @@ nesta rodada (confirmei só nome/cidade).
   rivalidade de Santa Cruz de la Sierra desde 1970), bem confirmado por
   múltiplas fontes de imprensa esportiva boliviana.
 
+## 2ª divisão CONMEBOL — Bolívia (Copa Simón Bolívar)
+
+- **Fonte**: Wikipédia ES "Copa Simón Bolívar 2026 (Bolivia)" — a edição já
+  está em andamento no mundo real (fase departamental e fase de grupos
+  nacional já disputadas), com tabelas de resultado real por grupo. A
+  primeira tentativa de extrair o conteúdo via fetch resumido por IA
+  pareceu suspeita (times com nomes coincidindo com clubes famosos de
+  outros países, ex: "F.C. Juan Aurich", que também é o nome de um clube
+  peruano famoso) — **verificado por raw HTML da própria Wikipédia que o
+  nome é real**, é um clube boliviano pequeno de Potosí distinto, mera
+  coincidência de nome. Fica registrado como lição: desconfiar de nomes
+  "importados" de outro país mesmo quando o fetch resumido parece
+  plausível, e confirmar contra o HTML bruto quando suspeitar.
+- **Formato real**: 3 fases — (1) fase departamental/preliminar, times
+  agrupados por associação (9 associações: Beni, Chuquisaca, Cochabamba,
+  La Paz, Oruro, Pando, Potosí, Santa Cruz, Tarija), turno e returno,
+  melhores de cada série avançam; (2) fase de grupos nacional, 24
+  classificados em 6 grupos de 4 (turno e returno), 2 melhores de cada
+  grupo + os 4 melhores terceiros avançam às oitavas; (3) mata-mata
+  (oitavas, quartas, semifinal, final) em ida e volta — formato exato da
+  final (jogo único ou ida e volta) não confirmado.
+- **Elenco modelado — só o corpo principal (24 clubes)**: a fonte cita
+  "69 clubes" no resumo mas depois "72 equipos" na seção "Clubes
+  clasificados" (inconsistência da própria fonte, não nossa) — a fase
+  departamental/preliminar completa (todos os ~69-72 clubes) **não foi
+  modelada**, só os **24 clubes confirmados na fase de grupos nacional**
+  (extraídos das tabelas reais de resultado, alta confiança). `times[]`
+  de `bolivia_segunda.json` reflete só esses 24; a fase preliminar fica
+  como pendência (mesmo padrão de simplificação já aplicado à Copa do
+  Brasil/Libertadores/Sul-Americana antes de termos `etapas` — aqui nem
+  chegamos a criar `etapas`, o "corpo principal" é a fase de grupos, não
+  o mata-mata, então a estrutura é diferente).
+- **Cidade de vários clubes por aproximação**: o schema exige `cidade`
+  obrigatória, mas a fonte só confirma o departamento pra vários clubes
+  (ex: `ingenieros_bo`, `veintiseis_de_febrero`, `hiska_nacional` — só
+  "La Paz" o departamento, não a cidade/bairro exata) — usei a capital do
+  departamento como aproximação razoável em ~10 dos 24 clubes; confiança
+  moderada, não alta, nesses casos.
+- **Acesso à 1ª divisão**: confirmado por duas fontes — o campeão sobe
+  direto; o vice disputa um **playoff de ida e volta contra o
+  penúltimo colocado da Divisão Profissional** da mesma temporada
+  (mecanismo de promoção/rebaixamento cruzado entre divisões que o
+  schema não representa — só `premiacao.acesso_proxima_divisao: 1`
+  reflete o acesso direto do campeão, o playoff do vice fica documentado
+  aqui sem campo correspondente).
+- **Rebaixamento**: não modelado — não pesquisado nesta rodada (a 2ª
+  divisão não desce pra lugar nenhum que estejamos modelando).
+
 ## Expansão CONMEBOL — Equador (1ª divisão)
 
 - **Fonte**: Wikipédia ES ("Serie A de Ecuador 2026"), cruzada com Cancha
