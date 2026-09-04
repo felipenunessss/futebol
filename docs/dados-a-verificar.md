@@ -383,6 +383,38 @@ nesta rodada (confirmei só nome/cidade).
   campeão — não confirmei se dão Sul-Americana/Libertadores direto (achei
   indício de que não, mas não é 100% certo).
 
+## Expansão CONMEBOL — Argentina (1ª divisão)
+
+- **Fonte**: openfootball só tem até a temporada 2025 (30 clubes,
+  confirmados por dados de partida real). Os 30 clubes de 2026 foram
+  confirmados via busca (ESPN, Wikipédia PT/EN, La Nación, Infobae) —
+  cross-referenciei com o elenco 2025 do openfootball e bate exatamente
+  exceto por 2 promovidos (Gimnasia y Esgrima de Mendoza, Estudiantes de
+  Río Cuarto) que verifiquei individualmente por fonte própria.
+- **Formato aproximado**: o real é duas zonas de 15 times por torneio
+  (Apertura e Clausura), quase-todos-contra-todos dentro da zona + 1
+  clássico/rodada interzonal, playoffs de jogo único pra decidir cada
+  torneio, e uma Tabela Anual (soma dos pontos da fase regular dos dois
+  torneios) que define o "Campeão de Liga" de verdade e as vagas
+  continentais. Modelei isso com `turno`/`returno` (um por torneio) +
+  `final_estadual` reaproveitado pra representar a Tabela Anual — não é
+  literalmente uma final, é uma reconciliação por tabela. Não modelei as
+  2 zonas internas de cada torneio nem o tamanho exato do chaveamento de
+  playoff (`classificam_proxima_fase: 16` é uma estimativa, não
+  confirmada).
+- **Rebaixamento**: Argentina usa um sistema de "promedios" (média de
+  pontos de múltiplas temporadas), não simples "último colocado desce" —
+  não modelado. `rebaixamento_proxima_divisao: 2` é inferência a partir
+  do número de promovidos (2), não confirmado por fonte direta sobre o
+  mecanismo real.
+- **Vagas CONMEBOL**: essas sim, bem confirmadas por fonte específica —
+  6 vagas de Libertadores (campeão Apertura, campeão Clausura, campeão
+  Copa Argentina, 3 melhores da Tabela Anual sem vaga por outra via) e
+  6 de Sul-Americana (6 melhores da Tabela Anual restantes).
+- **Clássicos**: só incluí os 2 mais inquestionáveis (Superclásico
+  River-Boca, Clássico de Avellaneda Racing-Independiente) — existem
+  vários outros clássicos regionais argentinos não pesquisados.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

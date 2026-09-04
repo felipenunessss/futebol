@@ -1,0 +1,43 @@
+{
+  "id": "argentina_primera",
+  "nome": "Liga Profesional Argentina (Primera División)",
+  "pais": "AR",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "turno": {
+      "nome": "Torneo Apertura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 16
+    },
+    "returno": {
+      "nome": "Torneo Clausura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 16
+    },
+    "final_estadual": {
+      "criterio": "tabela_anual_soma_pontos_apertura_e_clausura_define_campeao_de_liga_e_vagas_conmebol",
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "vaga_libertadores": 6,
+    "vaga_libertadores_criterio": "Campeão do Apertura, campeão do Clausura, campeão da Copa Argentina, e os 3 melhores da Tabela Anual que não tenham vaga por outra via",
+    "vaga_sulamericana": 6,
+    "vaga_sulamericana_criterio": "6 melhores da Tabela Anual que não tenham vaga de Libertadores",
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "river_plate", "time_b": "boca_juniors", "nome": "Superclásico", "peso_midia": 5 },
+    { "time_a": "racing_club", "time_b": "independiente", "nome": "Clásico de Avellaneda", "peso_midia": 5 }
+  ],
+  "times": [
+    "boca_juniors", "independiente", "san_lorenzo", "deportivo_riestra", "talleres_cordoba",
+    "instituto_cordoba", "platense", "estudiantes_lp", "gimnasia_mendoza", "velez_sarsfield",
+    "newells_old_boys", "union_santa_fe", "lanus", "central_cordoba_sde", "defensa_y_justicia",
+    "river_plate", "racing_club", "huracan", "barracas_central", "belgrano_cordoba",
+    "estudiantes_rio_cuarto", "independiente_rivadavia", "gimnasia_la_plata", "tigre",
+    "argentinos_juniors", "sarmiento_junin", "rosario_central", "banfield", "atletico_tucuman",
+    "aldosivi"
+  ]
+}

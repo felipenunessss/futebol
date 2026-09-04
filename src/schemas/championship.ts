@@ -79,7 +79,11 @@ export interface Premiacao {
   /** Como as vagas de vaga_copa_do_brasil são distribuídas (texto livre, ex: "campeão e vice da 1ª divisão"). */
   vaga_copa_do_brasil_criterio?: string;
   vaga_libertadores?: number;
+  /** Como as vagas de Libertadores são distribuídas (texto livre; critério varia muito por país/ano). */
+  vaga_libertadores_criterio?: string;
   vaga_sulamericana?: number;
+  /** Como as vagas de Sul-Americana são distribuídas (texto livre). */
+  vaga_sulamericana_criterio?: string;
   /** Vagas na Série D nacional concedidas via resultado do estadual (critério varia por federação). */
   vaga_serie_d?: number;
   /** Como as vagas de vaga_serie_d são distribuídas (texto livre; regra padrão quando não pesquisado: melhor(es) colocado(s) sem competição nacional). */
