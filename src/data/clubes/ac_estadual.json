@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "AC",
     "cidade": "Rio Branco",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "santa_cruz_ac",
@@ -23,7 +26,10 @@
     "pais": "BR",
     "estado": "AC",
     "cidade": "Rio Branco",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "sao_francisco_ac",
@@ -49,7 +55,10 @@
     "pais": "BR",
     "estado": "AC",
     "cidade": "Rio Branco",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "vasco_da_gama_ac",

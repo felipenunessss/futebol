@@ -1,6 +1,7 @@
 {
   "id": "brasileirao_serie_c",
   "nome": "Campeonato Brasileiro Série C",
+  "pais": "BR",
   "nivel": 3,
   "ano_referencia": 2026,
   "formato": {

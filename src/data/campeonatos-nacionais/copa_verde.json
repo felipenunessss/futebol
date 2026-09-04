@@ -1,6 +1,7 @@
 {
   "id": "copa_verde",
   "nome": "Copa Verde",
+  "pais": "BR",
   "nivel": 0,
   "ano_referencia": 2026,
   "formato": {

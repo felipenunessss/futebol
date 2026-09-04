@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "CE",
     "cidade": "Fortaleza",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "maracana_ce",
@@ -15,7 +18,10 @@
     "pais": "BR",
     "estado": "CE",
     "cidade": "Maracanaú",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "horizonte",
@@ -40,7 +46,10 @@
     "pais": "BR",
     "estado": "CE",
     "cidade": "Fortaleza",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "iguatu",
@@ -49,7 +58,10 @@
     "pais": "BR",
     "estado": "CE",
     "cidade": "Iguatu",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "tirol",
@@ -58,7 +70,10 @@
     "pais": "BR",
     "estado": "CE",
     "cidade": "Fortaleza",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "maranguape",
@@ -76,6 +91,9 @@
     "estado": "CE",
     "cidade": "Fortaleza",
     "estadio": "Domingão",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   }
 ]

@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "RO",
     "cidade": "Porto Velho",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "rondoniense_ro",
@@ -56,6 +59,9 @@
     "estado": "RO",
     "cidade": "Rolim de Moura",
     "estadio": "Cassolão",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   }
 ]

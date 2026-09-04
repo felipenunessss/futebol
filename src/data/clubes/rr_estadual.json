@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "RR",
     "cidade": "Boa Vista",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "bare",
@@ -23,7 +26,10 @@
     "pais": "BR",
     "estado": "RR",
     "cidade": "Boa Vista",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "rio_negro_rr",
@@ -48,7 +54,10 @@
     "pais": "BR",
     "estado": "RR",
     "cidade": "Boa Vista",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "nautico_rr",

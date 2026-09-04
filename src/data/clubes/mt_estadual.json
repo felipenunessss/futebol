@@ -25,7 +25,10 @@
     "estado": "MT",
     "cidade": "Lucas do Rio Verde",
     "estadio": "Passo das Emas",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "mixto",
@@ -35,7 +38,10 @@
     "estado": "MT",
     "cidade": "Cuiabá",
     "estadio": "Arena Pantanal",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "nova_mutum",

@@ -39,7 +39,10 @@
     "pais": "BR",
     "estado": "SE",
     "cidade": "Itabaiana",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "lagarto",
@@ -48,7 +51,10 @@
     "pais": "BR",
     "estado": "SE",
     "cidade": "Lagarto",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "falcon",
@@ -65,7 +71,10 @@
     "pais": "BR",
     "estado": "SE",
     "cidade": "Aracaju",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "desportiva_aracaju",

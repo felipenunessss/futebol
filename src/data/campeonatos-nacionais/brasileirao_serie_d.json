@@ -1,6 +1,7 @@
 {
   "id": "brasileirao_serie_d",
   "nome": "Campeonato Brasileiro Série D",
+  "pais": "BR",
   "nivel": 4,
   "ano_referencia": 2026,
   "formato": {
@@ -11,7 +12,14 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["segunda_fase", "terceira_fase", "oitavas", "quartas", "semifinal", "final"],
+      "fases": [
+        "segunda_fase",
+        "terceira_fase",
+        "oitavas",
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },

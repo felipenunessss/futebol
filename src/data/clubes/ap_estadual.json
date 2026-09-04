@@ -15,7 +15,10 @@
     "pais": "BR",
     "estado": "AP",
     "cidade": "Macapá",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "trem",
@@ -24,7 +27,10 @@
     "pais": "BR",
     "estado": "AP",
     "cidade": "Macapá",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "independente_ap",

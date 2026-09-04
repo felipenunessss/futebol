@@ -1,6 +1,7 @@
 {
   "id": "copa_sul_sudeste",
   "nome": "Copa Sul-Sudeste",
+  "pais": "BR",
   "nivel": 0,
   "ano_referencia": 2026,
   "formato": {

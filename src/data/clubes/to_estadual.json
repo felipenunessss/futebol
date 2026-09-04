@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "TO",
     "cidade": "Araguaína",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "bela_vista_to",
@@ -56,7 +59,10 @@
     "pais": "BR",
     "estado": "TO",
     "cidade": "Tocantinópolis",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "uniao_to",

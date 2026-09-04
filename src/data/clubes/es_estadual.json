@@ -38,7 +38,10 @@
     "pais": "BR",
     "estado": "ES",
     "cidade": "Águia Branca",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "rio_branco_vn",

@@ -25,7 +25,10 @@
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
     "estadio": "Conselheiro Galvão",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "marica",
@@ -35,7 +38,10 @@
     "estado": "RJ",
     "cidade": "Maricá",
     "estadio": "Municipal João Saldanha",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "nova_iguacu",
@@ -72,7 +78,10 @@
     "estado": "RJ",
     "cidade": "Volta Redonda",
     "estadio": "Raulino de Oliveira",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "america_rj",

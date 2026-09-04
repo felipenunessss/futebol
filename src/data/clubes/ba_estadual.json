@@ -16,7 +16,10 @@
     "estado": "BA",
     "cidade": "Alagoinhas",
     "estadio": "Municipal Antônio de Figueiredo Carneiro",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "bahia_de_feira",
@@ -35,7 +38,10 @@
     "estado": "BA",
     "cidade": "Riachão do Jacuípe",
     "estadio": "Roberto Santos",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "jequie",
@@ -54,7 +60,10 @@
     "estado": "BA",
     "cidade": "Juazeiro",
     "estadio": "Adauto Moraes",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "porto_ba",
@@ -64,7 +73,10 @@
     "estado": "BA",
     "cidade": "Porto Seguro",
     "estadio": "Municipal Agnaldo Bento dos Santos",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "barcelona_ilheus",

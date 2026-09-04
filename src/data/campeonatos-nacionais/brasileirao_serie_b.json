@@ -1,6 +1,7 @@
 {
   "id": "brasileirao_serie_b",
   "nome": "Campeonato Brasileiro Série B",
+  "pais": "BR",
   "nivel": 2,
   "ano_referencia": 2026,
   "formato": {

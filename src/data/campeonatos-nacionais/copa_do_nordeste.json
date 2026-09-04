@@ -1,6 +1,7 @@
 {
   "id": "copa_do_nordeste",
   "nome": "Copa do Nordeste",
+  "pais": "BR",
   "nivel": 0,
   "ano_referencia": 2026,
   "formato": {

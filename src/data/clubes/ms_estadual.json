@@ -79,6 +79,9 @@
     "pais": "BR",
     "estado": "MS",
     "cidade": "Ivinhema",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   }
 ]

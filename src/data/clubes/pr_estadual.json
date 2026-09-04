@@ -15,7 +15,10 @@
     "estado": "PR",
     "cidade": "Cascavel",
     "estadio": "Olímpico Regional Arnaldo Busatto",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "cianorte",
@@ -25,7 +28,10 @@
     "estado": "PR",
     "cidade": "Cianorte",
     "estadio": "Albino Turbay",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "azuriz",
@@ -35,7 +41,10 @@
     "estado": "PR",
     "cidade": "Pato Branco",
     "estadio": "Os Pioneiros",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "sao_joseense",
@@ -52,7 +61,10 @@
     "pais": "BR",
     "estado": "PR",
     "cidade": "Maringá",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "andraus",

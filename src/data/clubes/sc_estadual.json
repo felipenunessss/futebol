@@ -7,7 +7,10 @@
     "estado": "SC",
     "cidade": "Florianópolis",
     "estadio": "Orlando Scarpelli",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "carlos_renaux",
@@ -26,7 +29,10 @@
     "estado": "SC",
     "cidade": "Joinville",
     "estadio": "Arena Joinville",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "santa_catarina_ec",
@@ -45,7 +51,10 @@
     "estado": "SC",
     "cidade": "Brusque",
     "estadio": "Augusto Bauer",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "camboriu_fc",
@@ -71,7 +80,10 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Itajaí",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "barra_fc",
@@ -80,6 +92,9 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Balneário Camboriú",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   }
 ]

@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "São Bernardo do Campo",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "velo_clube",
@@ -23,7 +26,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "São Paulo",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "botafogo_sp",
@@ -32,7 +38,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Ribeirão Preto",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "primavera",
@@ -65,7 +74,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Diadema",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "ferroviaria",
@@ -74,7 +86,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Araraquara",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "gremio_prudente",
@@ -91,7 +106,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Limeira",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "ituano",
@@ -100,7 +118,10 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Itu",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "juventus_sp",

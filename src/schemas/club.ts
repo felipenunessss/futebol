@@ -1,4 +1,8 @@
-export type DivisaoNacional = "serie_a" | "serie_b" | "serie_c" | "serie_d";
+/** Em qual liga nacional (de qual país) e em que nível dela um clube joga. Nível é relativo ao país (1 = elite, 2 = segunda divisão, ...). */
+export interface DivisaoNacional {
+  pais: string; // ISO 3166-1 alpha-2, ex: "BR", "AR", "CL"
+  nivel: number;
+}
 
 /**
  * Tier relativo de força financeira do clube. Usado pela camada de mercado

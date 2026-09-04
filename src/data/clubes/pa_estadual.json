@@ -22,7 +22,10 @@
     "pais": "BR",
     "estado": "PA",
     "cidade": "Belém",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "aguia_de_maraba",
@@ -31,7 +34,10 @@
     "pais": "BR",
     "estado": "PA",
     "cidade": "Marabá",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "capitao_poco",

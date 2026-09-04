@@ -1,6 +1,7 @@
 {
   "id": "brasileirao_serie_a",
   "nome": "Campeonato Brasileiro Série A",
+  "pais": "BR",
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
@@ -13,13 +14,48 @@
     "rebaixamento_proxima_divisao": 4
   },
   "classicos": [
-    { "time_a": "gremio", "time_b": "internacional", "nome": "Grenal", "peso_midia": 5 },
-    { "time_a": "corinthians", "time_b": "palmeiras", "nome": "Derby Paulista", "peso_midia": 5 },
-    { "time_a": "flamengo", "time_b": "fluminense", "nome": "Fla-Flu", "peso_midia": 5 },
-    { "time_a": "flamengo", "time_b": "vasco_da_gama", "nome": "Clássico dos Milhões", "peso_midia": 5 },
-    { "time_a": "corinthians", "time_b": "sao_paulo", "nome": "Majestoso", "peso_midia": 4 },
-    { "time_a": "sao_paulo", "time_b": "santos", "nome": "Clássico da Vovó", "peso_midia": 4 },
-    { "time_a": "athletico_pr", "time_b": "coritiba", "nome": "Atletiba", "peso_midia": 5 }
+    {
+      "time_a": "gremio",
+      "time_b": "internacional",
+      "nome": "Grenal",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "corinthians",
+      "time_b": "palmeiras",
+      "nome": "Derby Paulista",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "flamengo",
+      "time_b": "fluminense",
+      "nome": "Fla-Flu",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "flamengo",
+      "time_b": "vasco_da_gama",
+      "nome": "Clássico dos Milhões",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "corinthians",
+      "time_b": "sao_paulo",
+      "nome": "Majestoso",
+      "peso_midia": 4
+    },
+    {
+      "time_a": "sao_paulo",
+      "time_b": "santos",
+      "nome": "Clássico da Vovó",
+      "peso_midia": 4
+    },
+    {
+      "time_a": "athletico_pr",
+      "time_b": "coritiba",
+      "nome": "Atletiba",
+      "peso_midia": 5
+    }
   ],
   "times": [
     "athletico_pr",

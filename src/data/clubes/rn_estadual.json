@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "RN",
     "cidade": "Natal",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "america_rn",
@@ -15,7 +18,10 @@
     "pais": "BR",
     "estado": "RN",
     "cidade": "Natal",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "globo_fc",
@@ -32,7 +38,10 @@
     "pais": "BR",
     "estado": "RN",
     "cidade": "Tibau do Sul",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "potiguar_mossoro",

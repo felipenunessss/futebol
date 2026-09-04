@@ -7,7 +7,10 @@
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
     "estadio": "Maracanã",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "muito_alta"
   },
   {
@@ -18,7 +21,10 @@
     "estado": "SP",
     "cidade": "São Paulo",
     "estadio": "Allianz Parque",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "muito_alta"
   },
   {
@@ -29,7 +35,10 @@
     "estado": "SP",
     "cidade": "São Paulo",
     "estadio": "MorumBIS",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -40,7 +49,10 @@
     "estado": "SP",
     "cidade": "São Paulo",
     "estadio": "Neo Química Arena",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -51,7 +63,10 @@
     "estado": "SP",
     "cidade": "Santos",
     "estadio": "Vila Belmiro",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -62,7 +77,10 @@
     "estado": "RS",
     "cidade": "Porto Alegre",
     "estadio": "Arena do Grêmio",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -73,7 +91,10 @@
     "estado": "RS",
     "cidade": "Porto Alegre",
     "estadio": "Beira-Rio",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -84,7 +105,10 @@
     "estado": "MG",
     "cidade": "Belo Horizonte",
     "estadio": "Mineirão",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -95,7 +119,10 @@
     "estado": "MG",
     "cidade": "Belo Horizonte",
     "estadio": "Arena MRV",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -106,7 +133,10 @@
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
     "estadio": "Nilton Santos",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -117,7 +147,10 @@
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
     "estadio": "Maracanã",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -128,7 +161,10 @@
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
     "estadio": "São Januário",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "alta"
   },
   {
@@ -139,7 +175,10 @@
     "estado": "BA",
     "cidade": "Salvador",
     "estadio": "Arena Fonte Nova",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -150,7 +189,10 @@
     "estado": "CE",
     "cidade": "Fortaleza",
     "estadio": "Arena Castelão",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "media"
   },
   {
@@ -161,7 +203,10 @@
     "estado": "PR",
     "cidade": "Curitiba",
     "estadio": "Ligga Arena",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -172,7 +217,10 @@
     "estado": "SP",
     "cidade": "Bragança Paulista",
     "estadio": "Nabi Abi Chedid",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -183,7 +231,10 @@
     "estado": "MT",
     "cidade": "Cuiabá",
     "estadio": "Arena Pantanal",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -194,7 +245,10 @@
     "estado": "BA",
     "cidade": "Salvador",
     "estadio": "Barradão",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -205,7 +259,10 @@
     "estado": "SC",
     "cidade": "Criciúma",
     "estadio": "Heriberto Hülse",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -216,7 +273,10 @@
     "estado": "RS",
     "cidade": "Caxias do Sul",
     "estadio": "Alfredo Jaconi",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -227,7 +287,10 @@
     "estado": "PE",
     "cidade": "Recife",
     "estadio": "Ilha do Retiro",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "media"
   },
   {
@@ -238,7 +301,10 @@
     "estado": "PE",
     "cidade": "Recife",
     "estadio": "Aflitos",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -249,7 +315,10 @@
     "estado": "PE",
     "cidade": "Recife",
     "estadio": "Arruda",
-    "divisao_nacional": "serie_c",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -260,7 +329,10 @@
     "estado": "CE",
     "cidade": "Fortaleza",
     "estadio": "Arena Castelão",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "media"
   },
   {
@@ -271,7 +343,10 @@
     "estado": "AL",
     "cidade": "Maceió",
     "estadio": "Rei Pelé",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -282,7 +357,10 @@
     "estado": "PR",
     "cidade": "Curitiba",
     "estadio": "Couto Pereira",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "media"
   },
   {
@@ -293,7 +371,10 @@
     "estado": "SC",
     "cidade": "Florianópolis",
     "estadio": "Ressacada",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -304,7 +385,10 @@
     "estado": "SC",
     "cidade": "Chapecó",
     "estadio": "Arena Condá",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -315,7 +399,10 @@
     "estado": "GO",
     "cidade": "Goiânia",
     "estadio": "Serra Dourada",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "media"
   },
   {
@@ -326,7 +413,10 @@
     "estado": "GO",
     "cidade": "Goiânia",
     "estadio": "Estádio Onésio Brasileiro Alvarenga",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -337,7 +427,10 @@
     "estado": "SP",
     "cidade": "Campinas",
     "estadio": "Brinco de Ouro",
-    "divisao_nacional": "serie_c",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -348,7 +441,10 @@
     "estado": "SP",
     "cidade": "Campinas",
     "estadio": "Moisés Lucarelli",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -359,7 +455,10 @@
     "estado": "SP",
     "cidade": "Novo Horizonte",
     "estadio": "Jorjão",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "muito_baixa"
   },
   {
@@ -370,7 +469,10 @@
     "estado": "SP",
     "cidade": "Mirassol",
     "estadio": "Campos Maia",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "muito_baixa"
   },
   {
@@ -381,7 +483,10 @@
     "estado": "MG",
     "cidade": "Belo Horizonte",
     "estadio": "Independência",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -392,7 +497,10 @@
     "estado": "MG",
     "cidade": "Tombos",
     "estadio": "Antônio Guimarães de Almeida",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "athletic_club_mg",
@@ -402,7 +510,10 @@
     "estado": "MG",
     "cidade": "São João del-Rei",
     "estadio": "Arena Unimed",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "remo",
@@ -412,7 +523,10 @@
     "estado": "PA",
     "cidade": "Belém",
     "estadio": "Baenão",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 1
+    },
     "forca_financeira": "baixa"
   },
   {
@@ -423,7 +537,10 @@
     "estado": "PR",
     "cidade": "Ponta Grossa",
     "estadio": "Germano Krüger",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "londrina",
@@ -433,7 +550,10 @@
     "estado": "PR",
     "cidade": "Londrina",
     "estadio": "Estádio do Café",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "atletico_goianiense",
@@ -443,7 +563,10 @@
     "estado": "GO",
     "cidade": "Goiânia",
     "estadio": "Antônio Accioly",
-    "divisao_nacional": "serie_b"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 2
+    }
   },
   {
     "id": "confianca",
@@ -453,7 +576,10 @@
     "estado": "SE",
     "cidade": "Aracaju",
     "estadio": "Lourival Baptista",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "csa",
@@ -462,7 +588,10 @@
     "pais": "BR",
     "estado": "AL",
     "cidade": "Maceió",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "paysandu",
@@ -471,7 +600,10 @@
     "pais": "BR",
     "estado": "PA",
     "cidade": "Belém",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "amazonas_fc",
@@ -481,6 +613,9 @@
     "estado": "AM",
     "cidade": "Manaus",
     "estadio": "Carlos Zamith",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   }
 ]

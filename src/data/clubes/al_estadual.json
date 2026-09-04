@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "AL",
     "cidade": "Arapiraca",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "coruripe",
@@ -31,7 +34,10 @@
     "pais": "BR",
     "estado": "AL",
     "cidade": "Palmeira dos Índios",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "murici",

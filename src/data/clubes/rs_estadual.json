@@ -16,7 +16,10 @@
     "estado": "RS",
     "cidade": "Caxias do Sul",
     "estadio": "Francisco Stédile",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "guarany_bage",
@@ -26,7 +29,10 @@
     "estado": "RS",
     "cidade": "Bagé",
     "estadio": "Antônio Magalhães Rossel",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "inter_santa_maria",
@@ -80,7 +86,10 @@
     "estado": "RS",
     "cidade": "Erechim",
     "estadio": "Olímpico Colosso da Lagoa",
-    "divisao_nacional": "serie_c"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 3
+    }
   },
   {
     "id": "aimore",
@@ -116,7 +125,10 @@
     "estado": "RS",
     "cidade": "Pelotas",
     "estadio": "Bento Freitas",
-    "divisao_nacional": "serie_d"
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   },
   {
     "id": "brasil_farroupilha",
