@@ -1,0 +1,18 @@
+[
+  { "id": "alianza_atletico", "nome": "Alianza Atlético Sullana", "nome_popular": "Alianza Atlético", "pais": "PE", "cidade": "Sullana", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "alianza_lima", "nome": "Club Alianza Lima", "nome_popular": "Alianza Lima", "pais": "PE", "cidade": "Lima", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "comerciantes_unidos", "nome": "Comerciantes Unidos", "nome_popular": "Comerciantes Unidos", "pais": "PE", "cidade": "Cutervo", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "cienciano", "nome": "Club Sportivo Cienciano", "nome_popular": "Cienciano", "pais": "PE", "cidade": "Cusco", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "chankas", "nome": "Los Chankas CYC", "nome_popular": "Los Chankas", "pais": "PE", "cidade": "Andahuaylas", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "cusco_fc", "nome": "Cusco Fútbol Club", "nome_popular": "Cusco FC", "pais": "PE", "cidade": "Cusco", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "deportivo_garcilaso", "nome": "Asociación Deportiva Deportivo Garcilaso", "nome_popular": "Deportivo Garcilaso", "pais": "PE", "cidade": "Cusco", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "melgar", "nome": "Foot Ball Club Melgar", "nome_popular": "Melgar", "pais": "PE", "cidade": "Arequipa", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "sporting_cristal", "nome": "Club Sporting Cristal", "nome_popular": "Sporting Cristal", "pais": "PE", "cidade": "Lima", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "universitario_peru", "nome": "Club Universitario de Deportes", "nome_popular": "Universitario", "pais": "PE", "cidade": "Lima", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "sport_huancayo", "nome": "Club Sport Huancayo", "nome_popular": "Sport Huancayo", "pais": "PE", "cidade": "Huancayo", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "utc", "nome": "Universidad Técnica de Cajamarca", "nome_popular": "UTC", "pais": "PE", "cidade": "Cajamarca", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "adt_tarma", "nome": "Asociación Deportiva Tarma", "nome_popular": "ADT", "pais": "PE", "cidade": "Tarma", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "comerciantes_fc", "nome": "Comerciantes FC", "nome_popular": "Comerciantes FC", "pais": "PE", "cidade": "Iquitos", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "juan_pablo_ii", "nome": "Club Deportivo Juan Pablo II College", "nome_popular": "Juan Pablo II", "pais": "PE", "cidade": "Chongoyape", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "sport_ancash", "nome": "Club Sport Áncash", "nome_popular": "Sport Áncash", "pais": "PE", "cidade": "Huaraz", "divisao_nacional": { "pais": "PE", "nivel": 1 } }
+]

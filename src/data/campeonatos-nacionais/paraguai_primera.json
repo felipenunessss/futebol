@@ -1,0 +1,13 @@
+{
+  "id": "paraguai_primera",
+  "nome": "Primera División do Paraguai",
+  "pais": "PY",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": { "turno": { "nome": "Torneo Apertura", "ida_e_volta": true, "classificam_proxima_fase": 0 }, "returno": { "nome": "Torneo Clausura", "ida_e_volta": true, "classificam_proxima_fase": 0 } },
+  "premiacao": {},
+  "classicos": [
+    { "time_a": "cerro_porteno", "time_b": "olimpia", "nome": "Superclásico Paraguayo", "peso_midia": 5 }
+  ],
+  "times": ["ameliano", "cerro_porteno", "general_caballero_jlm", "guarani_paraguai", "libertad_paraguai", "nacional_paraguai", "olimpia", "sportivo_2_de_mayo", "sportivo_luqueno", "trinidense"]
+}

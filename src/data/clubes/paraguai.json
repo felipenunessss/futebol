@@ -1,0 +1,12 @@
+[
+  { "id": "ameliano", "nome": "Club Sportivo Ameliano", "nome_popular": "Ameliano", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "cerro_porteno", "nome": "Club Cerro Porteño", "nome_popular": "Cerro Porteño", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "general_caballero_jlm", "nome": "Club General Caballero JLM", "nome_popular": "General Caballero JLM", "pais": "PY", "cidade": "Juan León Mallorquín", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "guarani_paraguai", "nome": "Club Guaraní", "nome_popular": "Guaraní", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "libertad_paraguai", "nome": "Club Libertad", "nome_popular": "Libertad", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "nacional_paraguai", "nome": "Club Nacional", "nome_popular": "Nacional", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "olimpia", "nome": "Club Olimpia", "nome_popular": "Olimpia", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "sportivo_2_de_mayo", "nome": "Club Sportivo 2 de Mayo", "nome_popular": "2 de Mayo", "pais": "PY", "cidade": "Pedro Juan Caballero", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "sportivo_luqueno", "nome": "Club Sportivo Luqueño", "nome_popular": "Sportivo Luqueño", "pais": "PY", "cidade": "Luque", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "trinidense", "nome": "Club Sportivo Trinidense", "nome_popular": "Trinidense", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } }
+]

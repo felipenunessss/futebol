@@ -1,0 +1,16 @@
+[
+  { "id": "always_ready", "nome": "Club Always Ready", "nome_popular": "Always Ready", "pais": "BO", "cidade": "El Alto", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "aurora", "nome": "Club Aurora", "nome_popular": "Aurora", "pais": "BO", "cidade": "Cochabamba", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "blooming", "nome": "Club Blooming", "nome_popular": "Blooming", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "bolivar", "nome": "Club Bolívar", "nome_popular": "Bolívar", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "guabira", "nome": "Club Deportivo Guabirá", "nome_popular": "Guabirá", "pais": "BO", "cidade": "Montero", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "independiente_petrolero", "nome": "Club Independiente Petrolero", "nome_popular": "Independiente Petrolero", "pais": "BO", "cidade": "Sucre", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "nacional_potosi", "nome": "Club Atlético Nacional Potosí", "nome_popular": "Nacional Potosí", "pais": "BO", "cidade": "Potosí", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "oriente_petrolero", "nome": "Club Deportivo Oriente Petrolero", "nome_popular": "Oriente Petrolero", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "real_oruro", "nome": "Club Deportivo Real Oruro", "nome_popular": "Real Oruro", "pais": "BO", "cidade": "Oruro", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "real_tomayapo", "nome": "Club Deportivo Real Tomayapo", "nome_popular": "Real Tomayapo", "pais": "BO", "cidade": "Tarija", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "san_antonio_bulo_bulo", "nome": "San Antonio de Bulo Bulo", "nome_popular": "San Antonio", "pais": "BO", "cidade": "Bulo Bulo", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "the_strongest", "nome": "Club The Strongest", "nome_popular": "The Strongest", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "universitario_vinto", "nome": "Universitario de Vinto", "nome_popular": "Universitario de Vinto", "pais": "BO", "cidade": "Vinto", "divisao_nacional": { "pais": "BO", "nivel": 1 } },
+  { "id": "wilstermann", "nome": "Club Deportivo Jorge Wilstermann", "nome_popular": "Wilstermann", "pais": "BO", "cidade": "Cochabamba", "divisao_nacional": { "pais": "BO", "nivel": 1 } }
+]
