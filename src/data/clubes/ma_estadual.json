@@ -1,0 +1,10 @@
+[
+  { "id": "mac", "nome": "Maranhão Atlético Clube", "nome_popular": "MAC", "pais": "BR", "estado": "MA", "cidade": "São Luís" },
+  { "id": "imperatriz", "nome": "Sociedade Imperatriz de Desportos", "nome_popular": "Imperatriz", "pais": "BR", "estado": "MA", "cidade": "Imperatriz", "estadio": "Frei Epifânio D'Abadia" },
+  { "id": "iape", "nome": "Instituto de Administração de Projetos Educacionais Futebol Clube", "nome_popular": "IAPE", "pais": "BR", "estado": "MA", "cidade": "São Luís", "estadio": "Nhozinho Santos" },
+  { "id": "sampaio_correa_ma", "nome": "Sampaio Corrêa Futebol Clube", "nome_popular": "Sampaio Corrêa", "pais": "BR", "estado": "MA", "cidade": "São Luís", "estadio": "Castelão" },
+  { "id": "moto_club", "nome": "Moto Club de São Luís", "nome_popular": "Moto Club", "pais": "BR", "estado": "MA", "cidade": "São Luís" },
+  { "id": "tuntum", "nome": "Tuntum Esporte Clube", "nome_popular": "Tuntum", "pais": "BR", "estado": "MA", "cidade": "Tuntum", "estadio": "Rafael Seabra" },
+  { "id": "luminense_ma", "nome": "Luminense Atlético Clube", "nome_popular": "Luminense", "pais": "BR", "estado": "MA", "cidade": "Paço do Lumiar" },
+  { "id": "itz_sport", "nome": "ITZ Sport", "nome_popular": "ITZ Sport", "pais": "BR", "estado": "MA", "cidade": "Imperatriz", "estadio": "Frei Epifânio D'Abadia" }
+]

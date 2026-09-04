@@ -182,6 +182,22 @@ nesta rodada (confirmei só nome/cidade).
 - Clássicos de RN e PB não foram pesquisados/adicionados por falta de
   confirmação do nome oficial de cada rivalidade.
 
+## Alagoas, Piauí, Maranhão e Espírito Santo — detalhes pendentes
+
+- **CSA** (Alagoas): confirmado jogando Série D nacional 2026 — movido para
+  `brasil.json`.
+- **"Capixaba" (ES)**: um dos 10 clubes da 1ª divisão do Capixaba 2026 não
+  teve a cidade confirmada com segurança (encontrei candidatos como "Sport
+  Clube Brasil Capixaba" mas não bati com certeza) — excluído da base por
+  `cidade` ser campo obrigatório. `capixaba_1.json` fica com 9 dos 10 times
+  reais da divisão até resolver.
+- Formatos de Alagoano, Piauiense e Maranhense modelados por aproximação
+  simples (turno único + semifinal/final) a partir de resumos rápidos de
+  fonte — não confirmei detalhes como cruzamentos exatos do mata-mata ou
+  número de rebaixados/vagas nacionais.
+- Clássicos de Alagoas e Piauí não foram pesquisados/adicionados por falta
+  de confirmação do nome oficial de cada rivalidade.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

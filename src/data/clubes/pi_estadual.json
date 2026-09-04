@@ -1,0 +1,10 @@
+[
+  { "id": "oeirense", "nome": "Oeirense Futebol Clube", "nome_popular": "Oeirense", "pais": "BR", "estado": "PI", "cidade": "Oeiras" },
+  { "id": "fluminense_pi", "nome": "Fluminense Esporte Clube (PI)", "nome_popular": "Fluminense-PI", "pais": "BR", "estado": "PI", "cidade": "Teresina" },
+  { "id": "piaui_ec", "nome": "Piauí Esporte Clube", "nome_popular": "Piauí", "pais": "BR", "estado": "PI", "cidade": "Teresina" },
+  { "id": "altos", "nome": "Altos Futebol Clube", "nome_popular": "Altos", "pais": "BR", "estado": "PI", "cidade": "Altos" },
+  { "id": "corisabba", "nome": "Associação Atlética Corisabbá", "nome_popular": "Corisabbá", "pais": "BR", "estado": "PI", "cidade": "Floriano" },
+  { "id": "teresina_ec", "nome": "Teresina Atlético Clube", "nome_popular": "Teresina", "pais": "BR", "estado": "PI", "cidade": "Teresina" },
+  { "id": "parnahyba", "nome": "Parnahyba Sport Club", "nome_popular": "Parnahyba", "pais": "BR", "estado": "PI", "cidade": "Parnaíba" },
+  { "id": "cap_pi", "nome": "Clube Atlético Piauiense", "nome_popular": "CAP", "pais": "BR", "estado": "PI", "cidade": "Teresina" }
+]

@@ -454,5 +454,14 @@
     "cidade": "Aracaju",
     "estadio": "Lourival Baptista",
     "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "csa",
+    "nome": "Centro Sportivo Alagoano",
+    "nome_popular": "CSA",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Maceió",
+    "divisao_nacional": "serie_d"
   }
 ]

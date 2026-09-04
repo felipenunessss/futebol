@@ -1,0 +1,11 @@
+[
+  { "id": "rio_branco_es", "nome": "Rio Branco Atlético Clube", "nome_popular": "Rio Branco-ES", "pais": "BR", "estado": "ES", "cidade": "Vitória" },
+  { "id": "vitoria_es", "nome": "Vitória Futebol Clube", "nome_popular": "Vitória-ES", "pais": "BR", "estado": "ES", "cidade": "Vitória" },
+  { "id": "desportiva_ferroviaria", "nome": "Associação Desportiva Ferroviária Vale do Rio Doce", "nome_popular": "Desportiva Ferroviária", "pais": "BR", "estado": "ES", "cidade": "Cariacica" },
+  { "id": "porto_vitoria", "nome": "Porto Vitória Futebol Clube", "nome_popular": "Porto Vitória", "pais": "BR", "estado": "ES", "cidade": "Serra" },
+  { "id": "real_noroeste", "nome": "Real Noroeste Capixaba Futebol Clube", "nome_popular": "Real Noroeste", "pais": "BR", "estado": "ES", "cidade": "Águia Branca" },
+  { "id": "rio_branco_vn", "nome": "Rio Branco Futebol Clube (Venda Nova)", "nome_popular": "Rio Branco-VN", "pais": "BR", "estado": "ES", "cidade": "Venda Nova do Imigrante" },
+  { "id": "vilavelhense", "nome": "Vilavelhense Futebol Clube", "nome_popular": "Vilavelhense", "pais": "BR", "estado": "ES", "cidade": "Vila Velha" },
+  { "id": "serra_fc", "nome": "Sociedade Desportiva Serra Futebol Clube", "nome_popular": "Serra", "pais": "BR", "estado": "ES", "cidade": "Serra" },
+  { "id": "forte_fc", "nome": "Forte Futebol Clube", "nome_popular": "Forte FC", "pais": "BR", "estado": "ES", "cidade": "Castelo" }
+]

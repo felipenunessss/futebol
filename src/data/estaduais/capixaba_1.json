@@ -1,0 +1,36 @@
+{
+  "id": "capixaba_1",
+  "nome": "Campeonato Capixaba",
+  "estado": "ES",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 10,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 8
+    },
+    "mata_mata": {
+      "fases": ["quartas", "semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [
+    { "time_a": "vitoria_es", "time_b": "rio_branco_es", "nome": "Vi-Rio", "peso_midia": 5 }
+  ],
+  "times": [
+    "rio_branco_es",
+    "vitoria_es",
+    "desportiva_ferroviaria",
+    "porto_vitoria",
+    "real_noroeste",
+    "rio_branco_vn",
+    "vilavelhense",
+    "serra_fc",
+    "forte_fc"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "alagoano_1",
+  "nome": "Campeonato Alagoano",
+  "estado": "AL",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "crb",
+    "csa",
+    "asa",
+    "coruripe",
+    "cruzeiro_al",
+    "cse",
+    "murici",
+    "penedense"
+  ]
+}

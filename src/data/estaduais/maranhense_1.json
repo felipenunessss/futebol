@@ -1,0 +1,33 @@
+{
+  "id": "maranhense_1",
+  "nome": "Campeonato Maranhense",
+  "estado": "MA",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [
+    { "time_a": "sampaio_correa_ma", "time_b": "moto_club", "nome": "Superclássico Maranhense", "peso_midia": 4 }
+  ],
+  "times": [
+    "mac",
+    "imperatriz",
+    "iape",
+    "sampaio_correa_ma",
+    "moto_club",
+    "tuntum",
+    "luminense_ma",
+    "itz_sport"
+  ]
+}
