@@ -617,5 +617,257 @@
       "pais": "BR",
       "nivel": 3
     }
+  },
+  {
+    "id": "rio_branco_es",
+    "nome": "Rio Branco Atlético Clube",
+    "nome_popular": "Rio Branco-ES",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Vitória",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "vitoria_es",
+    "nome": "Vitória Futebol Clube",
+    "nome_popular": "Vitória-ES",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Vitória",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "uberlandia_ec",
+    "nome": "Uberlândia Esporte Clube",
+    "nome_popular": "Uberlândia",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Uberlândia",
+    "estadio": "Parque do Sabiá",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "pouso_alegre",
+    "nome": "Pouso Alegre Futebol Clube",
+    "nome_popular": "Pouso Alegre",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Pouso Alegre",
+    "estadio": "Municipal Irmão Gino Maria Rossi",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "sao_jose_rs",
+    "nome": "Esporte Clube São José",
+    "nome_popular": "São José",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Porto Alegre",
+    "estadio": "Passo D'Areia",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "sao_luiz",
+    "nome": "Esporte Clube São Luiz",
+    "nome_popular": "São Luiz",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Ijuí",
+    "estadio": "19 de Outubro",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "santa_catarina_ec",
+    "nome": "Santa Catarina Esporte Clube",
+    "nome_popular": "Santa Catarina",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Rio do Sul",
+    "estadio": "Alfredo João Krieck",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "nova_iguacu",
+    "nome": "Nova Iguaçu Futebol Clube",
+    "nome_popular": "Nova Iguaçu",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Nova Iguaçu",
+    "estadio": "Jânio Moraes",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "portuguesa_rj",
+    "nome": "Associação Atlética Portuguesa",
+    "nome_popular": "Portuguesa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Luso-Brasileiro",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "sampaio_correa_rj",
+    "nome": "Sampaio Corrêa Futebol e Esporte",
+    "nome_popular": "Sampaio Corrêa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema",
+    "estadio": "Lourival Gomes de Almeida",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "america_rj",
+    "nome": "América Futebol Clube (RJ)",
+    "nome_popular": "América-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "velo_clube",
+    "nome": "Velo Clube Rioclarense",
+    "nome_popular": "Velo Clube",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Rio Claro",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "noroeste",
+    "nome": "Associação Atlética Noroeste",
+    "nome_popular": "Noroeste",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bauru",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "xv_de_piracicaba",
+    "nome": "Esporte Clube XV de Novembro",
+    "nome_popular": "XV de Piracicaba",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Piracicaba",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "sao_joseense",
+    "nome": "Independente Futebol São Joseense",
+    "nome_popular": "São Joseense",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "São José dos Pinhais",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "operario_vg",
+    "nome": "Clube Esportivo Operário Várzea-Grandense",
+    "nome_popular": "Operário-VG",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Várzea Grande",
+    "estadio": "Dito Souza",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "primavera_ac",
+    "nome": "Primavera Atlético Clube",
+    "nome_popular": "Primavera",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Primavera do Leste",
+    "estadio": "Cerradão",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "uniao_rondonopolis",
+    "nome": "União Esporte Clube",
+    "nome_popular": "União Rondonópolis",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Rondonópolis",
+    "estadio": "Engenheiro Luthero Lopes",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "operario_ms",
+    "nome": "Operário Futebol Clube",
+    "nome_popular": "Operário-MS",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Campo Grande",
+    "estadio": "Moreninhas",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
+  },
+  {
+    "id": "blumenau_ec",
+    "nome": "Blumenau Esporte Clube",
+    "nome_popular": "Blumenau",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Blumenau",
+    "divisao_nacional": {
+      "pais": "BR",
+      "nivel": 4
+    }
   }
 ]

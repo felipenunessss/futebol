@@ -44,33 +44,6 @@
     }
   },
   {
-    "id": "nova_iguacu",
-    "nome": "Nova Iguaçu Futebol Clube",
-    "nome_popular": "Nova Iguaçu",
-    "pais": "BR",
-    "estado": "RJ",
-    "cidade": "Nova Iguaçu",
-    "estadio": "Jânio Moraes"
-  },
-  {
-    "id": "portuguesa_rj",
-    "nome": "Associação Atlética Portuguesa",
-    "nome_popular": "Portuguesa-RJ",
-    "pais": "BR",
-    "estado": "RJ",
-    "cidade": "Rio de Janeiro",
-    "estadio": "Luso-Brasileiro"
-  },
-  {
-    "id": "sampaio_correa_rj",
-    "nome": "Sampaio Corrêa Futebol e Esporte",
-    "nome_popular": "Sampaio Corrêa-RJ",
-    "pais": "BR",
-    "estado": "RJ",
-    "cidade": "Saquarema",
-    "estadio": "Lourival Gomes de Almeida"
-  },
-  {
     "id": "volta_redonda",
     "nome": "Volta Redonda Futebol Clube",
     "nome_popular": "Volta Redonda",
@@ -82,14 +55,6 @@
       "pais": "BR",
       "nivel": 3
     }
-  },
-  {
-    "id": "america_rj",
-    "nome": "América Futebol Clube (RJ)",
-    "nome_popular": "América-RJ",
-    "pais": "BR",
-    "estado": "RJ",
-    "cidade": "Rio de Janeiro"
   },
   {
     "id": "americano",

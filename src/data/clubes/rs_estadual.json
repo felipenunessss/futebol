@@ -61,24 +61,6 @@
     "estadio": "Do Vale"
   },
   {
-    "id": "sao_jose_rs",
-    "nome": "Esporte Clube São José",
-    "nome_popular": "São José",
-    "pais": "BR",
-    "estado": "RS",
-    "cidade": "Porto Alegre",
-    "estadio": "Passo D'Areia"
-  },
-  {
-    "id": "sao_luiz",
-    "nome": "Esporte Clube São Luiz",
-    "nome_popular": "São Luiz",
-    "pais": "BR",
-    "estado": "RS",
-    "cidade": "Ijuí",
-    "estadio": "19 de Outubro"
-  },
-  {
     "id": "ypiranga_rs",
     "nome": "Ypiranga Futebol Clube",
     "nome_popular": "Ypiranga",

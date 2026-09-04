@@ -1,14 +1,5 @@
 [
   {
-    "id": "operario_vg",
-    "nome": "Clube Esportivo Operário Várzea-Grandense",
-    "nome_popular": "Operário-VG",
-    "pais": "BR",
-    "estado": "MT",
-    "cidade": "Várzea Grande",
-    "estadio": "Dito Souza"
-  },
-  {
     "id": "varzea_grande_ec",
     "nome": "Várzea Grande Esporte Clube",
     "nome_popular": "Várzea Grande",
@@ -60,24 +51,6 @@
     "estado": "MT",
     "cidade": "Sinop",
     "estadio": "Gigante do Norte"
-  },
-  {
-    "id": "primavera_ac",
-    "nome": "Primavera Atlético Clube",
-    "nome_popular": "Primavera",
-    "pais": "BR",
-    "estado": "MT",
-    "cidade": "Primavera do Leste",
-    "estadio": "Cerradão"
-  },
-  {
-    "id": "uniao_rondonopolis",
-    "nome": "União Esporte Clube",
-    "nome_popular": "União Rondonópolis",
-    "pais": "BR",
-    "estado": "MT",
-    "cidade": "Rondonópolis",
-    "estadio": "Engenheiro Luthero Lopes"
   },
   {
     "id": "chapada_fc",

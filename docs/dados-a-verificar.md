@@ -32,6 +32,14 @@ campo foram removidos deste documento.
   (estádio Zezinho Magalhães) — confirmados por múltiplas fontes (Wikipédia,
   Futebol Interior) disputando a A3 2026. Adicionados; a A3 agora tem os 16
   times reais da divisão.
+- **"America" ligado à Série D 2026 (RJ)**: a distribuição oficial de grupos
+  da Série D 2026 (CBF/NSC Total) lista "America-RJ" no Grupo A13 — é o
+  mesmo clube já cadastrado como `america_rj` (Rio de Janeiro), não um clube
+  distinto. Movido para `brasil.json` com `divisao_nacional` de Série D.
+- **"Blumenau" (SC) ligado à Série D 2026**: confirmado por duas fontes
+  independentes (distribuição oficial de grupos CBF/NSC Total, Grupo A16, e
+  tabela de participantes da Wikipédia) como Blumenau Esporte Clube — clube
+  novo na base (`blumenau_ec`), fundado em 1919, sede em Blumenau-SC.
 
 ## Divisões ainda não modeladas (lista de clubes não encontrada com confiança)
 
@@ -277,12 +285,32 @@ nesta rodada (confirmei só nome/cidade).
 
 ## Campeonato Brasileiro Série D — detalhes pendentes
 
-- **Elenco incompleto**: a Série D real 2026 tem 96 clubes; modelamos 76
-  (79%). As ~20 vagas restantes ficaram de fora por não termos conseguido
-  confirmar com segurança quem as ocupa (times de SP, RJ, RS, MS, ES,
-  entre outros, além de grupos que nenhuma das duas pesquisas cobriu em
-  detalhe). `times[]` em `brasileirao_serie_d.json` reflete só o que foi
-  confirmado.
+- **Elenco completo (96/96)**: os 20 clubes que faltavam foram confirmados
+  contra a distribuição oficial dos 16 grupos da edição 2026, cruzando duas
+  fontes independentes (CBF/NSC Total, que publicou a lista literal dos 16
+  grupos de 6, e a tabela de participantes da Wikipédia PT) — a fonte da CBF/
+  NSC foi tratada como autoritativa nos casos em que as duas fontes
+  divergiram em UF de um clube (ver bullet "Correções" abaixo). Dos 20, 19 já
+  existiam cadastrados em arquivos `<uf>_estadual.json` (times que também
+  disputam o estadual do seu estado) e foram movidos para `brasil.json` com
+  `divisao_nacional` adicionado, mantendo o mesmo `id`: `rio_branco_es`,
+  `vitoria_es` (ES); `uberlandia_ec`, `pouso_alegre` (MG); `sao_jose_rs`,
+  `sao_luiz` (RS); `santa_catarina_ec` (SC); `nova_iguacu`,
+  `sampaio_correa_rj`, `portuguesa_rj`, `america_rj` (RJ); `noroeste`,
+  `velo_clube`, `xv_de_piracicaba` (SP); `sao_joseense` (PR); `operario_vg`,
+  `primavera_ac`, `uniao_rondonopolis` (MT); `operario_ms` (MS). O 20º,
+  **Blumenau Esporte Clube** (`blumenau_ec`, SC), não existia na base —
+  criado novo, nome oficial e cidade confirmados via Wikipédia PT/EN,
+  Sofascore e FotMob (fundado em 1919, hoje disputa Série D e Catarinense
+  Série B).
+- **Correções encontradas durante a conferência**: a fonte CBF/NSC Total
+  confirmou que `decisao` é do **PE** (Goiana-PE, como já estava cadastrado)
+  e não "Decisão Goiana-GO" como uma fonte secundária (resumo da Wikipédia)
+  sugeriu — o nome "Goiana" é a cidade, não o estado; e que `oratorio` é do
+  **AP** (Macapá, como já estava cadastrado), não MG. Nenhuma das duas
+  precisou de correção na base — os dois já estavam certos —, mas fica
+  registrado porque a fonte secundária estava errada nesses dois casos
+  específicos, então não deve ser reusada sem checagem cruzada.
 - **Descompasso de temporada**: as vagas da Série D 2026 vêm, na maioria
   dos casos, do resultado dos estaduais de **2025** — não da edição 2026
   que modelamos em `src/data/estaduais/`. O campo `premiacao.vaga_serie_d`
@@ -312,11 +340,6 @@ nesta rodada (confirmei só nome/cidade).
   `candangao_1.premiacao` não recebeu `vaga_serie_d`, apesar de os 4
   clubes do DF (`gama`, `capital_cf`, `brasiliense`, `ceilandia`) estarem
   no elenco nacional.
-- **Excluídos por ambiguidade real**: um clube "America" ligado à Copa Rio
-  2025 (RJ) — não ficou claro se é o mesmo clube já cadastrado
-  (`america_rj`) ou outro distinto, então ficou de fora; e um clube
-  "Blumenau" (SC, via Copa Santa Catarina) que não existe na base e teve
-  confirmação de só uma fonte fraca — também ficou de fora.
 - **Bahia**: uma fonte da pesquisa inicial citou "Jequié" como possível
   3º representante baiano, mas verificação direta confirmou que os 4
   reais são Atlético de Alagoinhas, Jacuipense, Juazeirense e Porto —

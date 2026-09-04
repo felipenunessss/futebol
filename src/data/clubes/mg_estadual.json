@@ -9,15 +9,6 @@
     "estadio": "Zama Maciel"
   },
   {
-    "id": "uberlandia_ec",
-    "nome": "Uberlândia Esporte Clube",
-    "nome_popular": "Uberlândia",
-    "pais": "BR",
-    "estado": "MG",
-    "cidade": "Uberlândia",
-    "estadio": "Parque do Sabiá"
-  },
-  {
     "id": "democrata_gv",
     "nome": "Esporte Clube Democrata",
     "nome_popular": "Democrata-GV",
@@ -29,15 +20,6 @@
       "pais": "BR",
       "nivel": 4
     }
-  },
-  {
-    "id": "pouso_alegre",
-    "nome": "Pouso Alegre Futebol Clube",
-    "nome_popular": "Pouso Alegre",
-    "pais": "BR",
-    "estado": "MG",
-    "cidade": "Pouso Alegre",
-    "estadio": "Municipal Irmão Gino Maria Rossi"
   },
   {
     "id": "north_ec",

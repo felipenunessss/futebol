@@ -35,15 +35,6 @@
     }
   },
   {
-    "id": "santa_catarina_ec",
-    "nome": "Santa Catarina Esporte Clube",
-    "nome_popular": "Santa Catarina",
-    "pais": "BR",
-    "estado": "SC",
-    "cidade": "Rio do Sul",
-    "estadio": "Alfredo João Krieck"
-  },
-  {
     "id": "brusque_fc",
     "nome": "Brusque Futebol Clube",
     "nome_popular": "Brusque",

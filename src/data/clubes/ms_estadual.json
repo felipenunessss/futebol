@@ -1,14 +1,5 @@
 [
   {
-    "id": "operario_ms",
-    "nome": "Operário Futebol Clube",
-    "nome_popular": "Operário-MS",
-    "pais": "BR",
-    "estado": "MS",
-    "cidade": "Campo Grande",
-    "estadio": "Moreninhas"
-  },
-  {
     "id": "pantanal_fc",
     "nome": "Pantanal Futebol Clube",
     "nome_popular": "Pantanal",

@@ -1,21 +1,5 @@
 [
   {
-    "id": "rio_branco_es",
-    "nome": "Rio Branco Atlético Clube",
-    "nome_popular": "Rio Branco-ES",
-    "pais": "BR",
-    "estado": "ES",
-    "cidade": "Vitória"
-  },
-  {
-    "id": "vitoria_es",
-    "nome": "Vitória Futebol Clube",
-    "nome_popular": "Vitória-ES",
-    "pais": "BR",
-    "estado": "ES",
-    "cidade": "Vitória"
-  },
-  {
     "id": "desportiva_ferroviaria",
     "nome": "Associação Desportiva Ferroviária Vale do Rio Doce",
     "nome_popular": "Desportiva Ferroviária",

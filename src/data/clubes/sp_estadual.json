@@ -12,14 +12,6 @@
     }
   },
   {
-    "id": "velo_clube",
-    "nome": "Velo Clube Rioclarense",
-    "nome_popular": "Velo Clube",
-    "pais": "BR",
-    "estado": "SP",
-    "cidade": "Rio Claro"
-  },
-  {
     "id": "portuguesa",
     "nome": "Associação Portuguesa de Desportos",
     "nome_popular": "Portuguesa",
@@ -50,14 +42,6 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Indaiatuba"
-  },
-  {
-    "id": "noroeste",
-    "nome": "Associação Atlética Noroeste",
-    "nome_popular": "Noroeste",
-    "pais": "BR",
-    "estado": "SP",
-    "cidade": "Bauru"
   },
   {
     "id": "capivariano",
@@ -202,14 +186,6 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Votuporanga"
-  },
-  {
-    "id": "xv_de_piracicaba",
-    "nome": "Esporte Clube XV de Novembro",
-    "nome_popular": "XV de Piracicaba",
-    "pais": "BR",
-    "estado": "SP",
-    "cidade": "Piracicaba"
   },
   {
     "id": "bandeirante",
