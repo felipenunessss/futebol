@@ -50,9 +50,9 @@ describe("resolverVagasEstaduais", () => {
     });
 
     expect(resultado).toHaveLength(3);
-    expect(resultado).toContain("clube_a");
     expect(resultado).toContain("clube_b");
     expect(resultado).toContain("clube_x");
+    expect(resultado).not.toContain("clube_a");
   });
 
   it("lista times estaduais elegíveis para preencher vagas faltantes da temporada 1, só brasileiros", () => {
@@ -88,6 +88,7 @@ describe("resolverVagasEstaduais", () => {
     expect(candidatos.every((id) => clubesBrasileiros.has(id))).toBe(true);
     expect(candidatos.some((id) => id === "palmeiras")).toBe(false);
     expect(candidatos.some((id) => id === "botafogo_sp")).toBe(true);
+    expect(candidatos.some((id) => id === "atletico_alagoinhas")).toBe(true);
   });
 
   it("sorteia candidatos reais para a temporada inicial da Série D", () => {

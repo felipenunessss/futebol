@@ -38,9 +38,7 @@ export function listarCandidatosSerieD(
   clubesBrasileiros: ReadonlySet<string>,
   campeonatos: CampeonatoComTimesBasicos[],
 ): string[] {
-  return listarCandidatosVagasEstaduais(clubesEmCompeticaoNacional, campeonatos, clubesBrasileiros).filter(
-    (timeId) => !timeId.startsWith("atletico_") || !timeId.includes("_"),
-  );
+  return listarCandidatosVagasEstaduais(clubesEmCompeticaoNacional, campeonatos, clubesBrasileiros);
 }
 
 export function sortearCandidatosSerieDTemporadaInicial(
@@ -52,16 +50,12 @@ export function sortearCandidatosSerieDTemporadaInicial(
 ): string[] {
   const candidatos = listarCandidatosSerieD(clubesEmCompeticaoNacional, clubesBrasileiros, campeonatos);
   const selecionados: string[] = [];
-  const usados = new Set<string>();
+  const disponiveis = [...candidatos];
 
-  while (selecionados.length < Math.min(quantidadeDeVagas, candidatos.length)) {
-    const indice = Math.min(candidatos.length - 1, Math.max(0, Math.floor(random() * candidatos.length)));
-    const timeId = candidatos[indice];
-    if (!usados.has(timeId)) {
-      selecionados.push(timeId);
-      usados.add(timeId);
-    }
-    if (usados.size >= candidatos.length) break;
+  while (selecionados.length < Math.min(quantidadeDeVagas, disponiveis.length)) {
+    const indice = Math.min(disponiveis.length - 1, Math.max(0, Math.floor(random() * disponiveis.length)));
+    selecionados.push(disponiveis[indice]);
+    disponiveis.splice(indice, 1);
   }
 
   return selecionados;
@@ -108,26 +102,21 @@ export function resolverVagasEstaduais(
       return true;
     };
 
-    const elegiveis = [
+    const elegiveis = [...new Set([
       ...classificacaoFinal.filter(ehElegivel),
       ...candidatosExtras.filter(ehElegivel),
-    ];
+    ])];
 
     const selecionados: string[] = [];
-    const usados = new Set<string>();
-    const qtd = Math.min(quantidadeDeVagas, elegiveis.length);
+    const disponiveis = [...elegiveis];
 
-    while (selecionados.length < qtd) {
+    while (selecionados.length < Math.min(quantidadeDeVagas, disponiveis.length)) {
       const indice = Math.min(
-        elegiveis.length - 1,
-        Math.max(0, Math.floor(random() * elegiveis.length)),
+        disponiveis.length - 1,
+        Math.max(0, Math.floor(random() * disponiveis.length)),
       );
-      const timeId = elegiveis[indice];
-      if (!usados.has(timeId)) {
-        selecionados.push(timeId);
-        usados.add(timeId);
-      }
-      if (usados.size >= elegiveis.length) break;
+      selecionados.push(disponiveis[indice]);
+      disponiveis.splice(indice, 1);
     }
 
     return selecionados;
