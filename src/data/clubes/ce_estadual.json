@@ -1,10 +1,67 @@
 [
-  { "id": "ferroviario_ce", "nome": "Ferroviário Atlético Clube", "nome_popular": "Ferroviário", "pais": "BR", "estado": "CE", "cidade": "Fortaleza" },
-  { "id": "maracana_ce", "nome": "Maracanã Esporte Clube", "nome_popular": "Maracanã", "pais": "BR", "estado": "CE", "cidade": "Maracanaú" },
-  { "id": "horizonte", "nome": "Horizonte Futebol Clube", "nome_popular": "Horizonte", "pais": "BR", "estado": "CE", "cidade": "Horizonte" },
-  { "id": "quixada", "nome": "Quixadá Esporte Clube", "nome_popular": "Quixadá", "pais": "BR", "estado": "CE", "cidade": "Quixadá" },
-  { "id": "floresta", "nome": "Floresta Esporte Clube", "nome_popular": "Floresta", "pais": "BR", "estado": "CE", "cidade": "Fortaleza" },
-  { "id": "iguatu", "nome": "Iguatu Esporte Clube", "nome_popular": "Iguatu", "pais": "BR", "estado": "CE", "cidade": "Iguatu" },
-  { "id": "tirol", "nome": "Tirol Esporte Clube", "nome_popular": "Tirol", "pais": "BR", "estado": "CE", "cidade": "Fortaleza" },
-  { "id": "maranguape", "nome": "Maranguape Esporte Clube", "nome_popular": "Maranguape", "pais": "BR", "estado": "CE", "cidade": "Maranguape" }
+  {
+    "id": "ferroviario_ce",
+    "nome": "Ferroviário Atlético Clube",
+    "nome_popular": "Ferroviário",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza"
+  },
+  {
+    "id": "maracana_ce",
+    "nome": "Maracanã Esporte Clube",
+    "nome_popular": "Maracanã",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Maracanaú"
+  },
+  {
+    "id": "horizonte",
+    "nome": "Horizonte Futebol Clube",
+    "nome_popular": "Horizonte",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Horizonte"
+  },
+  {
+    "id": "quixada",
+    "nome": "Quixadá Esporte Clube",
+    "nome_popular": "Quixadá",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Quixadá"
+  },
+  {
+    "id": "floresta",
+    "nome": "Floresta Esporte Clube",
+    "nome_popular": "Floresta",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "iguatu",
+    "nome": "Iguatu Esporte Clube",
+    "nome_popular": "Iguatu",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Iguatu"
+  },
+  {
+    "id": "tirol",
+    "nome": "Tirol Esporte Clube",
+    "nome_popular": "Tirol",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza"
+  },
+  {
+    "id": "maranguape",
+    "nome": "Maranguape Esporte Clube",
+    "nome_popular": "Maranguape",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Maranguape"
+  }
 ]

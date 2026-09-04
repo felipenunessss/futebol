@@ -1,10 +1,67 @@
 [
-  { "id": "independencia_ac", "nome": "Independência Futebol Clube", "nome_popular": "Independência", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "santa_cruz_ac", "nome": "Santa Cruz Esporte Clube (AC)", "nome_popular": "Santa Cruz-AC", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "galvez", "nome": "Galvez Esporte Clube", "nome_popular": "Galvez", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "sao_francisco_ac", "nome": "São Francisco Futebol Clube (AC)", "nome_popular": "São Francisco-AC", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "adesg", "nome": "Associação Desportiva Senador Guiomard", "nome_popular": "ADESG", "pais": "BR", "estado": "AC", "cidade": "Senador Guiomard", "estadio": "Naborzão" },
-  { "id": "humaita_ac", "nome": "Sport Club Humaitá", "nome_popular": "Humaitá", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "vasco_da_gama_ac", "nome": "Associação Desportiva Vasco da Gama", "nome_popular": "Vasco-AC", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" },
-  { "id": "rio_branco_ac", "nome": "Rio Branco Futebol Clube (AC)", "nome_popular": "Rio Branco-AC", "pais": "BR", "estado": "AC", "cidade": "Rio Branco" }
+  {
+    "id": "independencia_ac",
+    "nome": "Independência Futebol Clube",
+    "nome_popular": "Independência",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "santa_cruz_ac",
+    "nome": "Santa Cruz Esporte Clube (AC)",
+    "nome_popular": "Santa Cruz-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "galvez",
+    "nome": "Galvez Esporte Clube",
+    "nome_popular": "Galvez",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "sao_francisco_ac",
+    "nome": "São Francisco Futebol Clube (AC)",
+    "nome_popular": "São Francisco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "adesg",
+    "nome": "Associação Desportiva Senador Guiomard",
+    "nome_popular": "ADESG",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Senador Guiomard",
+    "estadio": "Naborzão"
+  },
+  {
+    "id": "humaita_ac",
+    "nome": "Sport Club Humaitá",
+    "nome_popular": "Humaitá",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "vasco_da_gama_ac",
+    "nome": "Associação Desportiva Vasco da Gama",
+    "nome_popular": "Vasco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "rio_branco_ac",
+    "nome": "Rio Branco Futebol Clube (AC)",
+    "nome_popular": "Rio Branco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  }
 ]

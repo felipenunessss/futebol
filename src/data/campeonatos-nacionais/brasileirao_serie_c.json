@@ -1,0 +1,51 @@
+{
+  "id": "brasileirao_serie_c",
+  "nome": "Campeonato Brasileiro Série C",
+  "nivel": 3,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 20,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 8
+    },
+    "fase_quadrangular": {
+      "ativa": true,
+      "num_grupos": 2,
+      "times_por_grupo": 4,
+      "classificam_por_grupo": 2
+    },
+    "final_estadual": {
+      "criterio": "lideres_dos_quadrangulares_disputam_titulo",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 4,
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "amazonas_fc",
+    "anapolis_fc",
+    "barra_fc",
+    "botafogo_pb",
+    "brusque_fc",
+    "caxias",
+    "confianca",
+    "ferroviaria",
+    "figueirense",
+    "floresta",
+    "guarani",
+    "inter_de_limeira",
+    "itabaiana",
+    "ituano",
+    "mac",
+    "maringa_fc",
+    "paysandu",
+    "santa_cruz",
+    "volta_redonda",
+    "ypiranga_rs"
+  ]
+}

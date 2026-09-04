@@ -1,11 +1,76 @@
 [
-  { "id": "america_propria", "nome": "América Futebol Clube (Propriá)", "nome_popular": "América-SE", "pais": "BR", "estado": "SE", "cidade": "Propriá" },
-  { "id": "atletico_gloriense", "nome": "Associação Desportiva Atlético Gloriense", "nome_popular": "Atlético Gloriense", "pais": "BR", "estado": "SE", "cidade": "Nossa Senhora da Glória", "estadio": "Editon Oliveira da Silva" },
-  { "id": "dorense", "nome": "Dorense Futebol Clube", "nome_popular": "Dorense", "pais": "BR", "estado": "SE", "cidade": "Nossa Senhora das Dores" },
-  { "id": "guarany_porto_da_folha", "nome": "Guarany Futebol Clube (Porto da Folha)", "nome_popular": "Guarany", "pais": "BR", "estado": "SE", "cidade": "Porto da Folha" },
-  { "id": "itabaiana", "nome": "Itabaiana Esporte Clube", "nome_popular": "Itabaiana", "pais": "BR", "estado": "SE", "cidade": "Itabaiana" },
-  { "id": "lagarto", "nome": "Lagarto Futebol Clube", "nome_popular": "Lagarto", "pais": "BR", "estado": "SE", "cidade": "Lagarto" },
-  { "id": "falcon", "nome": "Falcon Football Club", "nome_popular": "Falcon", "pais": "BR", "estado": "SE", "cidade": "Aracaju" },
-  { "id": "sergipe_fc", "nome": "Sergipe Futebol Clube", "nome_popular": "Sergipe", "pais": "BR", "estado": "SE", "cidade": "Aracaju" },
-  { "id": "desportiva_aracaju", "nome": "Desportiva Aracaju Futebol Clube", "nome_popular": "Desportiva Aracaju", "pais": "BR", "estado": "SE", "cidade": "Aracaju" }
+  {
+    "id": "america_propria",
+    "nome": "América Futebol Clube (Propriá)",
+    "nome_popular": "América-SE",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Propriá"
+  },
+  {
+    "id": "atletico_gloriense",
+    "nome": "Associação Desportiva Atlético Gloriense",
+    "nome_popular": "Atlético Gloriense",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Nossa Senhora da Glória",
+    "estadio": "Editon Oliveira da Silva"
+  },
+  {
+    "id": "dorense",
+    "nome": "Dorense Futebol Clube",
+    "nome_popular": "Dorense",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Nossa Senhora das Dores"
+  },
+  {
+    "id": "guarany_porto_da_folha",
+    "nome": "Guarany Futebol Clube (Porto da Folha)",
+    "nome_popular": "Guarany",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Porto da Folha"
+  },
+  {
+    "id": "itabaiana",
+    "nome": "Itabaiana Esporte Clube",
+    "nome_popular": "Itabaiana",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Itabaiana",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "lagarto",
+    "nome": "Lagarto Futebol Clube",
+    "nome_popular": "Lagarto",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Lagarto"
+  },
+  {
+    "id": "falcon",
+    "nome": "Falcon Football Club",
+    "nome_popular": "Falcon",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  },
+  {
+    "id": "sergipe_fc",
+    "nome": "Sergipe Futebol Clube",
+    "nome_popular": "Sergipe",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  },
+  {
+    "id": "desportiva_aracaju",
+    "nome": "Desportiva Aracaju Futebol Clube",
+    "nome_popular": "Desportiva Aracaju",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  }
 ]

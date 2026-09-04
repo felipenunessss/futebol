@@ -1,9 +1,59 @@
 [
-  { "id": "manaus_fc", "nome": "Manaus Futebol Clube", "nome_popular": "Manaus FC", "pais": "BR", "estado": "AM", "cidade": "Manaus" },
-  { "id": "itacoatiara", "nome": "Itacoatiara Futebol Clube", "nome_popular": "Itacoatiara", "pais": "BR", "estado": "AM", "cidade": "Itacoatiara" },
-  { "id": "nacional_am", "nome": "Nacional Futebol Clube (AM)", "nome_popular": "Nacional-AM", "pais": "BR", "estado": "AM", "cidade": "Manaus" },
-  { "id": "manauara", "nome": "Manauara Esporte Clube", "nome_popular": "Manauara", "pais": "BR", "estado": "AM", "cidade": "Manaus" },
-  { "id": "parintins", "nome": "Rio Parintins Esporte Clube", "nome_popular": "Parintins", "pais": "BR", "estado": "AM", "cidade": "Parintins" },
-  { "id": "princesa_do_solimoes", "nome": "Princesa do Solimões Esporte Clube", "nome_popular": "Princesa do Solimões", "pais": "BR", "estado": "AM", "cidade": "Manacapuru", "estadio": "Gilbertão" },
-  { "id": "sao_raimundo_am", "nome": "São Raimundo Esporte Clube (AM)", "nome_popular": "São Raimundo-AM", "pais": "BR", "estado": "AM", "cidade": "Manaus" }
+  {
+    "id": "manaus_fc",
+    "nome": "Manaus Futebol Clube",
+    "nome_popular": "Manaus FC",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "itacoatiara",
+    "nome": "Itacoatiara Futebol Clube",
+    "nome_popular": "Itacoatiara",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Itacoatiara"
+  },
+  {
+    "id": "nacional_am",
+    "nome": "Nacional Futebol Clube (AM)",
+    "nome_popular": "Nacional-AM",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "manauara",
+    "nome": "Manauara Esporte Clube",
+    "nome_popular": "Manauara",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "parintins",
+    "nome": "Rio Parintins Esporte Clube",
+    "nome_popular": "Parintins",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Parintins"
+  },
+  {
+    "id": "princesa_do_solimoes",
+    "nome": "Princesa do Solimões Esporte Clube",
+    "nome_popular": "Princesa do Solimões",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manacapuru",
+    "estadio": "Gilbertão"
+  },
+  {
+    "id": "sao_raimundo_am",
+    "nome": "São Raimundo Esporte Clube (AM)",
+    "nome_popular": "São Raimundo-AM",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  }
 ]

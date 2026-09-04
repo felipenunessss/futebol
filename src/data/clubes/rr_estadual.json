@@ -1,11 +1,74 @@
 [
-  { "id": "monte_roraima", "nome": "Monte Roraima Futebol Clube", "nome_popular": "Monte Roraima", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "bare", "nome": "Baré Esporte Clube", "nome_popular": "Baré", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "sao_raimundo_rr", "nome": "São Raimundo Esporte Clube (RR)", "nome_popular": "São Raimundo-RR", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "rio_negro_rr", "nome": "Rio Negro Esporte Clube", "nome_popular": "Rio Negro", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "atletico_roraima", "nome": "Atlético Roraima Futebol Clube", "nome_popular": "Atlético Roraima", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "gas", "nome": "Grêmio Atlético Sampaio", "nome_popular": "GAS", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "nautico_rr", "nome": "Náutico Futebol Clube (RR)", "nome_popular": "Náutico-RR", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "progresso", "nome": "Progresso Esporte Clube", "nome_popular": "Progresso", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" },
-  { "id": "river_rr", "nome": "River Futebol Clube (RR)", "nome_popular": "River", "pais": "BR", "estado": "RR", "cidade": "Boa Vista" }
+  {
+    "id": "monte_roraima",
+    "nome": "Monte Roraima Futebol Clube",
+    "nome_popular": "Monte Roraima",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "bare",
+    "nome": "Baré Esporte Clube",
+    "nome_popular": "Baré",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "sao_raimundo_rr",
+    "nome": "São Raimundo Esporte Clube (RR)",
+    "nome_popular": "São Raimundo-RR",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "rio_negro_rr",
+    "nome": "Rio Negro Esporte Clube",
+    "nome_popular": "Rio Negro",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "atletico_roraima",
+    "nome": "Atlético Roraima Futebol Clube",
+    "nome_popular": "Atlético Roraima",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "gas",
+    "nome": "Grêmio Atlético Sampaio",
+    "nome_popular": "GAS",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "nautico_rr",
+    "nome": "Náutico Futebol Clube (RR)",
+    "nome_popular": "Náutico-RR",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "progresso",
+    "nome": "Progresso Esporte Clube",
+    "nome_popular": "Progresso",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "river_rr",
+    "nome": "River Futebol Clube (RR)",
+    "nome_popular": "River",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  }
 ]

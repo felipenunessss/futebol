@@ -30,7 +30,8 @@
     "nome_popular": "Botafogo-SP",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Ribeirão Preto"
+    "cidade": "Ribeirão Preto",
+    "divisao_nacional": "serie_b"
   },
   {
     "id": "primavera",
@@ -70,7 +71,8 @@
     "nome_popular": "Ferroviária",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Araraquara"
+    "cidade": "Araraquara",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "gremio_prudente",
@@ -86,7 +88,8 @@
     "nome_popular": "Inter de Limeira",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Limeira"
+    "cidade": "Limeira",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "ituano",
@@ -94,7 +97,8 @@
     "nome_popular": "Ituano",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Itu"
+    "cidade": "Itu",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "juventus_sp",

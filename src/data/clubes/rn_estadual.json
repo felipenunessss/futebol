@@ -1,10 +1,66 @@
 [
-  { "id": "abc_rn", "nome": "ABC Futebol Clube", "nome_popular": "ABC", "pais": "BR", "estado": "RN", "cidade": "Natal" },
-  { "id": "america_rn", "nome": "América Futebol Clube (RN)", "nome_popular": "América-RN", "pais": "BR", "estado": "RN", "cidade": "Natal" },
-  { "id": "globo_fc", "nome": "Globo Futebol Clube", "nome_popular": "Globo", "pais": "BR", "estado": "RN", "cidade": "Ceará-Mirim" },
-  { "id": "laguna", "nome": "Associação Atlética Laguna", "nome_popular": "Laguna", "pais": "BR", "estado": "RN", "cidade": "Tibau do Sul" },
-  { "id": "potiguar_mossoro", "nome": "Potiguar de Mossoró", "nome_popular": "Potiguar", "pais": "BR", "estado": "RN", "cidade": "Mossoró" },
-  { "id": "potyguar_seridoense", "nome": "Potyguar Seridoense", "nome_popular": "Potyguar", "pais": "BR", "estado": "RN", "cidade": "Currais Novos" },
-  { "id": "qfc", "nome": "Quinho Futebol Clube", "nome_popular": "QFC", "pais": "BR", "estado": "RN", "cidade": "Parnamirim" },
-  { "id": "santa_cruz_rn", "nome": "Santa Cruz Futebol Clube (Natal)", "nome_popular": "Santa Cruz-RN", "pais": "BR", "estado": "RN", "cidade": "Natal" }
+  {
+    "id": "abc_rn",
+    "nome": "ABC Futebol Clube",
+    "nome_popular": "ABC",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  },
+  {
+    "id": "america_rn",
+    "nome": "América Futebol Clube (RN)",
+    "nome_popular": "América-RN",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  },
+  {
+    "id": "globo_fc",
+    "nome": "Globo Futebol Clube",
+    "nome_popular": "Globo",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Ceará-Mirim"
+  },
+  {
+    "id": "laguna",
+    "nome": "Associação Atlética Laguna",
+    "nome_popular": "Laguna",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Tibau do Sul"
+  },
+  {
+    "id": "potiguar_mossoro",
+    "nome": "Potiguar de Mossoró",
+    "nome_popular": "Potiguar",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Mossoró"
+  },
+  {
+    "id": "potyguar_seridoense",
+    "nome": "Potyguar Seridoense",
+    "nome_popular": "Potyguar",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Currais Novos"
+  },
+  {
+    "id": "qfc",
+    "nome": "Quinho Futebol Clube",
+    "nome_popular": "QFC",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Parnamirim"
+  },
+  {
+    "id": "santa_cruz_rn",
+    "nome": "Santa Cruz Futebol Clube (Natal)",
+    "nome_popular": "Santa Cruz-RN",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  }
 ]

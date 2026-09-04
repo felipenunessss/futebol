@@ -1,12 +1,83 @@
 [
-  { "id": "atletico_cajazeirense", "nome": "Atlético Cajazeirense", "nome_popular": "Atlético Cajazeirense", "pais": "BR", "estado": "PB", "cidade": "Cajazeiras" },
-  { "id": "botafogo_pb", "nome": "Botafogo Futebol Clube (PB)", "nome_popular": "Botafogo-PB", "pais": "BR", "estado": "PB", "cidade": "João Pessoa" },
-  { "id": "campinense", "nome": "Campinense Clube", "nome_popular": "Campinense", "pais": "BR", "estado": "PB", "cidade": "Campina Grande" },
-  { "id": "confianca_pb", "nome": "Confiança (PB)", "nome_popular": "Confiança-PB", "pais": "BR", "estado": "PB", "cidade": "Sapé" },
-  { "id": "esporte_pb", "nome": "Esporte Clube Esporte", "nome_popular": "Esporte", "pais": "BR", "estado": "PB", "cidade": "Patos" },
-  { "id": "nacional_patos", "nome": "Nacional de Patos", "nome_popular": "Nacional de Patos", "pais": "BR", "estado": "PB", "cidade": "Patos" },
-  { "id": "pombal", "nome": "Pombal Esporte Clube", "nome_popular": "Pombal", "pais": "BR", "estado": "PB", "cidade": "Pombal" },
-  { "id": "serra_branca", "nome": "Serra Branca Futebol Clube", "nome_popular": "Serra Branca", "pais": "BR", "estado": "PB", "cidade": "Campina Grande" },
-  { "id": "sousa", "nome": "Sousa Esporte Clube", "nome_popular": "Sousa", "pais": "BR", "estado": "PB", "cidade": "Sousa" },
-  { "id": "treze", "nome": "Clube Treze de Maio", "nome_popular": "Treze", "pais": "BR", "estado": "PB", "cidade": "Campina Grande" }
+  {
+    "id": "atletico_cajazeirense",
+    "nome": "Atlético Cajazeirense",
+    "nome_popular": "Atlético Cajazeirense",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Cajazeiras"
+  },
+  {
+    "id": "botafogo_pb",
+    "nome": "Botafogo Futebol Clube (PB)",
+    "nome_popular": "Botafogo-PB",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "João Pessoa",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "campinense",
+    "nome": "Campinense Clube",
+    "nome_popular": "Campinense",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  },
+  {
+    "id": "confianca_pb",
+    "nome": "Confiança (PB)",
+    "nome_popular": "Confiança-PB",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Sapé"
+  },
+  {
+    "id": "esporte_pb",
+    "nome": "Esporte Clube Esporte",
+    "nome_popular": "Esporte",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Patos"
+  },
+  {
+    "id": "nacional_patos",
+    "nome": "Nacional de Patos",
+    "nome_popular": "Nacional de Patos",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Patos"
+  },
+  {
+    "id": "pombal",
+    "nome": "Pombal Esporte Clube",
+    "nome_popular": "Pombal",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Pombal"
+  },
+  {
+    "id": "serra_branca",
+    "nome": "Serra Branca Futebol Clube",
+    "nome_popular": "Serra Branca",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  },
+  {
+    "id": "sousa",
+    "nome": "Sousa Esporte Clube",
+    "nome_popular": "Sousa",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Sousa"
+  },
+  {
+    "id": "treze",
+    "nome": "Clube Treze de Maio",
+    "nome_popular": "Treze",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  }
 ]

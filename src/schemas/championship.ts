@@ -41,6 +41,12 @@ export interface FaseSuica {
   classificam_mata_mata: number;
 }
 
+/** Liga de pontos corridos sem fase de mata-mata (Brasileirão Séries A e B). */
+export interface PontosCorridos {
+  ida_e_volta: boolean;
+  rodadas: number;
+}
+
 /**
  * Blocos de formato opcionais — cada estado ativa só os que usa de verdade,
  * conforme doc seção 2.2.
@@ -51,6 +57,7 @@ export interface FormatoEstadual {
   fase_grupos?: FaseGrupos;
   fase_quadrangular?: FaseQuadrangular;
   fase_suica?: FaseSuica;
+  pontos_corridos?: PontosCorridos;
   mata_mata?: MataMata;
   final_estadual?: FinalEstadual;
 }

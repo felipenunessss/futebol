@@ -1,8 +1,50 @@
 [
-  { "id": "asa", "nome": "Agremiação Sportiva Arapiraquense", "nome_popular": "ASA", "pais": "BR", "estado": "AL", "cidade": "Arapiraca" },
-  { "id": "coruripe", "nome": "Coruripe Futebol Clube", "nome_popular": "Coruripe", "pais": "BR", "estado": "AL", "cidade": "Coruripe" },
-  { "id": "cruzeiro_al", "nome": "Esporte Clube Cruzeiro (Arapiraca)", "nome_popular": "Cruzeiro-AL", "pais": "BR", "estado": "AL", "cidade": "Arapiraca" },
-  { "id": "cse", "nome": "CSE", "nome_popular": "CSE", "pais": "BR", "estado": "AL", "cidade": "Palmeira dos Índios" },
-  { "id": "murici", "nome": "Murici Futebol Clube", "nome_popular": "Murici", "pais": "BR", "estado": "AL", "cidade": "Murici" },
-  { "id": "penedense", "nome": "Penedense Futebol Clube", "nome_popular": "Penedense", "pais": "BR", "estado": "AL", "cidade": "Penedo" }
+  {
+    "id": "asa",
+    "nome": "Agremiação Sportiva Arapiraquense",
+    "nome_popular": "ASA",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Arapiraca"
+  },
+  {
+    "id": "coruripe",
+    "nome": "Coruripe Futebol Clube",
+    "nome_popular": "Coruripe",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Coruripe"
+  },
+  {
+    "id": "cruzeiro_al",
+    "nome": "Esporte Clube Cruzeiro (Arapiraca)",
+    "nome_popular": "Cruzeiro-AL",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Arapiraca"
+  },
+  {
+    "id": "cse",
+    "nome": "CSE",
+    "nome_popular": "CSE",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Palmeira dos Índios"
+  },
+  {
+    "id": "murici",
+    "nome": "Murici Futebol Clube",
+    "nome_popular": "Murici",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Murici"
+  },
+  {
+    "id": "penedense",
+    "nome": "Penedense Futebol Clube",
+    "nome_popular": "Penedense",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Penedo"
+  }
 ]

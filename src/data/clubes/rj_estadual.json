@@ -69,7 +69,8 @@
     "pais": "BR",
     "estado": "RJ",
     "cidade": "Volta Redonda",
-    "estadio": "Raulino de Oliveira"
+    "estadio": "Raulino de Oliveira",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "america_rj",

@@ -42,7 +42,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Anápolis",
-    "estadio": "Jonas Duarte"
+    "estadio": "Jonas Duarte",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "crac",

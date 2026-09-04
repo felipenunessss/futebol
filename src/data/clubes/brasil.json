@@ -150,7 +150,7 @@
     "estado": "CE",
     "cidade": "Fortaleza",
     "estadio": "Arena Castelão",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": "serie_b",
     "forca_financeira": "media"
   },
   {
@@ -183,7 +183,7 @@
     "estado": "MT",
     "cidade": "Cuiabá",
     "estadio": "Arena Pantanal",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": "serie_b",
     "forca_financeira": "baixa"
   },
   {
@@ -205,7 +205,7 @@
     "estado": "SC",
     "cidade": "Criciúma",
     "estadio": "Heriberto Hülse",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": "serie_b",
     "forca_financeira": "baixa"
   },
   {
@@ -216,7 +216,7 @@
     "estado": "RS",
     "cidade": "Caxias do Sul",
     "estadio": "Alfredo Jaconi",
-    "divisao_nacional": "serie_a",
+    "divisao_nacional": "serie_b",
     "forca_financeira": "baixa"
   },
   {
@@ -249,7 +249,7 @@
     "estado": "PE",
     "cidade": "Recife",
     "estadio": "Arruda",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_c",
     "forca_financeira": "baixa"
   },
   {
@@ -282,7 +282,7 @@
     "estado": "PR",
     "cidade": "Curitiba",
     "estadio": "Couto Pereira",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_a",
     "forca_financeira": "media"
   },
   {
@@ -304,7 +304,7 @@
     "estado": "SC",
     "cidade": "Chapecó",
     "estadio": "Arena Condá",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_a",
     "forca_financeira": "baixa"
   },
   {
@@ -337,7 +337,7 @@
     "estado": "SP",
     "cidade": "Campinas",
     "estadio": "Brinco de Ouro",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_c",
     "forca_financeira": "baixa"
   },
   {
@@ -370,7 +370,7 @@
     "estado": "SP",
     "cidade": "Mirassol",
     "estadio": "Campos Maia",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_a",
     "forca_financeira": "muito_baixa"
   },
   {
@@ -391,8 +391,7 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Tombos",
-    "estadio": "Antônio Guimarães de Almeida",
-    "divisao_nacional": "serie_b"
+    "estadio": "Antônio Guimarães de Almeida"
   },
   {
     "id": "athletic_club_mg",
@@ -412,7 +411,7 @@
     "estado": "PA",
     "cidade": "Belém",
     "estadio": "Baenão",
-    "divisao_nacional": "serie_b",
+    "divisao_nacional": "serie_a",
     "forca_financeira": "baixa"
   },
   {

@@ -1,10 +1,67 @@
 [
-  { "id": "araguaina", "nome": "Araguaína Futebol Clube", "nome_popular": "Araguaína", "pais": "BR", "estado": "TO", "cidade": "Araguaína" },
-  { "id": "bela_vista_to", "nome": "Bela Vista Futebol Cachoeirense", "nome_popular": "Bela Vista", "pais": "BR", "estado": "TO", "cidade": "Cachoeirinha" },
-  { "id": "capital_fc_to", "nome": "Capital Futebol Clube", "nome_popular": "Capital", "pais": "BR", "estado": "TO", "cidade": "Palmas", "estadio": "Nilton Santos" },
-  { "id": "guarai", "nome": "Guaraí Esporte Clube", "nome_popular": "Guaraí", "pais": "BR", "estado": "TO", "cidade": "Guaraí" },
-  { "id": "gurupi", "nome": "Gurupi Esporte Clube", "nome_popular": "Gurupi", "pais": "BR", "estado": "TO", "cidade": "Gurupi" },
-  { "id": "palmas_fc", "nome": "Palmas Futebol e Regatas", "nome_popular": "Palmas", "pais": "BR", "estado": "TO", "cidade": "Palmas" },
-  { "id": "tocantinopolis", "nome": "Tocantinópolis Esporte Clube", "nome_popular": "Tocantinópolis", "pais": "BR", "estado": "TO", "cidade": "Tocantinópolis" },
-  { "id": "uniao_to", "nome": "União Atlético Clube", "nome_popular": "União-TO", "pais": "BR", "estado": "TO", "cidade": "Araguaína" }
+  {
+    "id": "araguaina",
+    "nome": "Araguaína Futebol Clube",
+    "nome_popular": "Araguaína",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Araguaína"
+  },
+  {
+    "id": "bela_vista_to",
+    "nome": "Bela Vista Futebol Cachoeirense",
+    "nome_popular": "Bela Vista",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Cachoeirinha"
+  },
+  {
+    "id": "capital_fc_to",
+    "nome": "Capital Futebol Clube",
+    "nome_popular": "Capital",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Palmas",
+    "estadio": "Nilton Santos"
+  },
+  {
+    "id": "guarai",
+    "nome": "Guaraí Esporte Clube",
+    "nome_popular": "Guaraí",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Guaraí"
+  },
+  {
+    "id": "gurupi",
+    "nome": "Gurupi Esporte Clube",
+    "nome_popular": "Gurupi",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Gurupi"
+  },
+  {
+    "id": "palmas_fc",
+    "nome": "Palmas Futebol e Regatas",
+    "nome_popular": "Palmas",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Palmas"
+  },
+  {
+    "id": "tocantinopolis",
+    "nome": "Tocantinópolis Esporte Clube",
+    "nome_popular": "Tocantinópolis",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Tocantinópolis"
+  },
+  {
+    "id": "uniao_to",
+    "nome": "União Atlético Clube",
+    "nome_popular": "União-TO",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Araguaína"
+  }
 ]

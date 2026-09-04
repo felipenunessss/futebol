@@ -15,7 +15,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Caxias do Sul",
-    "estadio": "Francisco Stédile"
+    "estadio": "Francisco Stédile",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "guarany_bage",
@@ -77,7 +78,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Erechim",
-    "estadio": "Olímpico Colosso da Lagoa"
+    "estadio": "Olímpico Colosso da Lagoa",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "aimore",

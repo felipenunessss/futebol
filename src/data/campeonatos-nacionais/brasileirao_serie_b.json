@@ -1,0 +1,39 @@
+{
+  "id": "brasileirao_serie_b",
+  "nome": "Campeonato Brasileiro Série B",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "pontos_corridos": {
+      "ida_e_volta": true,
+      "rodadas": 38
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 4,
+    "rebaixamento_proxima_divisao": 4
+  },
+  "classicos": [],
+  "times": [
+    "america_mg",
+    "athletic_club_mg",
+    "atletico_goianiense",
+    "avai",
+    "botafogo_sp",
+    "ceara",
+    "crb",
+    "criciuma",
+    "cuiaba",
+    "fortaleza",
+    "goias",
+    "juventude",
+    "londrina",
+    "nautico",
+    "novorizontino",
+    "operario_ferroviario",
+    "ponte_preta",
+    "sao_bernardo",
+    "sport_recife",
+    "vila_nova"
+  ]
+}

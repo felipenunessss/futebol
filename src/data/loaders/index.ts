@@ -2,7 +2,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Club } from "../../schemas/club.js";
-import type { CampeonatoEstadual } from "../../schemas/championship.js";
+import type { Classico, CampeonatoEstadual } from "../../schemas/championship.js";
+import type { CampeonatoNacional } from "../../schemas/national-championship.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, "..");
@@ -21,6 +22,13 @@ export function loadEstaduais(): CampeonatoEstadual[] {
     .map((f) => JSON.parse(readFileSync(join(dir, f), "utf-8")) as CampeonatoEstadual);
 }
 
+export function loadCampeonatosNacionais(): CampeonatoNacional[] {
+  const dir = join(DATA_DIR, "campeonatos-nacionais");
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(readFileSync(join(dir, f), "utf-8")) as CampeonatoNacional);
+}
+
 /** Retorna os ids de clube que aparecem em mais de um arquivo/fonte da base. */
 export function encontrarIdsDuplicados(clubes: Club[]): string[] {
   const vistos = new Set<string>();
@@ -32,27 +40,34 @@ export function encontrarIdsDuplicados(clubes: Club[]): string[] {
   return [...duplicados];
 }
 
+interface CampeonatoComTimes {
+  id: string;
+  times: string[];
+  classicos: Classico[];
+}
+
 /**
- * Confere se todo id em CampeonatoEstadual.times existe na base de clubes.
- * Retorna a lista de erros encontrados (vazia se tudo estiver consistente).
+ * Confere se todo id em times/clássicos de um campeonato (estadual ou
+ * nacional) existe na base de clubes. Retorna a lista de erros encontrados
+ * (vazia se tudo estiver consistente).
  */
 export function validarReferenciasDeTimes(
   clubes: Club[],
-  estaduais: CampeonatoEstadual[],
+  campeonatos: CampeonatoComTimes[],
 ): string[] {
   const idsValidos = new Set(clubes.map((c) => c.id));
   const erros: string[] = [];
 
-  for (const estadual of estaduais) {
-    for (const timeId of estadual.times) {
+  for (const campeonato of campeonatos) {
+    for (const timeId of campeonato.times) {
       if (!idsValidos.has(timeId)) {
-        erros.push(`${estadual.id}: time "${timeId}" não existe na base de clubes`);
+        erros.push(`${campeonato.id}: time "${timeId}" não existe na base de clubes`);
       }
     }
-    for (const classico of estadual.classicos) {
+    for (const classico of campeonato.classicos) {
       for (const timeId of [classico.time_a, classico.time_b]) {
         if (!idsValidos.has(timeId)) {
-          erros.push(`${estadual.id}: clássico "${classico.nome}" referencia time inexistente "${timeId}"`);
+          erros.push(`${campeonato.id}: clássico "${classico.nome}" referencia time inexistente "${timeId}"`);
         }
       }
     }

@@ -236,6 +236,34 @@ nesta rodada (confirmei só nome/cidade).
 - Clássicos de Acre, Roraima e Amapá não foram adicionados — não achei
   nome oficial confirmado de nenhuma rivalidade específica.
 
+## Campeonatos nacionais (Brasileirão A, B, C) — detalhes pendentes
+
+- **Tombense**: estava marcado `serie_b` mas foi confirmado que não faz
+  parte da Série B 2026 real — tag removida. Não foi possível confirmar em
+  que competição nacional (se alguma) o clube está atualmente, então ficou
+  sem `divisao_nacional` e de fora dos três arquivos de campeonato
+  nacional, até uma pesquisa dedicada confirmar sua situação.
+- **Vagas de Libertadores/Sul-Americana da Série A**: não modeladas em
+  `premiacao` — o número de vagas varia ano a ano pelo ranking da CBF
+  (não é um número fixo por posição simples), e isso não foi apurado com
+  precisão nesta rodada.
+- **Rebaixamento da Série B**: mantive `rebaixamento_proxima_divisao: 4`
+  por ser o padrão histórico conhecido, mas essa contagem específica não
+  foi reconfirmada para 2026 na pesquisa.
+- **Clássicos da Série A**: reaproveitei os clássicos estaduais já
+  verificados cujos dois clubes disputam a Série A 2026 (Grenal, Derby
+  Paulista, Fla-Flu, Clássico dos Milhões, Majestoso, Clássico da Vovó,
+  Atletiba). Nenhum clássico novo foi pesquisado especificamente para o
+  contexto nacional.
+- **Série C**: formato modelado com boa confiança (fonte: CBF, band.com.br,
+  olympics.com) — fase única de 20 times, top 8 avançam a 2 quadrangulares
+  cruzados (1º/4º/5º/8º vs. 2º/3º/6º/7º), os 2 melhores de cada
+  quadrangular sobem à Série B (4 vagas de acesso), líderes dos
+  quadrangulares disputam o título, 2 últimos da fase única são
+  rebaixados à Série D. É a última edição com 20 clubes antes da
+  expansão (24 em 2027, 28 em 2028) — o formato vai mudar de novo em
+  breve.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

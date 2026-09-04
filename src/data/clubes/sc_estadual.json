@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Florianópolis",
-    "estadio": "Orlando Scarpelli"
+    "estadio": "Orlando Scarpelli",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "carlos_renaux",
@@ -42,7 +43,8 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Brusque",
-    "estadio": "Augusto Bauer"
+    "estadio": "Augusto Bauer",
+    "divisao_nacional": "serie_c"
   },
   {
     "id": "camboriu_fc",
@@ -75,6 +77,7 @@
     "nome_popular": "Barra FC",
     "pais": "BR",
     "estado": "SC",
-    "cidade": "Balneário Camboriú"
+    "cidade": "Balneário Camboriú",
+    "divisao_nacional": "serie_c"
   }
 ]

@@ -1,10 +1,67 @@
 [
-  { "id": "macapa_ec", "nome": "Esporte Clube Macapá", "nome_popular": "Macapá", "pais": "BR", "estado": "AP", "cidade": "Macapá", "estadio": "Zerão" },
-  { "id": "oratorio", "nome": "Oratório Recreativo Clube", "nome_popular": "Oratório", "pais": "BR", "estado": "AP", "cidade": "Macapá" },
-  { "id": "trem", "nome": "Trem Desportivo Clube", "nome_popular": "Trem", "pais": "BR", "estado": "AP", "cidade": "Macapá" },
-  { "id": "independente_ap", "nome": "Independente Esporte Clube (AP)", "nome_popular": "Independente-AP", "pais": "BR", "estado": "AP", "cidade": "Santana" },
-  { "id": "ypiranga_ap", "nome": "Ypiranga Futebol Clube (AP)", "nome_popular": "Ypiranga-AP", "pais": "BR", "estado": "AP", "cidade": "Macapá" },
-  { "id": "santos_ap", "nome": "Santos Futebol Clube (AP)", "nome_popular": "Santos-AP", "pais": "BR", "estado": "AP", "cidade": "Macapá" },
-  { "id": "cristal", "nome": "Clube Atlético Cristal", "nome_popular": "Cristal", "pais": "BR", "estado": "AP", "cidade": "Macapá" },
-  { "id": "sao_jose_ap", "nome": "São José Futebol Clube (AP)", "nome_popular": "São José-AP", "pais": "BR", "estado": "AP", "cidade": "Macapá" }
+  {
+    "id": "macapa_ec",
+    "nome": "Esporte Clube Macapá",
+    "nome_popular": "Macapá",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá",
+    "estadio": "Zerão"
+  },
+  {
+    "id": "oratorio",
+    "nome": "Oratório Recreativo Clube",
+    "nome_popular": "Oratório",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "trem",
+    "nome": "Trem Desportivo Clube",
+    "nome_popular": "Trem",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "independente_ap",
+    "nome": "Independente Esporte Clube (AP)",
+    "nome_popular": "Independente-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Santana"
+  },
+  {
+    "id": "ypiranga_ap",
+    "nome": "Ypiranga Futebol Clube (AP)",
+    "nome_popular": "Ypiranga-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "santos_ap",
+    "nome": "Santos Futebol Clube (AP)",
+    "nome_popular": "Santos-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "cristal",
+    "nome": "Clube Atlético Cristal",
+    "nome_popular": "Cristal",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "sao_jose_ap",
+    "nome": "São José Futebol Clube (AP)",
+    "nome_popular": "São José-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  }
 ]
