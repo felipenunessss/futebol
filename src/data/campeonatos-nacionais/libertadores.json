@@ -12,8 +12,25 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["oitavas", "quartas", "semifinal", "final"],
-      "ida_e_volta": true
+      "fases": ["primeira_fase", "segunda_fase", "terceira_fase", "oitavas", "quartas", "semifinal", "final"],
+      "ida_e_volta": true,
+      "etapas": [
+        {
+          "nome": "primeira_fase",
+          "ida_e_volta": true,
+          "entrantes": ["alianza_lima", "deportivo_tachira", "universidad_catolica_ec", "sportivo_2_de_mayo", "juventud", "the_strongest"]
+        },
+        {
+          "nome": "segunda_fase",
+          "ida_e_volta": true,
+          "entrantes": ["botafogo", "bahia", "huachipato", "ohiggins", "independiente_medellin", "deportes_tolima", "argentinos_juniors", "nacional_potosi", "barcelona_sc", "guarani_paraguai", "sporting_cristal", "liverpool_uy", "carabobo"]
+        },
+        { "nome": "terceira_fase", "ida_e_volta": true },
+        { "nome": "oitavas", "ida_e_volta": true },
+        { "nome": "quartas", "ida_e_volta": true },
+        { "nome": "semifinal", "ida_e_volta": true },
+        { "nome": "final", "ida_e_volta": false }
+      ]
     }
   },
   "premiacao": {},

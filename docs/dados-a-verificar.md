@@ -514,23 +514,43 @@ nesta rodada (confirmei só nome/cidade).
   2 primeiros de cada grupo avançam) + mata-mata (oitavas, quartas,
   semifinal, final) — `fase_grupos`/`mata_mata` do schema, confiança alta
   (contagens e resultados reais confirmados grupo a grupo na fonte).
-- **Fase preliminar — pendência de modelagem** (mesmo problema já
-  documentado na Copa do Brasil): 19 clubes disputam 3 rodadas
-  eliminatórias de ida e volta antes da fase de grupos, com entrada
-  escalonada por fase (Fase 1: 6 clubes de BO/EC/PY/PE/UY/VE; Fase 2: 16
-  clubes — 2 de BR/CL/CO + 1 de AR/BO/EC/PY/PE/UY/VE + os 3 vencedores da
-  Fase 1; Fase 3: os 8 vencedores da Fase 2) — só 4 dos 19 avançam à fase
-  de grupos (completando os 32), os outros 15 são transferidos à Copa
-  Sul-Americana 2026 em pontos diferentes (os 4 perdedores da Fase 3 vão
-  pra fase de grupos da Sul-Americana; os 8 terceiros colocados da fase
-  de grupos da própria Libertadores vão pro repechaje de oitavas da
-  Sul-Americana). O schema não tem bloco pra representar entrada
-  escalonada por fase — não modelado, `times[]` só lista quem disputa a
-  competição, sem marcar em que fase cada um entrou.
-- **Final em jogo único** (Estádio Centenário, Montevidéu, confirmado por
-  fonte) — mesma limitação já documentada na Copa do Brasil: o bloco
-  `mata_mata` do schema usa um `ida_e_volta` único pra todas as fases
-  listadas, não representa a final como exceção.
+- **Fase preliminar — modelada em `formato.mata_mata.etapas`** (schema
+  estendido no commit `ccde052` com `EtapaMataMata`/`entrantes`, usado
+  pela primeira vez na Copa do Brasil e agora aqui). Confirmado por fonte
+  nominal (Wikipédia ES + ESPN + CONMEBOL.com, incluindo o release
+  oficial "Estos son los clasificados a la Fase 3"):
+  - **Primeira fase** (6 entrantes, ida e volta): `alianza_lima`,
+    `deportivo_tachira`, `universidad_catolica_ec`, `sportivo_2_de_mayo`,
+    `juventud`, `the_strongest` (3 confrontos: PE×VE, EC×UY, PY×BO).
+  - **Segunda fase** (13 entrantes frescos + 3 vencedores da 1ª fase,
+    ida e volta): `botafogo`, `bahia` (BR); `huachipato`, `ohiggins`
+    (CL); `independiente_medellin`, `deportes_tolima` (CO);
+    `argentinos_juniors` (AR); `nacional_potosi` (BO); `barcelona_sc`
+    (EC); `guarani_paraguai` (PY); `sporting_cristal` (PE); `liverpool_uy`
+    (UY); `carabobo` (VE).
+  - **Terceira fase** (sem entrantes novos — os 8 vencedores da 2ª fase
+    seguem direto): confirmado por fonte quem venceu e quem perdeu —
+    venceram e completaram os 32 da fase de grupos: `barcelona_sc`,
+    `deportes_tolima`, `sporting_cristal`, `independiente_medellin`;
+    **perderam e foram transferidos à Copa Sul-Americana 2026**:
+    `juventud`, `ohiggins`, `carabobo`, `botafogo` — esses 4 ids já
+    resolvem a metade da pendência de "quem vem da Libertadores pra
+    Sul-Americana" que ficou em aberto quando `sulamericana.json` foi
+    modelado, útil pra quando o arquivo da Sul-Americana ganhar seus
+    próprios `etapas`.
+  - **Não resolvido nesta rodada**: os 8 terceiros colocados da fase de
+    grupos da Libertadores (que vão pro repechaje de oitavas da
+    Sul-Americana) — o mecanismo está confirmado por fonte (1º avança
+    direto às oitavas da própria Libertadores, 2º idem, 3º cai pro
+    repechaje da Sul-Americana), mas os 8 ids específicos não foram
+    pesquisados nesta passada.
+  - `oitavas`/`quartas`/`semifinal`/`final` sem `entrantes` (continuação
+    natural da fase de grupos, sem entrada escalonada).
+- **Final em jogo único** (Estádio Centenário, Montevidéu) — resolvido
+  junto com a fase preliminar: a etapa `final` em `etapas` tem
+  `ida_e_volta: false`, enquanto as demais etapas de mata-mata (incluindo
+  as 3 preliminares) são `true`. O campo legado `mata_mata.ida_e_volta`
+  (nível do bloco todo) continua `true` só como resumo geral.
 - **`pais: "CONMEBOL"`**: decisão deliberada, não é um código ISO 3166-1
   real — a competição não tem país-sede único (final rotativa entre os
   10 países). Mesmo padrão poderia servir de referência pra outras copas
