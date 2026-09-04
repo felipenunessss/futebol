@@ -4,8 +4,20 @@
   "pais": "EC",
   "nivel": 1,
   "ano_referencia": 2026,
-  "formato": { "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 } },
-  "premiacao": {},
+  "formato": {
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 },
+    "final_estadual": {
+      "criterio": "apos_a_fase_inicial_os_16_times_dividem_se_por_faixa_de_classificacao_em_3_grupos_que_jogam_turno_unico_entre_si_hexagonal_do_titulo_1o_a_6o_hexagonal_do_titulo_define_campeao_e_vagas_conmebol_quadrangular_internacional_7o_a_10o_disputa_vaga_extra_de_sulamericana_hexagonal_de_rebaixamento_11o_a_16o_define_os_2_rebaixados",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_libertadores": 3,
+    "vaga_libertadores_criterio": "campeao_vice_e_3o_colocado_do_hexagonal_do_titulo_fase_final_i_a_4a_vaga_do_pais_vem_do_campeao_vice_ou_melhor_colocado_da_copa_equador_competicao_separada_nao_modelada_aqui",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "inferido_para_nao_sobrepor_a_libertadores_4o_5o_e_6o_colocados_do_hexagonal_do_titulo_mais_o_1o_colocado_do_quadrangular_internacional_fase_final_ii_fontes_consultadas_deram_versoes_contraditorias_sobre_os_3_primeiros_lugares_do_hexagonal_ver_dados_a_verificar",
+    "rebaixamento_proxima_divisao": 2
+  },
   "classicos": [
     { "time_a": "barcelona_sc", "time_b": "emelec", "nome": "Clásico del Astillero", "peso_midia": 5 },
     { "time_a": "ldu_quito", "time_b": "aucas", "nome": "Superclásico de Quito", "peso_midia": 4 }

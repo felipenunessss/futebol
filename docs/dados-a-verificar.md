@@ -595,6 +595,57 @@ nesta rodada (confirmei só nome/cidade).
   rivalidade de Santa Cruz de la Sierra desde 1970), bem confirmado por
   múltiplas fontes de imprensa esportiva boliviana.
 
+## Expansão CONMEBOL — Equador (1ª divisão)
+
+- **Fonte**: Wikipédia ES ("Serie A de Ecuador 2026"), cruzada com Cancha
+  Ecuador ("LigaPro cambia su formato para 2026...") e Primicias
+  (cobertura da reta final da temporada, incluindo os hexagonais de
+  título/rebaixamento já definidos, já que a temporada 2026 real está em
+  andamento/perto do fim na data de hoje).
+- **Formato real, mais complexo que o já modelado**: Fase Inicial de
+  pontos corridos, turno e returno (30 rodadas, 16 times) — isso já
+  estava certo na modelagem anterior. O que faltava: depois da Fase
+  Inicial, os 16 times se dividem por faixa de classificação em **3
+  grupos de turno único** com propósitos diferentes — hexagonal do
+  título (1º-6º), quadrangular internacional (7º-10º, disputa vaga extra
+  de Sul-Americana) e hexagonal de rebaixamento (11º-16º, define os 2
+  descensos). O schema não tem um bloco pra "3 grupos de tamanhos e
+  propósitos diferentes alimentados pela faixa de classificação da fase
+  anterior" — aproximei descrevendo tudo em texto livre no campo
+  `final_estadual.criterio` (reaproveitando o bloco, que não é literalmente
+  uma final), sem representar estruturalmente os 3 grupos nem o número
+  exato de jogos de cada um.
+- **Rebaixamento**: 2 clubes descem (últimos 2 colocados do hexagonal de
+  rebaixamento) — confirmado por duas fontes independentes.
+- **Vagas CONMEBOL — parcialmente confirmadas, com uma contradição entre
+  fontes que não foi possível resolver com confiança total**: Libertadores
+  2027 tem 4 vagas do Equador, sendo 3 diretas do campeonato (campeão,
+  vice, 3º colocado do hexagonal do título) e a 4ª vinda da Copa Equador
+  (competição separada, não modelada neste arquivo). Sul-Americana 2027
+  também tem 4 vagas — aqui uma fonte (resumo de busca) e outra (fetch
+  direto da Wikipédia) descreveram os critérios de forma contraditória,
+  ambas dizendo que os "3 primeiros do hexagonal do título" também
+  definem as vagas de Sul-Americana, o que duplicaria as posições já
+  usadas pra Libertadores. **Modelei por inferência** (pra evitar a
+  sobreposição, que não faz sentido esportivo) que a Sul-Americana pega o
+  4º, 5º e 6º colocado do hexagonal do título mais o 1º colocado do
+  quadrangular internacional — mas isso é uma suposição de boa fé pra
+  resolver a contradição das fontes, não uma confirmação direta. Vale
+  reconfirmar contra o regulamento oficial da FEF/CONMEBOL antes de
+  considerar definitivo (`vaga_sulamericana_criterio` documenta essa
+  incerteza no próprio JSON).
+- **El Nacional**: confirmado que foi **rebaixado para a Serie B 2026**
+  por sanção administrativa da FEF (dívidas/descumprimento financeiro,
+  perda de 6 pontos), a segunda vez em 5 anos — por isso o clube já
+  estava corretamente fora de `times[]` de `equador_primera.json` mesmo
+  antes desta rodada (a inconsistência identificada era só um alerta pra
+  conferir, não um erro real). Ele continua cadastrado em
+  `src/data/clubes/equador.json` sem `divisao_nacional`, já que a Serie B
+  do Equador não é modelada neste projeto — mantido assim.
+- **Clássicos**: mantidos os 2 já cadastrados (Clásico del Astillero,
+  Superclásico de Quito); não adicionei um terceiro por falta de fonte
+  boa o suficiente dentro do tempo desta pesquisa.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
