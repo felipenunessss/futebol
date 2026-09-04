@@ -12,8 +12,8 @@
     }
   },
   "premiacao": {
-    "vaga_libertadores": 3,
-    "vaga_libertadores_criterio": "campeao_vice_e_3o_colocado_do_hexagonal_do_titulo_fase_final_i_a_4a_vaga_do_pais_vem_do_campeao_vice_ou_melhor_colocado_da_copa_equador_competicao_separada_nao_modelada_aqui",
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "campeao_vice_e_3o_colocado_do_hexagonal_do_titulo_fase_final_i_mais_a_4a_vaga_do_pais_que_vem_do_campeao_vice_ou_melhor_colocado_da_copa_equador_competicao_separada_nao_modelada_aqui_total_4_bate_com_os_4_clubes_equatorianos_confirmados_em_libertadores_json_2026",
     "vaga_sulamericana": 4,
     "vaga_sulamericana_criterio": "inferido_para_nao_sobrepor_a_libertadores_4o_5o_e_6o_colocados_do_hexagonal_do_titulo_mais_o_1o_colocado_do_quadrangular_internacional_fase_final_ii_fontes_consultadas_deram_versoes_contraditorias_sobre_os_3_primeiros_lugares_do_hexagonal_ver_dados_a_verificar",
     "rebaixamento_proxima_divisao": 2

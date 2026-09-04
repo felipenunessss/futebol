@@ -7,7 +7,7 @@
   "formato": {
     "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 4, "rodadas": 14 },
     "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 4, "rodadas": 14 },
-    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 8, "ida_e_volta": true, "classificam_por_grupo": 4 },
+    "fase_grupos": { "num_grupos": 1, "times_por_grupo": 17, "ida_e_volta": true, "classificam_por_grupo": 8 },
     "mata_mata": { "fases": ["quartas", "semifinal", "final_do_apertura_ou_clausura"], "ida_e_volta": true },
     "final_estadual": {
       "criterio": "final_absoluta_ida_e_volta_entre_campeoes_do_apertura_e_clausura_vencedor_sobe_a_primeira_divisao",

@@ -21,8 +21,8 @@
     }
   },
   "premiacao": {
-    "vaga_libertadores": 6,
-    "vaga_libertadores_criterio": "Campeão do Apertura, campeão do Clausura, campeão da Copa Argentina, e os 3 melhores da Tabela Anual que não tenham vaga por outra via",
+    "vaga_libertadores": 7,
+    "vaga_libertadores_criterio": "Campeão do Apertura, campeão do Clausura, campeão da Copa Argentina, e os 3 melhores da Tabela Anual que não tenham vaga por outra via (6 vagas por critério direto); a Argentina teve uma 7ª vaga na Libertadores 2026 (Lanús, Platense, Estudiantes de La Plata, Independiente Rivadavia, Rosario Central, Boca Juniors, Argentinos Juniors — 7 clubes reais confirmados) cujo mecanismo exato não foi reconfirmado por fonte específica",
     "vaga_sulamericana": 6,
     "vaga_sulamericana_criterio": "6 melhores da Tabela Anual que não tenham vaga de Libertadores",
     "rebaixamento_proxima_divisao": 2

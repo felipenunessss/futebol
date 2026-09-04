@@ -13,8 +13,8 @@
   "premiacao": {
     "vaga_libertadores": 4,
     "vaga_libertadores_criterio": "peru_1_campeao_da_liguilla_nacional_peru_2_3_e_4_definidos_por_repescagem_entre_2o_3o_e_4o_colocados_da_tabela_acumulada",
-    "vaga_sulamericana": 2,
-    "vaga_sulamericana_criterio": "7o_e_8o_colocados_da_tabela_acumulada_entre_os_que_ainda_nao_se_classificaram_para_a_libertadores",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "melhores_colocados_da_tabela_acumulada_entre_os_que_ainda_nao_se_classificaram_para_a_libertadores_numero_corrigido_de_2_para_4_apos_conferir_contra_sulamericana_json_2026_posicoes_de_corte_exatas_nao_reconfirmadas",
     "rebaixamento_proxima_divisao": 2
   },
   "classicos": [

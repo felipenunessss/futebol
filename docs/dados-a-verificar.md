@@ -819,12 +819,13 @@ nesta rodada (confirmei só nome/cidade).
   `academia_puerto_cabello_b`, `zamora_b` — que é uma característica real
   da divisão venezuelana (clubes grandes mandam equipe reserva pra
   Segunda), não erro de duplicação.
-- **Formato aproximado**: Apertura/Clausura (14 rodadas cada) + fase de
-  grupos de 2×8 + mata-mata — o total de 17 times não fecha exatamente
-  com 2 grupos de 8 (16), então a composição exata dos grupos é uma
-  aproximação, não confirmada time a time contra o regulamento oficial
-  da divisão. Vale revisar contra fonte primária antes de considerar
-  fechado.
+- **Formato aproximado, corrigido pra não afirmar divisão errada**: a
+  versão original modelava "2 grupos de 8" sem bater com os 17 clubes
+  reais — corrigido pra `fase_grupos` de 1 grupo único de 17 (todos contra
+  todos, ida e volta), já que não temos fonte confirmando se a divisão em
+  grupos existe de fato nem sua composição exata. Continua sendo uma
+  aproximação (Apertura/Clausura + esse "grupo único" + mata-mata) — vale
+  revisar contra fonte primária antes de considerar fechado.
 - **Acesso**: 1 vaga à Primera División, campeão da final absoluta entre
   campeões do Apertura e Clausura (`acesso_proxima_divisao: 1`).
 - Esta seção foi escrita ao finalizar um trabalho que tinha ficado
@@ -985,53 +986,14 @@ nesta rodada (confirmei só nome/cidade).
   rivalidade de Santa Cruz de la Sierra desde 1970), bem confirmado por
   múltiplas fontes de imprensa esportiva boliviana.
 
-## 2ª divisão CONMEBOL — Bolívia (Copa Simón Bolívar)
+## 2ª divisão CONMEBOL — Bolívia (removida)
 
-- **Fonte**: Wikipédia ES "Copa Simón Bolívar 2026 (Bolivia)" — a edição já
-  está em andamento no mundo real (fase departamental e fase de grupos
-  nacional já disputadas), com tabelas de resultado real por grupo. A
-  primeira tentativa de extrair o conteúdo via fetch resumido por IA
-  pareceu suspeita (times com nomes coincidindo com clubes famosos de
-  outros países, ex: "F.C. Juan Aurich", que também é o nome de um clube
-  peruano famoso) — **verificado por raw HTML da própria Wikipédia que o
-  nome é real**, é um clube boliviano pequeno de Potosí distinto, mera
-  coincidência de nome. Fica registrado como lição: desconfiar de nomes
-  "importados" de outro país mesmo quando o fetch resumido parece
-  plausível, e confirmar contra o HTML bruto quando suspeitar.
-- **Formato real**: 3 fases — (1) fase departamental/preliminar, times
-  agrupados por associação (9 associações: Beni, Chuquisaca, Cochabamba,
-  La Paz, Oruro, Pando, Potosí, Santa Cruz, Tarija), turno e returno,
-  melhores de cada série avançam; (2) fase de grupos nacional, 24
-  classificados em 6 grupos de 4 (turno e returno), 2 melhores de cada
-  grupo + os 4 melhores terceiros avançam às oitavas; (3) mata-mata
-  (oitavas, quartas, semifinal, final) em ida e volta — formato exato da
-  final (jogo único ou ida e volta) não confirmado.
-- **Elenco modelado — só o corpo principal (24 clubes)**: a fonte cita
-  "69 clubes" no resumo mas depois "72 equipos" na seção "Clubes
-  clasificados" (inconsistência da própria fonte, não nossa) — a fase
-  departamental/preliminar completa (todos os ~69-72 clubes) **não foi
-  modelada**, só os **24 clubes confirmados na fase de grupos nacional**
-  (extraídos das tabelas reais de resultado, alta confiança). `times[]`
-  de `bolivia_segunda.json` reflete só esses 24; a fase preliminar fica
-  como pendência (mesmo padrão de simplificação já aplicado à Copa do
-  Brasil/Libertadores/Sul-Americana antes de termos `etapas` — aqui nem
-  chegamos a criar `etapas`, o "corpo principal" é a fase de grupos, não
-  o mata-mata, então a estrutura é diferente).
-- **Cidade de vários clubes por aproximação**: o schema exige `cidade`
-  obrigatória, mas a fonte só confirma o departamento pra vários clubes
-  (ex: `ingenieros_bo`, `veintiseis_de_febrero`, `hiska_nacional` — só
-  "La Paz" o departamento, não a cidade/bairro exata) — usei a capital do
-  departamento como aproximação razoável em ~10 dos 24 clubes; confiança
-  moderada, não alta, nesses casos.
-- **Acesso à 1ª divisão**: confirmado por duas fontes — o campeão sobe
-  direto; o vice disputa um **playoff de ida e volta contra o
-  penúltimo colocado da Divisão Profissional** da mesma temporada
-  (mecanismo de promoção/rebaixamento cruzado entre divisões que o
-  schema não representa — só `premiacao.acesso_proxima_divisao: 1`
-  reflete o acesso direto do campeão, o playoff do vice fica documentado
-  aqui sem campo correspondente).
-- **Rebaixamento**: não modelado — não pesquisado nesta rodada (a 2ª
-  divisão não desce pra lugar nenhum que estejamos modelando).
+Tentamos modelar a Copa Simón Bolívar 2026 (2ª divisão da Bolívia), mas só
+confirmamos 24 dos ~69-72 clubes reais (a fase departamental/preliminar
+inteira ficou de fora) — confiança baixa demais pro padrão do resto da
+base. Removida a pedido do usuário: `bolivia_segunda.json` excluído e os
+24 clubes retirados de `bolivia.json`. Pode ser retomada no futuro se
+alguém achar a lista completa da fase preliminar.
 
 ## Expansão CONMEBOL — Equador (1ª divisão)
 
@@ -1338,6 +1300,41 @@ primária achou pelo menos um erro real, não só detalhes faltando.
   (Estudiantes de Mérida x Deportivo Táchira, 1975) nem os Derbis da
   Capital (Caracas/La Guaira/Metropolitanos/UCV) por já ter 2 clássicos
   bem confirmados e não forçar mais do que o pedido.
+
+## Vagas de Libertadores/Sul-Americana reconciliadas contra o elenco real 2026
+
+Depois de fechar `libertadores.json` (47 clubes) e `sulamericana.json` (56
+clubes) com o elenco real da edição 2026, cruzei o número de clubes de cada
+país nessas duas listas contra `premiacao.vaga_libertadores`/
+`vaga_sulamericana` já declarado em cada `<pais>_primera.json`, descontando
+o mecanismo de "queda" da fase preliminar da Libertadores pra Sul-Americana
+(8 terceiros-colocados dos grupos + 4 perdedores da Fase 3, já mapeados nas
+seções da Libertadores/Sul-Americana) — esse mecanismo não é uma vaga
+concedida pela liga doméstica, é um efeito colateral da própria competição
+continental, então não devia contar como erro de modelagem do país.
+
+- **6 de 9 países já batiam exatamente** depois de descontar as quedas:
+  Bolívia, Chile, Colômbia, Paraguai, Uruguai, Venezuela — nenhuma mudança.
+- **3 erros reais corrigidos**:
+  - **Argentina — Libertadores 6 → 7**: o critério documentado (Apertura +
+    Clausura + Copa Argentina + 3 melhores da Tabela Anual) só soma 6, mas
+    os 7 clubes argentinos confirmados em `libertadores.json` (Lanús,
+    Platense, Estudiantes de La Plata, Independiente Rivadavia, Rosario
+    Central, Boca Juniors, Argentinos Juniors) mostram uma 7ª vaga real —
+    número corrigido, mas o mecanismo exato dessa vaga extra não foi
+    reconfirmado por fonte específica (não é o mesmo caso do Brasil, cuja
+    8ª vaga já é explicada por ser o campeão vigente da Libertadores).
+  - **Equador — Libertadores 3 → 4**: o campo já documentava que existia
+    uma 4ª vaga via Copa Equador "não modelada aqui", deixando o número
+    deliberadamente incompleto — corrigido pra refletir o total real (4),
+    já que os 4 clubes equatorianos batem exatamente com
+    `libertadores.json`.
+  - **Peru — Sul-Americana 2 → 4**: o número antigo (7º/8º colocados) não
+    batia de jeito nenhum com a realidade, mesmo descontando a 1 queda
+    conhecida da Libertadores (Sporting Cristal) — 5 reais - 1 queda = 4
+    vagas por critério doméstico, não 2. Corrigido; as posições de corte
+    exatas da tabela acumulada continuam sem reconfirmação por fonte
+    específica.
 
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
