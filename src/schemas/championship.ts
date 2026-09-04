@@ -24,9 +24,36 @@ export interface FaseQuadrangular {
   classificam_por_grupo: number;
 }
 
+/**
+ * Uma fase de um mata-mata com entrada escalonada (ex: Copa do Brasil,
+ * Libertadores, Sul-Americana): times que já vinham vencendo fases
+ * anteriores se juntam a times que só entram fresh nesta fase específica.
+ */
+export interface EtapaMataMata {
+  nome: string; // ex: "primeira_fase", "oitavas", "final"
+  ida_e_volta: boolean;
+  /**
+   * Club.id[] dos times que entram nesta fase sem ter jogado nenhuma
+   * anterior (bye direto até aqui). Times que não aparecem em `entrantes`
+   * de nenhuma etapa entram todos já na primeira etapa da lista (mesmo
+   * comportamento do `mata_mata` simples, sem entrada escalonada).
+   */
+  entrantes?: string[];
+}
+
 export interface MataMata {
   fases: string[]; // ex: ["quartas", "semifinal", "final"]
   ida_e_volta: boolean;
+  /**
+   * Representação detalhada opcional de um mata-mata com entrada
+   * escalonada por fase e/ou jogo único vs. ida-e-volta variável por fase
+   * (ex: Copa do Brasil e as copas continentais têm 1ª-4ª fase eliminatória
+   * em jogo único, fases seguintes em ida e volta, final em jogo único de
+   * novo). Quando presente, é a fonte de verdade mais precisa; `fases` e
+   * `ida_e_volta` continuam preenchidos como resumo rápido e por
+   * compatibilidade com competições que só usam o formato simples.
+   */
+  etapas?: EtapaMataMata[];
 }
 
 /** Final de estaduais com duas fases prévias (ex: Carioca: turno x returno). */
