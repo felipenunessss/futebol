@@ -353,10 +353,12 @@ nesta rodada (confirmei só nome/cidade).
 
 ## Copa do Brasil e lógica de resolução de vagas — o que foi construído
 
-- **Copa do Brasil 2026 — elenco completo (atualização)**: os 126 clubes
-  reais da edição 2026 foram confirmados e adicionados a `times[]`
-  (arquivo foi de 60 para 134 entradas — ver nota de "extras" abaixo).
-  Fontes cruzadas: CBF (nota oficial "recorde de participantes e 17
+- **Copa do Brasil 2026 — elenco completo (atualização)**: os clubes reais
+  da edição 2026 foram confirmados e adicionados a `times[]` (arquivo foi
+  de 60 para 133 entradas — o total de 126 das fontes cruzadas abaixo se
+  mostrou impreciso na verificação individual seguinte, ver nota de
+  "extras" abaixo). Fontes cruzadas: CBF (nota oficial "recorde de
+  participantes e 17
   estreantes"), Wikipédia PT ("Copa do Brasil de Futebol de 2026"),
   Rádio Itatiaia e Jornal da Paraíba (ambos publicaram a lista completa
   dos 126 clubes por fase de estreia, batendo exatamente nas contagens
@@ -375,17 +377,40 @@ nesta rodada (confirmei só nome/cidade).
     esse nome cadastrado no Maranhense, assumi que é o MAC (cujo nome
     completo é literalmente "Maranhão Atlético Clube") — confiança boa,
     mas não é uma confirmação nominal exata.
-  - **8 clubes que já estavam em `times[]` antes desta atualização não
-    aparecem em nenhuma das quatro listas de fase cruzadas** (`nautico`,
-    `botafogo_sp`, `criciuma`, `brusque_fc`, `ferroviaria`, `floresta`,
-    `inter_de_limeira`, `ituano`) — como as contagens por fase batem
-    exatamente (28+74+4+20=126) nas duas fontes que publicaram lista
-    completa, é pouco provável que sejam omissões de fonte; mais
-    provável é que esses 8 tenham sido incluídos anteriormente por
-    "alta confiança genérica" (jogam Série A/B/C) sem checar se
-    realmente entraram no chaveamento real desta edição específica.
-    Não foram removidos por precaução — vale confirmar contra a fonte
-    oficial antes de decidir se saem da lista.
+  - **Verificação individual dos 8 clubes que não apareciam nas listas
+    cruzadas** (atualização): pesquisados um a um por jogo/resultado real
+    na Copa do Brasil 2026, não só por presença em lista agregada.
+    Resultado: as duas fontes com "lista completa" batendo 28+74+4+20=126
+    eram menos precisas do que pareciam — 6 dos 8 clubes tinham jogo real
+    confirmado e ficaram de fora só por imprecisão de fonte, não porque
+    não participassem.
+    - **Removido**: `nautico` — confirmado por fonte direta (Terra) que
+      ficou de fora da edição 2026; a vaga de Pernambuco foi para o
+      Maguary. Único dos 8 removido.
+    - **Mantidos com jogo confirmado**: `botafogo_sp` (enfrentou o
+      Fortaleza na 4ª fase, 17/03, Estádio Luso Brasileiro); `criciuma`
+      (empatou 0-0 com Operário Várzea-grandense em 28/02, Arena
+      Pantanal-Cuiabá); `brusque_fc` (venceu o Trem-AP por 2-0 e avançou
+      à 2ª fase); `inter_de_limeira` (perdeu nos pênaltis por 7-6 para o
+      Vila Nova em jogo único em Limeira).
+    - **Mantido com confiança moderada**: `ituano` — sem resultado de
+      jogo específico encontrado, mas ESPN mantém página dedicada de
+      elenco para "Copa do Brasil 2026" do clube, o que indica registro
+      real na competição.
+    - **Mantidos por precaução, sem confirmação direta nos dois
+      sentidos**: `ferroviaria` (Araraquara-SP) e `floresta` (Fortaleza-
+      CE) — nenhuma fonte confirmou jogo ou exclusão específica. Cuidado
+      ao pesquisar `ferroviaria`: uma notícia sobre "Ferroviária x Sport
+      Recife" na Copa do Brasil 2026 é sobre a **Desportiva Ferroviária**
+      do Espírito Santo (já cadastrada à parte como `desportiva_ferroviaria`
+      em `times[]`), não sobre a Ferroviária de Araraquara-SP — são
+      clubes diferentes, não confundir numa futura verificação. Sobre
+      `floresta`: achei que os 3 classificados do Cearense 2026 pra Copa
+      do Brasil são Ceará, Ferroviário e Fortaleza (não Floresta), mas
+      isso provavelmente vale pra vaga da Copa do Brasil **2027** (mesmo
+      descompasso de temporada da Série D), não prova nada sobre quem
+      ocupou a vaga do Ceará na edição 2026 — por isso não foi removido
+      com essa informação sozinha.
   - **Formato real mais preciso que o já documentado**: 9 fases
     confirmado (CBF/Wikipédia); da 1ª à 4ª fase os jogos são eliminatórios
     em **partida única**; da 5ª fase às quartas de final (e semifinal,
