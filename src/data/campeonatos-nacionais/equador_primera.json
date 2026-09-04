@@ -10,5 +10,5 @@
     { "time_a": "barcelona_sc", "time_b": "emelec", "nome": "Clásico del Astillero", "peso_midia": 5 },
     { "time_a": "ldu_quito", "time_b": "aucas", "nome": "Superclásico de Quito", "peso_midia": 4 }
   ],
-  "times": ["aucas", "barcelona_sc", "delfin", "deportivo_cuenca", "el_nacional", "emelec", "guayaquil_city", "independiente_del_valle", "ldu_quito", "libertad_ec", "macara", "manta_fc", "mushuc_runa", "orense", "tecnico_universitario", "universidad_catolica_ec"]
+  "times": ["aucas", "barcelona_sc", "delfin", "deportivo_cuenca", "emelec", "guayaquil_city", "independiente_del_valle", "ldu_quito", "leones_ec", "libertad_ec", "macara", "manta_fc", "mushuc_runa", "orense", "tecnico_universitario", "universidad_catolica_ec"]
 }
