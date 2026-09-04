@@ -4,8 +4,9 @@ import {
   dividirEmGruposSequencial,
   simularFaseDeGrupos,
   simularFaseDeGruposDoFormato,
+  simularFaseQuadrangularDoFormato,
 } from "../../src/simulation/groups.js";
-import type { FaseGrupos } from "../../src/schemas/championship.js";
+import type { FaseGrupos, FaseQuadrangular } from "../../src/schemas/championship.js";
 
 describe("dividirEmGruposPorForca", () => {
   const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -76,5 +77,22 @@ describe("simularFaseDeGruposDoFormato", () => {
   it("lança erro se o número de times não bater com num_grupos × times_por_grupo", () => {
     expect(() => simularFaseDeGruposDoFormato(formato, times.slice(0, 7), ratings)).toThrow();
     expect(() => simularFaseDeGruposDoFormato(formato, [...times, "i"], ratings)).toThrow();
+  });
+});
+
+describe("simularFaseQuadrangularDoFormato", () => {
+  const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const formato: FaseQuadrangular = { ativa: true, num_grupos: 2, times_por_grupo: 4, classificam_por_grupo: 2 };
+
+  it("funciona igual a simularFaseDeGruposDoFormato (mesma estrutura, sem campo ida_e_volta próprio)", () => {
+    const resultado = simularFaseQuadrangularDoFormato(formato, times, ratings, () => Math.random());
+    expect(resultado.grupos).toHaveLength(2);
+    expect(resultado.classificados).toHaveLength(4);
+  });
+
+  it("lança erro se formato.ativa for false", () => {
+    const inativo: FaseQuadrangular = { ...formato, ativa: false };
+    expect(() => simularFaseQuadrangularDoFormato(inativo, times, ratings)).toThrow(/ativa/);
   });
 });

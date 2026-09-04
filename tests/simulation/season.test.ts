@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { gerarConfrontosPontosCorridos, simularTemporadaPontosCorridos } from "../../src/simulation/season.js";
+import type { FaseUnica } from "../../src/schemas/championship.js";
+import {
+  gerarConfrontosPontosCorridos,
+  simularFaseUnicaDoFormato,
+  simularTemporadaPontosCorridos,
+  somarTabelas,
+  type LinhaTabela,
+} from "../../src/simulation/season.js";
 
 describe("gerarConfrontosPontosCorridos", () => {
   it("turno único com número par de times: cada time joga contra todos os outros exatamente uma vez", () => {
@@ -77,5 +84,59 @@ describe("simularTemporadaPontosCorridos", () => {
       expect(linha.jogos).toBe(linha.vitorias + linha.empates + linha.derrotas);
       expect(linha.saldoDeGols).toBe(linha.golsPro - linha.golsContra);
     }
+  });
+});
+
+describe("simularFaseUnicaDoFormato", () => {
+  const times = ["a", "b", "c", "d"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("classifica exatamente classificam_proxima_fase times, na ordem da tabela desse torneio", () => {
+    const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 2 };
+    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
+
+    expect(resultado.classificados).toHaveLength(2);
+    expect(resultado.classificados).toEqual([resultado.tabela[0].clubeId, resultado.tabela[1].clubeId]);
+  });
+
+  it("classificam_proxima_fase: 0 não classifica ninguém, mas ainda gera tabela completa", () => {
+    const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 0 };
+    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
+
+    expect(resultado.classificados).toEqual([]);
+    expect(resultado.tabela).toHaveLength(4);
+  });
+});
+
+describe("somarTabelas", () => {
+  function linha(overrides: Partial<LinhaTabela>): LinhaTabela {
+    return { clubeId: "x", pontos: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, saldoDeGols: 0, ...overrides };
+  }
+
+  it("soma pontos/gols de cada clube entre as tabelas, tipo Apertura + Clausura", () => {
+    const turno: LinhaTabela[] = [linha({ clubeId: "a", pontos: 10, golsPro: 8, golsContra: 3 })];
+    const returno: LinhaTabela[] = [linha({ clubeId: "a", pontos: 7, golsPro: 5, golsContra: 4 })];
+
+    const [acumulado] = somarTabelas([turno, returno]);
+
+    expect(acumulado.pontos).toBe(17);
+    expect(acumulado.golsPro).toBe(13);
+    expect(acumulado.golsContra).toBe(7);
+    expect(acumulado.saldoDeGols).toBe(6);
+  });
+
+  it("clube presente em só uma das tabelas ainda entra no resultado (parte de zero na outra)", () => {
+    const turno: LinhaTabela[] = [linha({ clubeId: "a", pontos: 10 })];
+    const returno: LinhaTabela[] = [linha({ clubeId: "b", pontos: 5 })];
+
+    const acumulado = somarTabelas([turno, returno]);
+
+    expect(acumulado.map((l) => l.clubeId).sort()).toEqual(["a", "b"]);
+  });
+
+  it("resultado vem ordenado por pontos, igual as outras tabelas do motor", () => {
+    const turno: LinhaTabela[] = [linha({ clubeId: "a", pontos: 3 }), linha({ clubeId: "b", pontos: 9 })];
+    const acumulado = somarTabelas([turno]);
+    expect(acumulado[0].clubeId).toBe("b");
   });
 });

@@ -1,10 +1,13 @@
+import type { FaseUnica } from "../schemas/championship.js";
 import { gerarPerfilTime, simularPartida } from "./match.js";
 
 /**
  * Confrontos e tabela de uma temporada de pontos corridos — o formato mais
  * simples que já modelamos de verdade (`formato.pontos_corridos`, ver
- * `src/schemas/championship.ts`). Formatos com fase de grupos/mata-mata
- * ainda não têm gerador de confronto — ver TODO em `engine.ts`.
+ * `src/schemas/championship.ts`), reaproveitado também por `turno`/`returno`
+ * (`FaseUnica`, ver `simularFaseUnicaDoFormato` mais abaixo) — Apertura e
+ * Clausura são, na prática, cada um uma mini temporada de pontos corridos
+ * entre todos os times da competição.
  */
 
 export interface Confronto {
@@ -122,4 +125,58 @@ export function simularTemporadaPontosCorridos(
   );
 
   return { confrontos, tabela: tabelaOrdenada };
+}
+
+export interface ResultadoFaseUnica extends ResultadoTemporadaPontosCorridos {
+  /** Top `classificam_proxima_fase` da tabela DESSE torneio (não da tabela acumulada — some com `somarTabelas` se precisar da acumulada). */
+  classificados: string[];
+}
+
+/**
+ * Simula um `turno` ou `returno` (Apertura/Clausura, ver `FaseUnica` em
+ * `schemas/championship.ts`) — é a mesma mecânica de `pontos_corridos`, só
+ * que rodando entre todos os times da competição pra decidir quem classifica
+ * a partir dessa fase específica (`classificam_proxima_fase`), não pra
+ * decidir campeão sozinho.
+ */
+export function simularFaseUnicaDoFormato(
+  formato: FaseUnica,
+  times: string[],
+  ratings: Record<string, number>,
+  random: () => number = Math.random,
+): ResultadoFaseUnica {
+  const { confrontos, tabela } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random);
+  const classificados = tabela.slice(0, formato.classificam_proxima_fase).map((linha) => linha.clubeId);
+
+  return { confrontos, tabela, classificados };
+}
+
+/**
+ * Soma várias tabelas (ex: turno + returno) numa tabela acumulada só —
+ * cobre o padrão "soma dos pontos de Apertura e Clausura" que aparece no
+ * `tabela_acumulada.criterio` (texto livre) de quase todo país CONMEBOL
+ * modelado. Não tenta interpretar o texto do critério — só soma; se o
+ * critério real for outra coisa (ex: média em vez de soma), não serve.
+ */
+export function somarTabelas(tabelas: LinhaTabela[][]): LinhaTabela[] {
+  const acumulado = new Map<string, LinhaTabela>();
+
+  for (const tabela of tabelas) {
+    for (const linha of tabela) {
+      const atual = acumulado.get(linha.clubeId) ?? linhaVazia(linha.clubeId);
+      atual.pontos += linha.pontos;
+      atual.jogos += linha.jogos;
+      atual.vitorias += linha.vitorias;
+      atual.empates += linha.empates;
+      atual.derrotas += linha.derrotas;
+      atual.golsPro += linha.golsPro;
+      atual.golsContra += linha.golsContra;
+      atual.saldoDeGols = atual.golsPro - atual.golsContra;
+      acumulado.set(linha.clubeId, atual);
+    }
+  }
+
+  return [...acumulado.values()].sort(
+    (a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro,
+  );
 }

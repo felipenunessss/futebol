@@ -1,4 +1,4 @@
-import type { FaseGrupos } from "../schemas/championship.js";
+import type { FaseGrupos, FaseQuadrangular } from "../schemas/championship.js";
 import type { Confronto, LinhaTabela } from "./season.js";
 import { simularTemporadaPontosCorridos } from "./season.js";
 
@@ -103,4 +103,33 @@ export function simularFaseDeGruposDoFormato(
 
   const grupos = dividirEmGruposPorForca(times, formato.num_grupos, ratings);
   return simularFaseDeGrupos(grupos, ratings, formato.ida_e_volta, formato.classificam_por_grupo, random);
+}
+
+/**
+ * Atalho equivalente ao de cima, mas pro bloco `FaseQuadrangular` (ex: os 2
+ * quadrangulares da Série C, o "Grupo Ascenso"/"Grupo Descenso" do Equador
+ * 2ª divisão) — estruturalmente é a mesma coisa que `FaseGrupos`
+ * (`num_grupos`/`times_por_grupo`/`classificam_por_grupo`), só que sem
+ * campo `ida_e_volta` próprio (as fontes descrevem esses quadrangulares
+ * como turno e returno entre os 4 times do grupo — `idaEVolta` default
+ * `true` reflete isso; passe `false` se a fonte específica disser turno
+ * único) e com um flag `ativa` que precisa estar ligado.
+ */
+export function simularFaseQuadrangularDoFormato(
+  formato: FaseQuadrangular,
+  times: string[],
+  ratings: Record<string, number>,
+  random: () => number = Math.random,
+  idaEVolta = true,
+): ResultadoFaseDeGrupos {
+  if (!formato.ativa) {
+    throw new Error("simularFaseQuadrangularDoFormato: formato.ativa é false — essa fase não deveria estar rodando");
+  }
+
+  return simularFaseDeGruposDoFormato(
+    { num_grupos: formato.num_grupos, times_por_grupo: formato.times_por_grupo, classificam_por_grupo: formato.classificam_por_grupo, ida_e_volta: idaEVolta },
+    times,
+    ratings,
+    random,
+  );
 }
