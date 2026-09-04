@@ -442,6 +442,22 @@ nesta rodada (confirmei só nome/cidade).
   vice, 2º da Tabela Anual, campeão da Copa AUF Uruguay). Sul-Americana
   confirmada em número (4) mas não em critério exato posição-a-posição.
 
+## Expansão CONMEBOL — Chile (1ª divisão)
+
+- **Fonte**: sem cobertura no openfootball — pesquisado do zero,
+  confirmado por duas fontes independentes (busca agregada + fetch
+  direto da Wikipédia ES da temporada 2026), lista idêntica nas duas.
+- **Formato**: o mais simples até agora — torneio único de pontos
+  corridos (turno e returno, 30 rodadas), sem Apertura/Clausura. Encaixa
+  bem no bloco `pontos_corridos` já existente, sem aproximação.
+- **Vagas CONMEBOL muito bem documentadas**: 4 Libertadores (1º e 2º do
+  Campeonato Nacional, campeão da Copa de la Liga, vencedor de jogo
+  único 3º colocado x campeão da Copa Chile) e 4 Sul-Americana (4º, 5º,
+  6º colocados + perdedor daquele jogo único).
+- **Rebaixamento não confirmado**: não encontrei o número exato de
+  descensos nesta rodada de pesquisa — `premiacao` ficou sem
+  `rebaixamento_proxima_divisao`.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

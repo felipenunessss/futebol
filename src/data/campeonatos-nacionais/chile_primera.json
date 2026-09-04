@@ -1,0 +1,25 @@
+{
+  "id": "chile_primera",
+  "nome": "Campeonato Nacional de Chile (Liga de Primera)",
+  "pais": "CL",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 }
+  },
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "1º e 2º colocados do Campeonato Nacional, campeão da Copa de la Liga, vencedor de jogo único entre o 3º colocado e o campeão da Copa Chile",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "4º, 5º e 6º colocados do Campeonato Nacional, mais o perdedor do jogo único entre 3º colocado e campeão da Copa Chile"
+  },
+  "classicos": [
+    { "time_a": "colo_colo", "time_b": "universidad_de_chile", "nome": "Superclásico", "peso_midia": 5 },
+    { "time_a": "universidad_de_chile", "time_b": "universidad_catolica", "nome": "Clásico Universitario", "peso_midia": 4 }
+  ],
+  "times": [
+    "colo_colo", "universidad_de_chile", "universidad_catolica", "audax_italiano", "cobresal",
+    "coquimbo_unido", "deportes_concepcion", "deportes_la_serena", "deportes_limache", "everton_cl",
+    "huachipato", "nublense", "ohiggins", "palestino", "union_la_calera", "universidad_de_concepcion"
+  ]
+}
