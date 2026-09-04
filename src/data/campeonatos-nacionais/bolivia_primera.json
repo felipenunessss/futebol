@@ -9,5 +9,5 @@
   "classicos": [
     { "time_a": "bolivar", "time_b": "the_strongest", "nome": "Superclásico Paceño", "peso_midia": 5 }
   ],
-  "times": ["always_ready", "aurora", "blooming", "bolivar", "guabira", "gv_san_jose", "independiente_petrolero", "nacional_potosi", "oriente_petrolero", "real_oruro", "real_tomayapo", "san_antonio_bulo_bulo", "the_strongest", "universitario_vinto", "wilstermann"]
+  "times": ["abb", "always_ready", "aurora", "blooming", "bolivar", "guabira", "gv_san_jose", "independiente_petrolero", "nacional_potosi", "oriente_petrolero", "real_oruro", "real_potosi", "real_tomayapo", "san_antonio_bulo_bulo", "the_strongest", "universitario_vinto"]
 }
