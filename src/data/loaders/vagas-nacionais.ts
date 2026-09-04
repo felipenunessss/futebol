@@ -11,21 +11,17 @@
  * vice" (N=2) sem precisar de um branch por critério, já que a posição
  * exata só muda o N, não o mecanismo.
  *
- * Na primeira temporada da carreira, quando ainda não há uma classificação
- * histórica estável, o jogo pode preencher as vagas faltantes de forma
- * aleatória entre clubes elegíveis para evitar uma transição abrupta. A
- * partir da segunda temporada, a regra esportiva passa a valer de forma
- * determinística.
+ * Não sorteia nada: a temporada 1 da carreira usa o elenco fixo de cada
+ * competição nacional (ver `docs/regras-competicoes.md`), então essa
+ * resolução por classificação estadual só se aplica a partir da temporada
+ * 2 em diante, quando a competição nacional já tem vagas dinâmicas.
  *
  * Depende da classificação final do estadual, que só existe depois que o
  * motor de simulação (Fase 2) rodar a temporada — por isso esta função é
  * pura (recebe a classificação pronta) e não sabe nada de partidas.
  */
 export interface OpcaoResolucaoVagas {
-  temporada?: number;
-  candidatosExtras?: string[];
   clubesBrasileiros?: ReadonlySet<string>;
-  random?: () => number;
 }
 
 export interface CampeonatoComTimesBasicos {
@@ -39,26 +35,6 @@ export function listarCandidatosSerieD(
   campeonatos: CampeonatoComTimesBasicos[],
 ): string[] {
   return listarCandidatosVagasEstaduais(clubesEmCompeticaoNacional, campeonatos, clubesBrasileiros);
-}
-
-export function sortearCandidatosSerieDTemporadaInicial(
-  quantidadeDeVagas: number,
-  clubesEmCompeticaoNacional: ReadonlySet<string>,
-  clubesBrasileiros: ReadonlySet<string>,
-  campeonatos: CampeonatoComTimesBasicos[],
-  random: () => number = Math.random,
-): string[] {
-  const candidatos = listarCandidatosSerieD(clubesEmCompeticaoNacional, clubesBrasileiros, campeonatos);
-  const selecionados: string[] = [];
-  const disponiveis = [...candidatos];
-
-  while (selecionados.length < Math.min(quantidadeDeVagas, disponiveis.length)) {
-    const indice = Math.min(disponiveis.length - 1, Math.max(0, Math.floor(random() * disponiveis.length)));
-    selecionados.push(disponiveis[indice]);
-    disponiveis.splice(indice, 1);
-  }
-
-  return selecionados;
 }
 
 export function listarCandidatosVagasEstaduais(
@@ -88,39 +64,7 @@ export function resolverVagasEstaduais(
   clubesEmCompeticaoNacional: ReadonlySet<string>,
   opcoes: OpcaoResolucaoVagas = {},
 ): string[] {
-  const {
-    temporada = 2,
-    candidatosExtras = [],
-    clubesBrasileiros = new Set(),
-    random = Math.random,
-  } = opcoes;
-
-  if (temporada <= 1) {
-    const ehElegivel = (timeId: string) => {
-      if (clubesEmCompeticaoNacional.has(timeId)) return false;
-      if (clubesBrasileiros.size > 0 && !clubesBrasileiros.has(timeId)) return false;
-      return true;
-    };
-
-    const elegiveis = [...new Set([
-      ...classificacaoFinal.filter(ehElegivel),
-      ...candidatosExtras.filter(ehElegivel),
-    ])];
-
-    const selecionados: string[] = [];
-    const disponiveis = [...elegiveis];
-
-    while (selecionados.length < Math.min(quantidadeDeVagas, disponiveis.length)) {
-      const indice = Math.min(
-        disponiveis.length - 1,
-        Math.max(0, Math.floor(random() * disponiveis.length)),
-      );
-      selecionados.push(disponiveis[indice]);
-      disponiveis.splice(indice, 1);
-    }
-
-    return selecionados;
-  }
+  const { clubesBrasileiros = new Set() } = opcoes;
 
   const vencedores: string[] = [];
   for (const timeId of classificacaoFinal) {

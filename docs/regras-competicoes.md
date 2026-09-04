@@ -38,16 +38,14 @@ temporada em questão.
 
 ### Atenção para quem for implementar
 
-`resolverVagasEstaduais` já tem um branch para `temporada <= 1` que faz
-**sorteio aleatório** entre clubes elegíveis quando ainda não há classificação
-histórica — pensado para evitar transição abrupta em vagas nacionais no geral.
-Esse comportamento **conflita com a regra acima para a Série D
-especificamente**: na temporada 1, a Série D não deve passar por sorteio
-nenhum, deve usar a lista fixa dos clubes reais. Ao implementar, avaliar se
-o sorteio da temporada 1 continua fazendo sentido para outras vagas nacionais
-(ex: Copa do Brasil, que também usa vagas por estadual) ou se deve ser
-descontinuado também para manter a temporada 1 sempre fiel ao elenco real
-2026 onde ele existir.
+`resolverVagasEstaduais` chegou a ter um branch de sorteio aleatório para
+`temporada <= 1`, pensado para evitar transição abrupta em vagas nacionais
+no geral — mas isso conflitava com a regra acima (Série D na temporada 1 usa
+elenco fixo, sem sorteio nenhum). O branch foi removido: a função hoje só
+resolve vagas por classificação estadual (usada a partir da temporada 2). Se
+alguma competição nacional diferente da Série D precisar de um mecanismo de
+preenchimento na temporada 1, deve ser modelada separadamente com o mesmo
+princípio — elenco fixo real sempre que existir, sem sorteio.
 
 ### Status
 

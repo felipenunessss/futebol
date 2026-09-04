@@ -4,7 +4,6 @@ import {
   listarCandidatosSerieD,
   listarCandidatosVagasEstaduais,
   resolverVagasEstaduais,
-  sortearCandidatosSerieDTemporadaInicial,
 } from "../../src/data/loaders/vagas-nacionais.js";
 
 describe("resolverVagasEstaduais", () => {
@@ -38,21 +37,6 @@ describe("resolverVagasEstaduais", () => {
     const classificacao = ["clube_a", "clube_b", "clube_c"];
     const resultado = resolverVagasEstaduais(1, classificacao, new Set());
     expect(resultado.length).toBe(1);
-  });
-
-  it("na primeira temporada preenche vagas faltantes aleatoriamente entre candidatos elegíveis brasileiros", () => {
-    const classificacao = ["clube_a", "clube_b", "clube_c"];
-    const resultado = resolverVagasEstaduais(3, classificacao, new Set(["clube_a"]), {
-      temporada: 1,
-      candidatosExtras: ["clube_x", "clube_y", "clube_z"],
-      clubesBrasileiros: new Set(["clube_a", "clube_b", "clube_c", "clube_x", "clube_y", "clube_z"]),
-      random: () => 0.1,
-    });
-
-    expect(resultado).toHaveLength(3);
-    expect(resultado).toContain("clube_b");
-    expect(resultado).toContain("clube_x");
-    expect(resultado).not.toContain("clube_a");
   });
 
   it("lista times estaduais elegíveis para preencher vagas faltantes da temporada 1, só brasileiros", () => {
@@ -89,23 +73,5 @@ describe("resolverVagasEstaduais", () => {
     expect(candidatos.some((id) => id === "palmeiras")).toBe(false);
     expect(candidatos.some((id) => id === "botafogo_sp")).toBe(true);
     expect(candidatos.some((id) => id === "atletico_alagoinhas")).toBe(true);
-  });
-
-  it("sorteia candidatos reais para a temporada inicial da Série D", () => {
-    const clubes = loadClubes();
-    const clubesBrasileiros = new Set(clubes.filter((clube) => clube.pais === "BR").map((clube) => clube.id));
-    const emCompeticaoNacional = new Set(["palmeiras", "gremio", "flamengo", "corinthians", "fortaleza", "atletico_mg"]);
-
-    const selecionados = sortearCandidatosSerieDTemporadaInicial(
-      3,
-      emCompeticaoNacional,
-      clubesBrasileiros,
-      loadEstaduais(),
-      () => 0,
-    );
-
-    expect(selecionados).toHaveLength(3);
-    expect(selecionados.every((id) => clubesBrasileiros.has(id))).toBe(true);
-    expect(selecionados.every((id) => !emCompeticaoNacional.has(id))).toBe(true);
   });
 });
