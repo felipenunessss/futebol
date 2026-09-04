@@ -458,6 +458,30 @@ nesta rodada (confirmei só nome/cidade).
   descensos nesta rodada de pesquisa — `premiacao` ficou sem
   `rebaixamento_proxima_divisao`.
 
+## Expansão CONMEBOL — Colômbia (1ª divisão)
+
+- **Fonte**: openfootball só tem até 2025 (20 clubes). Lista 2026 completa
+  confirmada via fetch direto da Wikipédia ES ("Torneo Apertura 2026
+  (Colombia)"); os 3 clubes novos (Cúcuta Deportivo, Jaguares de
+  Córdoba promovidos; Internacional de Bogotá no lugar do Equidad)
+  também confirmados por uma segunda fonte (Futbolred) que citou essas
+  mudanças especificamente.
+- **Formato assimétrico não totalmente capturado**: em 2026 o Apertura
+  usa playoff direto (mata-mata a partir das quartas, sem cuadrangulares)
+  enquanto o Finalización usa cuadrangulares semifinais — mudança
+  específica dessa temporada. Modelei os dois torneios de forma
+  uniforme com `fase_quadrangular`, o que representa bem o Finalización
+  mas não a mudança de formato do Apertura.
+- **Vagas CONMEBOL bem documentadas**: 4 Libertadores (campeão Apertura,
+  campeão Finalización, 2 melhores da tabela de reclassificação anual) e
+  4 Sul-Americana (campeão da Copa Colombia + 3 melhores da
+  reclassificação restantes).
+- **Rebaixamento não confirmado** — `premiacao` ficou sem
+  `rebaixamento_proxima_divisao`.
+- **Águilas Doradas**: fontes divergem entre "Medellín" e "Rionegro"
+  como cidade-sede — usei Rionegro (sede tradicional do clube) por ser
+  mais específico, mas vale confirmar.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

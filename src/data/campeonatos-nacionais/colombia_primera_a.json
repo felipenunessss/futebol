@@ -1,0 +1,34 @@
+{
+  "id": "colombia_primera_a",
+  "nome": "Liga BetPlay Dimayor (Primera A)",
+  "pais": "CO",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "returno": { "nome": "Torneo Finalización", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "fase_quadrangular": { "ativa": true, "num_grupos": 2, "times_por_grupo": 4, "classificam_por_grupo": 1 },
+    "final_estadual": {
+      "criterio": "final_ida_e_volta_entre_os_2_classificados_da_fase_final_de_cada_torneio",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "Campeão do Apertura, campeão do Finalización, 2 melhores da tabela de reclassificação anual sem título de torneio",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "Campeão da Copa Colombia (Copa BetPlay) + 3 melhores da tabela de reclassificação anual sem vaga de Libertadores"
+  },
+  "classicos": [
+    { "time_a": "america_de_cali", "time_b": "deportivo_cali", "nome": "Clásico Vallecaucano", "peso_midia": 5 },
+    { "time_a": "millonarios", "time_b": "santa_fe_co", "nome": "Clásico Capitalino", "peso_midia": 5 },
+    { "time_a": "atletico_nacional", "time_b": "independiente_medellin", "nome": "Clásico Paisa", "peso_midia": 5 }
+  ],
+  "times": [
+    "aguilas_doradas", "alianza_valledupar", "america_de_cali", "atletico_bucaramanga",
+    "atletico_nacional", "boyaca_chico", "cucuta_deportivo", "deportes_tolima", "deportivo_cali",
+    "deportivo_pasto", "deportivo_pereira", "fortaleza_cf", "independiente_medellin",
+    "internacional_de_bogota", "jaguares_cordoba", "junior_barranquilla", "llaneros",
+    "millonarios", "once_caldas", "santa_fe_co"
+  ]
+}
