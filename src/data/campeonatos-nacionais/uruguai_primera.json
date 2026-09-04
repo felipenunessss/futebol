@@ -1,0 +1,30 @@
+{
+  "id": "uruguai_primera",
+  "nome": "Campeonato Uruguayo de Primera División (Liga AUF Uruguaya)",
+  "pais": "UY",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 8, "ida_e_volta": false, "classificam_por_grupo": 1 },
+    "mata_mata": {
+      "fases": ["final_torneo_intermedio", "semifinal_campeonato", "final_campeonato"],
+      "ida_e_volta": false
+    }
+  },
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "Campeão uruguaio anual, vice, 2º da Tabela Anual, campeão da Copa AUF Uruguay 2026",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "Distribuído entre campeões de torneio (Apertura/Clausura/Intermedio) sem vaga de Libertadores e posições seguintes da Tabela Anual — critério exato posição-a-posição não confirmado"
+  },
+  "classicos": [
+    { "time_a": "penarol", "time_b": "nacional_uy", "nome": "Clásico Uruguayo", "peso_midia": 5 }
+  ],
+  "times": [
+    "penarol", "nacional_uy", "danubio", "defensor_sporting", "boston_river", "cerro_largo",
+    "racing_uy", "montevideo_wanderers", "juventud", "liverpool_uy", "progreso", "albion",
+    "cerro", "central_espanol", "deportivo_maldonado", "montevideo_city_torque"
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  { "id": "penarol", "nome": "Club Atlético Peñarol", "nome_popular": "Peñarol", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "nacional_uy", "nome": "Club Nacional de Football", "nome_popular": "Nacional", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "danubio", "nome": "Danubio Fútbol Club", "nome_popular": "Danubio", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "defensor_sporting", "nome": "Defensor Sporting Club", "nome_popular": "Defensor Sporting", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "boston_river", "nome": "Boston River", "nome_popular": "Boston River", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "cerro_largo", "nome": "Cerro Largo Fútbol Club", "nome_popular": "Cerro Largo", "pais": "UY", "cidade": "Melo", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "racing_uy", "nome": "Racing Club de Montevideo", "nome_popular": "Racing", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "montevideo_wanderers", "nome": "Montevideo Wanderers Fútbol Club", "nome_popular": "Wanderers", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "juventud", "nome": "Club Atlético Juventud", "nome_popular": "Juventud", "pais": "UY", "cidade": "Las Piedras", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "liverpool_uy", "nome": "Liverpool Fútbol Club", "nome_popular": "Liverpool", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "progreso", "nome": "Club Atlético Progreso", "nome_popular": "Progreso", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "albion", "nome": "Albion Fútbol Club", "nome_popular": "Albion", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "cerro", "nome": "Club Atlético Cerro", "nome_popular": "Cerro", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "central_espanol", "nome": "Central Español Fútbol Club", "nome_popular": "Central Español", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "deportivo_maldonado", "nome": "Deportivo Maldonado", "nome_popular": "Maldonado", "pais": "UY", "cidade": "Maldonado", "divisao_nacional": { "pais": "UY", "nivel": 1 } },
+  { "id": "montevideo_city_torque", "nome": "Montevideo City Torque", "nome_popular": "Montevideo City", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 } }
+]

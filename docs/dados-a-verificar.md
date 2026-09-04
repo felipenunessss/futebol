@@ -415,6 +415,33 @@ nesta rodada (confirmei só nome/cidade).
   River-Boca, Clássico de Avellaneda Racing-Independiente) — existem
   vários outros clássicos regionais argentinos não pesquisados.
 
+## Expansão CONMEBOL — Uruguai (1ª divisão)
+
+- **Fonte**: sem cobertura no openfootball — pesquisado do zero via
+  Wikipédia ES/EN (fetch direto da página do Campeonato Uruguayo 2026),
+  cross-referenciado com uma segunda busca que trouxe a mesma lista de
+  16 clubes de forma independente.
+- **1 erro corrigido antes de gravar**: escrevi errado o nome oficial do
+  "Progreso" (coloquei "Institución Atlética Sud América", que é outro
+  clube uruguaio) — corrigido pra "Club Atlético Progreso" antes do
+  commit.
+- **Formato aproximado**: real tem 4 componentes (Apertura, Torneo
+  Intermedio — 16 times em 2 grupos por campanha do Apertura, Clausura,
+  Tabela Anual) e uma cadeia de mata-mata pra decidir o campeão anual
+  (semifinal Apertura x Clausura, final contra o líder da Tabela Anual,
+  com atalho se o mesmo time vencer os dois turnos). Modelado com
+  turno/returno (Apertura/Clausura) + fase_grupos (Intermedio) +
+  mata_mata (cadeia final) — aproximação razoável, mas o schema não
+  amarra explicitamente qual fase alimenta qual etapa do mata-mata.
+- **Rebaixamento não confirmado**: 3 clubes subiram da Segunda División
+  2025, o que sugere 3 descidas, mas não confirmei isso por fonte direta
+  nem o mecanismo exato (Uruguai também costuma usar tabela de médias
+  plurianuais, não simples "último cai") — `premiacao` ficou sem
+  `rebaixamento_proxima_divisao` por esse motivo.
+- **Vagas CONMEBOL**: Libertadores bem confirmada (4: campeão anual,
+  vice, 2º da Tabela Anual, campeão da Copa AUF Uruguay). Sul-Americana
+  confirmada em número (4) mas não em critério exato posição-a-posição.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
