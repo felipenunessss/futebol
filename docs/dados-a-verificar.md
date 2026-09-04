@@ -468,6 +468,54 @@ nesta rodada (confirmei só nome/cidade).
   campeão — não confirmei se dão Sul-Americana/Libertadores direto (achei
   indício de que não, mas não é 100% certo).
 
+## Modelagem — Copa Libertadores 2026
+
+- **Fonte**: Wikipédia ES "Copa Libertadores 2026" (fetch direto da página,
+  já com resultados reais da fase de grupos disputada em abril/maio de
+  2026 — a edição já está em andamento no mundo real na data de hoje,
+  faltando só as fases finais, que terminam em 28 de novembro de 2026).
+- **Elenco**: **47 de 47 clubes reais confirmados** (todos já existiam na
+  base, cadastrados durante a modelagem dos 9 países CONMEBOL + Brasil —
+  nenhum clube novo precisou ser criado). A fonte organiza os 47 por país
+  com o "cupo" de cada um: Argentina 7 (Lanús, Platense, Estudiantes LP,
+  Independiente Rivadavia, Rosario Central, Boca Juniors, Argentinos
+  Juniors), Bolívia 4, Brasil 8 (Flamengo, Corinthians, Palmeiras,
+  Cruzeiro, Mirassol, Fluminense, Botafogo, Bahia — campeão vigente da
+  Libertadores + campeão da Copa do Brasil + vice a 7º colocados do
+  Brasileirão 2025), Chile 4, Colômbia 4, Equador 4, Paraguai 4, Peru 4,
+  Uruguai 4, Venezuela 4. `times[]` inclui os 47, sem distinguir fase de
+  entrada (mesmo critério já usado na Copa do Brasil).
+- **Formato modelado (corpo principal)**: fase de grupos com os 32
+  clubes que a alcançam (8 grupos de 4, todos contra todos ida e volta,
+  2 primeiros de cada grupo avançam) + mata-mata (oitavas, quartas,
+  semifinal, final) — `fase_grupos`/`mata_mata` do schema, confiança alta
+  (contagens e resultados reais confirmados grupo a grupo na fonte).
+- **Fase preliminar — pendência de modelagem** (mesmo problema já
+  documentado na Copa do Brasil): 19 clubes disputam 3 rodadas
+  eliminatórias de ida e volta antes da fase de grupos, com entrada
+  escalonada por fase (Fase 1: 6 clubes de BO/EC/PY/PE/UY/VE; Fase 2: 16
+  clubes — 2 de BR/CL/CO + 1 de AR/BO/EC/PY/PE/UY/VE + os 3 vencedores da
+  Fase 1; Fase 3: os 8 vencedores da Fase 2) — só 4 dos 19 avançam à fase
+  de grupos (completando os 32), os outros 15 são transferidos à Copa
+  Sul-Americana 2026 em pontos diferentes (os 4 perdedores da Fase 3 vão
+  pra fase de grupos da Sul-Americana; os 8 terceiros colocados da fase
+  de grupos da própria Libertadores vão pro repechaje de oitavas da
+  Sul-Americana). O schema não tem bloco pra representar entrada
+  escalonada por fase — não modelado, `times[]` só lista quem disputa a
+  competição, sem marcar em que fase cada um entrou.
+- **Final em jogo único** (Estádio Centenário, Montevidéu, confirmado por
+  fonte) — mesma limitação já documentada na Copa do Brasil: o bloco
+  `mata_mata` do schema usa um `ida_e_volta` único pra todas as fases
+  listadas, não representa a final como exceção.
+- **`pais: "CONMEBOL"`**: decisão deliberada, não é um código ISO 3166-1
+  real — a competição não tem país-sede único (final rotativa entre os
+  10 países). Mesmo padrão poderia servir de referência pra outras copas
+  continentais (Sul-Americana, Recopa).
+- **Premiação**: nenhum campo de `Premiacao` do schema atual cobre o que
+  o campeão da Libertadores ganha (vaga direta na Copa Intercontinental
+  da FIFA 2026, na Recopa Sul-Americana 2027 e na Copa Mundial de Clubes
+  da FIFA 2029) — fica só documentado aqui, sem campo correspondente.
+
 ## Expansão CONMEBOL — Argentina (1ª divisão)
 
 - **Fonte**: openfootball só tem até a temporada 2025 (30 clubes,
