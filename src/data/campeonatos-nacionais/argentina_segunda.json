@@ -1,0 +1,25 @@
+{
+  "id": "argentina_segunda",
+  "nome": "Primera Nacional",
+  "pais": "AR",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 18, "ida_e_volta": true, "classificam_por_grupo": 8 },
+    "final_estadual": { "criterio": "campeoes_das_2_zonas_disputam_final_em_campo_neutro_pelo_1o_ascenso_direto", "ida_e_volta": false },
+    "mata_mata": { "fases": ["reduzido"], "ida_e_volta": false }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2,
+    "rebaixamento_proxima_divisao": 4
+  },
+  "classicos": [],
+  "times": [
+    "acassuso", "all_boys", "almirante_brown", "central_norte_salta", "chaco_for_ever", "ciudad_de_bolivar",
+    "colon_santa_fe", "defensores_de_belgrano", "deportivo_madryn", "deportivo_moron", "estudiantes_caseros",
+    "ferro_carril_oeste", "godoy_cruz", "los_andes", "mitre_santiago", "racing_cordoba", "san_miguel", "san_telmo",
+    "agropecuario", "almagro", "atlanta", "atletico_rafaela", "chacarita_juniors", "colegiales", "deportivo_maipu",
+    "ferrocarril_midland", "gimnasia_esgrima_jujuy", "gimnasia_tiro_salta", "guemes_santiago", "nueva_chicago",
+    "patronato", "quilmes", "san_martin_sj", "san_martin_tucuman", "temperley", "tristan_suarez"
+  ]
+}

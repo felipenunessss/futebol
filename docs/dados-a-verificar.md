@@ -653,6 +653,64 @@ nesta rodada (confirmei só nome/cidade).
   correspondente, mesma situação da premiação da própria Libertadores
   (Intercontinental/Recopa/Mundial de Clubes).
 
+## 2ª divisão CONMEBOL — Argentina (Primera Nacional)
+
+- **Fonte**: Wikipédia ES "Campeonato de Primera Nacional 2026" (fetch
+  direto do HTML — o WebFetch com resumo por IA errou a composição das
+  zonas na primeira tentativa, listando clubes duplicados entre Zona A e
+  B; a extração direta da tabela de posições de cada zona corrigiu isso).
+  A edição já está em andamento no mundo real (27ª rodada disputada).
+- **Elenco**: **36 de 36 clubes confirmados** (18 por zona), com
+  cidade/estádio direto da tabela oficial de participantes da Wikipédia.
+  Zona A: Acassuso, All Boys, Almirante Brown, Central Norte (Salta),
+  Chaco For Ever, Ciudad de Bolívar, Colón, Defensores de Belgrano,
+  Deportivo Madryn, Deportivo Morón, Estudiantes (BA), Ferro Carril
+  Oeste, Godoy Cruz, Los Andes, Mitre (SdE), Racing (Córdoba), San
+  Miguel, San Telmo. Zona B: Agropecuario, Almagro, Atlanta, Atlético de
+  Rafaela, Chacarita Juniors, Colegiales, Deportivo Maipú, Ferrocarril
+  Midland, Gimnasia y Esgrima (Jujuy), Gimnasia y Tiro (Salta), Güemes
+  (SdE), Nueva Chicago, Patronato, Quilmes, San Martín (SJ), San Martín
+  (Tucumán), Temperley, Tristán Suárez.
+- **Ids desambiguados** de clubes já existentes na base (nível 1) com
+  nome parecido: `estudiantes_caseros` (≠ `estudiantes_lp`,
+  `estudiantes_rio_cuarto`), `racing_cordoba` (≠ `racing_club`,
+  Avellaneda), `gimnasia_esgrima_jujuy`/`gimnasia_tiro_salta` (≠
+  `gimnasia_mendoza`, `gimnasia_la_plata`), `colon_santa_fe`,
+  `guemes_santiago`, `mitre_santiago`, `central_norte_salta` — nenhum
+  colidia de fato com id existente, mas o sufixo evita ambiguidade
+  futura. `san_martin_sj`/`san_martin_tucuman` também desambiguados entre
+  si (são dois clubes reais e distintos com o mesmo nome popular).
+- **Confirmado por esta pesquisa**: Godoy Cruz está corretamente fora da
+  1ª divisão (`argentina_primera.json`) — foi rebaixado à Primera
+  Nacional 2026 (fonte: tabela "Equipos descendidos de la Primera
+  División 2025" da própria Wikipédia). Nenhum conflito com a modelagem
+  da 1ª divisão já feita.
+- **Formato real**: 2 zonas de 18 times, todos-contra-todos ida e volta
+  (34 rodadas) + 1 rodada especial interzonal por turno. Os campeões de
+  cada zona disputam uma **final em campo neutro** pelo 1º ascenso
+  direto; o perdedor dessa final entra no **"Reduzido"** junto com as
+  posições 2ª-8ª de cada zona (14 times) — mata-mata de jogo único na
+  casa do melhor colocado, vencedor leva o 2º ascenso. Modelado com
+  `fase_grupos` (`classificam_por_grupo: 8`, aproximação — só o 1º de
+  cada zona vai direto à final, os demais entre 2º-8º vão ao Reduzido,
+  o schema não distingue as duas rotas) + `final_estadual` (a final
+  entre campeões de zona) + `mata_mata` simples (`["reduzido"]`, sem
+  `etapas` detalhado — não fechei o chaveamento exato de 15 times do
+  Reduzido nesta rodada).
+- **Rebaixamento**: 4 clubes (os 2 últimos de cada zona), confirmado por
+  fonte — descem pra Primera B Metropolitana ou Torneo Federal A
+  conforme afiliação (3ª divisão, não modelada no projeto).
+- **Vaga de Copa Argentina 2027**: a fonte confirma que algumas posições
+  de cada zona classificam à Copa Argentina 2027, mas as marcações
+  exatas (que posições) não ficaram claras na extração — não modelado
+  (não há campo de premiação genérico pra isso no schema, similar ao que
+  já documentamos pra vagas de Libertadores/Sul-Americana da Série A do
+  Brasil).
+- **Nomes completos**: pra clubes menos conhecidos, o campo `nome`
+  (razão social completa) foi preenchido por conhecimento geral de
+  futebol argentino, não reverificado individualmente clube a clube —
+  `nome_popular`/existência/participação 2026 vêm todos direto da fonte.
+
 ## Expansão CONMEBOL — Argentina (1ª divisão)
 
 - **Fonte**: openfootball só tem até a temporada 2025 (30 clubes,
