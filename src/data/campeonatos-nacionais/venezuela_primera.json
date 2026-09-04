@@ -5,11 +5,19 @@
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
-    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
-    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8, "rodadas": 13 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 8, "rodadas": 13 },
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 4, "ida_e_volta": true, "classificam_por_grupo": 1 },
+    "mata_mata": { "fases": ["final_do_apertura_ou_clausura"], "ida_e_volta": false },
+    "tabela_acumulada": { "criterio": "soma_das_fases_regulares_define_vagas_internacionais_e_rebaixamento" },
     "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura", "ida_e_volta": false }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_libertadores": 2,
+    "vaga_libertadores_criterio": "campeao_da_liga_na_fase_de_grupos_e_vice_campeao_na_primeira_fase",
+    "vaga_sulamericana": 2,
+    "vaga_sulamericana_criterio": "dois_melhores_da_tabela_acumulada_ainda_nao_classificados_para_a_libertadores"
+  },
   "classicos": [
     { "time_a": "caracas_fc", "time_b": "deportivo_tachira", "nome": "Clásico del Fútbol Venezolano", "peso_midia": 5 }
   ],
