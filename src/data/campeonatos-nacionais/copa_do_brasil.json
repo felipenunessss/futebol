@@ -11,12 +11,40 @@
         "segunda_fase",
         "terceira_fase",
         "quarta_fase",
+        "quinta_fase",
         "oitavas",
         "quartas",
         "semifinal",
         "final"
       ],
-      "ida_e_volta": true
+      "ida_e_volta": true,
+      "etapas": [
+        {
+          "nome": "primeira_fase",
+          "ida_e_volta": false,
+          "entrantes": ["ji_parana", "pantanal_fc", "ivinhema", "independente_ap", "bare", "madureira", "gama", "monte_roraima", "galvez", "guapore_fc", "araguaina", "primavera", "vasco_da_gama_ac", "velo_clube", "sampaio_correa_rj", "desportiva_ferroviaria", "betim_fc", "piaui_ec", "america_propria", "tirol", "santa_catarina_ec", "iape", "porto_ba", "serra_branca", "maguary", "laguna", "primavera_ac", "bragantino_pa"]
+        },
+        {
+          "nome": "segunda_fase",
+          "ida_e_volta": false,
+          "entrantes": ["abc_rn", "aguia_de_maraba", "altos", "amazonas_fc", "america_mg", "america_rn", "anapolis_fc", "asa", "athletic_club_mg", "atletico_alagoinhas", "atletico_goianiense", "avai", "azuriz", "boavista_rj", "botafogo_pb", "capital_cf", "capital_fc_to", "castanhal", "caxias", "ceara", "ceilandia", "cianorte", "crb", "csa", "cuiaba", "figueirense", "fluminense_pi", "fortaleza", "gas", "goias", "guarani", "guarany_bage", "imperatriz", "independencia_ac", "itabaiana", "jacuipense", "joinville", "juazeirense", "juventude", "lagarto", "londrina", "mac", "manauara", "manaus_fc", "maracana_ce", "maringa_fc", "mixto", "nacional_am", "nova_iguacu", "novorizontino", "operario_ferroviario", "operario_ms", "operario_vg", "oratorio", "penedense", "porto_velho_ec", "porto_vitoria", "portuguesa", "portuguesa_rj", "retro", "rio_branco_es", "santa_cruz", "sao_bernardo", "sao_luiz", "sousa", "sport_recife", "tocantinopolis", "tombense", "trem", "tuna_luso", "uberlandia_ec", "vila_nova", "volta_redonda", "ypiranga_rs"]
+        },
+        {
+          "nome": "terceira_fase",
+          "ida_e_volta": false,
+          "entrantes": ["paysandu", "confianca", "ponte_preta", "barra_fc"]
+        },
+        { "nome": "quarta_fase", "ida_e_volta": false },
+        {
+          "nome": "quinta_fase",
+          "ida_e_volta": true,
+          "entrantes": ["athletico_pr", "atletico_mg", "bahia", "botafogo", "chapecoense", "corinthians", "coritiba", "cruzeiro", "flamengo", "fluminense", "gremio", "internacional", "mirassol", "palmeiras", "red_bull_bragantino", "remo", "santos", "sao_paulo", "vasco_da_gama", "vitoria"]
+        },
+        { "nome": "oitavas", "ida_e_volta": true },
+        { "nome": "quartas", "ida_e_volta": true },
+        { "nome": "semifinal", "ida_e_volta": true },
+        { "nome": "final", "ida_e_volta": false }
+      ]
     }
   },
   "premiacao": {

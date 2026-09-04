@@ -401,17 +401,41 @@ nesta rodada (confirmei só nome/cidade).
     diferentes na história da competição desde 1989** e que **São Paulo é
     o estado com mais participantes (13)**, seguido do Rio de Janeiro
     (10) — dado de contexto, sem efeito na modelagem.
-  - **Formato real mais preciso que o já documentado**: 9 fases
-    confirmado (CBF/Wikipédia); da 1ª à 4ª fase os jogos são eliminatórios
-    em **partida única**; da 5ª fase às quartas de final (e semifinal,
-    segundo a Wikipédia) os confrontos são **ida e volta**; a **final é
-    jogo único** (mudança desta edição). O `formato.mata_mata` atual do
-    schema (`ida_e_volta: true` uniforme para todas as 8 fases listadas)
-    não representa nem o número certo de fases nem essa mistura de
-    jogo único/ida-e-volta/final única — schema precisaria de um campo
-    por fase (ou pelo menos separar "fases de jogo único" de "fases de
-    ida e volta" e marcar a final como exceção). Fica como pendência de
-    modelagem, não implementada nesta rodada.
+  - **Formato de 9 fases com entrada escalonada — modelado** (resolvido
+    com o novo campo `formato.mata_mata.etapas`, ver
+    `src/schemas/championship.ts`): `fases`/`ida_e_volta` legado agora tem
+    as 9 fases corretas (faltava `quinta_fase` na lista antiga, corrigido)
+    e `etapas[]` detalha jogo único (1ª-4ª fase e final) vs ida e volta
+    (5ª fase a semifinal) e quem entra fresco em cada fase:
+    - **1ª fase (28 clubes) — confiança alta, nominal**: confrontos
+      extraídos diretamente da tabela de resultados da Wikipédia PT
+      ("Copa do Brasil de Futebol de 2026"), os 14 jogos batem exatamente
+      com os 28 clubes de `times[]` que não aparecem em nenhuma outra
+      fase.
+    - **3ª fase (4 clubes) — confiança alta, nominal**: TMC Esporte
+      confirma os 4 entrantes diretos — Paysandu (campeão Copa Verde),
+      Confiança-SE (herdou a vaga da Copa do Nordeste porque o Bahia,
+      campeão de fato, foi excluído das copas regionais por disputar
+      competição internacional), Ponte Preta (campeã Série C) e Barra-SC
+      (campeão Série D).
+    - **5ª fase (20 clubes) — confiança alta, derivado da própria base**:
+      os 20 clubes de `divisao_nacional: {pais: "BR", nivel: 1}` (Série A
+      2026), sem precisar de fonte externa.
+    - **2ª fase (74 clubes) — confiança média, por dedução, não nominal
+      confirmada um a um**: nenhuma fonte consultada trouxe a lista
+      nominal completa da 2ª fase (só a contagem, "74 clubes com melhor
+      posicionamento no ranking entram nesta fase" — confirmada por 3
+      fontes independentes). Como as outras 4 fases (1ª, 3ª, 5ª, e a
+      ausência de entrantes na 4ª/oitavas/quartas/semifinal/final) já
+      somam exatamente 52 dos 126 clubes com confiança nominal alta, os
+      **74 restantes de `times[]` foram atribuídos à 2ª fase por
+      subtração** — matematicamente forçado a bater (28+74+4+20=126,
+      confirmado por múltiplas fontes), mas sem confirmação nominal
+      individual de que cada um desses 74 específicos entrou exatamente
+      nessa fase (só que o conjunto certo de 74 clubes entra ali).
+    - **4ª fase, oitavas, quartas, semifinal, final**: sem entrantes
+      novos — só quem venceu a fase anterior, por isso `entrantes`
+      omitido nessas etapas.
 - **`nivel: 0`** foi reservado para competições de mata-mata puro fora da
   hierarquia vertical A→B→C→D (hoje só a Copa do Brasil) — o teste que
   confere `divisao_nacional` por nível pula esse caso de propósito.
