@@ -851,6 +851,48 @@ nesta rodada (confirmei só nome/cidade).
   como cidade-sede — usei Rionegro (sede tradicional do clube) por ser
   mais específico, mas vale confirmar.
 
+## 2ª divisão CONMEBOL — Colômbia (Primera B)
+
+- **Fonte**: fetch direto do HTML da Wikipédia ES
+  ("Primera_B_2026_(Colombia)" — nota: a URL "Categoría_Primera_B_2026"
+  não existe mais, o artigo mudou de slug), tabela "Información"
+  (Equipo/Entrenador/Estadio) e texto de "Reclasificación"/"Cuadrangulares
+  semifinales" extraídos com parser de HTML em Python (evitando resumo
+  por IA, mesmo método que funcionou bem no Chile).
+- **Elenco 2026: 16 de 16 clubes confirmados**. Nenhum já existia na base
+  (diferente das outras 2ªs divisões já feitas, que reaproveitaram
+  clubes de estaduais/outras competições) — os 16 foram criados do zero
+  em `colombia.json` com `divisao_nacional: {"pais": "CO", "nivel": 2}`.
+- **Formato**: praticamente idêntico ao da Primera A que já modelamos —
+  Apertura + Finalización (`turno`/`returno`), cada um com fase de todos-
+  contra-todos (15 rodadas, 16 times) seguida de cuadrangulares
+  semifinais (8 classificados em 2 grupos de 4) e final. Alta confiança,
+  texto do regulamento direto na Wikipédia.
+- **2º acesso à Primera A — mecanismo real não representável no schema**:
+  os 2 campeões semestrais (Apertura/Finalización) sobem direto SE
+  ocuparem as 2 primeiras posições da tabela de reclassificação anual
+  (soma de pontos dos dois torneios); senão, um repechaje entre os
+  melhores colocados dessa tabela que não venceram torneio decide a 2ª
+  vaga. Modelado como aproximação (`tabela_acumulada.criterio` em texto
+  livre + `premiacao.acesso_proxima_divisao: 2`), sem representar a
+  condicional exata — mesma classe de aproximação já usada em outras
+  competições (Argentina, Bolívia).
+- **Rebaixamento**: não encontrei menção de descenso da Primera B pra
+  Primera C (3ª nível, existe mas não modelada) nesta rodada de pesquisa
+  — `premiacao` ficou sem `rebaixamento_proxima_divisao`, mesma situação
+  já documentada na 1ª divisão colombiana.
+- **Independiente Valle del Cauca / "Independiente Yumbo"**: a tabela de
+  elenco usa o nome "Independiente Valle del Cauca" (sede em
+  Yumbo/Palmira, com múltiplos estádios listados), mas os resultados de
+  partida usam "Independiente Yumbo" — tratado como o mesmo clube
+  (`independiente_valle_cauca`, `nome_popular: "Independiente Yumbo"}`).
+- **Instabilidade de sede**: uma nota da própria Wikipédia diz que o
+  Orsomarso "representó al departamento de Santander durante el Torneo
+  Apertura" — clubes da Primera B colombiana trocam de cidade/sede entre
+  torneios do mesmo ano com frequência (sistema de "fichas"); `cidade`
+  ficou com a sede mais recente encontrada (Yumbo), pode não valer pro
+  ano inteiro.
+
 ## Expansão CONMEBOL — Bolívia (1ª divisão)
 
 - **Fonte**: Wikipédia ES ("Primera División de Bolivia 2026"), cruzada

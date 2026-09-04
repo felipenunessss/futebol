@@ -1,0 +1,28 @@
+{
+  "id": "colombia_segunda",
+  "nome": "Primera B (Torneo BetPlay Dimayor II)",
+  "pais": "CO",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "returno": { "nome": "Torneo Finalización", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "fase_quadrangular": { "ativa": true, "num_grupos": 2, "times_por_grupo": 4, "classificam_por_grupo": 1 },
+    "final_estadual": {
+      "criterio": "final_ida_e_volta_entre_os_2_classificados_da_fase_final_de_cada_torneio",
+      "ida_e_volta": true
+    },
+    "tabela_acumulada": {
+      "criterio": "soma_dos_pontos_dos_dois_torneios_define_quem_disputa_o_repechaje_pelo_2o_acesso_a_primera_a"
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "atletico_fc_co", "barranquilla_fc", "boca_juniors_cali", "bogota_fc", "deportes_quindio",
+    "envigado_fc", "independiente_valle_cauca", "inter_de_palmira", "itagui_leones", "orsomarso",
+    "patriotas_fc", "real_cartagena", "real_cundinamarca", "real_santander", "tigres_fc_co", "union_magdalena"
+  ]
+}

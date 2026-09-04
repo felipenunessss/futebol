@@ -18,5 +18,21 @@
   { "id": "llaneros", "nome": "Llaneros Fútbol Club", "nome_popular": "Llaneros", "pais": "CO", "cidade": "Villavicencio", "divisao_nacional": { "pais": "CO", "nivel": 1 } },
   { "id": "millonarios", "nome": "Millonarios Fútbol Club", "nome_popular": "Millonarios", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 } },
   { "id": "once_caldas", "nome": "Once Caldas", "nome_popular": "Once Caldas", "pais": "CO", "cidade": "Manizales", "divisao_nacional": { "pais": "CO", "nivel": 1 } },
-  { "id": "santa_fe_co", "nome": "Independiente Santa Fe", "nome_popular": "Santa Fe", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 } }
+  { "id": "santa_fe_co", "nome": "Independiente Santa Fe", "nome_popular": "Santa Fe", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 } },
+  { "id": "atletico_fc_co", "nome": "Atlético Fútbol Club", "nome_popular": "Atlético F. C.", "pais": "CO", "cidade": "Cali", "estadio": "Olímpico Pascual Guerrero", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "barranquilla_fc", "nome": "Barranquilla Fútbol Club", "nome_popular": "Barranquilla F. C.", "pais": "CO", "cidade": "Barranquilla", "estadio": "Municipal Romelio Martínez", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "boca_juniors_cali", "nome": "Boca Juniors de Cali", "nome_popular": "Boca Juniors de Cali", "pais": "CO", "cidade": "Cali", "estadio": "Olímpico Pascual Guerrero", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "bogota_fc", "nome": "Bogotá Fútbol Club", "nome_popular": "Bogotá F. C.", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "deportes_quindio", "nome": "Deportes Quindío", "nome_popular": "Deportes Quindío", "pais": "CO", "cidade": "Armenia", "estadio": "Centenario de Armenia", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "envigado_fc", "nome": "Envigado Fútbol Club", "nome_popular": "Envigado F. C.", "pais": "CO", "cidade": "Envigado", "estadio": "Polideportivo Sur", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "independiente_valle_cauca", "nome": "Independiente Valle del Cauca", "nome_popular": "Independiente Yumbo", "pais": "CO", "cidade": "Yumbo", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "inter_de_palmira", "nome": "Inter de Palmira", "nome_popular": "Inter de Palmira", "pais": "CO", "cidade": "Palmira", "estadio": "Francisco Rivera Escobar", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "itagui_leones", "nome": "Itagüí Leones Fútbol Club", "nome_popular": "Itagüí Leones", "pais": "CO", "cidade": "Itagüí", "estadio": "Metropolitano Ciudad de Itagüí", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "orsomarso", "nome": "Orsomarso Sociedad Anónima Deportiva", "nome_popular": "Orsomarso", "pais": "CO", "cidade": "Yumbo", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "patriotas_fc", "nome": "Patriotas Boyacá Fútbol Club", "nome_popular": "Patriotas", "pais": "CO", "cidade": "Tunja", "estadio": "La Independencia", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "real_cartagena", "nome": "Real Cartagena", "nome_popular": "Real Cartagena", "pais": "CO", "cidade": "Cartagena", "estadio": "Olímpico Jaime Morón León", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "real_cundinamarca", "nome": "Real Cundinamarca", "nome_popular": "Real Cundinamarca", "pais": "CO", "cidade": "Mosquera", "estadio": "Municipal de Mosquera", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "real_santander", "nome": "Real Santander", "nome_popular": "Real Santander", "pais": "CO", "cidade": "Piedecuesta", "estadio": "Villa Concha", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "tigres_fc_co", "nome": "Tigres Fútbol Club", "nome_popular": "Tigres F. C.", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
+  { "id": "union_magdalena", "nome": "Unión Magdalena", "nome_popular": "Unión Magdalena", "pais": "CO", "cidade": "Santa Marta", "estadio": "Sierra Nevada", "divisao_nacional": { "pais": "CO", "nivel": 2 } }
 ]
