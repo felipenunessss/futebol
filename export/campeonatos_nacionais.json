@@ -1,0 +1,173 @@
+[
+  {
+    "id": "brasileirao_serie_a",
+    "nome": "Campeonato Brasileiro Série A",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "pontos_corridos": {
+        "ida_e_volta": true,
+        "rodadas": 38
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 4
+    },
+    "classicos": [
+      {
+        "time_a": "gremio",
+        "time_b": "internacional",
+        "nome": "Grenal",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "corinthians",
+        "time_b": "palmeiras",
+        "nome": "Derby Paulista",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "flamengo",
+        "time_b": "fluminense",
+        "nome": "Fla-Flu",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "flamengo",
+        "time_b": "vasco_da_gama",
+        "nome": "Clássico dos Milhões",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "corinthians",
+        "time_b": "sao_paulo",
+        "nome": "Majestoso",
+        "peso_midia": 4
+      },
+      {
+        "time_a": "sao_paulo",
+        "time_b": "santos",
+        "nome": "Clássico da Vovó",
+        "peso_midia": 4
+      },
+      {
+        "time_a": "athletico_pr",
+        "time_b": "coritiba",
+        "nome": "Atletiba",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "athletico_pr",
+      "atletico_mg",
+      "bahia",
+      "botafogo",
+      "chapecoense",
+      "corinthians",
+      "coritiba",
+      "cruzeiro",
+      "flamengo",
+      "fluminense",
+      "gremio",
+      "internacional",
+      "mirassol",
+      "palmeiras",
+      "red_bull_bragantino",
+      "remo",
+      "santos",
+      "sao_paulo",
+      "vasco_da_gama",
+      "vitoria"
+    ]
+  },
+  {
+    "id": "brasileirao_serie_b",
+    "nome": "Campeonato Brasileiro Série B",
+    "nivel": 2,
+    "ano_referencia": 2026,
+    "formato": {
+      "pontos_corridos": {
+        "ida_e_volta": true,
+        "rodadas": 38
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 4,
+      "rebaixamento_proxima_divisao": 4
+    },
+    "classicos": [],
+    "times": [
+      "america_mg",
+      "athletic_club_mg",
+      "atletico_goianiense",
+      "avai",
+      "botafogo_sp",
+      "ceara",
+      "crb",
+      "criciuma",
+      "cuiaba",
+      "fortaleza",
+      "goias",
+      "juventude",
+      "londrina",
+      "nautico",
+      "novorizontino",
+      "operario_ferroviario",
+      "ponte_preta",
+      "sao_bernardo",
+      "sport_recife",
+      "vila_nova"
+    ]
+  },
+  {
+    "id": "brasileirao_serie_c",
+    "nome": "Campeonato Brasileiro Série C",
+    "nivel": 3,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 20,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 8
+      },
+      "fase_quadrangular": {
+        "ativa": true,
+        "num_grupos": 2,
+        "times_por_grupo": 4,
+        "classificam_por_grupo": 2
+      },
+      "final_estadual": {
+        "criterio": "lideres_dos_quadrangulares_disputam_titulo",
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 4,
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "amazonas_fc",
+      "anapolis_fc",
+      "barra_fc",
+      "botafogo_pb",
+      "brusque_fc",
+      "caxias",
+      "confianca",
+      "ferroviaria",
+      "figueirense",
+      "floresta",
+      "guarani",
+      "inter_de_limeira",
+      "itabaiana",
+      "ituano",
+      "mac",
+      "maringa_fc",
+      "paysandu",
+      "santa_cruz",
+      "volta_redonda",
+      "ypiranga_rs"
+    ]
+  }
+]

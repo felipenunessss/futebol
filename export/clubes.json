@@ -1,0 +1,3231 @@
+[
+  {
+    "id": "abc_rn",
+    "nome": "ABC Futebol Clube",
+    "nome_popular": "ABC",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  },
+  {
+    "id": "abecat",
+    "nome": "Associação Beneficente e Esportiva Catalana e Ouvidorense",
+    "nome_popular": "ABECAT",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Ouvidor",
+    "estadio": "Luiz Benedito"
+  },
+  {
+    "id": "adesg",
+    "nome": "Associação Desportiva Senador Guiomard",
+    "nome_popular": "ADESG",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Senador Guiomard",
+    "estadio": "Naborzão"
+  },
+  {
+    "id": "agua_santa",
+    "nome": "Esporte Clube Água Santa",
+    "nome_popular": "Água Santa",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Diadema"
+  },
+  {
+    "id": "aguia_cumaru",
+    "nome": "Águia de Cumaru",
+    "nome_popular": "Águia",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Cumaru"
+  },
+  {
+    "id": "aguia_de_maraba",
+    "nome": "Águia de Marabá Futebol Clube",
+    "nome_popular": "Águia de Marabá",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Marabá"
+  },
+  {
+    "id": "aguia_negra",
+    "nome": "Esporte Clube Águia Negra",
+    "nome_popular": "Águia Negra",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Rio Brilhante"
+  },
+  {
+    "id": "aimore",
+    "nome": "Clube Esportivo Aimoré",
+    "nome_popular": "Aimoré",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "São Leopoldo",
+    "estadio": "João Correa da Silveira"
+  },
+  {
+    "id": "altos",
+    "nome": "Altos Futebol Clube",
+    "nome_popular": "Altos",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Altos"
+  },
+  {
+    "id": "amazonas_fc",
+    "nome": "Amazonas Futebol Clube",
+    "nome_popular": "Amazonas",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus",
+    "estadio": "Carlos Zamith",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "amazonia_pa",
+    "nome": "Amazônia Independente Futebol Clube",
+    "nome_popular": "Amazônia",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Santarém"
+  },
+  {
+    "id": "america_mg",
+    "nome": "América Futebol Clube",
+    "nome_popular": "América-MG",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Belo Horizonte",
+    "estadio": "Independência",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "america_pe",
+    "nome": "América Futebol Clube (PE)",
+    "nome_popular": "América-PE",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Recife"
+  },
+  {
+    "id": "america_propria",
+    "nome": "América Futebol Clube (Propriá)",
+    "nome_popular": "América-SE",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Propriá"
+  },
+  {
+    "id": "america_rj",
+    "nome": "América Futebol Clube (RJ)",
+    "nome_popular": "América-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro"
+  },
+  {
+    "id": "america_rn",
+    "nome": "América Futebol Clube (RN)",
+    "nome_popular": "América-RN",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  },
+  {
+    "id": "americano",
+    "nome": "Americano Esporte Clube",
+    "nome_popular": "Americano",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Campos dos Goytacazes"
+  },
+  {
+    "id": "anapolina",
+    "nome": "Associação Atlética Anapolina",
+    "nome_popular": "Anapolina",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Anápolis",
+    "estadio": "Jonas Duarte"
+  },
+  {
+    "id": "anapolis_fc",
+    "nome": "Anápolis Futebol Clube",
+    "nome_popular": "Anápolis FC",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Anápolis",
+    "estadio": "Jonas Duarte",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "andraus",
+    "nome": "Clube Andraus Brasil",
+    "nome_popular": "Andraus",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Campo Largo"
+  },
+  {
+    "id": "apafut",
+    "nome": "Associação de Pais e Amigos do Futebol",
+    "nome_popular": "Apafut",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Caxias do Sul"
+  },
+  {
+    "id": "aparecidense",
+    "nome": "Associação Atlética Aparecidense",
+    "nome_popular": "Aparecidense",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Aparecida de Goiânia",
+    "estadio": "Aníbal Batista de Toledo"
+  },
+  {
+    "id": "aracatuba",
+    "nome": "Araçatuba Futebol Clube",
+    "nome_popular": "Araçatuba",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araçatuba"
+  },
+  {
+    "id": "araguaina",
+    "nome": "Araguaína Futebol Clube",
+    "nome_popular": "Araguaína",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Araguaína"
+  },
+  {
+    "id": "araruama",
+    "nome": "Araruama Sport Club",
+    "nome_popular": "Araruama",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Araruama"
+  },
+  {
+    "id": "aruc",
+    "nome": "Associação Recreativa Cultural Unidos do Cruzeiro",
+    "nome_popular": "ARUC",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Brasília"
+  },
+  {
+    "id": "asa",
+    "nome": "Agremiação Sportiva Arapiraquense",
+    "nome_popular": "ASA",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Arapiraca"
+  },
+  {
+    "id": "athletic_club_mg",
+    "nome": "Athletic Club",
+    "nome_popular": "Athletic",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "São João del-Rei",
+    "estadio": "Arena Unimed",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "athletico_pr",
+    "nome": "Club Athletico Paranaense",
+    "nome_popular": "Athletico-PR",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Curitiba",
+    "estadio": "Ligga Arena",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "atletico_alagoinhas",
+    "nome": "Atlético de Alagoinhas",
+    "nome_popular": "Atlético-BA",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Alagoinhas",
+    "estadio": "Municipal Antônio de Figueiredo Carneiro"
+  },
+  {
+    "id": "atletico_cajazeirense",
+    "nome": "Atlético Cajazeirense",
+    "nome_popular": "Atlético Cajazeirense",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Cajazeiras"
+  },
+  {
+    "id": "atletico_gloriense",
+    "nome": "Associação Desportiva Atlético Gloriense",
+    "nome_popular": "Atlético Gloriense",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Nossa Senhora da Glória",
+    "estadio": "Editon Oliveira da Silva"
+  },
+  {
+    "id": "atletico_goianiense",
+    "nome": "Atlético Clube Goianiense",
+    "nome_popular": "Atlético-GO",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Goiânia",
+    "estadio": "Antônio Accioly",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "atletico_mg",
+    "nome": "Clube Atlético Mineiro",
+    "nome_popular": "Atlético-MG",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Belo Horizonte",
+    "estadio": "Arena MRV",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "atletico_roraima",
+    "nome": "Atlético Roraima Futebol Clube",
+    "nome_popular": "Atlético Roraima",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "audax_rio",
+    "nome": "Audax Rio Esporte Clube",
+    "nome_popular": "Audax Rio",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema"
+  },
+  {
+    "id": "avai",
+    "nome": "Avaí Futebol Clube",
+    "nome_popular": "Avaí",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Florianópolis",
+    "estadio": "Ressacada",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "avenida",
+    "nome": "Esporte Clube Avenida",
+    "nome_popular": "Avenida",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Cruz do Sul",
+    "estadio": "Dos Eucaliptos"
+  },
+  {
+    "id": "aymores",
+    "nome": "Sport Club Aymorés",
+    "nome_popular": "Aymorés",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Ubá"
+  },
+  {
+    "id": "azuriz",
+    "nome": "Azuriz Futebol Clube",
+    "nome_popular": "Azuriz",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Pato Branco",
+    "estadio": "Os Pioneiros"
+  },
+  {
+    "id": "bahia",
+    "nome": "Esporte Clube Bahia",
+    "nome_popular": "Bahia",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Arena Fonte Nova",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "bahia_de_feira",
+    "nome": "Bahia de Feira",
+    "nome_popular": "Bahia de Feira",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana",
+    "estadio": "Arena Cajueiro"
+  },
+  {
+    "id": "bandeirante",
+    "nome": "Bandeirante Esporte Clube",
+    "nome_popular": "Bandeirante",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Birigui"
+  },
+  {
+    "id": "bangu",
+    "nome": "Bangu Atlético Clube",
+    "nome_popular": "Bangu",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Moça Bonita"
+  },
+  {
+    "id": "barcelona_ilheus",
+    "nome": "Barcelona Futebol Clube",
+    "nome_popular": "Barcelona",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Ilhéus",
+    "estadio": "Mário Pessoa"
+  },
+  {
+    "id": "barcelona_ro",
+    "nome": "Barcelona Futebol Clube (RO)",
+    "nome_popular": "Barcelona-RO",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Porto Velho"
+  },
+  {
+    "id": "bare",
+    "nome": "Baré Esporte Clube",
+    "nome_popular": "Baré",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "barra_fc",
+    "nome": "Barra Futebol Clube",
+    "nome_popular": "Barra FC",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Balneário Camboriú",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "barreiras_fc",
+    "nome": "Barreiras Futebol Clube",
+    "nome_popular": "Barreiras FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Barreiras",
+    "estadio": "Geraldão"
+  },
+  {
+    "id": "barretos",
+    "nome": "Barretos Esporte Clube",
+    "nome_popular": "Barretos",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Barretos"
+  },
+  {
+    "id": "bataguassu",
+    "nome": "Associação Atlética Bataguassu",
+    "nome_popular": "Bataguassu",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Bataguassu"
+  },
+  {
+    "id": "bela_vista_to",
+    "nome": "Bela Vista Futebol Cachoeirense",
+    "nome_popular": "Bela Vista",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Cachoeirinha"
+  },
+  {
+    "id": "belo_jardim",
+    "nome": "Belo Jardim Futebol Clube",
+    "nome_popular": "Belo Jardim",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Belo Jardim"
+  },
+  {
+    "id": "betim_fc",
+    "nome": "Betim Futebol Clube",
+    "nome_popular": "Betim",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Betim",
+    "estadio": "Arena Vera Cruz"
+  },
+  {
+    "id": "boa_esporte",
+    "nome": "Boa Esporte Clube",
+    "nome_popular": "Boa Esporte",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Varginha",
+    "estadio": "Municipal Prefeito Luiz Dilzon de Melo"
+  },
+  {
+    "id": "boavista_rj",
+    "nome": "Boavista Sport Club",
+    "nome_popular": "Boavista",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema",
+    "estadio": "Elcyr Resende de Mendonça"
+  },
+  {
+    "id": "botafogo",
+    "nome": "Botafogo de Futebol e Regatas",
+    "nome_popular": "Botafogo",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Nilton Santos",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "botafogo_pb",
+    "nome": "Botafogo Futebol Clube (PB)",
+    "nome_popular": "Botafogo-PB",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "João Pessoa",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "botafogo_sp",
+    "nome": "Botafogo Futebol Clube (Ribeirão Preto)",
+    "nome_popular": "Botafogo-SP",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Ribeirão Preto",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "bragantino_pa",
+    "nome": "Bragantino Clube do Pará",
+    "nome_popular": "Bragantino-PA",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Bragança"
+  },
+  {
+    "id": "brasil_farroupilha",
+    "nome": "Sociedade Esportiva Recreativa e Cultural Brasil",
+    "nome_popular": "Brasil de Farroupilha",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Farroupilha"
+  },
+  {
+    "id": "brasil_pelotas",
+    "nome": "Grêmio Esportivo Brasil",
+    "nome_popular": "Brasil de Pelotas",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Pelotas",
+    "estadio": "Bento Freitas"
+  },
+  {
+    "id": "brasilia_fc",
+    "nome": "Brasília Futebol Clube",
+    "nome_popular": "Brasília",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Brasília",
+    "estadio": "Nacional Mané Garrincha"
+  },
+  {
+    "id": "brasiliense",
+    "nome": "Brasiliense Futebol Clube",
+    "nome_popular": "Brasiliense",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Taguatinga",
+    "estadio": "Elmo Serejo Farias"
+  },
+  {
+    "id": "brusque_fc",
+    "nome": "Brusque Futebol Clube",
+    "nome_popular": "Brusque",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Brusque",
+    "estadio": "Augusto Bauer",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "caldense",
+    "nome": "Associação Atlética Caldense",
+    "nome_popular": "Caldense",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Poços de Caldas",
+    "estadio": "Municipal Ronaldo Junqueira"
+  },
+  {
+    "id": "camacari",
+    "nome": "Camaçari Futebol Clube",
+    "nome_popular": "Camaçari",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Camaçari",
+    "estadio": "Armando Oliveira"
+  },
+  {
+    "id": "camboriu_fc",
+    "nome": "Camboriú Futebol Clube",
+    "nome_popular": "Camboriú",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Balneário Camboriú"
+  },
+  {
+    "id": "cameta",
+    "nome": "Cametá Esporte Clube",
+    "nome_popular": "Cametá",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Cametá"
+  },
+  {
+    "id": "campinense",
+    "nome": "Campinense Clube",
+    "nome_popular": "Campinense",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  },
+  {
+    "id": "cap_pi",
+    "nome": "Clube Atlético Piauiense",
+    "nome_popular": "CAP",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Teresina"
+  },
+  {
+    "id": "capital_cf",
+    "nome": "Capital Clube de Futebol",
+    "nome_popular": "Capital",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Paranoá",
+    "estadio": "JK"
+  },
+  {
+    "id": "capital_fc_to",
+    "nome": "Capital Futebol Clube",
+    "nome_popular": "Capital",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Palmas",
+    "estadio": "Nilton Santos"
+  },
+  {
+    "id": "capitao_poco",
+    "nome": "Capitão Poço Futebol Clube",
+    "nome_popular": "Capitão Poço",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Capitão Poço"
+  },
+  {
+    "id": "capivariano",
+    "nome": "Capivariano Futebol Clube",
+    "nome_popular": "Capivariano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Capivari"
+  },
+  {
+    "id": "carlos_renaux",
+    "nome": "Clube Atlético Carlos Renaux",
+    "nome_popular": "Carlos Renaux",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Brusque",
+    "estadio": "Augusto Bauer"
+  },
+  {
+    "id": "caruaru_city",
+    "nome": "Caruaru City",
+    "nome_popular": "Caruaru City",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Caruaru"
+  },
+  {
+    "id": "castanhal",
+    "nome": "Castanhal Esporte Clube",
+    "nome_popular": "Castanhal",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Castanhal"
+  },
+  {
+    "id": "catanduva",
+    "nome": "Catanduva Futebol Clube",
+    "nome_popular": "Catanduva",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Catanduva"
+  },
+  {
+    "id": "caxias",
+    "nome": "Sociedade Esportiva e Recreativa Caxias do Sul",
+    "nome_popular": "Caxias",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Caxias do Sul",
+    "estadio": "Francisco Stédile",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "ceara",
+    "nome": "Ceará Sporting Club",
+    "nome_popular": "Ceará",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza",
+    "estadio": "Arena Castelão",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "ceilandia",
+    "nome": "Ceilândia Esporte Clube",
+    "nome_popular": "Ceilândia",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Ceilândia",
+    "estadio": "Abadião"
+  },
+  {
+    "id": "centro_limoeirense",
+    "nome": "Centro Limoeirense de Futebol",
+    "nome_popular": "Centro Limoeirense",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Limoeiro"
+  },
+  {
+    "id": "centro_oeste_go",
+    "nome": "Centro Oeste Futebol Clube",
+    "nome_popular": "Centro Oeste",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Senador Canedo",
+    "estadio": "Jaime Guerra"
+  },
+  {
+    "id": "chapada_fc",
+    "nome": "Chapada Futebol Clube",
+    "nome_popular": "Chapada",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Chapada dos Guimarães",
+    "estadio": "Apolônio Bouret de Mello"
+  },
+  {
+    "id": "chapecoense",
+    "nome": "Associação Chapecoense de Futebol",
+    "nome_popular": "Chapecoense",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Chapecó",
+    "estadio": "Arena Condá",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "cianorte",
+    "nome": "Cianorte Futebol Clube",
+    "nome_popular": "Cianorte",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Cianorte",
+    "estadio": "Albino Turbay"
+  },
+  {
+    "id": "coimbra_ec",
+    "nome": "Coimbra Esporte Clube",
+    "nome_popular": "Coimbra",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Contagem"
+  },
+  {
+    "id": "colorado_caieiras",
+    "nome": "Colorado Esporte Clube (Caieiras)",
+    "nome_popular": "Colorado Caieiras",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Caieiras"
+  },
+  {
+    "id": "comercial_ribeirao_preto",
+    "nome": "Comercial Futebol Clube",
+    "nome_popular": "Comercial",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Ribeirão Preto"
+  },
+  {
+    "id": "concordia_ac",
+    "nome": "Concórdia Atlético Clube",
+    "nome_popular": "Concórdia",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Concórdia",
+    "estadio": "Domingos Machado de Lima"
+  },
+  {
+    "id": "confianca",
+    "nome": "Sport Club Confiança",
+    "nome_popular": "Confiança",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju",
+    "estadio": "Lourival Baptista",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "confianca_pb",
+    "nome": "Confiança (PB)",
+    "nome_popular": "Confiança-PB",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Sapé"
+  },
+  {
+    "id": "corinthians",
+    "nome": "Sport Club Corinthians Paulista",
+    "nome_popular": "Corinthians",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo",
+    "estadio": "Neo Química Arena",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "corisabba",
+    "nome": "Associação Atlética Corisabbá",
+    "nome_popular": "Corisabbá",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Floriano"
+  },
+  {
+    "id": "coritiba",
+    "nome": "Coritiba Foot Ball Club",
+    "nome_popular": "Coritiba",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Curitiba",
+    "estadio": "Couto Pereira",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "corumbaense",
+    "nome": "Corumbaense Futebol Clube",
+    "nome_popular": "Corumbaense",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Corumbá"
+  },
+  {
+    "id": "coruripe",
+    "nome": "Coruripe Futebol Clube",
+    "nome_popular": "Coruripe",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Coruripe"
+  },
+  {
+    "id": "costa_rica_ms",
+    "nome": "Costa Rica Esporte Clube",
+    "nome_popular": "Costa Rica",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Costa Rica"
+  },
+  {
+    "id": "cra_aquidauana",
+    "nome": "Clube de Regatas Aquidauana",
+    "nome_popular": "CRA",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Aquidauana"
+  },
+  {
+    "id": "crac",
+    "nome": "CRAC",
+    "nome_popular": "CRAC",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Catalão",
+    "estadio": "Genervino da Fonseca"
+  },
+  {
+    "id": "crb",
+    "nome": "Clube de Regatas Brasil",
+    "nome_popular": "CRB",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Maceió",
+    "estadio": "Rei Pelé",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "criciuma",
+    "nome": "Criciúma Esporte Clube",
+    "nome_popular": "Criciúma",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Criciúma",
+    "estadio": "Heriberto Hülse",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "cristal",
+    "nome": "Clube Atlético Cristal",
+    "nome_popular": "Cristal",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "cruzeiro",
+    "nome": "Cruzeiro Esporte Clube",
+    "nome_popular": "Cruzeiro",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Belo Horizonte",
+    "estadio": "Mineirão",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "cruzeiro_al",
+    "nome": "Esporte Clube Cruzeiro (Arapiraca)",
+    "nome_popular": "Cruzeiro-AL",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Arapiraca"
+  },
+  {
+    "id": "csa",
+    "nome": "Centro Sportivo Alagoano",
+    "nome_popular": "CSA",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Maceió",
+    "divisao_nacional": "serie_d"
+  },
+  {
+    "id": "cse",
+    "nome": "CSE",
+    "nome_popular": "CSE",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Palmeira dos Índios"
+  },
+  {
+    "id": "cuiaba",
+    "nome": "Cuiabá Esporte Clube",
+    "nome_popular": "Cuiabá",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Cuiabá",
+    "estadio": "Arena Pantanal",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "decisao",
+    "nome": "Decisão",
+    "nome_popular": "Decisão",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Goiana",
+    "estadio": "José Dionísio do Carmo"
+  },
+  {
+    "id": "democrata_gv",
+    "nome": "Esporte Clube Democrata",
+    "nome_popular": "Democrata-GV",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Governador Valadares",
+    "estadio": "José Mammoud Abbas"
+  },
+  {
+    "id": "democrata_sl",
+    "nome": "Democrata Futebol Clube",
+    "nome_popular": "Democrata-SL",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Sete Lagoas",
+    "estadio": "Joaquim Henrique Nogueira"
+  },
+  {
+    "id": "desportiva_aracaju",
+    "nome": "Desportiva Aracaju Futebol Clube",
+    "nome_popular": "Desportiva Aracaju",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  },
+  {
+    "id": "desportiva_ferroviaria",
+    "nome": "Associação Desportiva Ferroviária Vale do Rio Doce",
+    "nome_popular": "Desportiva Ferroviária",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Cariacica"
+  },
+  {
+    "id": "desportivo_brasil",
+    "nome": "Desportivo Brasil",
+    "nome_popular": "Desportivo Brasil",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Porto Feliz"
+  },
+  {
+    "id": "dorense",
+    "nome": "Dorense Futebol Clube",
+    "nome_popular": "Dorense",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Nossa Senhora das Dores"
+  },
+  {
+    "id": "dourados_ac",
+    "nome": "Dourados Atlético Clube",
+    "nome_popular": "DAC",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Dourados"
+  },
+  {
+    "id": "duque_de_caxias",
+    "nome": "Duque de Caxias Futebol Clube",
+    "nome_popular": "Duque de Caxias",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Duque de Caxias"
+  },
+  {
+    "id": "ec_sao_bernardo",
+    "nome": "Esporte Clube São Bernardo",
+    "nome_popular": "EC São Bernardo",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Bernardo do Campo",
+    "estadio": "1º de Maio"
+  },
+  {
+    "id": "ecpp_vitoria_conquista",
+    "nome": "Esporte Clube Primeiro Passo",
+    "nome_popular": "ECPP",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Vitória da Conquista"
+  },
+  {
+    "id": "ecus",
+    "nome": "Esporte Clube União Suzano",
+    "nome_popular": "ECUS",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Suzano",
+    "estadio": "Suzanão"
+  },
+  {
+    "id": "esporte_pb",
+    "nome": "Esporte Clube Esporte",
+    "nome_popular": "Esporte",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Patos"
+  },
+  {
+    "id": "esportivo_bento_goncalves",
+    "nome": "Clube Esportivo Bento Gonçalves",
+    "nome_popular": "Esportivo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bento Gonçalves"
+  },
+  {
+    "id": "falcon",
+    "nome": "Falcon Football Club",
+    "nome_popular": "Falcon",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  },
+  {
+    "id": "fc_cascavel",
+    "nome": "FC Cascavel",
+    "nome_popular": "Cascavel",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Cascavel",
+    "estadio": "Olímpico Regional Arnaldo Busatto"
+  },
+  {
+    "id": "feira_fc",
+    "nome": "Feira Futebol Clube",
+    "nome_popular": "Feira FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana"
+  },
+  {
+    "id": "ferroviaria",
+    "nome": "Associação Ferroviária de Esportes",
+    "nome_popular": "Ferroviária",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araraquara",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "ferroviario_ce",
+    "nome": "Ferroviário Atlético Clube",
+    "nome_popular": "Ferroviário",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza"
+  },
+  {
+    "id": "figueirense",
+    "nome": "Figueirense Futebol Clube",
+    "nome_popular": "Figueirense",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Florianópolis",
+    "estadio": "Orlando Scarpelli",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "flamengo",
+    "nome": "Clube de Regatas do Flamengo",
+    "nome_popular": "Flamengo",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Maracanã",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "muito_alta"
+  },
+  {
+    "id": "floresta",
+    "nome": "Floresta Esporte Clube",
+    "nome_popular": "Floresta",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "fluminense",
+    "nome": "Fluminense Football Club",
+    "nome_popular": "Fluminense",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Maracanã",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "fluminense_de_feira",
+    "nome": "Fluminense de Feira Futebol Clube",
+    "nome_popular": "Fluminense de Feira",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana"
+  },
+  {
+    "id": "fluminense_pi",
+    "nome": "Fluminense Esporte Clube (PI)",
+    "nome_popular": "Fluminense-PI",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Teresina"
+  },
+  {
+    "id": "fortaleza",
+    "nome": "Fortaleza Esporte Clube",
+    "nome_popular": "Fortaleza",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza",
+    "estadio": "Arena Castelão",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "forte_fc",
+    "nome": "Forte Futebol Clube",
+    "nome_popular": "Forte FC",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Castelo"
+  },
+  {
+    "id": "foz_do_iguacu",
+    "nome": "Foz do Iguaçu Futebol Clube",
+    "nome_popular": "Foz do Iguaçu",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Foz do Iguaçu"
+  },
+  {
+    "id": "francana",
+    "nome": "Associação Atlética Francana",
+    "nome_popular": "Francana",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Franca"
+  },
+  {
+    "id": "galicia",
+    "nome": "Galícia Esporte Clube",
+    "nome_popular": "Galícia",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Roberto Santos"
+  },
+  {
+    "id": "galo_maringa",
+    "nome": "Adap Galo Maringá Futebol Clube",
+    "nome_popular": "Galo Maringá",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Maringá"
+  },
+  {
+    "id": "galvez",
+    "nome": "Galvez Esporte Clube",
+    "nome_popular": "Galvez",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "gama",
+    "nome": "Sociedade Esportiva do Gama",
+    "nome_popular": "Gama",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Gama",
+    "estadio": "Valmir Campelo Bezerra"
+  },
+  {
+    "id": "gas",
+    "nome": "Grêmio Atlético Sampaio",
+    "nome_popular": "GAS",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "genus",
+    "nome": "Genus Futebol Clube",
+    "nome_popular": "Genus",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Porto Velho"
+  },
+  {
+    "id": "globo_fc",
+    "nome": "Globo Futebol Clube",
+    "nome_popular": "Globo",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Ceará-Mirim"
+  },
+  {
+    "id": "gloria",
+    "nome": "Grêmio Esportivo Glória",
+    "nome_popular": "Glória",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Vacaria"
+  },
+  {
+    "id": "goias",
+    "nome": "Goiás Esporte Clube",
+    "nome_popular": "Goiás",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Goiânia",
+    "estadio": "Serra Dourada",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "goiatuba",
+    "nome": "Goiatuba Esporte Clube",
+    "nome_popular": "Goiatuba",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Goiatuba",
+    "estadio": "Divino Garcia Rosa"
+  },
+  {
+    "id": "gramadense",
+    "nome": "Centro Esportivo Gramadense",
+    "nome_popular": "Gramadense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Gramado"
+  },
+  {
+    "id": "grapiuna",
+    "nome": "Grapiúna Atlético Clube",
+    "nome_popular": "Grapiúna",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Itabuna",
+    "estadio": "Luiz Viana Filho"
+  },
+  {
+    "id": "gremio",
+    "nome": "Grêmio Foot-Ball Porto Alegrense",
+    "nome_popular": "Grêmio",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Porto Alegre",
+    "estadio": "Arena do Grêmio",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "gremio_bage",
+    "nome": "Grêmio Esportivo Bagé",
+    "nome_popular": "Grêmio Bagé",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bagé",
+    "estadio": "Pedra Moura"
+  },
+  {
+    "id": "gremio_prudente",
+    "nome": "Grêmio Prudente Futebol",
+    "nome_popular": "Grêmio Prudente",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Presidente Prudente"
+  },
+  {
+    "id": "guapore_fc",
+    "nome": "Guaporé Futebol Clube",
+    "nome_popular": "Guaporé",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Rolim de Moura",
+    "estadio": "Cassolão"
+  },
+  {
+    "id": "guarai",
+    "nome": "Guaraí Esporte Clube",
+    "nome_popular": "Guaraí",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Guaraí"
+  },
+  {
+    "id": "guarani",
+    "nome": "Guarani Futebol Clube",
+    "nome_popular": "Guarani",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Campinas",
+    "estadio": "Brinco de Ouro",
+    "divisao_nacional": "serie_c",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "guarani_mg",
+    "nome": "Guarani Esporte Clube",
+    "nome_popular": "Guarani-MG",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Divinópolis",
+    "estadio": "Waldemar Teixeira de Faria"
+  },
+  {
+    "id": "guarani_va",
+    "nome": "Esporte Clube Guarani",
+    "nome_popular": "Guarani-VA",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Venâncio Aires"
+  },
+  {
+    "id": "guarany_bage",
+    "nome": "Guarany Futebol Clube",
+    "nome_popular": "Guarany",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bagé",
+    "estadio": "Antônio Magalhães Rossel"
+  },
+  {
+    "id": "guarany_porto_da_folha",
+    "nome": "Guarany Futebol Clube (Porto da Folha)",
+    "nome_popular": "Guarany",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Porto da Folha"
+  },
+  {
+    "id": "gurupi",
+    "nome": "Gurupi Esporte Clube",
+    "nome_popular": "Gurupi",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Gurupi"
+  },
+  {
+    "id": "horizonte",
+    "nome": "Horizonte Futebol Clube",
+    "nome_popular": "Horizonte",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Horizonte"
+  },
+  {
+    "id": "humaita_ac",
+    "nome": "Sport Club Humaitá",
+    "nome_popular": "Humaitá",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "iape",
+    "nome": "Instituto de Administração de Projetos Educacionais Futebol Clube",
+    "nome_popular": "IAPE",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "São Luís",
+    "estadio": "Nhozinho Santos"
+  },
+  {
+    "id": "iguatu",
+    "nome": "Iguatu Esporte Clube",
+    "nome_popular": "Iguatu",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Iguatu"
+  },
+  {
+    "id": "imperatriz",
+    "nome": "Sociedade Imperatriz de Desportos",
+    "nome_popular": "Imperatriz",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "Imperatriz",
+    "estadio": "Frei Epifânio D'Abadia"
+  },
+  {
+    "id": "independencia_ac",
+    "nome": "Independência Futebol Clube",
+    "nome_popular": "Independência",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "independente_ap",
+    "nome": "Independente Esporte Clube (AP)",
+    "nome_popular": "Independente-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Santana"
+  },
+  {
+    "id": "inhumas",
+    "nome": "Inhumas Esporte Clube",
+    "nome_popular": "Inhumas",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Inhumas",
+    "estadio": "Zico Brandão"
+  },
+  {
+    "id": "inter_de_bebedouro",
+    "nome": "Inter de Bebedouro Futebol Clube",
+    "nome_popular": "Inter de Bebedouro",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bebedouro"
+  },
+  {
+    "id": "inter_de_limeira",
+    "nome": "Inter de Limeira Futebol Clube",
+    "nome_popular": "Inter de Limeira",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Limeira",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "inter_santa_maria",
+    "nome": "Esporte Clube Internacional (Santa Maria)",
+    "nome_popular": "Inter-SM",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Maria",
+    "estadio": "Presidente Vargas"
+  },
+  {
+    "id": "internacional",
+    "nome": "Sport Club Internacional",
+    "nome_popular": "Internacional",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Porto Alegre",
+    "estadio": "Beira-Rio",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "ipatinga_fc",
+    "nome": "Ipatinga Futebol Clube",
+    "nome_popular": "Ipatinga",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Ipatinga",
+    "estadio": "João Lamego Netto"
+  },
+  {
+    "id": "ipojuca",
+    "nome": "Ipojuca",
+    "nome_popular": "Ipojuca",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Ipojuca"
+  },
+  {
+    "id": "itabaiana",
+    "nome": "Itabaiana Esporte Clube",
+    "nome_popular": "Itabaiana",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Itabaiana",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "itabirito",
+    "nome": "Itabirito Futebol Clube",
+    "nome_popular": "Itabirito",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Itabirito"
+  },
+  {
+    "id": "itacoatiara",
+    "nome": "Itacoatiara Futebol Clube",
+    "nome_popular": "Itacoatiara",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Itacoatiara"
+  },
+  {
+    "id": "itapirense",
+    "nome": "Itapirense Futebol Clube",
+    "nome_popular": "Itapirense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Itapira"
+  },
+  {
+    "id": "ituano",
+    "nome": "Ituano Futebol Clube",
+    "nome_popular": "Ituano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Itu",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "itz_sport",
+    "nome": "ITZ Sport",
+    "nome_popular": "ITZ Sport",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "Imperatriz",
+    "estadio": "Frei Epifânio D'Abadia"
+  },
+  {
+    "id": "ivinhema",
+    "nome": "Ivinhema Futebol Clube",
+    "nome_popular": "Ivinhema",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Ivinhema"
+  },
+  {
+    "id": "jabaquara",
+    "nome": "Jabaquara Atlético Clube",
+    "nome_popular": "Jabaquara",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "jacarei",
+    "nome": "Jacareí Atlético Clube",
+    "nome_popular": "Jacareí",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jacareí"
+  },
+  {
+    "id": "jacobina",
+    "nome": "Jacobina Esporte Clube",
+    "nome_popular": "Jacobina",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Jacobina",
+    "estadio": "José Rocha"
+  },
+  {
+    "id": "jacuipense",
+    "nome": "Jacuipense Esporte Clube",
+    "nome_popular": "Jacuipense",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Riachão do Jacuípe",
+    "estadio": "Roberto Santos"
+  },
+  {
+    "id": "jaguar",
+    "nome": "Jaguar",
+    "nome_popular": "Jaguar",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Jaboatão dos Guararapes",
+    "estadio": "Arena Pernambuco"
+  },
+  {
+    "id": "jataiense",
+    "nome": "Jataiense Esporte Clube",
+    "nome_popular": "Jataiense",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Jataí",
+    "estadio": "Arapucão"
+  },
+  {
+    "id": "jequie",
+    "nome": "Jequié Associação Desportiva",
+    "nome_popular": "Jequié",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Jequié",
+    "estadio": "Waldomirão"
+  },
+  {
+    "id": "ji_parana",
+    "nome": "Ji-Paraná Futebol Clube",
+    "nome_popular": "Ji-Paraná",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Ji-Paraná"
+  },
+  {
+    "id": "joinville",
+    "nome": "Joinville Esporte Clube",
+    "nome_popular": "Joinville",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Joinville",
+    "estadio": "Arena Joinville"
+  },
+  {
+    "id": "juazeirense",
+    "nome": "Juazeirense Sociedade Desportiva",
+    "nome_popular": "Juazeirense",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Juazeiro",
+    "estadio": "Adauto Moraes"
+  },
+  {
+    "id": "juventude",
+    "nome": "Esporte Clube Juventude",
+    "nome_popular": "Juventude",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Caxias do Sul",
+    "estadio": "Alfredo Jaconi",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "juventus_sp",
+    "nome": "Clube Atlético Juventus",
+    "nome_popular": "Juventus",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "lagarto",
+    "nome": "Lagarto Futebol Clube",
+    "nome_popular": "Lagarto",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Lagarto"
+  },
+  {
+    "id": "laguna",
+    "nome": "Associação Atlética Laguna",
+    "nome_popular": "Laguna",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Tibau do Sul"
+  },
+  {
+    "id": "lajeadense",
+    "nome": "Clube Esportivo Lajeadense",
+    "nome_popular": "Lajeadense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Lajeado",
+    "estadio": "Arena Alviazul"
+  },
+  {
+    "id": "lemense",
+    "nome": "Lemense Futebol Clube",
+    "nome_popular": "Lemense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Leme"
+  },
+  {
+    "id": "leonico",
+    "nome": "Associação Desportiva Leônico",
+    "nome_popular": "Leônico",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Edgar Santos"
+  },
+  {
+    "id": "linense",
+    "nome": "Associação Desportiva Classista Linense",
+    "nome_popular": "Linense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Lins"
+  },
+  {
+    "id": "londrina",
+    "nome": "Londrina Esporte Clube",
+    "nome_popular": "Londrina",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Londrina",
+    "estadio": "Estádio do Café",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "luminense_ma",
+    "nome": "Luminense Atlético Clube",
+    "nome_popular": "Luminense",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "Paço do Lumiar"
+  },
+  {
+    "id": "luverdense",
+    "nome": "Luverdense Esporte Clube",
+    "nome_popular": "Luverdense",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Lucas do Rio Verde",
+    "estadio": "Passo das Emas"
+  },
+  {
+    "id": "mac",
+    "nome": "Maranhão Atlético Clube",
+    "nome_popular": "MAC",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "São Luís",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "macapa_ec",
+    "nome": "Esporte Clube Macapá",
+    "nome_popular": "Macapá",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá",
+    "estadio": "Zerão"
+  },
+  {
+    "id": "madureira",
+    "nome": "Madureira Esporte Clube",
+    "nome_popular": "Madureira",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Conselheiro Galvão"
+  },
+  {
+    "id": "maguary",
+    "nome": "Maguary",
+    "nome_popular": "Maguary",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Bonito",
+    "estadio": "Arthur Tavares de Melo"
+  },
+  {
+    "id": "mamore",
+    "nome": "Esporte Clube Mamoré",
+    "nome_popular": "Mamoré",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Patos de Minas",
+    "estadio": "Bernardo Rubinger de Queiroz"
+  },
+  {
+    "id": "manauara",
+    "nome": "Manauara Esporte Clube",
+    "nome_popular": "Manauara",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "manaus_fc",
+    "nome": "Manaus Futebol Clube",
+    "nome_popular": "Manaus FC",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "maracana_ce",
+    "nome": "Maracanã Esporte Clube",
+    "nome_popular": "Maracanã",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Maracanaú"
+  },
+  {
+    "id": "maranguape",
+    "nome": "Maranguape Esporte Clube",
+    "nome_popular": "Maranguape",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Maranguape"
+  },
+  {
+    "id": "marcilio_dias",
+    "nome": "Clube Náutico Marcílio Dias",
+    "nome_popular": "Marcílio Dias",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Itajaí"
+  },
+  {
+    "id": "marica",
+    "nome": "Maricá Futebol Clube",
+    "nome_popular": "Maricá",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Maricá",
+    "estadio": "Municipal João Saldanha"
+  },
+  {
+    "id": "marilia",
+    "nome": "Marília Atlético Clube",
+    "nome_popular": "Marília",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Marília"
+  },
+  {
+    "id": "maringa_fc",
+    "nome": "Maringá Futebol Clube",
+    "nome_popular": "Maringá FC",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Maringá",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "mirassol",
+    "nome": "Mirassol Futebol Clube",
+    "nome_popular": "Mirassol",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Mirassol",
+    "estadio": "Campos Maia",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "muito_baixa"
+  },
+  {
+    "id": "mixto",
+    "nome": "Mixto Esporte Clube",
+    "nome_popular": "Mixto",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Cuiabá",
+    "estadio": "Arena Pantanal"
+  },
+  {
+    "id": "monsoon",
+    "nome": "Monsoon Futebol Clube",
+    "nome_popular": "Monsoon",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Capão da Canoa"
+  },
+  {
+    "id": "monte_azul",
+    "nome": "Monte Azul Esporte Clube",
+    "nome_popular": "Monte Azul",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Monte Azul Paulista"
+  },
+  {
+    "id": "monte_roraima",
+    "nome": "Monte Roraima Futebol Clube",
+    "nome_popular": "Monte Roraima",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "moto_club",
+    "nome": "Moto Club de São Luís",
+    "nome_popular": "Moto Club",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "São Luís"
+  },
+  {
+    "id": "murici",
+    "nome": "Murici Futebol Clube",
+    "nome_popular": "Murici",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Murici"
+  },
+  {
+    "id": "nacional_am",
+    "nome": "Nacional Futebol Clube (AM)",
+    "nome_popular": "Nacional-AM",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "nacional_catanduva",
+    "nome": "Nacional Futebol Clube (Catanduva)",
+    "nome_popular": "Nacional",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Catanduva"
+  },
+  {
+    "id": "nacional_patos",
+    "nome": "Nacional de Patos",
+    "nome_popular": "Nacional de Patos",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Patos"
+  },
+  {
+    "id": "nautico",
+    "nome": "Clube Náutico Capibaribe",
+    "nome_popular": "Náutico",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Recife",
+    "estadio": "Aflitos",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "nautico_rr",
+    "nome": "Náutico Futebol Clube (RR)",
+    "nome_popular": "Náutico-RR",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "naviraiense",
+    "nome": "Clube Esportivo Naviraiense",
+    "nome_popular": "Naviraiense",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Naviraí"
+  },
+  {
+    "id": "noroeste",
+    "nome": "Associação Atlética Noroeste",
+    "nome_popular": "Noroeste",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bauru"
+  },
+  {
+    "id": "north_ec",
+    "nome": "North Esporte Clube",
+    "nome_popular": "North",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Montes Claros",
+    "estadio": "Juvêncio Augusto Soares"
+  },
+  {
+    "id": "nova_iguacu",
+    "nome": "Nova Iguaçu Futebol Clube",
+    "nome_popular": "Nova Iguaçu",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Nova Iguaçu",
+    "estadio": "Jânio Moraes"
+  },
+  {
+    "id": "nova_mutum",
+    "nome": "Nova Mutum Esporte Clube",
+    "nome_popular": "Nova Mutum",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Nova Mutum",
+    "estadio": "Valdir Doilho Wons"
+  },
+  {
+    "id": "novo_hamburgo",
+    "nome": "Esporte Clube Novo Hamburgo",
+    "nome_popular": "Novo Hamburgo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Novo Hamburgo",
+    "estadio": "Do Vale"
+  },
+  {
+    "id": "novorizontino",
+    "nome": "Grêmio Novorizontino",
+    "nome_popular": "Novorizontino",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Novo Horizonte",
+    "estadio": "Jorjão",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "muito_baixa"
+  },
+  {
+    "id": "oeirense",
+    "nome": "Oeirense Futebol Clube",
+    "nome_popular": "Oeirense",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Oeiras"
+  },
+  {
+    "id": "olaria",
+    "nome": "Olaria Atlético Clube",
+    "nome_popular": "Olaria",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro"
+  },
+  {
+    "id": "operario_ferroviario",
+    "nome": "Operário Ferroviário Esporte Clube",
+    "nome_popular": "Operário-PR",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Ponta Grossa",
+    "estadio": "Germano Krüger",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "operario_ms",
+    "nome": "Operário Futebol Clube",
+    "nome_popular": "Operário-MS",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Campo Grande",
+    "estadio": "Moreninhas"
+  },
+  {
+    "id": "operario_vg",
+    "nome": "Clube Esportivo Operário Várzea-Grandense",
+    "nome_popular": "Operário-VG",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Várzea Grande",
+    "estadio": "Dito Souza"
+  },
+  {
+    "id": "oratorio",
+    "nome": "Oratório Recreativo Clube",
+    "nome_popular": "Oratório",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "osasco_sporting",
+    "nome": "Osasco Sporting Clube",
+    "nome_popular": "Osasco Sporting",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Osasco"
+  },
+  {
+    "id": "palmas_fc",
+    "nome": "Palmas Futebol e Regatas",
+    "nome_popular": "Palmas",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Palmas"
+  },
+  {
+    "id": "palmeiras",
+    "nome": "Sociedade Esportiva Palmeiras",
+    "nome_popular": "Palmeiras",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo",
+    "estadio": "Allianz Parque",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "muito_alta"
+  },
+  {
+    "id": "pantanal_fc",
+    "nome": "Pantanal Futebol Clube",
+    "nome_popular": "Pantanal",
+    "pais": "BR",
+    "estado": "MS",
+    "cidade": "Ladário"
+  },
+  {
+    "id": "paranoa",
+    "nome": "Paranoá Esporte Clube",
+    "nome_popular": "Paranoá",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Paranoá",
+    "estadio": "JK"
+  },
+  {
+    "id": "parintins",
+    "nome": "Rio Parintins Esporte Clube",
+    "nome_popular": "Parintins",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Parintins"
+  },
+  {
+    "id": "parnahyba",
+    "nome": "Parnahyba Sport Club",
+    "nome_popular": "Parnahyba",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Parnaíba"
+  },
+  {
+    "id": "passo_fundo",
+    "nome": "Esporte Clube Passo Fundo",
+    "nome_popular": "Passo Fundo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Passo Fundo",
+    "estadio": "Vermelhão da Serra"
+  },
+  {
+    "id": "patrocinense",
+    "nome": "Clube Atlético Patrocinense",
+    "nome_popular": "Patrocinense",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Patrocínio",
+    "estadio": "Pedro Alves do Nascimento"
+  },
+  {
+    "id": "paulista_jundiai",
+    "nome": "Paulista Futebol Clube",
+    "nome_popular": "Paulista de Jundiaí",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jundiaí"
+  },
+  {
+    "id": "paysandu",
+    "nome": "Paysandu Sport Club",
+    "nome_popular": "Paysandu",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Belém",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "pelotas",
+    "nome": "Esporte Clube Pelotas",
+    "nome_popular": "Pelotas",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Pelotas",
+    "estadio": "Boca do Lobo"
+  },
+  {
+    "id": "penapolense",
+    "nome": "Penapolense Futebol Clube",
+    "nome_popular": "Penapolense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Penápolis"
+  },
+  {
+    "id": "penedense",
+    "nome": "Penedense Futebol Clube",
+    "nome_popular": "Penedense",
+    "pais": "BR",
+    "estado": "AL",
+    "cidade": "Penedo"
+  },
+  {
+    "id": "perolas_negras",
+    "nome": "Pérolas Negras Futebol Clube",
+    "nome_popular": "Pérolas Negras",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Resende"
+  },
+  {
+    "id": "petropolis",
+    "nome": "Petrópolis Futebol Clube",
+    "nome_popular": "Petrópolis",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Petrópolis"
+  },
+  {
+    "id": "piaui_ec",
+    "nome": "Piauí Esporte Clube",
+    "nome_popular": "Piauí",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Teresina"
+  },
+  {
+    "id": "pombal",
+    "nome": "Pombal Esporte Clube",
+    "nome_popular": "Pombal",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Pombal"
+  },
+  {
+    "id": "ponte_preta",
+    "nome": "Associação Atlética Ponte Preta",
+    "nome_popular": "Ponte Preta",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Campinas",
+    "estadio": "Moisés Lucarelli",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "porto_ba",
+    "nome": "Porto Sport Club",
+    "nome_popular": "Porto",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Porto Seguro",
+    "estadio": "Municipal Agnaldo Bento dos Santos"
+  },
+  {
+    "id": "porto_caruaru",
+    "nome": "Porto",
+    "nome_popular": "Porto",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Caruaru"
+  },
+  {
+    "id": "porto_velho_ec",
+    "nome": "Gazin Porto Velho Esporte Clube",
+    "nome_popular": "Porto Velho",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Porto Velho"
+  },
+  {
+    "id": "porto_vitoria",
+    "nome": "Porto Vitória Futebol Clube",
+    "nome_popular": "Porto Vitória",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Serra"
+  },
+  {
+    "id": "portuguesa",
+    "nome": "Associação Portuguesa de Desportos",
+    "nome_popular": "Portuguesa",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "portuguesa_rj",
+    "nome": "Associação Atlética Portuguesa",
+    "nome_popular": "Portuguesa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Luso-Brasileiro"
+  },
+  {
+    "id": "portuguesa_santista",
+    "nome": "Portuguesa Santista",
+    "nome_popular": "Portuguesa Santista",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santos"
+  },
+  {
+    "id": "potiguar_mossoro",
+    "nome": "Potiguar de Mossoró",
+    "nome_popular": "Potiguar",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Mossoró"
+  },
+  {
+    "id": "potyguar_seridoense",
+    "nome": "Potyguar Seridoense",
+    "nome_popular": "Potyguar",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Currais Novos"
+  },
+  {
+    "id": "pouso_alegre",
+    "nome": "Pouso Alegre Futebol Clube",
+    "nome_popular": "Pouso Alegre",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Pouso Alegre",
+    "estadio": "Municipal Irmão Gino Maria Rossi"
+  },
+  {
+    "id": "primavera",
+    "nome": "Primavera Esporte Clube",
+    "nome_popular": "Primavera",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Indaiatuba"
+  },
+  {
+    "id": "primavera_ac",
+    "nome": "Primavera Atlético Clube",
+    "nome_popular": "Primavera",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Primavera do Leste",
+    "estadio": "Cerradão"
+  },
+  {
+    "id": "princesa_do_solimoes",
+    "nome": "Princesa do Solimões Esporte Clube",
+    "nome_popular": "Princesa do Solimões",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manacapuru",
+    "estadio": "Gilbertão"
+  },
+  {
+    "id": "progresso",
+    "nome": "Progresso Esporte Clube",
+    "nome_popular": "Progresso",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "qfc",
+    "nome": "Quinho Futebol Clube",
+    "nome_popular": "QFC",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Parnamirim"
+  },
+  {
+    "id": "quixada",
+    "nome": "Quixadá Esporte Clube",
+    "nome_popular": "Quixadá",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Quixadá"
+  },
+  {
+    "id": "real_brasilia",
+    "nome": "Real Brasília Futebol Clube",
+    "nome_popular": "Real Brasília",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Brasília",
+    "estadio": "Defelê"
+  },
+  {
+    "id": "real_noroeste",
+    "nome": "Real Noroeste Capixaba Futebol Clube",
+    "nome_popular": "Real Noroeste",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Águia Branca"
+  },
+  {
+    "id": "red_bull_bragantino",
+    "nome": "Red Bull Bragantino",
+    "nome_popular": "Bragantino",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bragança Paulista",
+    "estadio": "Nabi Abi Chedid",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "redencao",
+    "nome": "Redenção Futebol Clube",
+    "nome_popular": "Redenção",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador"
+  },
+  {
+    "id": "remo",
+    "nome": "Clube do Remo",
+    "nome_popular": "Remo",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Belém",
+    "estadio": "Baenão",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "resende",
+    "nome": "Resende Futebol Clube",
+    "nome_popular": "Resende",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Resende"
+  },
+  {
+    "id": "retro",
+    "nome": "Retrô Futebol Clube Brasil",
+    "nome_popular": "Retrô",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Camaragibe",
+    "estadio": "Arena Pernambuco"
+  },
+  {
+    "id": "rio_branco_ac",
+    "nome": "Rio Branco Futebol Clube (AC)",
+    "nome_popular": "Rio Branco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "rio_branco_americana",
+    "nome": "Rio Branco Esporte Clube",
+    "nome_popular": "Rio Branco (Americana)",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Americana"
+  },
+  {
+    "id": "rio_branco_es",
+    "nome": "Rio Branco Atlético Clube",
+    "nome_popular": "Rio Branco-ES",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Vitória"
+  },
+  {
+    "id": "rio_branco_vn",
+    "nome": "Rio Branco Futebol Clube (Venda Nova)",
+    "nome_popular": "Rio Branco-VN",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Venda Nova do Imigrante"
+  },
+  {
+    "id": "rio_claro",
+    "nome": "Rio Claro Futebol Clube",
+    "nome_popular": "Rio Claro",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Rio Claro"
+  },
+  {
+    "id": "rio_negro_rr",
+    "nome": "Rio Negro Esporte Clube",
+    "nome_popular": "Rio Negro",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "rio_preto",
+    "nome": "Rio Preto Esporte Clube",
+    "nome_popular": "Rio Preto",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São José do Rio Preto"
+  },
+  {
+    "id": "river_rr",
+    "nome": "River Futebol Clube (RR)",
+    "nome_popular": "River",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "rondoniense_ro",
+    "nome": "Rondoniense",
+    "nome_popular": "Rondoniense",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Porto Velho"
+  },
+  {
+    "id": "samambaia",
+    "nome": "Samambaia Futebol Clube",
+    "nome_popular": "Samambaia",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Samambaia",
+    "estadio": "Joaquim Domingos Roriz"
+  },
+  {
+    "id": "sampaio_correa_ma",
+    "nome": "Sampaio Corrêa Futebol Clube",
+    "nome_popular": "Sampaio Corrêa",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "São Luís",
+    "estadio": "Castelão"
+  },
+  {
+    "id": "sampaio_correa_rj",
+    "nome": "Sampaio Corrêa Futebol e Esporte",
+    "nome_popular": "Sampaio Corrêa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema",
+    "estadio": "Lourival Gomes de Almeida"
+  },
+  {
+    "id": "santa_catarina_ec",
+    "nome": "Santa Catarina Esporte Clube",
+    "nome_popular": "Santa Catarina",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Rio do Sul",
+    "estadio": "Alfredo João Krieck"
+  },
+  {
+    "id": "santa_cruz",
+    "nome": "Santa Cruz Futebol Clube",
+    "nome_popular": "Santa Cruz",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Recife",
+    "estadio": "Arruda",
+    "divisao_nacional": "serie_c",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "santa_cruz_ac",
+    "nome": "Santa Cruz Esporte Clube (AC)",
+    "nome_popular": "Santa Cruz-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "santa_cruz_rn",
+    "nome": "Santa Cruz Futebol Clube (Natal)",
+    "nome_popular": "Santa Cruz-RN",
+    "pais": "BR",
+    "estado": "RN",
+    "cidade": "Natal"
+  },
+  {
+    "id": "santa_cruz_rs",
+    "nome": "Futebol Clube Santa Cruz",
+    "nome_popular": "Santa Cruz",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Cruz do Sul",
+    "estadio": "Dos Plátanos"
+  },
+  {
+    "id": "santa_rosa_pa",
+    "nome": "Santa Rosa Esporte Clube",
+    "nome_popular": "Santa Rosa",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Belém"
+  },
+  {
+    "id": "santo_andre",
+    "nome": "Esporte Clube Santo André",
+    "nome_popular": "Santo André",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santo André"
+  },
+  {
+    "id": "santos",
+    "nome": "Santos Futebol Clube",
+    "nome_popular": "Santos",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santos",
+    "estadio": "Vila Belmiro",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "santos_ap",
+    "nome": "Santos Futebol Clube (AP)",
+    "nome_popular": "Santos-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "sao_bento",
+    "nome": "Associação Atlética São Bento",
+    "nome_popular": "São Bento",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Sorocaba"
+  },
+  {
+    "id": "sao_bernardo",
+    "nome": "São Bernardo Futebol Clube Ltda.",
+    "nome_popular": "São Bernardo",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Bernardo do Campo",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "sao_caetano",
+    "nome": "Associação Desportiva São Caetano",
+    "nome_popular": "São Caetano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Caetano do Sul"
+  },
+  {
+    "id": "sao_carlense",
+    "nome": "São-Carlense Futebol Clube",
+    "nome_popular": "São-Carlense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Carlos"
+  },
+  {
+    "id": "sao_francisco_ac",
+    "nome": "São Francisco Futebol Clube (AC)",
+    "nome_popular": "São Francisco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "sao_francisco_pa",
+    "nome": "São Francisco Futebol Clube (PA)",
+    "nome_popular": "São Francisco",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Santarém"
+  },
+  {
+    "id": "sao_goncalo_ec",
+    "nome": "São Gonçalo Esporte Clube",
+    "nome_popular": "São Gonçalo EC",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "São Gonçalo"
+  },
+  {
+    "id": "sao_jose_ap",
+    "nome": "São José Futebol Clube (AP)",
+    "nome_popular": "São José-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "sao_jose_rs",
+    "nome": "Esporte Clube São José",
+    "nome_popular": "São José",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Porto Alegre",
+    "estadio": "Passo D'Areia"
+  },
+  {
+    "id": "sao_jose_sp",
+    "nome": "São José Esporte Clube",
+    "nome_popular": "São José",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São José dos Campos"
+  },
+  {
+    "id": "sao_joseense",
+    "nome": "Independente Futebol São Joseense",
+    "nome_popular": "São Joseense",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "São José dos Pinhais"
+  },
+  {
+    "id": "sao_luiz",
+    "nome": "Esporte Clube São Luiz",
+    "nome_popular": "São Luiz",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Ijuí",
+    "estadio": "19 de Outubro"
+  },
+  {
+    "id": "sao_paulo",
+    "nome": "São Paulo Futebol Clube",
+    "nome_popular": "São Paulo",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo",
+    "estadio": "MorumBIS",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "sao_raimundo_am",
+    "nome": "São Raimundo Esporte Clube (AM)",
+    "nome_popular": "São Raimundo-AM",
+    "pais": "BR",
+    "estado": "AM",
+    "cidade": "Manaus"
+  },
+  {
+    "id": "sao_raimundo_pa",
+    "nome": "São Raimundo Esporte Clube (PA)",
+    "nome_popular": "São Raimundo-PA",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Santarém"
+  },
+  {
+    "id": "sao_raimundo_rr",
+    "nome": "São Raimundo Esporte Clube (RR)",
+    "nome_popular": "São Raimundo-RR",
+    "pais": "BR",
+    "estado": "RR",
+    "cidade": "Boa Vista"
+  },
+  {
+    "id": "sc_gaucho",
+    "nome": "Sport Clube Gaúcho",
+    "nome_popular": "Gaúcho",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Passo Fundo"
+  },
+  {
+    "id": "sergipe_fc",
+    "nome": "Sergipe Futebol Clube",
+    "nome_popular": "Sergipe",
+    "pais": "BR",
+    "estado": "SE",
+    "cidade": "Aracaju"
+  },
+  {
+    "id": "serra_branca",
+    "nome": "Serra Branca Futebol Clube",
+    "nome_popular": "Serra Branca",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  },
+  {
+    "id": "serra_fc",
+    "nome": "Sociedade Desportiva Serra Futebol Clube",
+    "nome_popular": "Serra",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Serra"
+  },
+  {
+    "id": "sertaozinho",
+    "nome": "Sertãozinho Futebol Clube",
+    "nome_popular": "Sertãozinho",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Sertãozinho"
+  },
+  {
+    "id": "sobradinho",
+    "nome": "Sobradinho Esporte Clube",
+    "nome_popular": "Sobradinho",
+    "pais": "BR",
+    "estado": "DF",
+    "cidade": "Sobradinho",
+    "estadio": "Augustinho Lima"
+  },
+  {
+    "id": "sousa",
+    "nome": "Sousa Esporte Clube",
+    "nome_popular": "Sousa",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Sousa"
+  },
+  {
+    "id": "sport_recife",
+    "nome": "Sport Club do Recife",
+    "nome_popular": "Sport",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Recife",
+    "estadio": "Ilha do Retiro",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "sport_sinop",
+    "nome": "Clube Sport Sinop",
+    "nome_popular": "Sport Sinop",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Sinop",
+    "estadio": "Gigante do Norte"
+  },
+  {
+    "id": "ssa_fc",
+    "nome": "SSA Futebol Clube",
+    "nome_popular": "SSA FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador"
+  },
+  {
+    "id": "tanabi",
+    "nome": "Tanabi Esporte Clube",
+    "nome_popular": "Tanabi",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Tanabi"
+  },
+  {
+    "id": "taquaritinga",
+    "nome": "Taquaritinga Futebol Clube",
+    "nome_popular": "Taquaritinga",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Taquaritinga"
+  },
+  {
+    "id": "taubate",
+    "nome": "Taubaté Futebol",
+    "nome_popular": "Taubaté",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Taubaté"
+  },
+  {
+    "id": "teresina_ec",
+    "nome": "Teresina Atlético Clube",
+    "nome_popular": "Teresina",
+    "pais": "BR",
+    "estado": "PI",
+    "cidade": "Teresina"
+  },
+  {
+    "id": "tirol",
+    "nome": "Tirol Esporte Clube",
+    "nome_popular": "Tirol",
+    "pais": "BR",
+    "estado": "CE",
+    "cidade": "Fortaleza"
+  },
+  {
+    "id": "tocantinopolis",
+    "nome": "Tocantinópolis Esporte Clube",
+    "nome_popular": "Tocantinópolis",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Tocantinópolis"
+  },
+  {
+    "id": "tombense",
+    "nome": "Tombense Futebol Clube",
+    "nome_popular": "Tombense",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Tombos",
+    "estadio": "Antônio Guimarães de Almeida"
+  },
+  {
+    "id": "trem",
+    "nome": "Trem Desportivo Clube",
+    "nome_popular": "Trem",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "treze",
+    "nome": "Clube Treze de Maio",
+    "nome_popular": "Treze",
+    "pais": "BR",
+    "estado": "PB",
+    "cidade": "Campina Grande"
+  },
+  {
+    "id": "tuna_luso",
+    "nome": "Tuna Luso Brasileira",
+    "nome_popular": "Tuna Luso",
+    "pais": "BR",
+    "estado": "PA",
+    "cidade": "Belém"
+  },
+  {
+    "id": "tuntum",
+    "nome": "Tuntum Esporte Clube",
+    "nome_popular": "Tuntum",
+    "pais": "BR",
+    "estado": "MA",
+    "cidade": "Tuntum",
+    "estadio": "Rafael Seabra"
+  },
+  {
+    "id": "uberaba_sc",
+    "nome": "Uberaba Sport Club",
+    "nome_popular": "Uberaba",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Uberaba",
+    "estadio": "Municipal João Guido"
+  },
+  {
+    "id": "uberlandia_ec",
+    "nome": "Uberlândia Esporte Clube",
+    "nome_popular": "Uberlândia",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Uberlândia",
+    "estadio": "Parque do Sabiá"
+  },
+  {
+    "id": "uniao_barbarense",
+    "nome": "União Agrícola Barbarense Futebol Clube",
+    "nome_popular": "União Barbarense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santa Bárbara d'Oeste",
+    "estadio": "Antônio Lins Ribeiro Guimarães"
+  },
+  {
+    "id": "uniao_cacoalense",
+    "nome": "União Cacoalense",
+    "nome_popular": "União Cacoalense",
+    "pais": "BR",
+    "estado": "RO",
+    "cidade": "Cacoal"
+  },
+  {
+    "id": "uniao_frederiquense",
+    "nome": "União Frederiquense de Futebol",
+    "nome_popular": "União Frederiquense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Frederico Westphalen"
+  },
+  {
+    "id": "uniao_rondonopolis",
+    "nome": "União Esporte Clube",
+    "nome_popular": "União Rondonópolis",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Rondonópolis",
+    "estadio": "Engenheiro Luthero Lopes"
+  },
+  {
+    "id": "uniao_sao_joao",
+    "nome": "União São João Esporte Clube",
+    "nome_popular": "União São João",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araçoiaba da Serra"
+  },
+  {
+    "id": "uniao_suzano",
+    "nome": "União Suzano Atlético Clube",
+    "nome_popular": "União Suzano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Suzano",
+    "estadio": "Francisco Marques Figueira"
+  },
+  {
+    "id": "uniao_to",
+    "nome": "União Atlético Clube",
+    "nome_popular": "União-TO",
+    "pais": "BR",
+    "estado": "TO",
+    "cidade": "Araguaína"
+  },
+  {
+    "id": "urt",
+    "nome": "União Recreativa dos Trabalhadores",
+    "nome_popular": "URT",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Patos de Minas",
+    "estadio": "Zama Maciel"
+  },
+  {
+    "id": "valeriodoce",
+    "nome": "Valeriodoce Esporte Clube",
+    "nome_popular": "Valeriodoce",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Itabira",
+    "estadio": "Israel Pinheiro"
+  },
+  {
+    "id": "varzea_grande_ec",
+    "nome": "Várzea Grande Esporte Clube",
+    "nome_popular": "Várzea Grande",
+    "pais": "BR",
+    "estado": "MT",
+    "cidade": "Várzea Grande",
+    "estadio": "Dito Souza"
+  },
+  {
+    "id": "vasco_da_gama",
+    "nome": "Club de Regatas Vasco da Gama",
+    "nome_popular": "Vasco da Gama",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "São Januário",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "alta"
+  },
+  {
+    "id": "vasco_da_gama_ac",
+    "nome": "Associação Desportiva Vasco da Gama",
+    "nome_popular": "Vasco-AC",
+    "pais": "BR",
+    "estado": "AC",
+    "cidade": "Rio Branco"
+  },
+  {
+    "id": "velo_clube",
+    "nome": "Velo Clube Rioclarense",
+    "nome_popular": "Velo Clube",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Rio Claro"
+  },
+  {
+    "id": "vera_cruz_pe",
+    "nome": "Vera Cruz Futebol Clube",
+    "nome_popular": "Vera Cruz",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Vitória de Santo Antão",
+    "estadio": "Severino Cândido Carneiro"
+  },
+  {
+    "id": "veranopolis",
+    "nome": "Veranópolis Esporte Clube Recreativo e Cultural",
+    "nome_popular": "Veranópolis",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Veranópolis",
+    "estadio": "Antônio David Farina"
+  },
+  {
+    "id": "vila_nova",
+    "nome": "Vila Nova Futebol Clube",
+    "nome_popular": "Vila Nova",
+    "pais": "BR",
+    "estado": "GO",
+    "cidade": "Goiânia",
+    "estadio": "Estádio Onésio Brasileiro Alvarenga",
+    "divisao_nacional": "serie_b",
+    "forca_financeira": "baixa"
+  },
+  {
+    "id": "vilavelhense",
+    "nome": "Vilavelhense Futebol Clube",
+    "nome_popular": "Vilavelhense",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Vila Velha"
+  },
+  {
+    "id": "villa_nova",
+    "nome": "Villa Nova Atlético Clube",
+    "nome_popular": "Villa Nova",
+    "pais": "BR",
+    "estado": "MG",
+    "cidade": "Nova Lima",
+    "estadio": "Castor Cifuentes"
+  },
+  {
+    "id": "vitoria",
+    "nome": "Esporte Clube Vitória",
+    "nome_popular": "Vitória",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Barradão",
+    "divisao_nacional": "serie_a",
+    "forca_financeira": "media"
+  },
+  {
+    "id": "vitoria_es",
+    "nome": "Vitória Futebol Clube",
+    "nome_popular": "Vitória-ES",
+    "pais": "BR",
+    "estado": "ES",
+    "cidade": "Vitória"
+  },
+  {
+    "id": "vitoria_tabocas",
+    "nome": "Associação Acadêmica e Desportiva Vitória das Tabocas",
+    "nome_popular": "Vitória das Tabocas",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Vitória de Santo Antão",
+    "estadio": "Arena Pernambuco"
+  },
+  {
+    "id": "vocem",
+    "nome": "Vila Operária Clube Esporte Mariano",
+    "nome_popular": "VOCEM",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Assis",
+    "estadio": "Tonicão"
+  },
+  {
+    "id": "volta_redonda",
+    "nome": "Volta Redonda Futebol Clube",
+    "nome_popular": "Volta Redonda",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Volta Redonda",
+    "estadio": "Raulino de Oliveira",
+    "divisao_nacional": "serie_c"
+  },
+  {
+    "id": "votuporanguense",
+    "nome": "Votuporanguense Futebol Clube",
+    "nome_popular": "Votuporanguense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Votuporanga"
+  },
+  {
+    "id": "xv_de_jau",
+    "nome": "Esporte Clube XV de Novembro (Jaú)",
+    "nome_popular": "XV de Jaú",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jaú",
+    "estadio": "Zezinho Magalhães"
+  },
+  {
+    "id": "xv_de_piracicaba",
+    "nome": "Esporte Clube XV de Novembro",
+    "nome_popular": "XV de Piracicaba",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Piracicaba"
+  },
+  {
+    "id": "ypiranga_ap",
+    "nome": "Ypiranga Futebol Clube (AP)",
+    "nome_popular": "Ypiranga-AP",
+    "pais": "BR",
+    "estado": "AP",
+    "cidade": "Macapá"
+  },
+  {
+    "id": "ypiranga_pe",
+    "nome": "Sociedade Esportiva Ypiranga Futebol Clube",
+    "nome_popular": "Ypiranga-PE",
+    "pais": "BR",
+    "estado": "PE",
+    "cidade": "Santa Cruz do Capibaribe"
+  },
+  {
+    "id": "ypiranga_rs",
+    "nome": "Ypiranga Futebol Clube",
+    "nome_popular": "Ypiranga",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Erechim",
+    "estadio": "Olímpico Colosso da Lagoa",
+    "divisao_nacional": "serie_c"
+  }
+]

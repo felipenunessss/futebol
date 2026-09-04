@@ -1,0 +1,1460 @@
+[
+  {
+    "id": "acreano_1",
+    "nome": "Campeonato Acreano",
+    "estado": "AC",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "independencia_ac",
+      "santa_cruz_ac",
+      "galvez",
+      "sao_francisco_ac",
+      "adesg",
+      "humaita_ac",
+      "vasco_da_gama_ac",
+      "rio_branco_ac"
+    ]
+  },
+  {
+    "id": "alagoano_1",
+    "nome": "Campeonato Alagoano",
+    "estado": "AL",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "crb",
+      "csa",
+      "asa",
+      "coruripe",
+      "cruzeiro_al",
+      "cse",
+      "murici",
+      "penedense"
+    ]
+  },
+  {
+    "id": "amapaense_1",
+    "nome": "Campeonato Amapaense",
+    "estado": "AP",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "macapa_ec",
+      "oratorio",
+      "trem",
+      "independente_ap",
+      "ypiranga_ap",
+      "santos_ap",
+      "cristal",
+      "sao_jose_ap"
+    ]
+  },
+  {
+    "id": "amazonense_1",
+    "nome": "Campeonato Amazonense",
+    "estado": "AM",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 1
+    },
+    "classicos": [],
+    "times": [
+      "amazonas_fc",
+      "manaus_fc",
+      "itacoatiara",
+      "nacional_am",
+      "manauara",
+      "parintins",
+      "princesa_do_solimoes",
+      "sao_raimundo_am"
+    ]
+  },
+  {
+    "id": "baiano_a1",
+    "nome": "Campeonato Baiano - Série A1",
+    "estado": "BA",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": false
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "bahia",
+        "time_b": "vitoria",
+        "nome": "Ba-Vi",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "bahia",
+      "vitoria",
+      "galicia",
+      "atletico_alagoinhas",
+      "bahia_de_feira",
+      "jacuipense",
+      "jequie",
+      "juazeirense",
+      "porto_ba",
+      "barcelona_ilheus"
+    ]
+  },
+  {
+    "id": "baiano_b",
+    "nome": "Campeonato Baiano - Série B",
+    "estado": "BA",
+    "nivel": 2,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "leonico",
+      "barreiras_fc",
+      "camacari",
+      "ecpp_vitoria_conquista",
+      "feira_fc",
+      "fluminense_de_feira",
+      "grapiuna",
+      "jacobina",
+      "redencao",
+      "ssa_fc"
+    ]
+  },
+  {
+    "id": "candangao_1",
+    "nome": "Campeonato Brasiliense",
+    "estado": "DF",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "gama",
+      "samambaia",
+      "sobradinho",
+      "ceilandia",
+      "capital_cf",
+      "brasiliense",
+      "real_brasilia",
+      "paranoa",
+      "brasilia_fc",
+      "aruc"
+    ]
+  },
+  {
+    "id": "capixaba_1",
+    "nome": "Campeonato Capixaba",
+    "estado": "ES",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "vitoria_es",
+        "time_b": "rio_branco_es",
+        "nome": "Vi-Rio",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "rio_branco_es",
+      "vitoria_es",
+      "desportiva_ferroviaria",
+      "porto_vitoria",
+      "real_noroeste",
+      "rio_branco_vn",
+      "vilavelhense",
+      "serra_fc",
+      "forte_fc"
+    ]
+  },
+  {
+    "id": "carioca_a",
+    "nome": "Campeonato Carioca - Série A",
+    "estado": "RJ",
+    "nivel": 1,
+    "ano_referencia": 2025,
+    "formato": {
+      "turno": {
+        "nome": "Taça Guanabara",
+        "ida_e_volta": false,
+        "classificam_proxima_fase": 4
+      },
+      "returno": {
+        "nome": "Taça Rio",
+        "ida_e_volta": false,
+        "classificam_proxima_fase": 4
+      },
+      "final_estadual": {
+        "criterio": "campeoes_turno_returno_ou_melhor_campanha",
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "vaga_copa_do_brasil": 4,
+      "vaga_libertadores": 1,
+      "rebaixamento_proxima_divisao": 1
+    },
+    "classicos": [
+      {
+        "time_a": "flamengo",
+        "time_b": "fluminense",
+        "nome": "Fla-Flu",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "flamengo",
+        "time_b": "vasco_da_gama",
+        "nome": "Clássico dos Milhões",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "vasco_da_gama",
+        "time_b": "botafogo",
+        "nome": "Clássico da Amizade",
+        "peso_midia": 3
+      }
+    ],
+    "times": [
+      "flamengo",
+      "fluminense",
+      "vasco_da_gama",
+      "botafogo",
+      "bangu",
+      "boavista_rj",
+      "madureira",
+      "marica",
+      "nova_iguacu",
+      "portuguesa_rj",
+      "sampaio_correa_rj",
+      "volta_redonda"
+    ]
+  },
+  {
+    "id": "carioca_a2",
+    "nome": "Campeonato Carioca - Série A2",
+    "estado": "RJ",
+    "nivel": 2,
+    "ano_referencia": 2025,
+    "formato": {
+      "turno": {
+        "nome": "Taça Santos Dumont",
+        "ida_e_volta": false,
+        "classificam_proxima_fase": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 1
+    },
+    "classicos": [],
+    "times": [
+      "america_rj",
+      "americano",
+      "araruama",
+      "audax_rio",
+      "bangu",
+      "duque_de_caxias",
+      "olaria",
+      "perolas_negras",
+      "petropolis",
+      "resende",
+      "sao_goncalo_ec"
+    ]
+  },
+  {
+    "id": "catarinense_1",
+    "nome": "Campeonato Catarinense - Série A",
+    "estado": "SC",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 2,
+        "times_por_pote": 6,
+        "jogos_por_time": 6,
+        "classificam_mata_mata": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 3
+    },
+    "classicos": [
+      {
+        "time_a": "avai",
+        "time_b": "figueirense",
+        "nome": "Clássico Avaí-Figueirense",
+        "peso_midia": 4
+      }
+    ],
+    "times": [
+      "avai",
+      "chapecoense",
+      "criciuma",
+      "figueirense",
+      "carlos_renaux",
+      "joinville",
+      "santa_catarina_ec",
+      "brusque_fc",
+      "camboriu_fc",
+      "concordia_ac",
+      "marcilio_dias",
+      "barra_fc"
+    ]
+  },
+  {
+    "id": "cearense_1",
+    "nome": "Campeonato Cearense",
+    "estado": "CE",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 2,
+        "times_por_grupo": 5,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 3
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "ceara",
+        "time_b": "fortaleza",
+        "nome": "Clássico-Rei",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "ceara",
+      "fortaleza",
+      "ferroviario_ce",
+      "maracana_ce",
+      "horizonte",
+      "quixada",
+      "floresta",
+      "iguatu",
+      "tirol",
+      "maranguape"
+    ]
+  },
+  {
+    "id": "gauchao_a",
+    "nome": "Campeonato Gaúcho",
+    "estado": "RS",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 2,
+        "times_por_pote": 6,
+        "jogos_por_time": 6,
+        "classificam_mata_mata": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": false
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "gremio",
+        "time_b": "internacional",
+        "nome": "Grenal",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "gremio",
+      "internacional",
+      "juventude",
+      "avenida",
+      "caxias",
+      "guarany_bage",
+      "inter_santa_maria",
+      "monsoon",
+      "novo_hamburgo",
+      "sao_jose_rs",
+      "sao_luiz",
+      "ypiranga_rs"
+    ]
+  },
+  {
+    "id": "gauchao_a2",
+    "nome": "Campeonato Gaúcho - Série A2",
+    "estado": "RS",
+    "nivel": 2,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 4,
+        "times_por_grupo": 4,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 2
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "aimore",
+      "apafut",
+      "gremio_bage",
+      "brasil_pelotas",
+      "brasil_farroupilha",
+      "esportivo_bento_goncalves",
+      "sc_gaucho",
+      "gloria",
+      "gramadense",
+      "guarani_va",
+      "lajeadense",
+      "passo_fundo",
+      "pelotas",
+      "santa_cruz_rs",
+      "uniao_frederiquense",
+      "veranopolis"
+    ]
+  },
+  {
+    "id": "goiano_1",
+    "nome": "Campeonato Goiano",
+    "estado": "GO",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 3,
+        "times_por_pote": 4,
+        "jogos_por_time": 8,
+        "classificam_mata_mata": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "goias",
+      "vila_nova",
+      "atletico_goianiense",
+      "aparecidense",
+      "anapolina",
+      "abecat",
+      "centro_oeste_go",
+      "anapolis_fc",
+      "crac",
+      "goiatuba",
+      "inhumas",
+      "jataiense"
+    ]
+  },
+  {
+    "id": "maranhense_1",
+    "nome": "Campeonato Maranhense",
+    "estado": "MA",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [
+      {
+        "time_a": "sampaio_correa_ma",
+        "time_b": "moto_club",
+        "nome": "Superclássico Maranhense",
+        "peso_midia": 4
+      }
+    ],
+    "times": [
+      "mac",
+      "imperatriz",
+      "iape",
+      "sampaio_correa_ma",
+      "moto_club",
+      "tuntum",
+      "luminense_ma",
+      "itz_sport"
+    ]
+  },
+  {
+    "id": "matogrossense_1",
+    "nome": "Campeonato Matogrossense",
+    "estado": "MT",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 6
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "cuiaba",
+      "operario_vg",
+      "varzea_grande_ec",
+      "luverdense",
+      "mixto",
+      "nova_mutum",
+      "sport_sinop",
+      "primavera_ac",
+      "uniao_rondonopolis",
+      "chapada_fc"
+    ]
+  },
+  {
+    "id": "mineiro_modulo_1",
+    "nome": "Campeonato Mineiro - Módulo I",
+    "estado": "MG",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 3,
+        "times_por_pote": 4,
+        "jogos_por_time": 8,
+        "classificam_mata_mata": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal"
+        ],
+        "ida_e_volta": true
+      },
+      "final_estadual": {
+        "criterio": "cruzamento_dos_classificados_da_fase_suica",
+        "ida_e_volta": false
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "cruzeiro",
+        "time_b": "atletico_mg",
+        "nome": "Clássico Mineiro",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "cruzeiro",
+      "atletico_mg",
+      "america_mg",
+      "urt",
+      "uberlandia_ec",
+      "democrata_gv",
+      "pouso_alegre",
+      "tombense",
+      "betim_fc",
+      "north_ec",
+      "itabirito",
+      "athletic_club_mg"
+    ]
+  },
+  {
+    "id": "mineiro_modulo_2",
+    "nome": "Campeonato Mineiro - Módulo II",
+    "estado": "MG",
+    "nivel": 2,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 2,
+        "times_por_grupo": 6,
+        "ida_e_volta": true,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "boa_esporte",
+      "patrocinense",
+      "caldense",
+      "guarani_mg",
+      "mamore",
+      "uberaba_sc",
+      "coimbra_ec",
+      "democrata_sl",
+      "aymores",
+      "valeriodoce",
+      "villa_nova",
+      "ipatinga_fc"
+    ]
+  },
+  {
+    "id": "paraense_1",
+    "nome": "Campeonato Paraense",
+    "estado": "PA",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 2,
+        "times_por_pote": 6,
+        "jogos_por_time": 6,
+        "classificam_mata_mata": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [
+      {
+        "time_a": "remo",
+        "time_b": "paysandu",
+        "nome": "Re-Pa",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "remo",
+      "paysandu",
+      "bragantino_pa",
+      "castanhal",
+      "tuna_luso",
+      "aguia_de_maraba",
+      "capitao_poco",
+      "santa_rosa_pa",
+      "cameta",
+      "sao_francisco_pa",
+      "sao_raimundo_pa",
+      "amazonia_pa"
+    ]
+  },
+  {
+    "id": "paraibano_1",
+    "nome": "Campeonato Paraibano",
+    "estado": "PB",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "atletico_cajazeirense",
+      "botafogo_pb",
+      "campinense",
+      "confianca_pb",
+      "esporte_pb",
+      "nacional_patos",
+      "pombal",
+      "serra_branca",
+      "sousa",
+      "treze"
+    ]
+  },
+  {
+    "id": "paranaense_1",
+    "nome": "Campeonato Paranaense",
+    "estado": "PR",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 2,
+        "times_por_pote": 6,
+        "jogos_por_time": 6,
+        "classificam_mata_mata": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "athletico_pr",
+        "time_b": "coritiba",
+        "nome": "Atletiba",
+        "peso_midia": 5
+      }
+    ],
+    "times": [
+      "athletico_pr",
+      "coritiba",
+      "londrina",
+      "operario_ferroviario",
+      "foz_do_iguacu",
+      "fc_cascavel",
+      "cianorte",
+      "azuriz",
+      "sao_joseense",
+      "maringa_fc",
+      "andraus",
+      "galo_maringa"
+    ]
+  },
+  {
+    "id": "paulistao_a1",
+    "nome": "Campeonato Paulista - Série A1",
+    "estado": "SP",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_suica": {
+        "num_potes": 4,
+        "times_por_pote": 4,
+        "jogos_por_time": 9,
+        "classificam_mata_mata": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "vaga_copa_do_brasil": 4,
+      "vaga_libertadores": 1,
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [
+      {
+        "time_a": "corinthians",
+        "time_b": "palmeiras",
+        "nome": "Derby Paulista",
+        "peso_midia": 5
+      },
+      {
+        "time_a": "sao_paulo",
+        "time_b": "santos",
+        "nome": "Clássico da Vovó",
+        "peso_midia": 4
+      },
+      {
+        "time_a": "corinthians",
+        "time_b": "sao_paulo",
+        "nome": "Majestoso",
+        "peso_midia": 4
+      }
+    ],
+    "times": [
+      "corinthians",
+      "palmeiras",
+      "sao_paulo",
+      "santos",
+      "sao_bernardo",
+      "novorizontino",
+      "red_bull_bragantino",
+      "mirassol",
+      "guarani",
+      "ponte_preta",
+      "velo_clube",
+      "portuguesa",
+      "botafogo_sp",
+      "primavera",
+      "noroeste",
+      "capivariano"
+    ]
+  },
+  {
+    "id": "paulistao_a2",
+    "nome": "Campeonato Paulista - Série A2",
+    "estado": "SP",
+    "nivel": 2,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 16,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 8
+      },
+      "fase_quadrangular": {
+        "ativa": true,
+        "num_grupos": 2,
+        "times_por_grupo": 4,
+        "classificam_por_grupo": 1
+      },
+      "final_estadual": {
+        "criterio": "lideres_dos_quadrangulares_disputam_final_de_acesso",
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "agua_santa",
+      "ferroviaria",
+      "gremio_prudente",
+      "inter_de_limeira",
+      "ituano",
+      "juventus_sp",
+      "linense",
+      "monte_azul",
+      "osasco_sporting",
+      "santo_andre",
+      "sao_bento",
+      "sao_jose_sp",
+      "sertaozinho",
+      "taubate",
+      "votuporanguense",
+      "xv_de_piracicaba"
+    ]
+  },
+  {
+    "id": "paulistao_a3",
+    "nome": "Campeonato Paulista - Série A3",
+    "estado": "SP",
+    "nivel": 3,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 16,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 8
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "bandeirante",
+      "catanduva",
+      "desportivo_brasil",
+      "francana",
+      "itapirense",
+      "marilia",
+      "paulista_jundiai",
+      "portuguesa_santista",
+      "rio_branco_americana",
+      "rio_claro",
+      "rio_preto",
+      "uniao_barbarense",
+      "uniao_sao_joao",
+      "ec_sao_bernardo",
+      "uniao_suzano",
+      "xv_de_jau"
+    ]
+  },
+  {
+    "id": "paulistao_a4",
+    "nome": "Campeonato Paulista - Série A4",
+    "estado": "SP",
+    "nivel": 4,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 16,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 2
+      },
+      "mata_mata": {
+        "fases": [
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "inter_de_bebedouro",
+      "sao_caetano",
+      "penapolense",
+      "sao_carlense",
+      "barretos",
+      "taquaritinga",
+      "jacarei",
+      "lemense",
+      "ecus",
+      "comercial_ribeirao_preto",
+      "tanabi",
+      "jabaquara",
+      "vocem",
+      "colorado_caieiras",
+      "nacional_catanduva",
+      "aracatuba"
+    ]
+  },
+  {
+    "id": "pernambucano_a1",
+    "nome": "Campeonato Pernambucano - Série A1",
+    "estado": "PE",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 6
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 1
+    },
+    "classicos": [],
+    "times": [
+      "sport_recife",
+      "nautico",
+      "santa_cruz",
+      "maguary",
+      "jaguar",
+      "retro",
+      "decisao",
+      "vitoria_tabocas"
+    ]
+  },
+  {
+    "id": "pernambucano_a2",
+    "nome": "Campeonato Pernambucano - Série A2",
+    "estado": "PE",
+    "nivel": 2,
+    "ano_referencia": 2025,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 2,
+        "times_por_grupo": 5,
+        "ida_e_volta": true,
+        "classificam_por_grupo": 2
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "acesso_proxima_divisao": 1
+    },
+    "classicos": [],
+    "times": [
+      "aguia_cumaru",
+      "america_pe",
+      "belo_jardim",
+      "caruaru_city",
+      "centro_limoeirense",
+      "ipojuca",
+      "porto_caruaru",
+      "vera_cruz_pe",
+      "vitoria_tabocas",
+      "ypiranga_pe"
+    ]
+  },
+  {
+    "id": "piauiense_1",
+    "nome": "Campeonato Piauiense",
+    "estado": "PI",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "oeirense",
+      "fluminense_pi",
+      "piaui_ec",
+      "altos",
+      "corisabba",
+      "teresina_ec",
+      "parnahyba",
+      "cap_pi"
+    ]
+  },
+  {
+    "id": "potiguar_1",
+    "nome": "Campeonato Potiguar",
+    "estado": "RN",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 6
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "abc_rn",
+      "america_rn",
+      "globo_fc",
+      "laguna",
+      "potiguar_mossoro",
+      "potyguar_seridoense",
+      "qfc",
+      "santa_cruz_rn"
+    ]
+  },
+  {
+    "id": "rondoniense_1",
+    "nome": "Campeonato Rondoniense",
+    "estado": "RO",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 7,
+        "ida_e_volta": true,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {},
+    "classicos": [],
+    "times": [
+      "porto_velho_ec",
+      "rondoniense_ro",
+      "genus",
+      "barcelona_ro",
+      "ji_parana",
+      "uniao_cacoalense",
+      "guapore_fc"
+    ]
+  },
+  {
+    "id": "roraimense_1",
+    "nome": "Campeonato Roraimense",
+    "estado": "RR",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 9,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 1
+    },
+    "classicos": [],
+    "times": [
+      "monte_roraima",
+      "bare",
+      "sao_raimundo_rr",
+      "rio_negro_rr",
+      "atletico_roraima",
+      "gas",
+      "nautico_rr",
+      "progresso",
+      "river_rr"
+    ]
+  },
+  {
+    "id": "sergipano_1",
+    "nome": "Campeonato Sergipano",
+    "estado": "SE",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 7
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": false
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "confianca",
+      "america_propria",
+      "atletico_gloriense",
+      "dorense",
+      "guarany_porto_da_folha",
+      "itabaiana",
+      "lagarto",
+      "falcon",
+      "sergipe_fc",
+      "desportiva_aracaju"
+    ]
+  },
+  {
+    "id": "sul_matogrossense_1",
+    "nome": "Campeonato Sul-Mato-Grossense",
+    "estado": "MS",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 10,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 6
+      },
+      "mata_mata": {
+        "fases": [
+          "quartas",
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "operario_ms",
+      "pantanal_fc",
+      "aguia_negra",
+      "corumbaense",
+      "costa_rica_ms",
+      "cra_aquidauana",
+      "bataguassu",
+      "naviraiense",
+      "dourados_ac",
+      "ivinhema"
+    ]
+  },
+  {
+    "id": "tocantinense_1",
+    "nome": "Campeonato Tocantinense",
+    "estado": "TO",
+    "nivel": 1,
+    "ano_referencia": 2026,
+    "formato": {
+      "fase_grupos": {
+        "num_grupos": 1,
+        "times_por_grupo": 8,
+        "ida_e_volta": false,
+        "classificam_por_grupo": 4
+      },
+      "mata_mata": {
+        "fases": [
+          "semifinal",
+          "final"
+        ],
+        "ida_e_volta": true
+      }
+    },
+    "premiacao": {
+      "rebaixamento_proxima_divisao": 2
+    },
+    "classicos": [],
+    "times": [
+      "araguaina",
+      "bela_vista_to",
+      "capital_fc_to",
+      "guarai",
+      "gurupi",
+      "palmas_fc",
+      "tocantinopolis",
+      "uniao_to"
+    ]
+  }
+]
