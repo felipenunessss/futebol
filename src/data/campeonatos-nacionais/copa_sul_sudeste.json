@@ -1,0 +1,39 @@
+{
+  "id": "copa_sul_sudeste",
+  "nome": "Copa Sul-Sudeste",
+  "nivel": 0,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 2,
+      "times_por_pote": 6,
+      "jogos_por_time": 6,
+      "classificam_mata_mata": 4
+    },
+    "mata_mata": {
+      "fases": [
+        "semifinal",
+        "final"
+      ],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 1
+  },
+  "classicos": [],
+  "times": [
+    "volta_redonda",
+    "sampaio_correa_rj",
+    "sao_bernardo",
+    "novorizontino",
+    "america_mg",
+    "tombense",
+    "operario_ferroviario",
+    "cianorte",
+    "avai",
+    "chapecoense",
+    "caxias",
+    "juventude"
+  ]
+}

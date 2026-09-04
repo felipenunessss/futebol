@@ -1,0 +1,52 @@
+{
+  "id": "copa_verde",
+  "nome": "Copa Verde",
+  "nivel": 0,
+  "ano_referencia": 2026,
+  "formato": {
+    "dupla_chave_regional": {
+      "nome_chave_a": "Copa Norte",
+      "nome_chave_b": "Copa Centro-Oeste",
+      "fase_suica": {
+        "num_potes": 2,
+        "times_por_pote": 6,
+        "jogos_por_time": 6,
+        "classificam_mata_mata": 4
+      }
+    },
+    "final_estadual": {
+      "criterio": "campeoes_das_duas_chaves_regionais",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 1
+  },
+  "classicos": [],
+  "times": [
+    "remo",
+    "paysandu",
+    "aguia_de_maraba",
+    "amazonas_fc",
+    "nacional_am",
+    "porto_velho_ec",
+    "guapore_fc",
+    "independencia_ac",
+    "galvez",
+    "gas",
+    "monte_roraima",
+    "trem",
+    "vila_nova",
+    "anapolis_fc",
+    "atletico_goianiense",
+    "primavera_ac",
+    "cuiaba",
+    "gama",
+    "capital_cf",
+    "araguaina",
+    "tocantinopolis",
+    "rio_branco_es",
+    "porto_vitoria",
+    "operario_ms"
+  ]
+}

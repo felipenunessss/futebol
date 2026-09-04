@@ -1,0 +1,40 @@
+{
+  "id": "copa_do_nordeste",
+  "nome": "Copa do Nordeste",
+  "nivel": 0,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_suica": {
+      "num_potes": 4,
+      "times_por_pote": 5,
+      "jogos_por_time": 5,
+      "classificam_mata_mata": 8
+    }
+  },
+  "premiacao": {
+    "vaga_copa_do_brasil": 1
+  },
+  "classicos": [],
+  "times": [
+    "crb",
+    "asa",
+    "vitoria",
+    "juazeirense",
+    "jacuipense",
+    "ceara",
+    "fortaleza",
+    "ferroviario_ce",
+    "mac",
+    "imperatriz",
+    "sousa",
+    "botafogo_pb",
+    "sport_recife",
+    "retro",
+    "piaui_ec",
+    "fluminense_pi",
+    "abc_rn",
+    "america_rn",
+    "itabaiana",
+    "confianca"
+  ]
+}

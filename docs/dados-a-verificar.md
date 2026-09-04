@@ -350,6 +350,39 @@ nesta rodada (confirmei só nome/cidade).
   revisar contra fonte real depois, especialmente São Paulo, que
   provavelmente tem mais de 1 vaga por ser um estado grande.
 
+## Copas regionais (Nordeste, Verde, Sul-Sudeste) — geradas por script
+
+- **Geração automática**: `scripts/gerar-copas-regionais.ts` monta os 3
+  arquivos a partir de um seed de vagas reais pesquisadas (não escrito à
+  mão) + `gerarTimesDaCopa` (`src/data/loaders/gerar-copa-regional.ts`),
+  que só valida que os ids existem na base e monta a lista — nenhum clube
+  novo foi pesquisado, os 56 já existiam. Rodar de novo com
+  `npx tsx scripts/gerar-copas-regionais.ts` sempre que o seed mudar.
+- **Critério real não é "sem competição nacional"**: diferente da Série D,
+  a exclusão dessas copas é "sem CONMEBOL" (Libertadores/Sul-Americana),
+  não "sem Série A/B/C" — por isso clubes de Série A/B (Vitória, Ceará,
+  Fortaleza, Sport, Avaí, Juventude etc.) aparecem normalmente nas listas.
+  Não temos no schema um jeito de saber quem está na CONMEBOL num dado
+  ano, então o seed usa a lista real já resolvida pela fonte, em vez de
+  tentar recalcular a exclusão.
+- **Campeão vs. vice não distinguido**: pra quase todas as vagas, sei
+  quais 2-3 clubes ocupam a vaga de cada estado/federação, mas não qual é
+  campeão e qual é vice (exceto MG, PR e SC na Copa Sul-Sudeste, onde a
+  fonte foi explícita). Os campos `criterio` refletem essa incerteza.
+- **Copa do Nordeste — formato aproximado**: o real são 4 grupos de 5
+  pareados (A×B, C×D — um grupo só enfrenta o seu par, não os outros
+  dois); `fase_suica` não representa esse pareamento, só bate a
+  contagem de jogos (5 por time). A continuação depois da fase de grupos
+  (mata-mata? outra fase de grupos?) não foi confirmada.
+- **Copa Verde**: schema ganhou o bloco `dupla_chave_regional`
+  (`FormatoEstadual`) pra representar as duas metades independentes
+  (Copa Norte, Copa Centro-Oeste) que só se cruzam na final — confirmado
+  por fonte que a final 2026 foi exatamente Anápolis (campeão Centro-
+  Oeste) x Paysandu (campeão Norte).
+- **Premiação**: as três dão vaga na Copa do Brasil (3ª fase) pro
+  campeão — não confirmei se dão Sul-Americana/Libertadores direto (achei
+  indício de que não, mas não é 100% certo).
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

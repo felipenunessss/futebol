@@ -48,6 +48,17 @@ export interface PontosCorridos {
 }
 
 /**
+ * Duas chaves regionais independentes que só se cruzam na final (ex: Copa
+ * Verde = Copa Norte + Copa Centro-Oeste, cada uma rodando sua própria
+ * fase_suica; os dois campeões de chave decidem o título).
+ */
+export interface DuplaChaveRegional {
+  nome_chave_a: string;
+  nome_chave_b: string;
+  fase_suica: FaseSuica;
+}
+
+/**
  * Blocos de formato opcionais — cada estado ativa só os que usa de verdade,
  * conforme doc seção 2.2.
  */
@@ -58,6 +69,7 @@ export interface FormatoEstadual {
   fase_quadrangular?: FaseQuadrangular;
   fase_suica?: FaseSuica;
   pontos_corridos?: PontosCorridos;
+  dupla_chave_regional?: DuplaChaveRegional;
   mata_mata?: MataMata;
   final_estadual?: FinalEstadual;
 }
