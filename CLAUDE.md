@@ -20,6 +20,7 @@ Simulador de carreira de futebol (base Copero + Brasfoot + Pro Clubs), com foco 
 docs/
   game-design.md          — design doc original do jogo
   dados-a-verificar.md    — pendências/ressalvas de dados (leia antes de confiar em algo "meio certo")
+  regras-competicoes.md   — decisões de regra de jogo (não de dado) pendentes de implementação na Fase 2
 
 src/
   schemas/                — tipos TS (Club, CampeonatoEstadual, CampeonatoNacional, Player, etc.)
