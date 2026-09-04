@@ -565,6 +565,36 @@ nesta rodada (confirmei só nome/cidade).
   como cidade-sede — usei Rionegro (sede tradicional do clube) por ser
   mais específico, mas vale confirmar.
 
+## Expansão CONMEBOL — Bolívia (1ª divisão)
+
+- **Fonte**: Wikipédia ES ("Primera División de Bolivia 2026"), cruzada
+  com busca agregada sobre os cupos continentais de 2026 (que descreve o
+  mesmo padrão de critério, ainda que aplicado à temporada 2025→
+  Libertadores/Sul-Americana 2026 — usado só pra confirmar o formato do
+  critério, não os clubes específicos daquele ano).
+- **Correção de formato**: ao contrário do que a modelagem inicial
+  assumia, a Bolívia **não** usa Apertura/Clausura em 2026 — é um único
+  torneio de pontos corridos, todos-contra-todos, ida e volta (30
+  rodadas com 16 times). O bloco `pontos_corridos` já estava certo na
+  estrutura, só a contagem de rodadas estava errada (26 em vez de 30) —
+  corrigida.
+- **Elenco confirmado**: os 16 clubes já cadastrados batem exatamente com
+  a fonte, incluindo o retorno do Real Potosí ao profissionalismo após 4
+  temporadas fora. Vaga de acesso à elite veio do campeão da Copa Simón
+  Bolívar 2025 (2ª divisão).
+- **Rebaixamento**: 1 clube desce por temporada, mas por **tabela
+  acumulada/histórica plurianual** (sistema de médias, como Argentina e
+  Uruguai), não simples último colocado da temporada corrente — mecanismo
+  exato (quantos anos entram na média) não foi encontrado com precisão;
+  `rebaixamento_proxima_divisao: 1` reflete só o número, não o critério.
+- **Vagas CONMEBOL bem confirmadas**: 4 de Libertadores (campeão, vice,
+  campeão da Copa Bolívia, 3º colocado da tabela) e 4 de Sul-Americana
+  (vice da Copa Bolívia, 4º, 5º e 6º colocados da tabela).
+- **Clássicos**: Superclásico Paceño (Bolívar x The Strongest) já estava
+  cadastrado; adicionado o Clásico Cruceño (Oriente Petrolero x Blooming,
+  rivalidade de Santa Cruz de la Sierra desde 1970), bem confirmado por
+  múltiplas fontes de imprensa esportiva boliviana.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

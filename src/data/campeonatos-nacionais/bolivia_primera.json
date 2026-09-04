@@ -4,10 +4,17 @@
   "pais": "BO",
   "nivel": 1,
   "ano_referencia": 2026,
-  "formato": { "pontos_corridos": { "ida_e_volta": true, "rodadas": 26 } },
-  "premiacao": {},
+  "formato": { "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 } },
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "Campeão da tabela (todos-contra-todos), vice-campeão, campeão da Copa Bolívia e 3º colocado da tabela",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "Vice-campeão da Copa Bolívia, 4º, 5º e 6º colocados da tabela",
+    "rebaixamento_proxima_divisao": 1
+  },
   "classicos": [
-    { "time_a": "bolivar", "time_b": "the_strongest", "nome": "Superclásico Paceño", "peso_midia": 5 }
+    { "time_a": "bolivar", "time_b": "the_strongest", "nome": "Superclásico Paceño", "peso_midia": 5 },
+    { "time_a": "oriente_petrolero", "time_b": "blooming", "nome": "Clásico Cruceño", "peso_midia": 4 }
   ],
   "times": ["abb", "always_ready", "aurora", "blooming", "bolivar", "guabira", "gv_san_jose", "independiente_petrolero", "nacional_potosi", "oriente_petrolero", "real_oruro", "real_potosi", "real_tomayapo", "san_antonio_bulo_bulo", "the_strongest", "universitario_vinto"]
 }
