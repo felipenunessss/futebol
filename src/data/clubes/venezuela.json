@@ -1,6 +1,6 @@
 [
   { "id": "academia_puerto_cabello", "nome": "Academia Puerto Cabello", "nome_popular": "Puerto Cabello", "pais": "VE", "cidade": "Puerto Cabello", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
-  { "id": "angostura", "nome": "Angostura Fútbol Club", "nome_popular": "Angostura", "pais": "VE", "cidade": "Ciudad Bolívar", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
+  { "id": "anzoategui", "nome": "Anzoátegui Fútbol Club", "nome_popular": "Anzoátegui", "pais": "VE", "cidade": "Puerto La Cruz", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "caracas_fc", "nome": "Caracas Fútbol Club", "nome_popular": "Caracas", "pais": "VE", "cidade": "Caracas", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "carabobo", "nome": "Carabobo Fútbol Club", "nome_popular": "Carabobo", "pais": "VE", "cidade": "Valencia", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "deportivo_la_guaira", "nome": "Deportivo La Guaira Fútbol Club", "nome_popular": "La Guaira", "pais": "VE", "cidade": "Caracas", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
@@ -10,6 +10,7 @@
   { "id": "monagas", "nome": "Monagas Sport Club", "nome_popular": "Monagas", "pais": "VE", "cidade": "Maturín", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "portuguesa_venezuela", "nome": "Portuguesa Fútbol Club", "nome_popular": "Portuguesa", "pais": "VE", "cidade": "Acarigua", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "rayo_zuliano", "nome": "Rayo Zuliano", "nome_popular": "Rayo Zuliano", "pais": "VE", "cidade": "Maracaibo", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
+  { "id": "trujillanos", "nome": "Trujillanos Fútbol Club", "nome_popular": "Trujillanos", "pais": "VE", "cidade": "Valera", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "universidad_central_venezuela", "nome": "Universidad Central de Venezuela Fútbol Club", "nome_popular": "UCV", "pais": "VE", "cidade": "Caracas", "divisao_nacional": { "pais": "VE", "nivel": 1 } },
   { "id": "zamora_venezuela", "nome": "Zamora Fútbol Club", "nome_popular": "Zamora", "pais": "VE", "cidade": "Barinas", "divisao_nacional": { "pais": "VE", "nivel": 1 } }
 ]

@@ -4,11 +4,15 @@
   "pais": "PE",
   "nivel": 1,
   "ano_referencia": 2026,
-  "formato": { "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 } },
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "final_estadual": { "criterio": "playoffs_com_campeoes_do_apertura_clausura_e_melhores_da_tabela_acumulada", "ida_e_volta": true }
+  },
   "premiacao": {},
   "classicos": [
     { "time_a": "alianza_lima", "time_b": "universitario_peru", "nome": "Superclásico Peruano", "peso_midia": 5 },
     { "time_a": "sporting_cristal", "time_b": "alianza_lima", "nome": "Clásico Lima", "peso_midia": 4 }
   ],
-  "times": ["alianza_atletico", "alianza_lima", "comerciantes_unidos", "cienciano", "chankas", "cusco_fc", "deportivo_garcilaso", "melgar", "sporting_cristal", "universitario_peru", "sport_huancayo", "utc", "adt_tarma", "comerciantes_fc", "juan_pablo_ii", "sport_ancash"]
+  "times": ["alianza_atletico", "alianza_lima", "comerciantes_unidos", "cienciano", "chankas", "cusco_fc", "deportivo_garcilaso", "melgar", "sporting_cristal", "universitario_peru", "sport_huancayo", "utc", "adt_tarma", "sport_boys", "atletico_grau", "deportivo_moquegua", "fc_cajamarca", "juan_pablo_ii"]
 }

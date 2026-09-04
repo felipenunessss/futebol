@@ -2,11 +2,13 @@
 
 - Foram adicionadas as ligas de primeira divisão de Bolívia, Equador,
   Paraguai, Peru e Venezuela, com clubes, cidades e vínculos `pais`/`nivel`.
-- As listas foram incluídas como primeira modelagem da temporada 2026 e ainda
-  precisam de conferência com as listas oficiais das respectivas federações.
-- Formatos, número de rodadas, acessos, rebaixamentos e vagas continentais
-  dessas cinco ligas não devem ser considerados definitivos até a validação dos
-  regulamentos oficiais; por isso `premiacao` ficou vazio nos novos arquivos.
+- Peru e Venezuela já foram corrigidos para os elencos de 2026 confirmados nas
+  fontes consultadas: 18 e 14 clubes, respectivamente, incluindo Apertura e
+  Clausura em turno único.
+- Bolívia, Equador e Paraguai ainda precisam de conferência com as listas
+  oficiais das respectivas federações. Formatos, acessos, rebaixamentos e
+  vagas continentais continuam pendentes nos cinco arquivos.
+
 # Dados a verificar
 
 Rastreamento das pendências de qualidade de dados abertas durante o povoamento dos

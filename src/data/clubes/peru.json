@@ -12,7 +12,9 @@
   { "id": "sport_huancayo", "nome": "Club Sport Huancayo", "nome_popular": "Sport Huancayo", "pais": "PE", "cidade": "Huancayo", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
   { "id": "utc", "nome": "Universidad Técnica de Cajamarca", "nome_popular": "UTC", "pais": "PE", "cidade": "Cajamarca", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
   { "id": "adt_tarma", "nome": "Asociación Deportiva Tarma", "nome_popular": "ADT", "pais": "PE", "cidade": "Tarma", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
-  { "id": "comerciantes_fc", "nome": "Comerciantes FC", "nome_popular": "Comerciantes FC", "pais": "PE", "cidade": "Iquitos", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
-  { "id": "juan_pablo_ii", "nome": "Club Deportivo Juan Pablo II College", "nome_popular": "Juan Pablo II", "pais": "PE", "cidade": "Chongoyape", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
-  { "id": "sport_ancash", "nome": "Club Sport Áncash", "nome_popular": "Sport Áncash", "pais": "PE", "cidade": "Huaraz", "divisao_nacional": { "pais": "PE", "nivel": 1 } }
+  { "id": "sport_boys", "nome": "Sport Boys Association", "nome_popular": "Sport Boys", "pais": "PE", "cidade": "Callao", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "atletico_grau", "nome": "Club Atlético Grau", "nome_popular": "Atlético Grau", "pais": "PE", "cidade": "Piura", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "deportivo_moquegua", "nome": "Club Deportivo Moquegua", "nome_popular": "Deportivo Moquegua", "pais": "PE", "cidade": "Moquegua", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "fc_cajamarca", "nome": "FC Cajamarca", "nome_popular": "Cajamarca", "pais": "PE", "cidade": "Cajamarca", "divisao_nacional": { "pais": "PE", "nivel": 1 } },
+  { "id": "juan_pablo_ii", "nome": "Club Deportivo Juan Pablo II College", "nome_popular": "Juan Pablo II", "pais": "PE", "cidade": "Chongoyape", "divisao_nacional": { "pais": "PE", "nivel": 1 } }
 ]

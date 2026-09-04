@@ -4,10 +4,14 @@
   "pais": "VE",
   "nivel": 1,
   "ano_referencia": 2026,
-  "formato": { "pontos_corridos": { "ida_e_volta": true, "rodadas": 26 } },
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 8 },
+    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura", "ida_e_volta": false }
+  },
   "premiacao": {},
   "classicos": [
     { "time_a": "caracas_fc", "time_b": "deportivo_tachira", "nome": "Clásico del Fútbol Venezolano", "peso_midia": 5 }
   ],
-  "times": ["academia_puerto_cabello", "angostura", "caracas_fc", "carabobo", "deportivo_la_guaira", "deportivo_tachira", "estudiantes_merida", "metropolitanos", "monagas", "portuguesa_venezuela", "rayo_zuliano", "universidad_central_venezuela", "zamora_venezuela"]
+  "times": ["academia_puerto_cabello", "anzoategui", "caracas_fc", "carabobo", "deportivo_la_guaira", "deportivo_tachira", "estudiantes_merida", "metropolitanos", "monagas", "portuguesa_venezuela", "rayo_zuliano", "trujillanos", "universidad_central_venezuela", "zamora_venezuela"]
 }
