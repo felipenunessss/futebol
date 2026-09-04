@@ -218,6 +218,24 @@ nesta rodada (confirmei só nome/cidade).
   adicionados por falta de confirmação do nome oficial de cada rivalidade
   (Re-Pa do Pará foi adicionado por ser amplamente conhecido).
 
+## Acre, Roraima e Amapá — detalhes pendentes
+
+- **Roraimense e Acreano**: quase todos os clubes de cada estado jogam no
+  mesmo estádio da capital (Canarinho em Boa Vista; Florestão em Rio
+  Branco) — por isso a maioria dos clubes ficou com `cidade` igual
+  (Boa Vista / Rio Branco), o que é real, não erro de dado. Exceção:
+  ADESG (Acre) é de Senador Guiomard, não da capital.
+  Não é redundante nem gerou registros duplicados — são clubes distintos.
+- **Amapaense**: cidade do "Cristal" inferida por contexto (fundado para
+  rivalizar com o Oratório, também de Macapá) mas não confirmada
+  explicitamente por fonte direta — confiança moderada, não alta.
+- **Números de rebaixamento**: Acreano e Amapaense não tiveram o número
+  exato de rebaixados confirmado nesta rodada (`premiacao` ficou vazio);
+  Roraimense confirmado com 1 rebaixado (introduzido pela primeira vez
+  em 2026, quando a 2ª divisão estadual foi criada).
+- Clássicos de Acre, Roraima e Amapá não foram adicionados — não achei
+  nome oficial confirmado de nenhuma rivalidade específica.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4

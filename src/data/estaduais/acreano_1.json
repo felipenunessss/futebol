@@ -1,0 +1,31 @@
+{
+  "id": "acreano_1",
+  "nome": "Campeonato Acreano",
+  "estado": "AC",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 8,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {},
+  "classicos": [],
+  "times": [
+    "independencia_ac",
+    "santa_cruz_ac",
+    "galvez",
+    "sao_francisco_ac",
+    "adesg",
+    "humaita_ac",
+    "vasco_da_gama_ac",
+    "rio_branco_ac"
+  ]
+}

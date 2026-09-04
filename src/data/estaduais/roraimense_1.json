@@ -1,0 +1,34 @@
+{
+  "id": "roraimense_1",
+  "nome": "Campeonato Roraimense",
+  "estado": "RR",
+  "nivel": 1,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": {
+      "num_grupos": 1,
+      "times_por_grupo": 9,
+      "ida_e_volta": false,
+      "classificam_por_grupo": 4
+    },
+    "mata_mata": {
+      "fases": ["semifinal", "final"],
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "monte_roraima",
+    "bare",
+    "sao_raimundo_rr",
+    "rio_negro_rr",
+    "atletico_roraima",
+    "gas",
+    "nautico_rr",
+    "progresso",
+    "river_rr"
+  ]
+}
