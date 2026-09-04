@@ -9,9 +9,16 @@
     "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 0, "rodadas": 11 },
     "tabela_acumulada": { "criterio": "soma_dos_pontos_de_apertura_e_clausura_define_vagas_internacionais_e_rebaixamento_por_media_de_tres_temporadas" }
   },
-  "premiacao": {},
+  "premiacao": {
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "campeao_do_apertura_mais_campeao_do_clausura_mais_campeao_da_copa_paraguay_ou_proximo_colocado_da_copa_se_o_campeao_for_inelegivel_ex_por_rebaixamento_mais_melhor_posicao_restante_na_tabela_acumulada_anual_ainda_nao_classificada",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "4_melhores_da_tabela_acumulada_anual_ainda_nao_classificados_para_a_libertadores",
+    "rebaixamento_proxima_divisao": 2
+  },
   "classicos": [
-    { "time_a": "cerro_porteno", "time_b": "olimpia", "nome": "Superclásico Paraguayo", "peso_midia": 5 }
+    { "time_a": "cerro_porteno", "time_b": "olimpia", "nome": "Superclásico Paraguayo", "peso_midia": 5 },
+    { "time_a": "cerro_porteno", "time_b": "nacional_paraguai", "nome": "Clásico del Barrio Obrero", "peso_midia": 3 }
   ],
   "times": ["ameliano", "cerro_porteno", "guarani_paraguai", "libertad_paraguai", "nacional_paraguai", "olimpia", "recoleta_paraguai", "rubio_nu", "san_lorenzo_paraguai", "sportivo_2_de_mayo", "sportivo_luqueno", "trinidense"]
 }

@@ -646,6 +646,49 @@ nesta rodada (confirmei só nome/cidade).
   Superclásico de Quito); não adicionei um terceiro por falta de fonte
   boa o suficiente dentro do tempo desta pesquisa.
 
+## Expansão CONMEBOL — Paraguai (1ª divisão)
+
+- **Fonte**: busca cruzada com Wikipédia ES/EN ("Primera División de
+  Paraguay", "2026 Copa de Primera"), APF (site oficial, páginas dos
+  torneos Apertura/Clausura) e ABC Color (fetch direto de matéria sobre
+  a definição das vagas de Libertadores 2026).
+- **Formato**: a modelagem anterior (Apertura + Clausura, 12 times, 11
+  rodadas cada, turno único — `classificam_proxima_fase: 0` nos dois —
+  mais `tabela_acumulada` somando os pontos dos dois torneios) já estava
+  correta e foi confirmada por fonte — não há playoff interno em nenhum
+  dos dois torneios, o campeão de cada um é só quem termina em 1º na
+  tabela daquele torneio. Não precisou de bloco `mata_mata`/`final_estadual`
+  adicional.
+- **Rebaixamento**: 2 clubes, pela tabela de médias de pontos das **3
+  últimas temporadas** (não só a atual) — confirmado por fonte, batendo
+  exatamente com o texto que já estava em `tabela_acumulada.criterio`.
+- **Vagas CONMEBOL**: Libertadores tem 4 vagas — campeão do Apertura +
+  campeão do Clausura + campeão da Copa Paraguay (competição separada,
+  não modelada neste arquivo) + melhor posição restante na tabela
+  acumulada anual ainda não classificada. Sul-Americana tem 4 vagas — os
+  4 melhores da tabela acumulada anual ainda não classificados pra
+  Libertadores. Ambos os critérios bem confirmados por fonte específica
+  (matéria da ABC Color detalhando exatamente como os 4 classificados de
+  2026 se encaixaram em cada critério).
+- **General Caballero JLM**: confirmado que foi **rebaixado à División
+  Intermedia ao fim de 2025** (11º de 12 na tabela de médias) — por isso
+  já estava corretamente fora de `times[]` (a inconsistência identificada
+  era só um alerta pra conferir, não um erro real). Caso real e específico
+  interessante: o clube tinha vencido a Copa Paraguay 2025, o que
+  normalmente lhe daria uma vaga de Libertadores 2026 — mas por estar
+  rebaixado, a vaga passou pro vice-campeão da copa (2 de Mayo), que por
+  isso está entre os 4 clubes paraguaios na Libertadores 2026 apesar de
+  não ter vencido nada na liga. Ele segue cadastrado em
+  `src/data/clubes/paraguai.json` sem `divisao_nacional` (a División
+  Intermedia não é modelada neste projeto) — mantido assim.
+- **Clássicos**: mantido o Superclásico Paraguayo (Cerro Porteño x
+  Olimpia); adicionado o Clásico del Barrio Obrero (Cerro Porteño x
+  Nacional, os dois clubes mais tradicionais do bairro Barrio Obrero em
+  Assunção) — confirmado por múltiplas fontes de imprensa paraguaia
+  (ADN Digital, Agencia IP, Versus/VS Sports) cobrindo a edição real de
+  2026. Cuidado: a pesquisa inicial chegou a supor "Libertad x Nacional"
+  pra esse clássico, o que é **errado** — foi corrigido antes de gravar.
+
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
 - **Paulistão A1 (fase suíça, desde 2026)**: confirmado que são 16 times em 4
