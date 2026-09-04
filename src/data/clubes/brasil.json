@@ -11,7 +11,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "muito_alta"
+    "forca_financeira": "muito_alta",
+    "rating_inicial": 1839
   },
   {
     "id": "palmeiras",
@@ -25,7 +26,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "muito_alta"
+    "forca_financeira": "muito_alta",
+    "rating_inicial": 1826
   },
   {
     "id": "sao_paulo",
@@ -39,7 +41,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1696
   },
   {
     "id": "corinthians",
@@ -53,7 +56,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1718
   },
   {
     "id": "santos",
@@ -67,7 +71,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1675
   },
   {
     "id": "gremio",
@@ -81,7 +86,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1676
   },
   {
     "id": "internacional",
@@ -95,7 +101,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1673
   },
   {
     "id": "cruzeiro",
@@ -109,7 +116,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1744
   },
   {
     "id": "atletico_mg",
@@ -123,7 +131,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1709
   },
   {
     "id": "botafogo",
@@ -137,7 +146,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1701
   },
   {
     "id": "fluminense",
@@ -151,7 +161,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1741
   },
   {
     "id": "vasco_da_gama",
@@ -165,7 +176,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "alta"
+    "forca_financeira": "alta",
+    "rating_inicial": 1668
   },
   {
     "id": "bahia",
@@ -179,7 +191,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1706
   },
   {
     "id": "fortaleza",
@@ -207,7 +220,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1710
   },
   {
     "id": "red_bull_bragantino",
@@ -221,7 +235,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1674
   },
   {
     "id": "cuiaba",
@@ -249,7 +264,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1639
   },
   {
     "id": "criciuma",
@@ -361,7 +377,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1643
   },
   {
     "id": "avai",
@@ -389,7 +406,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1563
   },
   {
     "id": "goias",
@@ -473,7 +491,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "muito_baixa"
+    "forca_financeira": "muito_baixa",
+    "rating_inicial": 1687
   },
   {
     "id": "america_mg",
@@ -527,7 +546,8 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1625
   },
   {
     "id": "operario_ferroviario",
