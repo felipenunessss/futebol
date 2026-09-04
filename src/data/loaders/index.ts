@@ -75,3 +75,5 @@ export function validarReferenciasDeTimes(
 
   return erros;
 }
+
+export { construirCalendarioPadrao, loadCalendarioPadrao } from "./calendario.js";

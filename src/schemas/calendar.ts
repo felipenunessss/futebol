@@ -1,2 +1,9 @@
-// TODO: tipos para calendario_mestre — ver doc seção 2.1
-export {};
+export interface PeriodoCalendario {
+  periodo: string;
+  competicoes_ativas: string[];
+}
+
+export interface CalendarioMestre {
+  temporada: number;
+  calendario: PeriodoCalendario[];
+}
