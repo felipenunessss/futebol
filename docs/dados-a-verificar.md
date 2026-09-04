@@ -1,22 +1,26 @@
 # Dados a verificar
 
 Rastreamento das pendências de qualidade de dados abertas durante o povoamento dos
-clubes e estaduais (Tier 1: SP, RJ, MG, RS, BA, PE). Critério aplicado: só entra na
-base um clube/fato confirmado por pelo menos uma fonte razoável; qualquer coisa
-duvidosa fica de fora dos arquivos de dados e listada aqui.
+clubes e estaduais. Critério aplicado: só entra na base um clube/fato confirmado por
+pelo menos uma fonte razoável; qualquer coisa duvidosa fica de fora dos arquivos de
+dados e listada aqui.
+
+Nota: o campo `fundacao` foi removido do schema de `Club` — não rastreamos mais ano
+de fundação dos clubes, então itens que só existiam por causa de ambiguidade nesse
+campo foram removidos deste documento.
 
 ## Resolvidos
 
 - **"EC São Bernardo"** vs **"São Bernardo FC"**: confirmados como dois clubes
   distintos e reais, ambos de São Bernardo do Campo — Wikipédia inglesa tem
   páginas separadas e a página do São Bernardo FC diz explicitamente "Not to
-  be confused with Esporte Clube São Bernardo". EC São Bernardo (fundado
-  1928, estádio 1º de Maio) disputa a A3; São Bernardo FC (fundado 2004,
-  também joga a Série B nacional) disputa a A1. Ambos adicionados à base.
-- **União Suzano** (fundado 1969, estádio Francisco Marques Figueira) e
-  **XV de Jaú** (fundado 1924, estádio Zezinho Magalhães) — confirmados por
-  múltiplas fontes (Wikipédia, Futebol Interior) disputando a A3 2026.
-  Adicionados; a A3 agora tem os 16 times reais da divisão.
+  be confused with Esporte Clube São Bernardo". EC São Bernardo (estádio 1º
+  de Maio) disputa a A3; São Bernardo FC (também joga a Série B nacional)
+  disputa a A1. Ambos adicionados à base.
+- **União Suzano** (estádio Francisco Marques Figueira) e **XV de Jaú**
+  (estádio Zezinho Magalhães) — confirmados por múltiplas fontes (Wikipédia,
+  Futebol Interior) disputando a A3 2026. Adicionados; a A3 agora tem os 16
+  times reais da divisão.
 
 ## Divisões ainda não modeladas (lista de clubes não encontrada com confiança)
 
@@ -35,25 +39,11 @@ duvidosa fica de fora dos arquivos de dados e listada aqui.
 ## Detalhes pendentes em clubes já incluídos
 
 A maioria dos clubes novos em `src/data/clubes/sp_estadual.json` e
-`rj_estadual.json` tem `fundacao` e `estadio` ausentes — não foram
-verificados individualmente nesta rodada (confirmei só nome/cidade). Exceções
-já confirmadas: União Barbarense, ECUS, VOCEM (SP) e Bangu, Madureira, Nova
-Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
-
-- **Maricá Futebol Clube**: fundação incerta (fontes divergem entre 2001 e
-  2003) — campo `fundacao` deixado de fora de propósito.
-- **Boavista Sport Club**: história de fundação complexa (refundado em 2004,
-  origem em 1961 como outro nome) — campo `fundacao` deixado de fora até
-  decidir qual ano usar.
+`rj_estadual.json` tem `estadio` ausente — não foi verificado individualmente
+nesta rodada (confirmei só nome/cidade).
 
 ## Minas Gerais — detalhes pendentes
 
-- **Betim Futebol Clube** (Módulo I): há duas histórias de fundação conflitantes
-  nas fontes — um "Betim Futebol Clube" fundado em 2006, e uma entidade fundada
-  em 2008 como "Associação Mineira de Desenvolvimento Humano" que se tornou
-  "Betim Futebol" em 2019 e subiu ao Módulo I em 2024/2025. A existência e
-  participação atual do clube estão confirmadas; o campo `fundacao` foi
-  deixado de fora por não haver consenso de qual é o ano correto.
 - **Itabirito Futebol Clube** e **Sport Club Aymorés**: nome do estádio atual
   incerto (fontes citam nomes diferentes, possivelmente por reforma/mudança
   recente) — campo `estadio` deixado de fora.
@@ -70,14 +60,14 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 
 ## Rio Grande do Sul — detalhes pendentes
 
-- **Monsoon Futebol Clube** (1ª divisão): clube real (fundado 2021), mas mudou
-  a sede de Porto Alegre para Capão da Canoa em 2026 — o estádio atual não
-  foi confirmado, campo `estadio` deixado de fora.
+- **Monsoon Futebol Clube** (1ª divisão): clube real, mas mudou a sede de
+  Porto Alegre para Capão da Canoa em 2026 — o estádio atual não foi
+  confirmado, campo `estadio` deixado de fora.
 - **8 clubes da Série A2** (Apafut, Brasil-Farroupilha, Esportivo Bento
   Gonçalves, Sport Clube Gaúcho, Glória, Gramadense, Guarani-VA, União
   Frederiquense): existência e participação na temporada 2026 confirmadas
-  pela Wikipédia oficial da competição, mas `fundacao`/`estadio` não foram
-  pesquisados individualmente ainda.
+  pela Wikipédia oficial da competição, mas `estadio` não foi pesquisado
+  individualmente ainda.
 - **Gauchão (1ª divisão)**: vagas de Copa do Brasil/Libertadores não
   pesquisadas — `premiacao` só tem o rebaixamento confirmado (2 times).
 - Nenhum clube com risco real de duplicata/identidade ambígua foi encontrado
@@ -85,8 +75,6 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 
 ## Bahia — detalhes pendentes
 
-- **Porto Sport Club** (A1): ano de fundação não encontrado — campo
-  `fundacao` deixado de fora.
 - **ECPP (Vitória da Conquista), Fluminense de Feira, Redenção, SSA FC**
   (Série B): estádio não confirmado — campo `estadio` deixado de fora.
 - **Feira de Santana tem 3 clubes reais e distintos** no Baianão: Bahia de
@@ -107,12 +95,8 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   `pernambucano_2.json` usa 2025 (última edição completa da A2 antes da
   fusão) — os dois arquivos têm `ano_referencia` diferentes de propósito.
   O formato novo (31 clubes) não foi modelado ainda.
-- **Vitória das Tabocas**: fundação ambígua (origem 1990 vs. refundação
-  2008) — campo `fundacao` deixado de fora, igual ao caso do Boavista-RJ.
-- **Jaguar**: ano de fundação exato não confirmado (só referência relativa
-  de "15 anos" em 2026) — campo `fundacao` deixado de fora.
 - **6 clubes da Série A2** (Águia de Cumaru, América-PE, Caruaru City,
-  Ipojuca, Porto, Ypiranga-PE): fundação/estádio não pesquisados ainda.
+  Ipojuca, Porto, Ypiranga-PE): estádio não pesquisado ainda.
 - **Pernambucano A1**: o formato real tem uma assimetria que o schema atual
   não representa bem — 1º e 2º colocados do turno único avançam direto à
   semifinal, enquanto só 3º-6º disputam quartas de final. Modelei como
@@ -130,13 +114,12 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 
 - **"Andraus" x "Galo Maringá"**: a pesquisa inicial levantou dúvida se
   seriam o mesmo clube com nome composto. Verificado por fonte: são dois
-  clubes reais e distintos — Andraus (Campo Largo, fundado 2003) e Galo
-  Maringá (Maringá) — e há de fato um terceiro clube de Maringá, o Maringá
-  FC (fundado 2010), tornando a cidade única no campeonato por ter dois
-  representantes.
+  clubes reais e distintos — Andraus (Campo Largo) e Galo Maringá (Maringá)
+  — e há de fato um terceiro clube de Maringá, o Maringá FC, tornando a
+  cidade única no campeonato por ter dois representantes.
 - **"Barra FC" (Catarinense)**: a pesquisa inicial errou a cidade (disse
   Barra Velha). Verificado: o Barra FC que disputa a Série A 2026 é de
-  Balneário Camboriú, fundado em 2013 — corrigido antes de gravar.
+  Balneário Camboriú — corrigido antes de gravar.
 - **Carlos Renaux x Brusque FC**: ambos clubes de Brusque-SC, e o Brusque FC
   nasceu de uma fusão em 1987 entre o antigo Carlos Renaux e o Paysandu de
   Brusque — mas a fonte da lista de participantes 2026 os trata como dois
@@ -146,8 +129,6 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
   Série A 2026, mas vale checar essa história com mais cuidado.
 - **Operário Ferroviário** e **Londrina**: ambos jogam Série B nacional —
   movidos para `brasil.json`.
-- **Azuriz**: ano de fundação não encontrado — campo `fundacao` deixado de
-  fora.
 - **Paranaense**: formato de mata-mata e relegação é mais complexo do que o
   schema representa (grupo de 4 times em "Torneio da Morte" à parte da
   fase principal) — modelei de forma aproximada; o resultado final
@@ -160,20 +141,12 @@ Iguaçu, Portuguesa-RJ, Sampaio Corrêa-RJ, Volta Redonda (RJ).
 
 ## Distrito Federal, Goiás, Mato Grosso e Mato Grosso do Sul — detalhes pendentes
 
-- **Ceilândia EC** e **Chapada FC**: ano de fundação incerto (fontes
-  divergem) — campo `fundacao` deixado de fora dos dois.
-- **Real Brasília**: fundação (1996) corresponde à entidade original "Dom
-  Pedro II", que passou por dois rebrandings (2009 e 2020) até o nome
-  atual — mantive 1996 por ser a origem, mas é uma escolha discutível.
 - **Primavera Atlético Clube**: herdou o estádio Cerradão do antigo
   Primavera EC (dissolvido em 2011), mas a continuidade entre os dois
   clubes não está 100% confirmada.
 - **Atlético Goianiense**: confirmado jogando Série B nacional 2026 —
   movido para `brasil.json`, mas continua listado em `times` do
   `goiano_1.json` por também disputar o estadual.
-- **Anápolis FC, CRAC, Goiatuba, Inhumas, Jataiense** (GO) e **Pantanal FC,
-  Águia Negra, Corumbaense, Costa Rica, CRA** (MS): fundação não
-  pesquisada — cidade e estádio (quando presente) confirmados.
 - **Matogrossense**: número de rebaixados não encontrado nas fontes
   consultadas — `premiacao` ficou vazio nesse arquivo.
 - **Goiano**: regra real de rebaixamento tem um playoff condicional (10º x

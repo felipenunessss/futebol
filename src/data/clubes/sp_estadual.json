@@ -1,60 +1,449 @@
 [
-  { "id": "sao_bernardo", "nome": "São Bernardo Futebol Clube Ltda.", "nome_popular": "São Bernardo", "pais": "BR", "estado": "SP", "cidade": "São Bernardo do Campo", "fundacao": 2004, "divisao_nacional": "serie_b" },
-  { "id": "velo_clube", "nome": "Velo Clube Rioclarense", "nome_popular": "Velo Clube", "pais": "BR", "estado": "SP", "cidade": "Rio Claro" },
-  { "id": "portuguesa", "nome": "Associação Portuguesa de Desportos", "nome_popular": "Portuguesa", "pais": "BR", "estado": "SP", "cidade": "São Paulo" },
-  { "id": "botafogo_sp", "nome": "Botafogo Futebol Clube (Ribeirão Preto)", "nome_popular": "Botafogo-SP", "pais": "BR", "estado": "SP", "cidade": "Ribeirão Preto" },
-  { "id": "primavera", "nome": "Primavera Esporte Clube", "nome_popular": "Primavera", "pais": "BR", "estado": "SP", "cidade": "Indaiatuba" },
-  { "id": "noroeste", "nome": "Associação Atlética Noroeste", "nome_popular": "Noroeste", "pais": "BR", "estado": "SP", "cidade": "Bauru" },
-  { "id": "capivariano", "nome": "Capivariano Futebol Clube", "nome_popular": "Capivariano", "pais": "BR", "estado": "SP", "cidade": "Capivari" },
-
-  { "id": "agua_santa", "nome": "Esporte Clube Água Santa", "nome_popular": "Água Santa", "pais": "BR", "estado": "SP", "cidade": "Diadema" },
-  { "id": "ferroviaria", "nome": "Associação Ferroviária de Esportes", "nome_popular": "Ferroviária", "pais": "BR", "estado": "SP", "cidade": "Araraquara" },
-  { "id": "gremio_prudente", "nome": "Grêmio Prudente Futebol", "nome_popular": "Grêmio Prudente", "pais": "BR", "estado": "SP", "cidade": "Presidente Prudente" },
-  { "id": "inter_de_limeira", "nome": "Inter de Limeira Futebol Clube", "nome_popular": "Inter de Limeira", "pais": "BR", "estado": "SP", "cidade": "Limeira" },
-  { "id": "ituano", "nome": "Ituano Futebol Clube", "nome_popular": "Ituano", "pais": "BR", "estado": "SP", "cidade": "Itu" },
-  { "id": "juventus_sp", "nome": "Clube Atlético Juventus", "nome_popular": "Juventus", "pais": "BR", "estado": "SP", "cidade": "São Paulo" },
-  { "id": "linense", "nome": "Associação Desportiva Classista Linense", "nome_popular": "Linense", "pais": "BR", "estado": "SP", "cidade": "Lins" },
-  { "id": "monte_azul", "nome": "Monte Azul Esporte Clube", "nome_popular": "Monte Azul", "pais": "BR", "estado": "SP", "cidade": "Monte Azul Paulista" },
-  { "id": "osasco_sporting", "nome": "Osasco Sporting Clube", "nome_popular": "Osasco Sporting", "pais": "BR", "estado": "SP", "cidade": "Osasco" },
-  { "id": "santo_andre", "nome": "Esporte Clube Santo André", "nome_popular": "Santo André", "pais": "BR", "estado": "SP", "cidade": "Santo André" },
-  { "id": "sao_bento", "nome": "Associação Atlética São Bento", "nome_popular": "São Bento", "pais": "BR", "estado": "SP", "cidade": "Sorocaba" },
-  { "id": "sao_jose_sp", "nome": "São José Esporte Clube", "nome_popular": "São José", "pais": "BR", "estado": "SP", "cidade": "São José dos Campos" },
-  { "id": "sertaozinho", "nome": "Sertãozinho Futebol Clube", "nome_popular": "Sertãozinho", "pais": "BR", "estado": "SP", "cidade": "Sertãozinho" },
-  { "id": "taubate", "nome": "Taubaté Futebol", "nome_popular": "Taubaté", "pais": "BR", "estado": "SP", "cidade": "Taubaté" },
-  { "id": "votuporanguense", "nome": "Votuporanguense Futebol Clube", "nome_popular": "Votuporanguense", "pais": "BR", "estado": "SP", "cidade": "Votuporanga" },
-  { "id": "xv_de_piracicaba", "nome": "Esporte Clube XV de Novembro", "nome_popular": "XV de Piracicaba", "pais": "BR", "estado": "SP", "cidade": "Piracicaba" },
-
-  { "id": "bandeirante", "nome": "Bandeirante Esporte Clube", "nome_popular": "Bandeirante", "pais": "BR", "estado": "SP", "cidade": "Birigui" },
-  { "id": "catanduva", "nome": "Catanduva Futebol Clube", "nome_popular": "Catanduva", "pais": "BR", "estado": "SP", "cidade": "Catanduva" },
-  { "id": "desportivo_brasil", "nome": "Desportivo Brasil", "nome_popular": "Desportivo Brasil", "pais": "BR", "estado": "SP", "cidade": "Porto Feliz" },
-  { "id": "francana", "nome": "Associação Atlética Francana", "nome_popular": "Francana", "pais": "BR", "estado": "SP", "cidade": "Franca" },
-  { "id": "itapirense", "nome": "Itapirense Futebol Clube", "nome_popular": "Itapirense", "pais": "BR", "estado": "SP", "cidade": "Itapira" },
-  { "id": "marilia", "nome": "Marília Atlético Clube", "nome_popular": "Marília", "pais": "BR", "estado": "SP", "cidade": "Marília" },
-  { "id": "paulista_jundiai", "nome": "Paulista Futebol Clube", "nome_popular": "Paulista de Jundiaí", "pais": "BR", "estado": "SP", "cidade": "Jundiaí" },
-  { "id": "portuguesa_santista", "nome": "Portuguesa Santista", "nome_popular": "Portuguesa Santista", "pais": "BR", "estado": "SP", "cidade": "Santos" },
-  { "id": "rio_branco_americana", "nome": "Rio Branco Esporte Clube", "nome_popular": "Rio Branco (Americana)", "pais": "BR", "estado": "SP", "cidade": "Americana" },
-  { "id": "rio_claro", "nome": "Rio Claro Futebol Clube", "nome_popular": "Rio Claro", "pais": "BR", "estado": "SP", "cidade": "Rio Claro" },
-  { "id": "rio_preto", "nome": "Rio Preto Esporte Clube", "nome_popular": "Rio Preto", "pais": "BR", "estado": "SP", "cidade": "São José do Rio Preto" },
-  { "id": "uniao_barbarense", "nome": "União Agrícola Barbarense Futebol Clube", "nome_popular": "União Barbarense", "pais": "BR", "estado": "SP", "cidade": "Santa Bárbara d'Oeste", "fundacao": 1914, "estadio": "Antônio Lins Ribeiro Guimarães" },
-  { "id": "uniao_sao_joao", "nome": "União São João Esporte Clube", "nome_popular": "União São João", "pais": "BR", "estado": "SP", "cidade": "Araçoiaba da Serra" },
-  { "id": "ec_sao_bernardo", "nome": "Esporte Clube São Bernardo", "nome_popular": "EC São Bernardo", "pais": "BR", "estado": "SP", "cidade": "São Bernardo do Campo", "fundacao": 1928, "estadio": "1º de Maio" },
-  { "id": "uniao_suzano", "nome": "União Suzano Atlético Clube", "nome_popular": "União Suzano", "pais": "BR", "estado": "SP", "cidade": "Suzano", "fundacao": 1969, "estadio": "Francisco Marques Figueira" },
-  { "id": "xv_de_jau", "nome": "Esporte Clube XV de Novembro (Jaú)", "nome_popular": "XV de Jaú", "pais": "BR", "estado": "SP", "cidade": "Jaú", "fundacao": 1924, "estadio": "Zezinho Magalhães" },
-
-  { "id": "inter_de_bebedouro", "nome": "Inter de Bebedouro Futebol Clube", "nome_popular": "Inter de Bebedouro", "pais": "BR", "estado": "SP", "cidade": "Bebedouro" },
-  { "id": "sao_caetano", "nome": "Associação Desportiva São Caetano", "nome_popular": "São Caetano", "pais": "BR", "estado": "SP", "cidade": "São Caetano do Sul" },
-  { "id": "penapolense", "nome": "Penapolense Futebol Clube", "nome_popular": "Penapolense", "pais": "BR", "estado": "SP", "cidade": "Penápolis" },
-  { "id": "sao_carlense", "nome": "São-Carlense Futebol Clube", "nome_popular": "São-Carlense", "pais": "BR", "estado": "SP", "cidade": "São Carlos" },
-  { "id": "barretos", "nome": "Barretos Esporte Clube", "nome_popular": "Barretos", "pais": "BR", "estado": "SP", "cidade": "Barretos" },
-  { "id": "taquaritinga", "nome": "Taquaritinga Futebol Clube", "nome_popular": "Taquaritinga", "pais": "BR", "estado": "SP", "cidade": "Taquaritinga" },
-  { "id": "jacarei", "nome": "Jacareí Atlético Clube", "nome_popular": "Jacareí", "pais": "BR", "estado": "SP", "cidade": "Jacareí" },
-  { "id": "lemense", "nome": "Lemense Futebol Clube", "nome_popular": "Lemense", "pais": "BR", "estado": "SP", "cidade": "Leme" },
-  { "id": "ecus", "nome": "Esporte Clube União Suzano", "nome_popular": "ECUS", "pais": "BR", "estado": "SP", "cidade": "Suzano", "fundacao": 1993, "estadio": "Suzanão" },
-  { "id": "comercial_ribeirao_preto", "nome": "Comercial Futebol Clube", "nome_popular": "Comercial", "pais": "BR", "estado": "SP", "cidade": "Ribeirão Preto" },
-  { "id": "tanabi", "nome": "Tanabi Esporte Clube", "nome_popular": "Tanabi", "pais": "BR", "estado": "SP", "cidade": "Tanabi" },
-  { "id": "jabaquara", "nome": "Jabaquara Atlético Clube", "nome_popular": "Jabaquara", "pais": "BR", "estado": "SP", "cidade": "São Paulo" },
-  { "id": "vocem", "nome": "Vila Operária Clube Esporte Mariano", "nome_popular": "VOCEM", "pais": "BR", "estado": "SP", "cidade": "Assis", "fundacao": 1954, "estadio": "Tonicão" },
-  { "id": "colorado_caieiras", "nome": "Colorado Esporte Clube (Caieiras)", "nome_popular": "Colorado Caieiras", "pais": "BR", "estado": "SP", "cidade": "Caieiras" },
-  { "id": "nacional_catanduva", "nome": "Nacional Futebol Clube (Catanduva)", "nome_popular": "Nacional", "pais": "BR", "estado": "SP", "cidade": "Catanduva" },
-  { "id": "aracatuba", "nome": "Araçatuba Futebol Clube", "nome_popular": "Araçatuba", "pais": "BR", "estado": "SP", "cidade": "Araçatuba" }
+  {
+    "id": "sao_bernardo",
+    "nome": "São Bernardo Futebol Clube Ltda.",
+    "nome_popular": "São Bernardo",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Bernardo do Campo",
+    "divisao_nacional": "serie_b"
+  },
+  {
+    "id": "velo_clube",
+    "nome": "Velo Clube Rioclarense",
+    "nome_popular": "Velo Clube",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Rio Claro"
+  },
+  {
+    "id": "portuguesa",
+    "nome": "Associação Portuguesa de Desportos",
+    "nome_popular": "Portuguesa",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "botafogo_sp",
+    "nome": "Botafogo Futebol Clube (Ribeirão Preto)",
+    "nome_popular": "Botafogo-SP",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Ribeirão Preto"
+  },
+  {
+    "id": "primavera",
+    "nome": "Primavera Esporte Clube",
+    "nome_popular": "Primavera",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Indaiatuba"
+  },
+  {
+    "id": "noroeste",
+    "nome": "Associação Atlética Noroeste",
+    "nome_popular": "Noroeste",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bauru"
+  },
+  {
+    "id": "capivariano",
+    "nome": "Capivariano Futebol Clube",
+    "nome_popular": "Capivariano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Capivari"
+  },
+  {
+    "id": "agua_santa",
+    "nome": "Esporte Clube Água Santa",
+    "nome_popular": "Água Santa",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Diadema"
+  },
+  {
+    "id": "ferroviaria",
+    "nome": "Associação Ferroviária de Esportes",
+    "nome_popular": "Ferroviária",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araraquara"
+  },
+  {
+    "id": "gremio_prudente",
+    "nome": "Grêmio Prudente Futebol",
+    "nome_popular": "Grêmio Prudente",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Presidente Prudente"
+  },
+  {
+    "id": "inter_de_limeira",
+    "nome": "Inter de Limeira Futebol Clube",
+    "nome_popular": "Inter de Limeira",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Limeira"
+  },
+  {
+    "id": "ituano",
+    "nome": "Ituano Futebol Clube",
+    "nome_popular": "Ituano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Itu"
+  },
+  {
+    "id": "juventus_sp",
+    "nome": "Clube Atlético Juventus",
+    "nome_popular": "Juventus",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "linense",
+    "nome": "Associação Desportiva Classista Linense",
+    "nome_popular": "Linense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Lins"
+  },
+  {
+    "id": "monte_azul",
+    "nome": "Monte Azul Esporte Clube",
+    "nome_popular": "Monte Azul",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Monte Azul Paulista"
+  },
+  {
+    "id": "osasco_sporting",
+    "nome": "Osasco Sporting Clube",
+    "nome_popular": "Osasco Sporting",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Osasco"
+  },
+  {
+    "id": "santo_andre",
+    "nome": "Esporte Clube Santo André",
+    "nome_popular": "Santo André",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santo André"
+  },
+  {
+    "id": "sao_bento",
+    "nome": "Associação Atlética São Bento",
+    "nome_popular": "São Bento",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Sorocaba"
+  },
+  {
+    "id": "sao_jose_sp",
+    "nome": "São José Esporte Clube",
+    "nome_popular": "São José",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São José dos Campos"
+  },
+  {
+    "id": "sertaozinho",
+    "nome": "Sertãozinho Futebol Clube",
+    "nome_popular": "Sertãozinho",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Sertãozinho"
+  },
+  {
+    "id": "taubate",
+    "nome": "Taubaté Futebol",
+    "nome_popular": "Taubaté",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Taubaté"
+  },
+  {
+    "id": "votuporanguense",
+    "nome": "Votuporanguense Futebol Clube",
+    "nome_popular": "Votuporanguense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Votuporanga"
+  },
+  {
+    "id": "xv_de_piracicaba",
+    "nome": "Esporte Clube XV de Novembro",
+    "nome_popular": "XV de Piracicaba",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Piracicaba"
+  },
+  {
+    "id": "bandeirante",
+    "nome": "Bandeirante Esporte Clube",
+    "nome_popular": "Bandeirante",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Birigui"
+  },
+  {
+    "id": "catanduva",
+    "nome": "Catanduva Futebol Clube",
+    "nome_popular": "Catanduva",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Catanduva"
+  },
+  {
+    "id": "desportivo_brasil",
+    "nome": "Desportivo Brasil",
+    "nome_popular": "Desportivo Brasil",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Porto Feliz"
+  },
+  {
+    "id": "francana",
+    "nome": "Associação Atlética Francana",
+    "nome_popular": "Francana",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Franca"
+  },
+  {
+    "id": "itapirense",
+    "nome": "Itapirense Futebol Clube",
+    "nome_popular": "Itapirense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Itapira"
+  },
+  {
+    "id": "marilia",
+    "nome": "Marília Atlético Clube",
+    "nome_popular": "Marília",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Marília"
+  },
+  {
+    "id": "paulista_jundiai",
+    "nome": "Paulista Futebol Clube",
+    "nome_popular": "Paulista de Jundiaí",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jundiaí"
+  },
+  {
+    "id": "portuguesa_santista",
+    "nome": "Portuguesa Santista",
+    "nome_popular": "Portuguesa Santista",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santos"
+  },
+  {
+    "id": "rio_branco_americana",
+    "nome": "Rio Branco Esporte Clube",
+    "nome_popular": "Rio Branco (Americana)",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Americana"
+  },
+  {
+    "id": "rio_claro",
+    "nome": "Rio Claro Futebol Clube",
+    "nome_popular": "Rio Claro",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Rio Claro"
+  },
+  {
+    "id": "rio_preto",
+    "nome": "Rio Preto Esporte Clube",
+    "nome_popular": "Rio Preto",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São José do Rio Preto"
+  },
+  {
+    "id": "uniao_barbarense",
+    "nome": "União Agrícola Barbarense Futebol Clube",
+    "nome_popular": "União Barbarense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Santa Bárbara d'Oeste",
+    "estadio": "Antônio Lins Ribeiro Guimarães"
+  },
+  {
+    "id": "uniao_sao_joao",
+    "nome": "União São João Esporte Clube",
+    "nome_popular": "União São João",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araçoiaba da Serra"
+  },
+  {
+    "id": "ec_sao_bernardo",
+    "nome": "Esporte Clube São Bernardo",
+    "nome_popular": "EC São Bernardo",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Bernardo do Campo",
+    "estadio": "1º de Maio"
+  },
+  {
+    "id": "uniao_suzano",
+    "nome": "União Suzano Atlético Clube",
+    "nome_popular": "União Suzano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Suzano",
+    "estadio": "Francisco Marques Figueira"
+  },
+  {
+    "id": "xv_de_jau",
+    "nome": "Esporte Clube XV de Novembro (Jaú)",
+    "nome_popular": "XV de Jaú",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jaú",
+    "estadio": "Zezinho Magalhães"
+  },
+  {
+    "id": "inter_de_bebedouro",
+    "nome": "Inter de Bebedouro Futebol Clube",
+    "nome_popular": "Inter de Bebedouro",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Bebedouro"
+  },
+  {
+    "id": "sao_caetano",
+    "nome": "Associação Desportiva São Caetano",
+    "nome_popular": "São Caetano",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Caetano do Sul"
+  },
+  {
+    "id": "penapolense",
+    "nome": "Penapolense Futebol Clube",
+    "nome_popular": "Penapolense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Penápolis"
+  },
+  {
+    "id": "sao_carlense",
+    "nome": "São-Carlense Futebol Clube",
+    "nome_popular": "São-Carlense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Carlos"
+  },
+  {
+    "id": "barretos",
+    "nome": "Barretos Esporte Clube",
+    "nome_popular": "Barretos",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Barretos"
+  },
+  {
+    "id": "taquaritinga",
+    "nome": "Taquaritinga Futebol Clube",
+    "nome_popular": "Taquaritinga",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Taquaritinga"
+  },
+  {
+    "id": "jacarei",
+    "nome": "Jacareí Atlético Clube",
+    "nome_popular": "Jacareí",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Jacareí"
+  },
+  {
+    "id": "lemense",
+    "nome": "Lemense Futebol Clube",
+    "nome_popular": "Lemense",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Leme"
+  },
+  {
+    "id": "ecus",
+    "nome": "Esporte Clube União Suzano",
+    "nome_popular": "ECUS",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Suzano",
+    "estadio": "Suzanão"
+  },
+  {
+    "id": "comercial_ribeirao_preto",
+    "nome": "Comercial Futebol Clube",
+    "nome_popular": "Comercial",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Ribeirão Preto"
+  },
+  {
+    "id": "tanabi",
+    "nome": "Tanabi Esporte Clube",
+    "nome_popular": "Tanabi",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Tanabi"
+  },
+  {
+    "id": "jabaquara",
+    "nome": "Jabaquara Atlético Clube",
+    "nome_popular": "Jabaquara",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "São Paulo"
+  },
+  {
+    "id": "vocem",
+    "nome": "Vila Operária Clube Esporte Mariano",
+    "nome_popular": "VOCEM",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Assis",
+    "estadio": "Tonicão"
+  },
+  {
+    "id": "colorado_caieiras",
+    "nome": "Colorado Esporte Clube (Caieiras)",
+    "nome_popular": "Colorado Caieiras",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Caieiras"
+  },
+  {
+    "id": "nacional_catanduva",
+    "nome": "Nacional Futebol Clube (Catanduva)",
+    "nome_popular": "Nacional",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Catanduva"
+  },
+  {
+    "id": "aracatuba",
+    "nome": "Araçatuba Futebol Clube",
+    "nome_popular": "Araçatuba",
+    "pais": "BR",
+    "estado": "SP",
+    "cidade": "Araçatuba"
+  }
 ]

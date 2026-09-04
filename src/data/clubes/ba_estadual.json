@@ -1,21 +1,159 @@
 [
-  { "id": "galicia", "nome": "Galícia Esporte Clube", "nome_popular": "Galícia", "pais": "BR", "estado": "BA", "cidade": "Salvador", "fundacao": 1933, "estadio": "Roberto Santos" },
-  { "id": "atletico_alagoinhas", "nome": "Atlético de Alagoinhas", "nome_popular": "Atlético-BA", "pais": "BR", "estado": "BA", "cidade": "Alagoinhas", "fundacao": 1970, "estadio": "Municipal Antônio de Figueiredo Carneiro" },
-  { "id": "bahia_de_feira", "nome": "Bahia de Feira", "nome_popular": "Bahia de Feira", "pais": "BR", "estado": "BA", "cidade": "Feira de Santana", "fundacao": 1937, "estadio": "Arena Cajueiro" },
-  { "id": "jacuipense", "nome": "Jacuipense Esporte Clube", "nome_popular": "Jacuipense", "pais": "BR", "estado": "BA", "cidade": "Riachão do Jacuípe", "fundacao": 1965, "estadio": "Roberto Santos" },
-  { "id": "jequie", "nome": "Jequié Associação Desportiva", "nome_popular": "Jequié", "pais": "BR", "estado": "BA", "cidade": "Jequié", "fundacao": 1969, "estadio": "Waldomirão" },
-  { "id": "juazeirense", "nome": "Juazeirense Sociedade Desportiva", "nome_popular": "Juazeirense", "pais": "BR", "estado": "BA", "cidade": "Juazeiro", "fundacao": 2006, "estadio": "Adauto Moraes" },
-  { "id": "porto_ba", "nome": "Porto Sport Club", "nome_popular": "Porto", "pais": "BR", "estado": "BA", "cidade": "Porto Seguro", "estadio": "Municipal Agnaldo Bento dos Santos" },
-  { "id": "barcelona_ilheus", "nome": "Barcelona Futebol Clube", "nome_popular": "Barcelona", "pais": "BR", "estado": "BA", "cidade": "Ilhéus", "fundacao": 2019, "estadio": "Mário Pessoa" },
-
-  { "id": "leonico", "nome": "Associação Desportiva Leônico", "nome_popular": "Leônico", "pais": "BR", "estado": "BA", "cidade": "Salvador", "fundacao": 1940, "estadio": "Edgar Santos" },
-  { "id": "barreiras_fc", "nome": "Barreiras Futebol Clube", "nome_popular": "Barreiras FC", "pais": "BR", "estado": "BA", "cidade": "Barreiras", "fundacao": 2026, "estadio": "Geraldão" },
-  { "id": "camacari", "nome": "Camaçari Futebol Clube", "nome_popular": "Camaçari", "pais": "BR", "estado": "BA", "cidade": "Camaçari", "fundacao": 1968, "estadio": "Armando Oliveira" },
-  { "id": "ecpp_vitoria_conquista", "nome": "Esporte Clube Primeiro Passo", "nome_popular": "ECPP", "pais": "BR", "estado": "BA", "cidade": "Vitória da Conquista", "fundacao": 2005 },
-  { "id": "feira_fc", "nome": "Feira Futebol Clube", "nome_popular": "Feira FC", "pais": "BR", "estado": "BA", "cidade": "Feira de Santana", "fundacao": 2026 },
-  { "id": "fluminense_de_feira", "nome": "Fluminense de Feira Futebol Clube", "nome_popular": "Fluminense de Feira", "pais": "BR", "estado": "BA", "cidade": "Feira de Santana", "fundacao": 1941 },
-  { "id": "grapiuna", "nome": "Grapiúna Atlético Clube", "nome_popular": "Grapiúna", "pais": "BR", "estado": "BA", "cidade": "Itabuna", "fundacao": 1996, "estadio": "Luiz Viana Filho" },
-  { "id": "jacobina", "nome": "Jacobina Esporte Clube", "nome_popular": "Jacobina", "pais": "BR", "estado": "BA", "cidade": "Jacobina", "fundacao": 1993, "estadio": "José Rocha" },
-  { "id": "redencao", "nome": "Redenção Futebol Clube", "nome_popular": "Redenção", "pais": "BR", "estado": "BA", "cidade": "Salvador", "fundacao": 1945 },
-  { "id": "ssa_fc", "nome": "SSA Futebol Clube", "nome_popular": "SSA FC", "pais": "BR", "estado": "BA", "cidade": "Salvador", "fundacao": 2021 }
+  {
+    "id": "galicia",
+    "nome": "Galícia Esporte Clube",
+    "nome_popular": "Galícia",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Roberto Santos"
+  },
+  {
+    "id": "atletico_alagoinhas",
+    "nome": "Atlético de Alagoinhas",
+    "nome_popular": "Atlético-BA",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Alagoinhas",
+    "estadio": "Municipal Antônio de Figueiredo Carneiro"
+  },
+  {
+    "id": "bahia_de_feira",
+    "nome": "Bahia de Feira",
+    "nome_popular": "Bahia de Feira",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana",
+    "estadio": "Arena Cajueiro"
+  },
+  {
+    "id": "jacuipense",
+    "nome": "Jacuipense Esporte Clube",
+    "nome_popular": "Jacuipense",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Riachão do Jacuípe",
+    "estadio": "Roberto Santos"
+  },
+  {
+    "id": "jequie",
+    "nome": "Jequié Associação Desportiva",
+    "nome_popular": "Jequié",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Jequié",
+    "estadio": "Waldomirão"
+  },
+  {
+    "id": "juazeirense",
+    "nome": "Juazeirense Sociedade Desportiva",
+    "nome_popular": "Juazeirense",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Juazeiro",
+    "estadio": "Adauto Moraes"
+  },
+  {
+    "id": "porto_ba",
+    "nome": "Porto Sport Club",
+    "nome_popular": "Porto",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Porto Seguro",
+    "estadio": "Municipal Agnaldo Bento dos Santos"
+  },
+  {
+    "id": "barcelona_ilheus",
+    "nome": "Barcelona Futebol Clube",
+    "nome_popular": "Barcelona",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Ilhéus",
+    "estadio": "Mário Pessoa"
+  },
+  {
+    "id": "leonico",
+    "nome": "Associação Desportiva Leônico",
+    "nome_popular": "Leônico",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador",
+    "estadio": "Edgar Santos"
+  },
+  {
+    "id": "barreiras_fc",
+    "nome": "Barreiras Futebol Clube",
+    "nome_popular": "Barreiras FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Barreiras",
+    "estadio": "Geraldão"
+  },
+  {
+    "id": "camacari",
+    "nome": "Camaçari Futebol Clube",
+    "nome_popular": "Camaçari",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Camaçari",
+    "estadio": "Armando Oliveira"
+  },
+  {
+    "id": "ecpp_vitoria_conquista",
+    "nome": "Esporte Clube Primeiro Passo",
+    "nome_popular": "ECPP",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Vitória da Conquista"
+  },
+  {
+    "id": "feira_fc",
+    "nome": "Feira Futebol Clube",
+    "nome_popular": "Feira FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana"
+  },
+  {
+    "id": "fluminense_de_feira",
+    "nome": "Fluminense de Feira Futebol Clube",
+    "nome_popular": "Fluminense de Feira",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Feira de Santana"
+  },
+  {
+    "id": "grapiuna",
+    "nome": "Grapiúna Atlético Clube",
+    "nome_popular": "Grapiúna",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Itabuna",
+    "estadio": "Luiz Viana Filho"
+  },
+  {
+    "id": "jacobina",
+    "nome": "Jacobina Esporte Clube",
+    "nome_popular": "Jacobina",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Jacobina",
+    "estadio": "José Rocha"
+  },
+  {
+    "id": "redencao",
+    "nome": "Redenção Futebol Clube",
+    "nome_popular": "Redenção",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador"
+  },
+  {
+    "id": "ssa_fc",
+    "nome": "SSA Futebol Clube",
+    "nome_popular": "SSA FC",
+    "pais": "BR",
+    "estado": "BA",
+    "cidade": "Salvador"
+  }
 ]

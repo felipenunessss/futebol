@@ -14,7 +14,6 @@ export interface Club {
   pais: string; // ISO 3166-1 alpha-2, ex: "BR"
   estado?: string; // UF, para clubes brasileiros
   cidade: string;
-  fundacao?: number;
   estadio?: string;
   divisao_nacional?: DivisaoNacional;
   /** Ausente quando o clube não tem dados financeiros conhecidos ainda (comum em clubes menores). */

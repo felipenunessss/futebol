@@ -1,28 +1,218 @@
 [
-  { "id": "avenida", "nome": "Esporte Clube Avenida", "nome_popular": "Avenida", "pais": "BR", "estado": "RS", "cidade": "Santa Cruz do Sul", "fundacao": 1944, "estadio": "Dos Eucaliptos" },
-  { "id": "caxias", "nome": "Sociedade Esportiva e Recreativa Caxias do Sul", "nome_popular": "Caxias", "pais": "BR", "estado": "RS", "cidade": "Caxias do Sul", "fundacao": 1935, "estadio": "Francisco Stédile" },
-  { "id": "guarany_bage", "nome": "Guarany Futebol Clube", "nome_popular": "Guarany", "pais": "BR", "estado": "RS", "cidade": "Bagé", "fundacao": 1907, "estadio": "Antônio Magalhães Rossel" },
-  { "id": "inter_santa_maria", "nome": "Esporte Clube Internacional (Santa Maria)", "nome_popular": "Inter-SM", "pais": "BR", "estado": "RS", "cidade": "Santa Maria", "fundacao": 1928, "estadio": "Presidente Vargas" },
-  { "id": "monsoon", "nome": "Monsoon Futebol Clube", "nome_popular": "Monsoon", "pais": "BR", "estado": "RS", "cidade": "Capão da Canoa", "fundacao": 2021 },
-  { "id": "novo_hamburgo", "nome": "Esporte Clube Novo Hamburgo", "nome_popular": "Novo Hamburgo", "pais": "BR", "estado": "RS", "cidade": "Novo Hamburgo", "fundacao": 1911, "estadio": "Do Vale" },
-  { "id": "sao_jose_rs", "nome": "Esporte Clube São José", "nome_popular": "São José", "pais": "BR", "estado": "RS", "cidade": "Porto Alegre", "fundacao": 1913, "estadio": "Passo D'Areia" },
-  { "id": "sao_luiz", "nome": "Esporte Clube São Luiz", "nome_popular": "São Luiz", "pais": "BR", "estado": "RS", "cidade": "Ijuí", "fundacao": 1938, "estadio": "19 de Outubro" },
-  { "id": "ypiranga_rs", "nome": "Ypiranga Futebol Clube", "nome_popular": "Ypiranga", "pais": "BR", "estado": "RS", "cidade": "Erechim", "fundacao": 1924, "estadio": "Olímpico Colosso da Lagoa" },
-
-  { "id": "aimore", "nome": "Clube Esportivo Aimoré", "nome_popular": "Aimoré", "pais": "BR", "estado": "RS", "cidade": "São Leopoldo", "fundacao": 1936, "estadio": "João Correa da Silveira" },
-  { "id": "apafut", "nome": "Associação de Pais e Amigos do Futebol", "nome_popular": "Apafut", "pais": "BR", "estado": "RS", "cidade": "Caxias do Sul" },
-  { "id": "gremio_bage", "nome": "Grêmio Esportivo Bagé", "nome_popular": "Grêmio Bagé", "pais": "BR", "estado": "RS", "cidade": "Bagé", "fundacao": 1920, "estadio": "Pedra Moura" },
-  { "id": "brasil_pelotas", "nome": "Grêmio Esportivo Brasil", "nome_popular": "Brasil de Pelotas", "pais": "BR", "estado": "RS", "cidade": "Pelotas", "fundacao": 1911, "estadio": "Bento Freitas" },
-  { "id": "brasil_farroupilha", "nome": "Sociedade Esportiva Recreativa e Cultural Brasil", "nome_popular": "Brasil de Farroupilha", "pais": "BR", "estado": "RS", "cidade": "Farroupilha" },
-  { "id": "esportivo_bento_goncalves", "nome": "Clube Esportivo Bento Gonçalves", "nome_popular": "Esportivo", "pais": "BR", "estado": "RS", "cidade": "Bento Gonçalves" },
-  { "id": "sc_gaucho", "nome": "Sport Clube Gaúcho", "nome_popular": "Gaúcho", "pais": "BR", "estado": "RS", "cidade": "Passo Fundo" },
-  { "id": "gloria", "nome": "Grêmio Esportivo Glória", "nome_popular": "Glória", "pais": "BR", "estado": "RS", "cidade": "Vacaria" },
-  { "id": "gramadense", "nome": "Centro Esportivo Gramadense", "nome_popular": "Gramadense", "pais": "BR", "estado": "RS", "cidade": "Gramado" },
-  { "id": "guarani_va", "nome": "Esporte Clube Guarani", "nome_popular": "Guarani-VA", "pais": "BR", "estado": "RS", "cidade": "Venâncio Aires" },
-  { "id": "lajeadense", "nome": "Clube Esportivo Lajeadense", "nome_popular": "Lajeadense", "pais": "BR", "estado": "RS", "cidade": "Lajeado", "fundacao": 1911, "estadio": "Arena Alviazul" },
-  { "id": "passo_fundo", "nome": "Esporte Clube Passo Fundo", "nome_popular": "Passo Fundo", "pais": "BR", "estado": "RS", "cidade": "Passo Fundo", "fundacao": 1986, "estadio": "Vermelhão da Serra" },
-  { "id": "pelotas", "nome": "Esporte Clube Pelotas", "nome_popular": "Pelotas", "pais": "BR", "estado": "RS", "cidade": "Pelotas", "fundacao": 1908, "estadio": "Boca do Lobo" },
-  { "id": "santa_cruz_rs", "nome": "Futebol Clube Santa Cruz", "nome_popular": "Santa Cruz", "pais": "BR", "estado": "RS", "cidade": "Santa Cruz do Sul", "fundacao": 1913, "estadio": "Dos Plátanos" },
-  { "id": "uniao_frederiquense", "nome": "União Frederiquense de Futebol", "nome_popular": "União Frederiquense", "pais": "BR", "estado": "RS", "cidade": "Frederico Westphalen" },
-  { "id": "veranopolis", "nome": "Veranópolis Esporte Clube Recreativo e Cultural", "nome_popular": "Veranópolis", "pais": "BR", "estado": "RS", "cidade": "Veranópolis", "fundacao": 1992, "estadio": "Antônio David Farina" }
+  {
+    "id": "avenida",
+    "nome": "Esporte Clube Avenida",
+    "nome_popular": "Avenida",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Cruz do Sul",
+    "estadio": "Dos Eucaliptos"
+  },
+  {
+    "id": "caxias",
+    "nome": "Sociedade Esportiva e Recreativa Caxias do Sul",
+    "nome_popular": "Caxias",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Caxias do Sul",
+    "estadio": "Francisco Stédile"
+  },
+  {
+    "id": "guarany_bage",
+    "nome": "Guarany Futebol Clube",
+    "nome_popular": "Guarany",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bagé",
+    "estadio": "Antônio Magalhães Rossel"
+  },
+  {
+    "id": "inter_santa_maria",
+    "nome": "Esporte Clube Internacional (Santa Maria)",
+    "nome_popular": "Inter-SM",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Maria",
+    "estadio": "Presidente Vargas"
+  },
+  {
+    "id": "monsoon",
+    "nome": "Monsoon Futebol Clube",
+    "nome_popular": "Monsoon",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Capão da Canoa"
+  },
+  {
+    "id": "novo_hamburgo",
+    "nome": "Esporte Clube Novo Hamburgo",
+    "nome_popular": "Novo Hamburgo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Novo Hamburgo",
+    "estadio": "Do Vale"
+  },
+  {
+    "id": "sao_jose_rs",
+    "nome": "Esporte Clube São José",
+    "nome_popular": "São José",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Porto Alegre",
+    "estadio": "Passo D'Areia"
+  },
+  {
+    "id": "sao_luiz",
+    "nome": "Esporte Clube São Luiz",
+    "nome_popular": "São Luiz",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Ijuí",
+    "estadio": "19 de Outubro"
+  },
+  {
+    "id": "ypiranga_rs",
+    "nome": "Ypiranga Futebol Clube",
+    "nome_popular": "Ypiranga",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Erechim",
+    "estadio": "Olímpico Colosso da Lagoa"
+  },
+  {
+    "id": "aimore",
+    "nome": "Clube Esportivo Aimoré",
+    "nome_popular": "Aimoré",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "São Leopoldo",
+    "estadio": "João Correa da Silveira"
+  },
+  {
+    "id": "apafut",
+    "nome": "Associação de Pais e Amigos do Futebol",
+    "nome_popular": "Apafut",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Caxias do Sul"
+  },
+  {
+    "id": "gremio_bage",
+    "nome": "Grêmio Esportivo Bagé",
+    "nome_popular": "Grêmio Bagé",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bagé",
+    "estadio": "Pedra Moura"
+  },
+  {
+    "id": "brasil_pelotas",
+    "nome": "Grêmio Esportivo Brasil",
+    "nome_popular": "Brasil de Pelotas",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Pelotas",
+    "estadio": "Bento Freitas"
+  },
+  {
+    "id": "brasil_farroupilha",
+    "nome": "Sociedade Esportiva Recreativa e Cultural Brasil",
+    "nome_popular": "Brasil de Farroupilha",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Farroupilha"
+  },
+  {
+    "id": "esportivo_bento_goncalves",
+    "nome": "Clube Esportivo Bento Gonçalves",
+    "nome_popular": "Esportivo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Bento Gonçalves"
+  },
+  {
+    "id": "sc_gaucho",
+    "nome": "Sport Clube Gaúcho",
+    "nome_popular": "Gaúcho",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Passo Fundo"
+  },
+  {
+    "id": "gloria",
+    "nome": "Grêmio Esportivo Glória",
+    "nome_popular": "Glória",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Vacaria"
+  },
+  {
+    "id": "gramadense",
+    "nome": "Centro Esportivo Gramadense",
+    "nome_popular": "Gramadense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Gramado"
+  },
+  {
+    "id": "guarani_va",
+    "nome": "Esporte Clube Guarani",
+    "nome_popular": "Guarani-VA",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Venâncio Aires"
+  },
+  {
+    "id": "lajeadense",
+    "nome": "Clube Esportivo Lajeadense",
+    "nome_popular": "Lajeadense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Lajeado",
+    "estadio": "Arena Alviazul"
+  },
+  {
+    "id": "passo_fundo",
+    "nome": "Esporte Clube Passo Fundo",
+    "nome_popular": "Passo Fundo",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Passo Fundo",
+    "estadio": "Vermelhão da Serra"
+  },
+  {
+    "id": "pelotas",
+    "nome": "Esporte Clube Pelotas",
+    "nome_popular": "Pelotas",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Pelotas",
+    "estadio": "Boca do Lobo"
+  },
+  {
+    "id": "santa_cruz_rs",
+    "nome": "Futebol Clube Santa Cruz",
+    "nome_popular": "Santa Cruz",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Santa Cruz do Sul",
+    "estadio": "Dos Plátanos"
+  },
+  {
+    "id": "uniao_frederiquense",
+    "nome": "União Frederiquense de Futebol",
+    "nome_popular": "União Frederiquense",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Frederico Westphalen"
+  },
+  {
+    "id": "veranopolis",
+    "nome": "Veranópolis Esporte Clube Recreativo e Cultural",
+    "nome_popular": "Veranópolis",
+    "pais": "BR",
+    "estado": "RS",
+    "cidade": "Veranópolis",
+    "estadio": "Antônio David Farina"
+  }
 ]

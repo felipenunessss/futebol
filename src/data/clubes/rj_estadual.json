@@ -1,21 +1,154 @@
 [
-  { "id": "bangu", "nome": "Bangu Atlético Clube", "nome_popular": "Bangu", "pais": "BR", "estado": "RJ", "cidade": "Rio de Janeiro", "fundacao": 1904, "estadio": "Moça Bonita" },
-  { "id": "boavista_rj", "nome": "Boavista Sport Club", "nome_popular": "Boavista", "pais": "BR", "estado": "RJ", "cidade": "Saquarema", "estadio": "Elcyr Resende de Mendonça" },
-  { "id": "madureira", "nome": "Madureira Esporte Clube", "nome_popular": "Madureira", "pais": "BR", "estado": "RJ", "cidade": "Rio de Janeiro", "fundacao": 1914, "estadio": "Conselheiro Galvão" },
-  { "id": "marica", "nome": "Maricá Futebol Clube", "nome_popular": "Maricá", "pais": "BR", "estado": "RJ", "cidade": "Maricá", "estadio": "Municipal João Saldanha" },
-  { "id": "nova_iguacu", "nome": "Nova Iguaçu Futebol Clube", "nome_popular": "Nova Iguaçu", "pais": "BR", "estado": "RJ", "cidade": "Nova Iguaçu", "fundacao": 1990, "estadio": "Jânio Moraes" },
-  { "id": "portuguesa_rj", "nome": "Associação Atlética Portuguesa", "nome_popular": "Portuguesa-RJ", "pais": "BR", "estado": "RJ", "cidade": "Rio de Janeiro", "fundacao": 1924, "estadio": "Luso-Brasileiro" },
-  { "id": "sampaio_correa_rj", "nome": "Sampaio Corrêa Futebol e Esporte", "nome_popular": "Sampaio Corrêa-RJ", "pais": "BR", "estado": "RJ", "cidade": "Saquarema", "fundacao": 2006, "estadio": "Lourival Gomes de Almeida" },
-  { "id": "volta_redonda", "nome": "Volta Redonda Futebol Clube", "nome_popular": "Volta Redonda", "pais": "BR", "estado": "RJ", "cidade": "Volta Redonda", "fundacao": 1976, "estadio": "Raulino de Oliveira" },
-
-  { "id": "america_rj", "nome": "América Futebol Clube (RJ)", "nome_popular": "América-RJ", "pais": "BR", "estado": "RJ", "cidade": "Rio de Janeiro" },
-  { "id": "americano", "nome": "Americano Esporte Clube", "nome_popular": "Americano", "pais": "BR", "estado": "RJ", "cidade": "Campos dos Goytacazes" },
-  { "id": "araruama", "nome": "Araruama Sport Club", "nome_popular": "Araruama", "pais": "BR", "estado": "RJ", "cidade": "Araruama" },
-  { "id": "audax_rio", "nome": "Audax Rio Esporte Clube", "nome_popular": "Audax Rio", "pais": "BR", "estado": "RJ", "cidade": "Saquarema" },
-  { "id": "duque_de_caxias", "nome": "Duque de Caxias Futebol Clube", "nome_popular": "Duque de Caxias", "pais": "BR", "estado": "RJ", "cidade": "Duque de Caxias" },
-  { "id": "olaria", "nome": "Olaria Atlético Clube", "nome_popular": "Olaria", "pais": "BR", "estado": "RJ", "cidade": "Rio de Janeiro" },
-  { "id": "perolas_negras", "nome": "Pérolas Negras Futebol Clube", "nome_popular": "Pérolas Negras", "pais": "BR", "estado": "RJ", "cidade": "Resende" },
-  { "id": "petropolis", "nome": "Petrópolis Futebol Clube", "nome_popular": "Petrópolis", "pais": "BR", "estado": "RJ", "cidade": "Petrópolis" },
-  { "id": "resende", "nome": "Resende Futebol Clube", "nome_popular": "Resende", "pais": "BR", "estado": "RJ", "cidade": "Resende" },
-  { "id": "sao_goncalo_ec", "nome": "São Gonçalo Esporte Clube", "nome_popular": "São Gonçalo EC", "pais": "BR", "estado": "RJ", "cidade": "São Gonçalo" }
+  {
+    "id": "bangu",
+    "nome": "Bangu Atlético Clube",
+    "nome_popular": "Bangu",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Moça Bonita"
+  },
+  {
+    "id": "boavista_rj",
+    "nome": "Boavista Sport Club",
+    "nome_popular": "Boavista",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema",
+    "estadio": "Elcyr Resende de Mendonça"
+  },
+  {
+    "id": "madureira",
+    "nome": "Madureira Esporte Clube",
+    "nome_popular": "Madureira",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Conselheiro Galvão"
+  },
+  {
+    "id": "marica",
+    "nome": "Maricá Futebol Clube",
+    "nome_popular": "Maricá",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Maricá",
+    "estadio": "Municipal João Saldanha"
+  },
+  {
+    "id": "nova_iguacu",
+    "nome": "Nova Iguaçu Futebol Clube",
+    "nome_popular": "Nova Iguaçu",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Nova Iguaçu",
+    "estadio": "Jânio Moraes"
+  },
+  {
+    "id": "portuguesa_rj",
+    "nome": "Associação Atlética Portuguesa",
+    "nome_popular": "Portuguesa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro",
+    "estadio": "Luso-Brasileiro"
+  },
+  {
+    "id": "sampaio_correa_rj",
+    "nome": "Sampaio Corrêa Futebol e Esporte",
+    "nome_popular": "Sampaio Corrêa-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema",
+    "estadio": "Lourival Gomes de Almeida"
+  },
+  {
+    "id": "volta_redonda",
+    "nome": "Volta Redonda Futebol Clube",
+    "nome_popular": "Volta Redonda",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Volta Redonda",
+    "estadio": "Raulino de Oliveira"
+  },
+  {
+    "id": "america_rj",
+    "nome": "América Futebol Clube (RJ)",
+    "nome_popular": "América-RJ",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro"
+  },
+  {
+    "id": "americano",
+    "nome": "Americano Esporte Clube",
+    "nome_popular": "Americano",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Campos dos Goytacazes"
+  },
+  {
+    "id": "araruama",
+    "nome": "Araruama Sport Club",
+    "nome_popular": "Araruama",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Araruama"
+  },
+  {
+    "id": "audax_rio",
+    "nome": "Audax Rio Esporte Clube",
+    "nome_popular": "Audax Rio",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Saquarema"
+  },
+  {
+    "id": "duque_de_caxias",
+    "nome": "Duque de Caxias Futebol Clube",
+    "nome_popular": "Duque de Caxias",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Duque de Caxias"
+  },
+  {
+    "id": "olaria",
+    "nome": "Olaria Atlético Clube",
+    "nome_popular": "Olaria",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Rio de Janeiro"
+  },
+  {
+    "id": "perolas_negras",
+    "nome": "Pérolas Negras Futebol Clube",
+    "nome_popular": "Pérolas Negras",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Resende"
+  },
+  {
+    "id": "petropolis",
+    "nome": "Petrópolis Futebol Clube",
+    "nome_popular": "Petrópolis",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Petrópolis"
+  },
+  {
+    "id": "resende",
+    "nome": "Resende Futebol Clube",
+    "nome_popular": "Resende",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "Resende"
+  },
+  {
+    "id": "sao_goncalo_ec",
+    "nome": "São Gonçalo Esporte Clube",
+    "nome_popular": "São Gonçalo EC",
+    "pais": "BR",
+    "estado": "RJ",
+    "cidade": "São Gonçalo"
+  }
 ]

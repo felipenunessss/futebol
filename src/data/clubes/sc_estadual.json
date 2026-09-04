@@ -1,11 +1,80 @@
 [
-  { "id": "figueirense", "nome": "Figueirense Futebol Clube", "nome_popular": "Figueirense", "pais": "BR", "estado": "SC", "cidade": "Florianópolis", "fundacao": 1921, "estadio": "Orlando Scarpelli" },
-  { "id": "carlos_renaux", "nome": "Clube Atlético Carlos Renaux", "nome_popular": "Carlos Renaux", "pais": "BR", "estado": "SC", "cidade": "Brusque", "fundacao": 1913, "estadio": "Augusto Bauer" },
-  { "id": "joinville", "nome": "Joinville Esporte Clube", "nome_popular": "Joinville", "pais": "BR", "estado": "SC", "cidade": "Joinville", "fundacao": 1976, "estadio": "Arena Joinville" },
-  { "id": "santa_catarina_ec", "nome": "Santa Catarina Esporte Clube", "nome_popular": "Santa Catarina", "pais": "BR", "estado": "SC", "cidade": "Rio do Sul", "fundacao": 2022, "estadio": "Alfredo João Krieck" },
-  { "id": "brusque_fc", "nome": "Brusque Futebol Clube", "nome_popular": "Brusque", "pais": "BR", "estado": "SC", "cidade": "Brusque", "fundacao": 1987, "estadio": "Augusto Bauer" },
-  { "id": "camboriu_fc", "nome": "Camboriú Futebol Clube", "nome_popular": "Camboriú", "pais": "BR", "estado": "SC", "cidade": "Balneário Camboriú", "fundacao": 2003 },
-  { "id": "concordia_ac", "nome": "Concórdia Atlético Clube", "nome_popular": "Concórdia", "pais": "BR", "estado": "SC", "cidade": "Concórdia", "fundacao": 2005, "estadio": "Domingos Machado de Lima" },
-  { "id": "marcilio_dias", "nome": "Clube Náutico Marcílio Dias", "nome_popular": "Marcílio Dias", "pais": "BR", "estado": "SC", "cidade": "Itajaí", "fundacao": 1919 },
-  { "id": "barra_fc", "nome": "Barra Futebol Clube", "nome_popular": "Barra FC", "pais": "BR", "estado": "SC", "cidade": "Balneário Camboriú", "fundacao": 2013 }
+  {
+    "id": "figueirense",
+    "nome": "Figueirense Futebol Clube",
+    "nome_popular": "Figueirense",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Florianópolis",
+    "estadio": "Orlando Scarpelli"
+  },
+  {
+    "id": "carlos_renaux",
+    "nome": "Clube Atlético Carlos Renaux",
+    "nome_popular": "Carlos Renaux",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Brusque",
+    "estadio": "Augusto Bauer"
+  },
+  {
+    "id": "joinville",
+    "nome": "Joinville Esporte Clube",
+    "nome_popular": "Joinville",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Joinville",
+    "estadio": "Arena Joinville"
+  },
+  {
+    "id": "santa_catarina_ec",
+    "nome": "Santa Catarina Esporte Clube",
+    "nome_popular": "Santa Catarina",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Rio do Sul",
+    "estadio": "Alfredo João Krieck"
+  },
+  {
+    "id": "brusque_fc",
+    "nome": "Brusque Futebol Clube",
+    "nome_popular": "Brusque",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Brusque",
+    "estadio": "Augusto Bauer"
+  },
+  {
+    "id": "camboriu_fc",
+    "nome": "Camboriú Futebol Clube",
+    "nome_popular": "Camboriú",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Balneário Camboriú"
+  },
+  {
+    "id": "concordia_ac",
+    "nome": "Concórdia Atlético Clube",
+    "nome_popular": "Concórdia",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Concórdia",
+    "estadio": "Domingos Machado de Lima"
+  },
+  {
+    "id": "marcilio_dias",
+    "nome": "Clube Náutico Marcílio Dias",
+    "nome_popular": "Marcílio Dias",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Itajaí"
+  },
+  {
+    "id": "barra_fc",
+    "nome": "Barra Futebol Clube",
+    "nome_popular": "Barra FC",
+    "pais": "BR",
+    "estado": "SC",
+    "cidade": "Balneário Camboriú"
+  }
 ]

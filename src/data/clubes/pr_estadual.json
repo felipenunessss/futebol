@@ -1,10 +1,69 @@
 [
-  { "id": "foz_do_iguacu", "nome": "Foz do Iguaçu Futebol Clube", "nome_popular": "Foz do Iguaçu", "pais": "BR", "estado": "PR", "cidade": "Foz do Iguaçu", "fundacao": 1996 },
-  { "id": "fc_cascavel", "nome": "FC Cascavel", "nome_popular": "Cascavel", "pais": "BR", "estado": "PR", "cidade": "Cascavel", "fundacao": 2008, "estadio": "Olímpico Regional Arnaldo Busatto" },
-  { "id": "cianorte", "nome": "Cianorte Futebol Clube", "nome_popular": "Cianorte", "pais": "BR", "estado": "PR", "cidade": "Cianorte", "fundacao": 2002, "estadio": "Albino Turbay" },
-  { "id": "azuriz", "nome": "Azuriz Futebol Clube", "nome_popular": "Azuriz", "pais": "BR", "estado": "PR", "cidade": "Pato Branco", "estadio": "Os Pioneiros" },
-  { "id": "sao_joseense", "nome": "Independente Futebol São Joseense", "nome_popular": "São Joseense", "pais": "BR", "estado": "PR", "cidade": "São José dos Pinhais", "fundacao": 2015 },
-  { "id": "maringa_fc", "nome": "Maringá Futebol Clube", "nome_popular": "Maringá FC", "pais": "BR", "estado": "PR", "cidade": "Maringá", "fundacao": 2010 },
-  { "id": "andraus", "nome": "Clube Andraus Brasil", "nome_popular": "Andraus", "pais": "BR", "estado": "PR", "cidade": "Campo Largo", "fundacao": 2003 },
-  { "id": "galo_maringa", "nome": "Adap Galo Maringá Futebol Clube", "nome_popular": "Galo Maringá", "pais": "BR", "estado": "PR", "cidade": "Maringá" }
+  {
+    "id": "foz_do_iguacu",
+    "nome": "Foz do Iguaçu Futebol Clube",
+    "nome_popular": "Foz do Iguaçu",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Foz do Iguaçu"
+  },
+  {
+    "id": "fc_cascavel",
+    "nome": "FC Cascavel",
+    "nome_popular": "Cascavel",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Cascavel",
+    "estadio": "Olímpico Regional Arnaldo Busatto"
+  },
+  {
+    "id": "cianorte",
+    "nome": "Cianorte Futebol Clube",
+    "nome_popular": "Cianorte",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Cianorte",
+    "estadio": "Albino Turbay"
+  },
+  {
+    "id": "azuriz",
+    "nome": "Azuriz Futebol Clube",
+    "nome_popular": "Azuriz",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Pato Branco",
+    "estadio": "Os Pioneiros"
+  },
+  {
+    "id": "sao_joseense",
+    "nome": "Independente Futebol São Joseense",
+    "nome_popular": "São Joseense",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "São José dos Pinhais"
+  },
+  {
+    "id": "maringa_fc",
+    "nome": "Maringá Futebol Clube",
+    "nome_popular": "Maringá FC",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Maringá"
+  },
+  {
+    "id": "andraus",
+    "nome": "Clube Andraus Brasil",
+    "nome_popular": "Andraus",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Campo Largo"
+  },
+  {
+    "id": "galo_maringa",
+    "nome": "Adap Galo Maringá Futebol Clube",
+    "nome_popular": "Galo Maringá",
+    "pais": "BR",
+    "estado": "PR",
+    "cidade": "Maringá"
+  }
 ]
