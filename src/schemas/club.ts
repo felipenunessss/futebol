@@ -22,4 +22,13 @@ export interface Club {
   divisao_nacional?: DivisaoNacional;
   /** Ausente quando o clube não tem dados financeiros conhecidos ainda (comum em clubes menores). */
   forca_financeira?: ForcaFinanceira;
+  /**
+   * Rating de força esportiva numa escala tipo Elo (ex: 1000-2000), semeado
+   * a partir de desempenho histórico real — ver docs/motor-de-partida.md
+   * seção 1. Ausente pra quase todo clube ainda (dado não populado); nesse
+   * caso `simulation/rating.ts` calcula um fallback a partir de
+   * `divisao_nacional`/`forca_financeira`. Depois de semeado, evolui
+   * sozinho pelos resultados simulados (não é um valor estático).
+   */
+  rating_inicial?: number;
 }
