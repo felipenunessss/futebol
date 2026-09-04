@@ -4,7 +4,11 @@
   "pais": "PY",
   "nivel": 1,
   "ano_referencia": 2026,
-  "formato": { "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 0 }, "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 0 } },
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 0, "rodadas": 11 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 0, "rodadas": 11 },
+    "tabela_acumulada": { "criterio": "soma_dos_pontos_de_apertura_e_clausura_define_vagas_internacionais_e_rebaixamento_por_media_de_tres_temporadas" }
+  },
   "premiacao": {},
   "classicos": [
     { "time_a": "cerro_porteno", "time_b": "olimpia", "nome": "Superclásico Paraguayo", "peso_midia": 5 }

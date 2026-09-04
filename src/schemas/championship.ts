@@ -10,6 +10,11 @@ export interface FaseUnica {
   nome?: string;
   ida_e_volta: boolean;
   classificam_proxima_fase: number;
+  rodadas?: number;
+}
+
+export interface TabelaAcumulada {
+  criterio: string;
 }
 
 export interface FaseQuadrangular {
@@ -69,6 +74,7 @@ export interface FormatoEstadual {
   fase_quadrangular?: FaseQuadrangular;
   fase_suica?: FaseSuica;
   pontos_corridos?: PontosCorridos;
+  tabela_acumulada?: TabelaAcumulada;
   dupla_chave_regional?: DuplaChaveRegional;
   mata_mata?: MataMata;
   final_estadual?: FinalEstadual;
