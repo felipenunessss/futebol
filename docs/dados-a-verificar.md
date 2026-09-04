@@ -353,64 +353,52 @@ nesta rodada (confirmei só nome/cidade).
 
 ## Copa do Brasil e lógica de resolução de vagas — o que foi construído
 
-- **Copa do Brasil 2026 — elenco completo (atualização)**: os clubes reais
-  da edição 2026 foram confirmados e adicionados a `times[]` (arquivo foi
-  de 60 para 133 entradas — o total de 126 das fontes cruzadas abaixo se
-  mostrou impreciso na verificação individual seguinte, ver nota de
-  "extras" abaixo). Fontes cruzadas: CBF (nota oficial "recorde de
-  participantes e 17
-  estreantes"), Wikipédia PT ("Copa do Brasil de Futebol de 2026"),
-  Rádio Itatiaia e Jornal da Paraíba (ambos publicaram a lista completa
-  dos 126 clubes por fase de estreia, batendo exatamente nas contagens
-  por estado: 28 na 1ª fase, 74 na 2ª, 4 na 3ª — campeões de Copa Verde/
-  Série D/Série C e vice da Copa do Nordeste — e 20 na 5ª, que é a
-  Série A). Todos os 74 clubes novos já existiam cadastrados em algum
-  `<uf>_estadual.json` ou em `brasil.json` — nenhum clube precisou ser
-  criado do zero.
-  - **`rio_branco_es`** (Espírito Santo): confirmado por manchete direta
-    da CNN Brasil ("Rio Branco-ES x Athletic Club"), resolvendo a
-    ambiguidade entre os dois "Rio Branco" capixabas cadastrados
-    (`rio_branco_es`, Vitória, e `rio_branco_vn`, Venda Nova do
-    Imigrante) — é o primeiro.
-  - **`mac`** (Maranhão Atlético Clube): a fonte só citava "Maranhão"
-    como participante da 2ª fase; como não há nenhum outro clube com
-    esse nome cadastrado no Maranhense, assumi que é o MAC (cujo nome
-    completo é literalmente "Maranhão Atlético Clube") — confiança boa,
-    mas não é uma confirmação nominal exata.
-  - **Verificação individual dos 8 clubes que não apareciam nas listas
-    cruzadas** (atualização): pesquisados um a um por jogo/resultado real
-    na Copa do Brasil 2026, não só por presença em lista agregada.
-    Resultado: as duas fontes com "lista completa" batendo 28+74+4+20=126
-    eram menos precisas do que pareciam — 6 dos 8 clubes tinham jogo real
-    confirmado e ficaram de fora só por imprecisão de fonte, não porque
-    não participassem.
-    - **Removido**: `nautico` — confirmado por fonte direta (Terra) que
-      ficou de fora da edição 2026; a vaga de Pernambuco foi para o
-      Maguary. Único dos 8 removido.
-    - **Mantidos com jogo confirmado**: `botafogo_sp` (enfrentou o
-      Fortaleza na 4ª fase, 17/03, Estádio Luso Brasileiro); `criciuma`
-      (empatou 0-0 com Operário Várzea-grandense em 28/02, Arena
-      Pantanal-Cuiabá); `brusque_fc` (venceu o Trem-AP por 2-0 e avançou
-      à 2ª fase); `inter_de_limeira` (perdeu nos pênaltis por 7-6 para o
-      Vila Nova em jogo único em Limeira).
-    - **Mantido com confiança moderada**: `ituano` — sem resultado de
-      jogo específico encontrado, mas ESPN mantém página dedicada de
-      elenco para "Copa do Brasil 2026" do clube, o que indica registro
-      real na competição.
-    - **Mantidos por precaução, sem confirmação direta nos dois
-      sentidos**: `ferroviaria` (Araraquara-SP) e `floresta` (Fortaleza-
-      CE) — nenhuma fonte confirmou jogo ou exclusão específica. Cuidado
-      ao pesquisar `ferroviaria`: uma notícia sobre "Ferroviária x Sport
-      Recife" na Copa do Brasil 2026 é sobre a **Desportiva Ferroviária**
-      do Espírito Santo (já cadastrada à parte como `desportiva_ferroviaria`
-      em `times[]`), não sobre a Ferroviária de Araraquara-SP — são
-      clubes diferentes, não confundir numa futura verificação. Sobre
-      `floresta`: achei que os 3 classificados do Cearense 2026 pra Copa
-      do Brasil são Ceará, Ferroviário e Fortaleza (não Floresta), mas
-      isso provavelmente vale pra vaga da Copa do Brasil **2027** (mesmo
-      descompasso de temporada da Série D), não prova nada sobre quem
-      ocupou a vaga do Ceará na edição 2026 — por isso não foi removido
-      com essa informação sozinha.
+- **Copa do Brasil 2026 — elenco completo e corrigido contra a fonte
+  primária (CBF)**: `times[]` tem os 126 clubes reais da edição, com
+  fonte de verdade agora sendo a própria página da CBF
+  (cbf.com.br/futebol-brasileiro/noticias/se/a/copa-do-brasil-de-2026-tera-recorde-de-participantes-e-17-estreantes),
+  que lista os 126 participantes nominalmente por estado (não só o total
+  "recorde de participantes e 17 estreantes"). Essa lista por estado
+  bateu 126/126 contra a base de clubes já cadastrada, sem precisar criar
+  nenhum clube novo.
+  - **Duas rodadas anteriores de pesquisa (Wikipédia/imprensa regional
+    cruzadas, depois "verificação individual" clube a clube) erraram
+    9 entradas**, incluídas por engano antes da fonte oficial ser
+    conferida diretamente: `botafogo_sp`, `criciuma`, `brusque_fc`,
+    `ferroviaria`, `floresta`, `inter_de_limeira`, `ituano`, `gurupi`,
+    `brasiliense`. Nenhum desses aparece na lista oficial da CBF pro
+    estado correspondente (SP tem 13 confirmados, nenhum é Botafogo-SP/
+    Ferroviária/Inter de Limeira/Ituano; SC tem 6, nenhum é Criciúma/
+    Brusque; CE tem 4, nenhum é Floresta; TO tem 3 — Araguaína, Capital,
+    Tocantinópolis, não Gurupi; DF tem 3 — Capital, Ceilândia, Gama, não
+    Brasiliense) — **removidos de `times[]`**. Isso inclui até 4 casos em
+    que uma pesquisa anterior achou o que parecia ser um resultado de
+    jogo real específico (`botafogo_sp`, `criciuma`, `brusque_fc`,
+    `inter_de_limeira`) — bate errado com a fonte oficial mesmo assim, o
+    que sugere que esses "resultados" encontrados por busca na web eram
+    de outra competição/ano ou mal atribuídos. **Lição**: pra uma
+    competição com fonte primária federativa disponível e completa (like
+    esta nota da CBF), ela deve prevalecer sobre cruzamento de fontes
+    secundárias, mesmo quando a fonte secundária parece dar um resultado
+    de jogo específico.
+  - **Duas vagas reais ficaram de fora nas rodadas anteriores e foram
+    adicionadas agora**: `ceilandia` (DF) e `capital_fc_to` (Tocantins,
+    não confundir com `capital_cf`, o Capital do Distrito Federal).
+  - **`rio_branco_es`** (Espírito Santo) permanece confirmado — a fonte
+    da CBF só cita "Rio Branco (7 participações)" sem desambiguar, mas a
+    manchete direta da CNN Brasil ("Rio Branco-ES x Athletic Club") já
+    tinha resolvido a ambiguidade entre os dois "Rio Branco" capixabas
+    cadastrados (`rio_branco_es`, Vitória — o correto — e `rio_branco_vn`,
+    Venda Nova do Imigrante).
+  - **`mac`** (Maranhão Atlético Clube): a fonte da CBF cita só "Maranhão
+    (10 participações)"; como não há nenhum outro clube com esse nome
+    cadastrado no Maranhense, mantém-se a suposição de que é o MAC (nome
+    completo "Maranhão Atlético Clube") — confiança boa, mas não é uma
+    confirmação nominal exata letra por letra.
+  - A nota da CBF também confirma que a edição 2026 tem **415 clubes
+    diferentes na história da competição desde 1989** e que **São Paulo é
+    o estado com mais participantes (13)**, seguido do Rio de Janeiro
+    (10) — dado de contexto, sem efeito na modelagem.
   - **Formato real mais preciso que o já documentado**: 9 fases
     confirmado (CBF/Wikipédia); da 1ª à 4ª fase os jogos são eliminatórios
     em **partida única**; da 5ª fase às quartas de final (e semifinal,
