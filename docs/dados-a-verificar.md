@@ -353,14 +353,50 @@ nesta rodada (confirmei só nome/cidade).
 
 ## Copa do Brasil e lógica de resolução de vagas — o que foi construído
 
-- **Copa do Brasil 2026**: 126 clubes reais em 9 fases (entrada escalonada
-  por ranking CBF; Série A só entra na 5ª fase; campeões de Série C/D/
-  Copa Verde/Copa Nordeste entram na 3ª). Modelado com os 60 clubes de
-  confiança alta (todos os de Série A/B/C) em `times[]`; os ~66 restantes
-  (entradas via estadual, ranking CBF, Copa Verde, Copa Nordeste) não
-  foram pesquisados individualmente — dependem da mesma lógica de
-  resolução de vagas descrita abaixo, aplicada quando houver
-  classificação real dos estaduais.
+- **Copa do Brasil 2026 — elenco completo (atualização)**: os 126 clubes
+  reais da edição 2026 foram confirmados e adicionados a `times[]`
+  (arquivo foi de 60 para 134 entradas — ver nota de "extras" abaixo).
+  Fontes cruzadas: CBF (nota oficial "recorde de participantes e 17
+  estreantes"), Wikipédia PT ("Copa do Brasil de Futebol de 2026"),
+  Rádio Itatiaia e Jornal da Paraíba (ambos publicaram a lista completa
+  dos 126 clubes por fase de estreia, batendo exatamente nas contagens
+  por estado: 28 na 1ª fase, 74 na 2ª, 4 na 3ª — campeões de Copa Verde/
+  Série D/Série C e vice da Copa do Nordeste — e 20 na 5ª, que é a
+  Série A). Todos os 74 clubes novos já existiam cadastrados em algum
+  `<uf>_estadual.json` ou em `brasil.json` — nenhum clube precisou ser
+  criado do zero.
+  - **`rio_branco_es`** (Espírito Santo): confirmado por manchete direta
+    da CNN Brasil ("Rio Branco-ES x Athletic Club"), resolvendo a
+    ambiguidade entre os dois "Rio Branco" capixabas cadastrados
+    (`rio_branco_es`, Vitória, e `rio_branco_vn`, Venda Nova do
+    Imigrante) — é o primeiro.
+  - **`mac`** (Maranhão Atlético Clube): a fonte só citava "Maranhão"
+    como participante da 2ª fase; como não há nenhum outro clube com
+    esse nome cadastrado no Maranhense, assumi que é o MAC (cujo nome
+    completo é literalmente "Maranhão Atlético Clube") — confiança boa,
+    mas não é uma confirmação nominal exata.
+  - **8 clubes que já estavam em `times[]` antes desta atualização não
+    aparecem em nenhuma das quatro listas de fase cruzadas** (`nautico`,
+    `botafogo_sp`, `criciuma`, `brusque_fc`, `ferroviaria`, `floresta`,
+    `inter_de_limeira`, `ituano`) — como as contagens por fase batem
+    exatamente (28+74+4+20=126) nas duas fontes que publicaram lista
+    completa, é pouco provável que sejam omissões de fonte; mais
+    provável é que esses 8 tenham sido incluídos anteriormente por
+    "alta confiança genérica" (jogam Série A/B/C) sem checar se
+    realmente entraram no chaveamento real desta edição específica.
+    Não foram removidos por precaução — vale confirmar contra a fonte
+    oficial antes de decidir se saem da lista.
+  - **Formato real mais preciso que o já documentado**: 9 fases
+    confirmado (CBF/Wikipédia); da 1ª à 4ª fase os jogos são eliminatórios
+    em **partida única**; da 5ª fase às quartas de final (e semifinal,
+    segundo a Wikipédia) os confrontos são **ida e volta**; a **final é
+    jogo único** (mudança desta edição). O `formato.mata_mata` atual do
+    schema (`ida_e_volta: true` uniforme para todas as 8 fases listadas)
+    não representa nem o número certo de fases nem essa mistura de
+    jogo único/ida-e-volta/final única — schema precisaria de um campo
+    por fase (ou pelo menos separar "fases de jogo único" de "fases de
+    ida e volta" e marcar a final como exceção). Fica como pendência de
+    modelagem, não implementada nesta rodada.
 - **`nivel: 0`** foi reservado para competições de mata-mata puro fora da
   hierarquia vertical A→B→C→D (hoje só a Copa do Brasil) — o teste que
   confere `divisao_nacional` por nível pula esse caso de propósito.
