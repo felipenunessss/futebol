@@ -1,0 +1,22 @@
+{
+  "id": "peru_segunda",
+  "nome": "Liga 2 do Peru",
+  "pais": "PE",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 9, "ida_e_volta": true, "classificam_por_grupo": 6 },
+    "mata_mata": { "fases": ["fase_final_grupos_campeonato_e_descenso", "playoffs_ascenso"], "ida_e_volta": true }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2,
+    "rebaixamento_proxima_divisao": 2
+  },
+  "classicos": [],
+  "times": [
+    "academia_cantolao", "ada_jaen", "alianza_universidad", "ayacucho_fc", "bentin_tacna_heroica",
+    "carlos_a_mannucci", "comerciantes_fc", "deportivo_binacional", "deportivo_llacuabamba",
+    "estudiantil_cni", "fc_san_marcos", "pirata_fc", "santos_fc_pe", "sport_huancayo_b",
+    "union_comercio_pe", "union_minas", "universidad_cesar_vallejo", "universidad_san_martin"
+  ]
+}

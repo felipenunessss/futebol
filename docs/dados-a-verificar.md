@@ -1180,6 +1180,48 @@ zero.
   tradicionais fora de Lima, com cruzamentos até internacionais (Copa
   Sul-Americana 2022 e 2026). Mantidos os 2 clássicos de Lima já existentes.
 
+## 2ª divisão CONMEBOL — Peru (Liga 2)
+
+- **Fonte**: fetch direto do HTML da Wikipédia ES ("Liga2 2026 (Perú)"),
+  seções "Fase Regional"/"Fase Final"/"Playoffs de ascenso"/"Descenso a
+  Liga3"/"Ascensos y descensos" + tabela "Información de los equipos",
+  extraídos com parser de HTML em Python.
+- **Elenco 2026: 18 de 18 clubes confirmados**, todos novos em
+  `peru.json` (nenhum já existia). Confirma de brinde que `fc_cajamarca`
+  e `deportivo_moquegua` (já cadastrados em `peru_primera.json`) são
+  exatamente o campeão e vice da Liga 2 2025 que subiram — bate
+  perfeitamente com o que já tínhamos.
+- **Formato real: muito mais complexo do que o schema representa bem**
+  (o mais elaborado de todas as competições CONMEBOL modeladas até
+  agora): 2 grupos regionais de 9 (ida e volta, 18 rodadas) → os 6
+  melhores de cada grupo (12 times) se juntam em 3 "Grupos Campeonato"
+  de 4 (com pontos de bônus carregados da fase anterior conforme a
+  posição de entrada) → playoffs de ascenso em 3 etapas (semifinal,
+  final, repechaje, mais uma "definição de subcampeonato") decidem os 2
+  promovidos; os 6 piores (7º-9º de cada grupo) formam 2 triangulares de
+  descenso, o último de cada um cai à Liga3. Modelado só o "corpo
+  principal" (`fase_grupos`: 2 grupos de 9, `classificam_por_grupo: 6`)
+  + um `mata_mata` genérico de 2 fases (`fase_final_grupos_campeonato_e_
+  descenso`, `playoffs_ascenso`) como placeholder pra sinalizar que há
+  mais estrutura depois — não representa os grupos de 4 com pontos de
+  bônus nem o chaveamento real dos playoffs. Mesma classe de aproximação
+  já usada no "Reduzido" argentino.
+- **Acesso**: 2 vagas (campeão + vencedor da "definição de
+  subcampeonato") — confirmado com alta confiança, mecanismo detalhado
+  no texto do regulamento.
+- **Rebaixamento**: 2 vagas (último de cada triangular de descenso) —
+  confirmado com alta confiança.
+- **`sport_huancayo_b`**: é o time B/filial do Sport Huancayo (que já
+  disputa a Liga 1, `sport_huancayo`) — times filiais normalmente não
+  podem subir mesmo se classificarem (regra vista também no Equador),
+  mas não confirmei se essa regra específica vale pra Liga 2 peruana;
+  fica documentado, não modelado.
+- **Ambiguidades de sede menores**: FC San Marcos aparece como "Huaraz"
+  numa tabela da fonte e "Huari" (mesma região, Áncash) noutra — usei
+  Huaraz. Unión Comercio aparece como "Tarapoto" numa tabela e "Nueva
+  Cajamarca" noutra (mesma região, San Martín) — usei Tarapoto. Nenhuma
+  das duas é claramente errada, só imprecisão da própria fonte.
+
 ## Expansão CONMEBOL — Venezuela (1ª divisão) — auditoria de modelagem prévia
 
 Diferente de Bolívia/Equador/Paraguai, a Venezuela já tinha sido marcada como
