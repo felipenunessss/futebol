@@ -576,12 +576,15 @@ nesta rodada (confirmei só nome/cidade).
   dos 9 países CONMEBOL + Brasil e/ou durante a modelagem da própria
   Libertadores — nenhum clube novo precisou ser criado). Distribuição por
   país: Argentina 8, Bolívia 5, Brasil 7, Chile 5, Colômbia 6, Equador 4,
-  Paraguai 4, Peru 5, Uruguai 6, Venezuela 6. Isso inclui tanto os times
-  que já estão nos 32 confirmados da fase de grupos (28 confirmados
-  nominalmente + 4 vagas que só se resolvem quando saírem os perdedores
-  da Fase 3 da Libertadores, ainda não jogada na fonte consultada) quanto
-  os que disputam só fases preliminares — `times[]` não distingue fase de
-  entrada, mesmo critério já usado na Copa do Brasil e na Libertadores.
+  Paraguai 4, Peru 5, Uruguai 6, Venezuela 6. `times[]` não distingue
+  fase de entrada (mesmo critério já usado na Copa do Brasil e na
+  Libertadores) — mas a fase de entrada de cada um dos 56 já está
+  totalmente resolvida em `formato.mata_mata.etapas`, ver bullet abaixo
+  (atualização: as 4 vagas da fase de grupos vindas da Fase 3 da
+  Libertadores, citadas como não resolvidas numa rodada de pesquisa
+  anterior, e as 8 vagas da `repescagem` vindas dos terceiros-colocados
+  da Libertadores, também citadas como pendentes na seção da
+  Libertadores, foram todas confirmadas nominalmente por fonte).
   - **12 clubes marcados "(L)" no mapa da Wikipédia** (`boca_juniors`,
     `lanus`, `bolivar`, `botafogo`, `ohiggins`, `santa_fe_co`,
     `independiente_medellin`, `sporting_cristal`, `nacional_uy`,
@@ -594,24 +597,50 @@ nesta rodada (confirmei só nome/cidade).
 - **Formato modelado (corpo principal)**: fase de grupos com os 32 clubes
   que a alcançam (8 grupos de 4, todos contra todos ida e volta) —
   confiança alta pro tamanho/formato geral (confirmado por múltiplas
-  fontes de imprensa). **Assimetria não representada**: só o 1º colocado
-  de cada grupo avança direto às oitavas; o 2º colocado disputa um
-  **repechaje** contra um dos 8 times eliminados em 3º lugar da fase de
-  grupos da própria Libertadores (mecanismo já citado na seção da
-  Libertadores) — modelei como `classificam_por_grupo: 2` por aproximação
-  (mesmo padrão de simplificação já usado em outras assimetrias do
-  projeto, ex: Pernambucano A1), perdendo a informação de que só metade
-  dos classificados avança direto.
-- **Fase preliminar — pendência de modelagem** (mesmo problema já
-  documentado na Copa do Brasil e na Libertadores): número exato de
-  rodadas eliminatórias antes da fase de grupos e entrada escalonada por
-  país/ranking não foram mapeados em detalhe nesta rodada — o schema não
-  tem bloco pra representar isso, então só o corpo principal (fase de
-  grupos + mata-mata) foi modelado.
-- **Final em jogo único** (Barranquilla, confirmado por fonte) — mesma
-  limitação já documentada na Copa do Brasil e na Libertadores: o bloco
-  `mata_mata` do schema usa um `ida_e_volta` único pra todas as fases
-  listadas, não representa a final como exceção.
+  fontes de imprensa). **Assimetria de classificação ainda não
+  representada** (só `classificam_por_grupo: 2` por aproximação): o 1º
+  colocado de cada grupo avança direto às oitavas, o 2º entra na
+  `repescagem` (ver abaixo) — o schema não tem como marcar "1º e 2º
+  seguem caminhos diferentes" dentro de `fase_grupos`, mesma
+  simplificação já usada em outras assimetrias do projeto (ex:
+  Pernambucano A1).
+- **Fase preliminar e repescagem — modeladas** com o novo campo
+  `formato.mata_mata.etapas` (mesma técnica já usada na Copa do Brasil e
+  na Libertadores), **todas as entradas confirmadas individualmente por
+  fonte** (Wikipédia EN "2026 Copa Sudamericana first stage"/"final
+  stages", beIN Sports, FotMob):
+  - **`primeira_fase`** (32 clubes, jogo único com pênaltis em caso de
+    empate — confirmado explicitamente pelo texto do regulamento citado
+    na Wikipédia): 4 clubes de cada um dos 8 países "menores" (Bolívia,
+    Chile, Colômbia, Equador, Paraguai, Peru, Uruguai, Venezuela) jogam
+    2 confrontos internos por país (não cruzados entre países), 16
+    vencedores avançam à fase de grupos.
+  - **`repescagem`** (ida e volta, mandante do returno é o 2º colocado
+    do grupo da Sul-Americana): os **8 terceiros colocados da fase de
+    grupos da Libertadores** (`independiente_medellin`, `nacional_uy`,
+    `bolivar`, `boca_juniors`, `santa_fe_co`, `sporting_cristal`,
+    `lanus`, `universidad_central_venezuela`) enfrentam os 8 segundos
+    colocados dos grupos da própria Sul-Americana — resolve a pendência
+    que tinha ficado em aberto na seção da Libertadores ("8 terceiros
+    colocados... não foram resolvidos nesta rodada").
+  - **16 clubes entram direto na fase de grupos** sem passar por
+    `primeira_fase` nem aparecer em nenhum `entrantes`: Argentina 6
+    (`river_plate`, `racing_club`, `deportivo_riestra`, `san_lorenzo`,
+    `tigre`, `barracas_central`) + Brasil 6 (`sao_paulo`, `gremio`,
+    `red_bull_bragantino`, `atletico_mg`, `santos`, `vasco_da_gama`) + 4
+    perdedores da Fase 3 da Libertadores (`juventud`, `ohiggins`,
+    `carabobo`, `botafogo`) — mesma convenção já usada na Libertadores
+    pros diretos-à-fase-de-grupos (não ficam em `etapas`, só em
+    `times[]`, porque quem os "recebe" é `fase_grupos`, não `mata_mata`).
+  - `oitavas`/`quartas`/`semifinal`: ida e volta, mandante do returno é
+    o time de melhor campanha/seed. `final`: jogo único (Barranquilla,
+    já documentado).
+  - Isso corrigiu também os 12 clubes marcados "(L)" do bullet anterior:
+    4 deles (`juventud`, `ohiggins`, `carabobo`, `botafogo`) são
+    perdedores da Fase 3 (entram direto na fase de grupos), os outros 8
+    são os terceiros-colocados que entram na `repescagem` — a
+    distinção entre os dois grupos não estava clara na pesquisa
+    anterior e ficou resolvida agora.
 - **`pais: "CONMEBOL"`**: mesma decisão deliberada já usada na
   Libertadores — sem sede única (a final é rotativa, mas todo o resto do
   torneio é distribuído pelos 10 países).
