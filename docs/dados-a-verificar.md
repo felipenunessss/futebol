@@ -761,14 +761,55 @@ nesta rodada (confirmei só nome/cidade).
   turno/returno (Apertura/Clausura) + fase_grupos (Intermedio) +
   mata_mata (cadeia final) — aproximação razoável, mas o schema não
   amarra explicitamente qual fase alimenta qual etapa do mata-mata.
-- **Rebaixamento não confirmado**: 3 clubes subiram da Segunda División
-  2025, o que sugere 3 descidas, mas não confirmei isso por fonte direta
-  nem o mecanismo exato (Uruguai também costuma usar tabela de médias
-  plurianuais, não simples "último cai") — `premiacao` ficou sem
-  `rebaixamento_proxima_divisao` por esse motivo.
+- **Rebaixamento — resolvido na modelagem da 2ª divisão**: 3 clubes
+  descem por temporada, confirmado ao modelar `uruguai_segunda.json` —
+  a seção "Ascensos y descensos" da Wikipédia da Segunda División 2026
+  lista Plaza Colonia (14º), River Plate (15º) e Miramar Misiones (16º)
+  como os 3 descendidos da "tabla del descenso" da Primera División
+  2025. `premiacao.rebaixamento_proxima_divisao: 3` preenchido.
 - **Vagas CONMEBOL**: Libertadores bem confirmada (4: campeão anual,
   vice, 2º da Tabela Anual, campeão da Copa AUF Uruguay). Sul-Americana
   confirmada em número (4) mas não em critério exato posição-a-posição.
+
+## 2ª divisão CONMEBOL — Uruguai (Segunda División Profesional)
+
+- **Fonte**: fetch direto do HTML da Wikipédia ES ("Campeonato Uruguayo
+  de Segunda División 2026"), tabela "Equipo/Ciudad/Estadio" + texto de
+  "Sistema de disputa"/"Ascensos y descensos", extraídos com parser de
+  HTML em Python.
+- **Elenco 2026: 14 de 14 clubes confirmados**, todos novos em
+  `uruguai.json`. Confirma de brinde que Albion, Central Español e
+  Deportivo Maldonado (já em `uruguai_primera.json`) são exatamente o
+  campeão, vice e vencedor do play-off da Segunda 2025 que subiram —
+  bate perfeitamente com o que já tínhamos.
+- **Formato, bem confiança** (texto do regulamento na própria
+  Wikipédia): a temporada começa com o "Torneo Competencia" (2 séries de
+  7 times, turno único, os campeões de série disputam uma final) — o
+  campeão garante vaga no playoff do 3º acesso, a menos que já esteja em
+  zona de acesso direto ao fim da temporada. Depois roda a "fase
+  regular" tradicional (todos contra todos, ida e volta, 26 rodadas). A
+  soma dos dois define uma tabela acumulada: 1º e 2º sobem direto, o 3º
+  acesso vai a um playoff entre os 4 seguintes melhores colocados.
+  Modelado com `fase_grupos` (Torneo Competencia) + `final_estadual`
+  (final de séries) + `pontos_corridos` (fase regular) +
+  `tabela_acumulada` (critério em texto) + `mata_mata` (playoff do 3º
+  acesso) — aproximação razoável, mas o schema não amarra explicitamente
+  como o resultado do Torneo Competencia se soma à fase regular, nem
+  representa a condicional "só vale a vaga garantida se não estiver já
+  em zona de acesso".
+- **Acesso**: 3 vagas (2 diretas + 1 via playoff) — bem confirmado.
+  `acesso_proxima_divisao: 3`.
+- **Rebaixamento — temporada especial, sem descenso direto**: 2026 é uma
+  transição pra expandir a divisão de 14 para 16 clubes em 2027 — "No
+  habrá descensos directos esta temporada": os 2 últimos da tabela de
+  médias plurianuais disputam uma "promoción por la permanencia" contra
+  2 clubes da Primera Divisional C (3ª nível, não modelada), em vez de
+  cair direto. Por ser uma regra pontual desta edição (não o padrão
+  normal do campeonato), `premiacao` ficou sem
+  `rebaixamento_proxima_divisao` — não documentar um número fixo evitaria
+  confundir uma futura Fase 2 que tentasse aplicar essa regra em
+  temporadas seguintes, quando o normal (2027+) deve voltar a ter
+  descenso direto.
 
 ## Expansão CONMEBOL — Chile (1ª divisão)
 

@@ -1,0 +1,25 @@
+{
+  "id": "uruguai_segunda",
+  "nome": "Segunda División Profesional do Uruguai",
+  "pais": "UY",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 7, "ida_e_volta": false, "classificam_por_grupo": 1 },
+    "final_estadual": { "criterio": "final_entre_campeoes_de_serie_do_torneio_competencia", "ida_e_volta": false },
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 26 },
+    "tabela_acumulada": {
+      "criterio": "soma_torneio_competencia_e_fase_regular_define_campeao_e_vice_ascenso_direto_mais_playoff_de_4_times_pelo_3o_acesso"
+    },
+    "mata_mata": { "fases": ["playoff_terceiro_acesso"], "ida_e_volta": false }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 3
+  },
+  "classicos": [],
+  "times": [
+    "atenas_uy", "cerrito", "colon_uy", "fenix", "huracan_uy", "la_luz", "miramar_misiones",
+    "oriental_uy", "paysandu_uy", "plaza_colonia", "rentistas", "river_plate_uy",
+    "tacuarembo", "uruguay_montevideo"
+  ]
+}
