@@ -11,7 +11,8 @@
     "vaga_libertadores": 4,
     "vaga_libertadores_criterio": "1º e 2º colocados do Campeonato Nacional, campeão da Copa de la Liga, vencedor de jogo único entre o 3º colocado e o campeão da Copa Chile",
     "vaga_sulamericana": 4,
-    "vaga_sulamericana_criterio": "4º, 5º e 6º colocados do Campeonato Nacional, mais o perdedor do jogo único entre 3º colocado e campeão da Copa Chile"
+    "vaga_sulamericana_criterio": "4º, 5º e 6º colocados do Campeonato Nacional, mais o perdedor do jogo único entre 3º colocado e campeão da Copa Chile",
+    "rebaixamento_proxima_divisao": 2
   },
   "classicos": [
     { "time_a": "colo_colo", "time_b": "universidad_de_chile", "nome": "Superclásico", "peso_midia": 5 },

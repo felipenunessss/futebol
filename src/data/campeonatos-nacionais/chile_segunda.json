@@ -1,0 +1,21 @@
+{
+  "id": "chile_segunda",
+  "nome": "Liga de Ascenso do Chile",
+  "pais": "CL",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 },
+    "mata_mata": { "fases": ["quartas_liguilla", "semifinal_liguilla", "final_liguilla"], "ida_e_volta": true }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2,
+    "rebaixamento_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "san_marcos_de_arica", "deportes_iquique", "cobreloa", "deportes_antofagasta", "deportes_copiapo",
+    "san_luis_de_quillota", "santiago_wanderers", "union_san_felipe", "deportes_recoleta", "magallanes",
+    "union_espanola", "deportes_santa_cruz", "curico_unido", "rangers_talca", "deportes_temuco", "deportes_puerto_montt"
+  ]
+}

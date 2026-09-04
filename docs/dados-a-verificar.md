@@ -782,9 +782,50 @@ nesta rodada (confirmei só nome/cidade).
   Campeonato Nacional, campeão da Copa de la Liga, vencedor de jogo
   único 3º colocado x campeão da Copa Chile) e 4 Sul-Americana (4º, 5º,
   6º colocados + perdedor daquele jogo único).
-- **Rebaixamento não confirmado**: não encontrei o número exato de
-  descensos nesta rodada de pesquisa — `premiacao` ficou sem
-  `rebaixamento_proxima_divisao`.
+- **Rebaixamento — resolvido na modelagem da 2ª divisão**: 2 clubes descem
+  por temporada. Confirmado ao modelar `chile_segunda.json` — a seção
+  "Relevos" da Wikipédia da Liga de Ascenso 2026 lista Deportes Iquique
+  (15º) e Unión Española (16º) como os 2 rebaixados da Liga de Primera
+  2025 que passaram a disputar a Liga de Ascenso em 2026.
+  `premiacao.rebaixamento_proxima_divisao: 2` preenchido.
+
+## 2ª divisão CONMEBOL — Chile (Liga de Ascenso)
+
+- **Correção de nome**: a competição chamada "Primera B" em pesquisas
+  anteriores foi renomeada — a página da Wikipédia ES está em
+  "Liga de Ascenso de Chile 2026" (redirecionada a partir de "Primera B
+  de Chile 2026"), e o texto do artigo confirma "Liga de Ascenso 2026"
+  como nome vigente. Usado esse nome em `nome` do JSON.
+- **Fonte**: fetch direto do HTML da Wikipédia ES (tabela "Información"
+  com técnico/estádio/capacidade por clube, e texto de "Sistema de
+  competición"/"Relevos"/"Play-Offs") — evitei resumo por IA depois que
+  rodadas anteriores (Argentina, Bolívia) tiveram erro de raspagem
+  nessa abordagem.
+- **Elenco 2026: 16 de 16 clubes confirmados**, batendo exatamente com
+  os 16 já adicionados numa tentativa anterior que falhou por rate limit
+  antes de commitar — conferido clube a clube contra a tabela oficial,
+  nenhuma correção necessária. A seção "Relevos" explica por que dois
+  nomes que aparecem como links na página (Universidad de Concepción,
+  Deportes Concepción) NÃO estão nos 16: subiram para a Liga de Primera
+  2026 (já corretamente cadastrados em `chile_primera.json`); e por que
+  "Santiago Morning" também aparece mencionado sem estar nos 16: desceu
+  da Liga de Ascenso para a Segunda División Profesional (3ª nível, não
+  modelada) depois de 2025.
+- **Formato real 2026, alta confiança** (texto do regulamento na própria
+  Wikipédia): 30 rodadas, turno e returno (`pontos_corridos`). O campeão
+  (1º colocado) sobe direto à Liga de Primera 2027. A 2ª vaga de acesso
+  vai a uma "liguilla" de ida e volta entre 2º-8º colocados: 3º-8º jogam
+  quartas de final (3x8, 4x7, 5x6), o 2º colocado entra direto na
+  semifinal (bye), e o vencedor da final leva a 2ª vaga — modelado como
+  `mata_mata.fases: ["quartas_liguilla", "semifinal_liguilla",
+  "final_liguilla"]`, `ida_e_volta: true`; o bye do 2º colocado não é
+  representável no schema atual (mesma classe de aproximação já usada no
+  "Reduzido" argentino) — documentado aqui, não modelado em `etapas`
+  porque os confrontos dependem da posição final (o campeonato 2026 real
+  ainda está em andamento, 22 de 30 rodadas jogadas até 31/08/2026 — não
+  dá pra cravar quem ocupa cada posição ainda).
+- **Rebaixamento**: 1 clube desce à Segunda División Profesional (3ª
+  nível, não modelada) — `rebaixamento_proxima_divisao: 1`.
 
 ## Expansão CONMEBOL — Colômbia (1ª divisão)
 
