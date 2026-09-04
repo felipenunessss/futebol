@@ -1,0 +1,27 @@
+{
+  "id": "venezuela_segunda",
+  "nome": "Segunda División da Venezuela",
+  "pais": "VE",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 4, "rodadas": 14 },
+    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 4, "rodadas": 14 },
+    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 8, "ida_e_volta": true, "classificam_por_grupo": 4 },
+    "mata_mata": { "fases": ["quartas", "semifinal", "final_do_apertura_ou_clausura"], "ida_e_volta": true },
+    "final_estadual": {
+      "criterio": "final_absoluta_ida_e_volta_entre_campeoes_do_apertura_e_clausura_vencedor_sobe_a_primeira_divisao",
+      "ida_e_volta": true
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 1
+  },
+  "classicos": [],
+  "times": [
+    "atletico_avila", "aragua_fc", "bolivar_ve", "deportivo_miranda", "dynamo_puerto",
+    "maritimo_la_guaira", "mineros_de_guayana", "monagas_b", "academia_puerto_cabello_b",
+    "atletico_barinas", "atletico_el_vigia", "barquisimeto_sc", "deportivo_lara",
+    "real_frontera", "urena", "yaracuyanos", "zamora_b"
+  ]
+}

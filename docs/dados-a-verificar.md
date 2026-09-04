@@ -811,6 +811,27 @@ nesta rodada (confirmei só nome/cidade).
   temporadas seguintes, quando o normal (2027+) deve voltar a ter
   descenso direto.
 
+## 2ª divisão CONMEBOL — Venezuela (Segunda División)
+
+- **Elenco 2026**: 17 clubes cadastrados em `venezuela.json` com
+  `divisao_nacional: {"pais": "VE", "nivel": 2}`, incluindo times "B"
+  (reserva) de clubes da Primera División — `monagas_b`,
+  `academia_puerto_cabello_b`, `zamora_b` — que é uma característica real
+  da divisão venezuelana (clubes grandes mandam equipe reserva pra
+  Segunda), não erro de duplicação.
+- **Formato aproximado**: Apertura/Clausura (14 rodadas cada) + fase de
+  grupos de 2×8 + mata-mata — o total de 17 times não fecha exatamente
+  com 2 grupos de 8 (16), então a composição exata dos grupos é uma
+  aproximação, não confirmada time a time contra o regulamento oficial
+  da divisão. Vale revisar contra fonte primária antes de considerar
+  fechado.
+- **Acesso**: 1 vaga à Primera División, campeão da final absoluta entre
+  campeões do Apertura e Clausura (`acesso_proxima_divisao: 1`).
+- Esta seção foi escrita ao finalizar um trabalho que tinha ficado
+  parado no meio (ver commit de conclusão) — o nível de pesquisa aqui é
+  mais raso que o das outras 2ªs divisões CONMEBOL, deliberadamente, a
+  pedido do usuário.
+
 ## Expansão CONMEBOL — Chile (1ª divisão)
 
 - **Fonte**: sem cobertura no openfootball — pesquisado do zero,
