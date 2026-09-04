@@ -10,16 +10,18 @@
     "fase_grupos": { "num_grupos": 2, "times_por_grupo": 4, "ida_e_volta": true, "classificam_por_grupo": 1 },
     "mata_mata": { "fases": ["final_do_apertura_ou_clausura"], "ida_e_volta": false },
     "tabela_acumulada": { "criterio": "soma_das_fases_regulares_define_vagas_internacionais_e_rebaixamento" },
-    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura", "ida_e_volta": false }
+    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura_ou_campeao_absoluto_automatico_se_o_mesmo_time_vencer_os_dois_torneios", "ida_e_volta": false }
   },
   "premiacao": {
-    "vaga_libertadores": 2,
-    "vaga_libertadores_criterio": "campeao_da_liga_na_fase_de_grupos_e_vice_campeao_na_primeira_fase",
-    "vaga_sulamericana": 2,
-    "vaga_sulamericana_criterio": "dois_melhores_da_tabela_acumulada_ainda_nao_classificados_para_a_libertadores"
+    "vaga_libertadores": 4,
+    "vaga_libertadores_criterio": "campeao_e_vice_campeao_da_final_absoluta_entre_campeoes_do_apertura_e_clausura_campeao_vai_direto_a_fase_de_grupos_vice_entra_na_fase_2_mais_os_2_melhores_da_tabela_acumulada",
+    "vaga_sulamericana": 4,
+    "vaga_sulamericana_criterio": "vice_campeao_do_apertura_e_vice_campeao_do_clausura_perdedores_da_final_de_cada_cuadrangular_mais_3_e_4_melhores_da_tabela_acumulada_excluindo_quem_ja_classificou_para_a_libertadores",
+    "rebaixamento_proxima_divisao": 1
   },
   "classicos": [
-    { "time_a": "caracas_fc", "time_b": "deportivo_tachira", "nome": "Clásico del Fútbol Venezolano", "peso_midia": 5 }
+    { "time_a": "caracas_fc", "time_b": "deportivo_tachira", "nome": "Clásico del Fútbol Venezolano", "peso_midia": 5 },
+    { "time_a": "portuguesa_venezuela", "time_b": "estudiantes_merida", "nome": "Clásico Añejo", "peso_midia": 3 }
   ],
   "times": ["academia_puerto_cabello", "anzoategui", "caracas_fc", "carabobo", "deportivo_la_guaira", "deportivo_tachira", "estudiantes_merida", "metropolitanos", "monagas", "portuguesa_venezuela", "rayo_zuliano", "trujillanos", "universidad_central_venezuela", "zamora_venezuela"]
 }

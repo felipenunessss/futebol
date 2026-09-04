@@ -2,12 +2,14 @@
 
 - Foram adicionadas as ligas de primeira divisão de Bolívia, Equador,
   Paraguai, Peru e Venezuela, com clubes, cidades e vínculos `pais`/`nivel`.
-- Peru e Venezuela já foram corrigidos para os elencos de 2026 confirmados nas
-  fontes consultadas: 18 e 14 clubes, respectivamente, incluindo Apertura e
-  Clausura em turno único.
-- Bolívia, Equador e Paraguai ainda precisam de conferência com as listas
-  oficiais das respectivas federações. Formatos, acessos, rebaixamentos e
-  vagas continentais continuam pendentes nos cinco arquivos.
+- **Atualização**: os 5 países já receberam o mesmo tratamento de detalhe
+  que Argentina/Uruguai/Chile/Colômbia — formato real, rebaixamento e vagas
+  de Libertadores/Sul-Americana documentados e confirmados por fonte, ver
+  seções próprias "Expansão CONMEBOL — <país>" mais abaixo neste arquivo.
+  Nenhum ficou sem correção: até os 2 marcados como "já corrigidos" (Peru,
+  Venezuela) numa rodada anterior tinham pelo menos um erro real (Peru:
+  `premiacao` vazia e Liguilla final mal modelada; Venezuela: vagas
+  CONMEBOL subestimadas pela metade — 4+4, não 2+2).
 
 # Dados a verificar
 
@@ -734,6 +736,61 @@ zero.
   peso_midia 3) — rivalidade bem documentada entre os dois clubes mais
   tradicionais fora de Lima, com cruzamentos até internacionais (Copa
   Sul-Americana 2022 e 2026). Mantidos os 2 clássicos de Lima já existentes.
+
+## Expansão CONMEBOL — Venezuela (1ª divisão) — auditoria de modelagem prévia
+
+Diferente de Bolívia/Equador/Paraguai, a Venezuela já tinha sido marcada como
+"corrigida" numa rodada anterior ("fix: model Venezuela 2026 league format"),
+com `formato` detalhado e `premiacao` já preenchida — mas, como nos outros
+países auditados (mesmo os "já corrigidos"), a conferência contra fonte
+primária achou pelo menos um erro real, não só detalhes faltando.
+
+- **Formato**: a estrutura de blocos já modelada estava correta e não
+  precisou de mudança estrutural — confirmado por múltiplas fontes
+  independentes (Wikipédia ES da edição 2026, e ao menos 5 portais
+  esportivos venezuelanos — Balonazos, Líder en Deportes, Sports Venezuela,
+  Pasión x el Deporte, Noticia al Día — descrevendo o mesmo formato pro
+  sorteio dos cuadrangulares 2026). 14 clubes, Apertura e Clausura idênticos:
+  fase 1 de 13 rodadas todos-contra-todos (`turno`/`returno`,
+  `classificam_proxima_fase: 8`), top 8 avançam a 2 cuadrangulares de 4
+  times cada, ida e volta (`fase_grupos`), os 2 vencedores de cuadrangular
+  disputam a final do torneio corto em jogo único (`mata_mata`). Os
+  campeões do Apertura e do Clausura disputam depois a "Final Absoluta" em
+  jogo único (`final_estadual`) — **exceto se o mesmo clube vencer os dois
+  torneios, caso em que é proclamado Campeão Absoluto automaticamente sem
+  jogar a final** (nuance agora registrada no texto de `final_estadual`).
+- **Vagas CONMEBOL — erro real corrigido**: a modelagem anterior tinha só
+  **2 vagas de Libertadores e 2 de Sul-Americana** (4 no total); a fonte
+  primária (Wikipédia ES, seção "Formato" da edição 2026, texto direto da
+  Assembleia Geral da Liga FUTVE) deixa claro que são **4 de Libertadores
+  e 4 de Sul-Americana** (8 no total, bastante pras 14 vagas da liga) —
+  `premiacao` estava subestimada pela metade. Critério exato: Libertadores
+  = campeão + vice da "Liga FUTVE" (a Final Absoluta entre campeões do
+  Apertura/Clausura) + os 2 melhores da tabela acumulada; o campeão vai
+  direto à fase de grupos da Libertadores, o vice entra na fase 2 (detalhe
+  de fase de entrada guardado no texto do critério, schema não modela fase
+  de entrada — mesmo padrão já usado pra Copa do Brasil). Sul-Americana =
+  vice-campeão do Apertura + vice-campeão do Clausura (perdedores da final
+  de cada cuadrangular, diferente do "vice da Liga FUTVE" usado na
+  Libertadores) + 3º e 4º melhores da tabela acumulada ainda não
+  classificados pra Libertadores.
+- **Rebaixamento**: confirmado **1 clube** (último da tabela acumulada,
+  soma dos resultados da fase 1 de cada torneio corto) — já estava correto
+  na modelagem anterior, agora preenchido explicitamente em
+  `premiacao.rebaixamento_proxima_divisao` (campo ausente antes, apesar do
+  texto de `tabela_acumulada.criterio` já mencionar rebaixamento).
+- **Elenco**: os 14 clubes já cadastrados batem exatamente com a Wikipédia
+  ES 2026 (confere inclusive a movimentação real: Trujillanos subiu como
+  campeão da Segunda División 2025 no lugar do Yaracuyanos, rebaixado —
+  Trujillanos já estava certo em `times[]`). Nenhuma mudança.
+- **Clássicos**: mantido o Clásico del Fútbol Venezolano (Caracas FC x
+  Deportivo Táchira); adicionado o "Clásico Añejo" (Portuguesa FC x
+  Estudiantes de Mérida, peso_midia 3) — um dos clássicos mais antigos do
+  país, iniciado em 1972, confirmado pela página dedicada da Wikipédia
+  "Rivalidades de fútbol en Venezuela". Não adicionado o Clásico Andino
+  (Estudiantes de Mérida x Deportivo Táchira, 1975) nem os Derbis da
+  Capital (Caracas/La Guaira/Metropolitanos/UCV) por já ter 2 clássicos
+  bem confirmados e não forçar mais do que o pedido.
 
 ## Regras de formato ainda não confirmadas com o regulamento oficial
 
