@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { EtapaMataMata, MataMata } from "../../src/schemas/championship.js";
-import { simularMataMataComEtapas, simularMataMataDoFormato, simularMataMataSimples } from "../../src/simulation/knockout.js";
+import type { EtapaMataMata, FinalEstadual, MataMata } from "../../src/schemas/championship.js";
+import {
+  simularFinalEstadualDoFormato,
+  simularMataMataComEtapas,
+  simularMataMataDoFormato,
+  simularMataMataSimples,
+} from "../../src/simulation/knockout.js";
 
 describe("simularMataMataSimples", () => {
   it("4 times, 2 fases (semifinal+final): produz 1 campeão que estava entre os 4", () => {
@@ -92,5 +97,28 @@ describe("simularMataMataDoFormato", () => {
     const formato: MataMata = { fases: ["semifinal", "final"], ida_e_volta: true };
     const resultado = simularMataMataDoFormato(formato, ratings, ["a", "b", "c", "d"], () => Math.random());
     expect(["a", "b", "c", "d"]).toContain(resultado.campeao);
+  });
+});
+
+describe("simularFinalEstadualDoFormato", () => {
+  const ratings = { a: 1600, b: 1600 };
+  const formato: FinalEstadual = { criterio: "campeoes_turno_returno_ou_melhor_campanha", ida_e_volta: true };
+
+  it("com 1 participante só, é campeão automático — sem final, sem confronto", () => {
+    const resultado = simularFinalEstadualDoFormato(formato, ["a"], ratings, () => Math.random());
+    expect(resultado.campeao).toBe("a");
+    expect(resultado.confronto).toBeUndefined();
+  });
+
+  it("com 2 participantes, resolve o confronto e o campeão é um dos dois", () => {
+    const resultado = simularFinalEstadualDoFormato(formato, ["a", "b"], ratings, () => Math.random());
+    expect(["a", "b"]).toContain(resultado.campeao);
+    expect(resultado.confronto).toBeDefined();
+    expect(resultado.confronto?.vencedor).toBe(resultado.campeao);
+  });
+
+  it("lança erro com número de participantes diferente de 1 ou 2", () => {
+    expect(() => simularFinalEstadualDoFormato(formato, [], ratings)).toThrow();
+    expect(() => simularFinalEstadualDoFormato(formato, ["a", "b", "c"], ratings)).toThrow();
   });
 });

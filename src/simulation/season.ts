@@ -74,11 +74,13 @@ export interface ResultadoTemporadaPontosCorridos {
   tabela: LinhaTabela[];
 }
 
-function linhaVazia(clubeId: string): LinhaTabela {
+/** Exportado pra outros geradores de confronto (ex: `swiss.ts`) montarem tabela sem duplicar essa lógica. */
+export function linhaVazia(clubeId: string): LinhaTabela {
   return { clubeId, pontos: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, saldoDeGols: 0 };
 }
 
-function atualizarLinha(linha: LinhaTabela, golsFeitos: number, golsSofridos: number): void {
+/** Exportado pelo mesmo motivo que `linhaVazia`. */
+export function atualizarLinha(linha: LinhaTabela, golsFeitos: number, golsSofridos: number): void {
   linha.jogos++;
   linha.golsPro += golsFeitos;
   linha.golsContra += golsSofridos;

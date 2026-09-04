@@ -1,4 +1,4 @@
-import type { EtapaMataMata, MataMata } from "../schemas/championship.js";
+import type { EtapaMataMata, FinalEstadual, MataMata } from "../schemas/championship.js";
 import { gerarPerfilTime, probabilidadeDeVencer, simularPartida } from "./match.js";
 
 /**
@@ -53,12 +53,13 @@ function emparelharPorForca(participantes: string[], ratings: Record<string, num
   return pares;
 }
 
-function resolverConfronto(
+/** Exportado pra `simularFinalEstadualDoFormato` reaproveitar (uma final de estadual é, na essência, um confronto de mata-mata isolado). */
+export function resolverConfronto(
   timeA: string,
   timeB: string,
   ratings: Record<string, number>,
   idaEVolta: boolean,
-  random: () => number,
+  random: () => number = Math.random,
 ): ResultadoConfrontoMataMata {
   const ratingA = ratings[timeA];
   const ratingB = ratings[timeB];
@@ -156,4 +157,36 @@ export function simularMataMataDoFormato(
   }
 
   return simularMataMataSimples(participantes, formato.fases, formato.ida_e_volta, ratings, random);
+}
+
+export interface ResultadoFinalEstadual {
+  campeao: string;
+  /** Ausente quando não houve final de fato — alguém já tinha se sagrado campeão automático (ex: mesmo clube venceu turno e returno, ver `FinalEstadual.criterio`). */
+  confronto?: ResultadoConfrontoMataMata;
+}
+
+/**
+ * Resolve uma `FinalEstadual` (ver `schemas/championship.ts`) — a final
+ * entre campeões de turno/returno (Uruguai, Carioca, etc). `criterio` é
+ * texto livre e não é interpretado aqui: cabe a quem chama decidir, a
+ * partir dele, quem são os participantes (normalmente 2 — campeão do turno
+ * x campeão do returno — ou só 1, quando o mesmo clube venceu os dois e
+ * já é campeão automático sem precisar de final).
+ */
+export function simularFinalEstadualDoFormato(
+  formato: FinalEstadual,
+  participantes: string[],
+  ratings: Record<string, number>,
+  random: () => number = Math.random,
+): ResultadoFinalEstadual {
+  if (participantes.length === 1) {
+    return { campeao: participantes[0] };
+  }
+
+  if (participantes.length !== 2) {
+    throw new Error(`simularFinalEstadualDoFormato: esperava 1 ou 2 participantes, recebeu ${participantes.length}`);
+  }
+
+  const confronto = resolverConfronto(participantes[0], participantes[1], ratings, formato.ida_e_volta, random);
+  return { campeao: confronto.vencedor, confronto };
 }
