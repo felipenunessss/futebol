@@ -11,8 +11,8 @@ Um simulador de carreira de jogador de futebol inspirado no **Copero.net**, mas 
 2. **Imersão profunda em campeonatos regionais e estaduais brasileiros** (Paulistão, Carioca, Mineiro, Gaúcho, etc.), tratados como parte central da jornada, não como preenchimento de calendário.
 3. **Mix de mecânicas de evolução** entre três referências:
    - **Copero** → XP por desempenho real em campo, jornada narrativa de carreira.
-   - **Brasfoot** → profundidade de gestão: mercado de transferências, negociação, finanças de clube, database realista.
-   - **Pro Clubs** → arquétipos por posição, progressão em níveis, perks desbloqueáveis, builds com identidade.
+   - **Brasfoot/Football Manager** → motor de partida por atributo/tática (não só resultado abstrato) e profundidade de gestão: mercado de transferências, negociação, finanças de clube, database realista.
+   - **Pro Clubs** → arquétipos por posição, builds com identidade — **sem perks/habilidades especiais**: arquétipo acelera o crescimento de atributos numéricos (estilo FIFA), não desbloqueia poder nenhum. Decisão registrada em detalhe em `docs/motor-de-partida.md`, que também supersede a seção 3 abaixo.
 
 Database ampla: clubes reais das primeiras e segundas divisões de ~50-60 países do futebol mundial (Europa toda, América do Sul toda, principais da América do Norte/África/Ásia), com todas as nacionalidades disponíveis para criação de jogador.
 
@@ -91,6 +91,13 @@ Estrutura modular — cada estado ativa só os blocos de formato que usa de verd
 ---
 
 ## 3. Sistema de Evolução do Jogador
+
+> **Superada por `docs/motor-de-partida.md`** (design da Fase 2/3, sessão
+> dedicada a pensar a lógica das partidas): sem perks, sem slots de nível —
+> tudo vira atributo numérico 0-99 estilo FIFA, arquétipo só acelera
+> crescimento, e `nível`/overall é derivado dos atributos, não um recurso
+> separado. As seções 3.1-3.3 abaixo ficam como registro histórico do
+> desenho original, não como fonte de verdade atual.
 
 ### 3.1 Geração de XP (base Copero)
 

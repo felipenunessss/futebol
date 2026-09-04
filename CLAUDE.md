@@ -18,7 +18,8 @@ Simulador de carreira de futebol (base Copero + Brasfoot + Pro Clubs), com foco 
 
 ```
 docs/
-  game-design.md          — design doc original do jogo
+  game-design.md          — design doc original do jogo (seção 3 superada, ver motor-de-partida.md)
+  motor-de-partida.md     — design do motor de partida e progressão do jogador (Fase 2/3): rating tipo Elo, duelo por zona, atributos sem perks
   dados-a-verificar.md    — pendências/ressalvas de dados (leia antes de confiar em algo "meio certo")
   regras-competicoes.md   — decisões de regra de jogo (não de dado) pendentes de implementação na Fase 2
 
