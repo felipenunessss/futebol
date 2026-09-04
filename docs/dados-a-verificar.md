@@ -516,6 +516,70 @@ nesta rodada (confirmei só nome/cidade).
   da FIFA 2026, na Recopa Sul-Americana 2027 e na Copa Mundial de Clubes
   da FIFA 2029) — fica só documentado aqui, sem campo correspondente.
 
+## Modelagem — Copa Sul-Americana 2026
+
+- **Fonte**: busca agregada (Infobae, El Gráfico, ESPN, promediosinfo.com)
+  + fetch direto da Wikipédia ES "Copa Sudamericana 2026" (mapa de
+  localização dos clubes participantes, que também marca com "(L)" os
+  clubes transferidos da Copa Libertadores 2026 — mesma edição que acabou
+  de ser modelada em `libertadores.json`). Como a Libertadores, a edição
+  2026 já está em andamento no mundo real (fase de grupos disputada entre
+  abril e maio de 2026); final marcada para 21/11/2026, em jogo único, no
+  Estádio Metropolitano Roberto Meléndez, Barranquilla-Colômbia (fonte:
+  CONMEBOL, ESPN).
+- **Elenco**: **56 de 56 clubes confirmados** no mapa de participantes da
+  Wikipédia (todos já existiam na base, cadastrados durante a modelagem
+  dos 9 países CONMEBOL + Brasil e/ou durante a modelagem da própria
+  Libertadores — nenhum clube novo precisou ser criado). Distribuição por
+  país: Argentina 8, Bolívia 5, Brasil 7, Chile 5, Colômbia 6, Equador 4,
+  Paraguai 4, Peru 5, Uruguai 6, Venezuela 6. Isso inclui tanto os times
+  que já estão nos 32 confirmados da fase de grupos (28 confirmados
+  nominalmente + 4 vagas que só se resolvem quando saírem os perdedores
+  da Fase 3 da Libertadores, ainda não jogada na fonte consultada) quanto
+  os que disputam só fases preliminares — `times[]` não distingue fase de
+  entrada, mesmo critério já usado na Copa do Brasil e na Libertadores.
+  - **12 clubes marcados "(L)" no mapa da Wikipédia** (`boca_juniors`,
+    `lanus`, `bolivar`, `botafogo`, `ohiggins`, `santa_fe_co`,
+    `independiente_medellin`, `sporting_cristal`, `nacional_uy`,
+    `juventud`, `universidad_central_venezuela`, `carabobo`) também
+    aparecem em `times[]` da Libertadores — **não é duplicata/erro**: são
+    clubes que disputam (ou disputaram) a Libertadores e, se eliminados
+    nas fases preliminares dela, são transferidos pra Sul-Americana no
+    mesmo ano, então aparecer nas duas listas é o comportamento real
+    esperado.
+- **Formato modelado (corpo principal)**: fase de grupos com os 32 clubes
+  que a alcançam (8 grupos de 4, todos contra todos ida e volta) —
+  confiança alta pro tamanho/formato geral (confirmado por múltiplas
+  fontes de imprensa). **Assimetria não representada**: só o 1º colocado
+  de cada grupo avança direto às oitavas; o 2º colocado disputa um
+  **repechaje** contra um dos 8 times eliminados em 3º lugar da fase de
+  grupos da própria Libertadores (mecanismo já citado na seção da
+  Libertadores) — modelei como `classificam_por_grupo: 2` por aproximação
+  (mesmo padrão de simplificação já usado em outras assimetrias do
+  projeto, ex: Pernambucano A1), perdendo a informação de que só metade
+  dos classificados avança direto.
+- **Fase preliminar — pendência de modelagem** (mesmo problema já
+  documentado na Copa do Brasil e na Libertadores): número exato de
+  rodadas eliminatórias antes da fase de grupos e entrada escalonada por
+  país/ranking não foram mapeados em detalhe nesta rodada — o schema não
+  tem bloco pra representar isso, então só o corpo principal (fase de
+  grupos + mata-mata) foi modelado.
+- **Final em jogo único** (Barranquilla, confirmado por fonte) — mesma
+  limitação já documentada na Copa do Brasil e na Libertadores: o bloco
+  `mata_mata` do schema usa um `ida_e_volta` único pra todas as fases
+  listadas, não representa a final como exceção.
+- **`pais: "CONMEBOL"`**: mesma decisão deliberada já usada na
+  Libertadores — sem sede única (a final é rotativa, mas todo o resto do
+  torneio é distribuído pelos 10 países).
+- **Premiação — vaga direta na Libertadores seguinte**: confirmado por
+  fonte (desde 2016, regra vigente) que o campeão da Sul-Americana entra
+  direto na fase de grupos da Libertadores do ano seguinte — nenhum campo
+  de `Premiacao` do schema atual cobre isso (é uma vaga *concedida por*
+  uma competição *pra* outra competição irmã, não uma vaga estadual pra
+  competição nacional), fica só documentado aqui, sem campo
+  correspondente, mesma situação da premiação da própria Libertadores
+  (Intercontinental/Recopa/Mundial de Clubes).
+
 ## Expansão CONMEBOL — Argentina (1ª divisão)
 
 - **Fonte**: openfootball só tem até a temporada 2025 (30 clubes,
