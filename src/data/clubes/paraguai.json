@@ -1,7 +1,7 @@
 [
   { "id": "ameliano", "nome": "Club Sportivo Ameliano", "nome_popular": "Ameliano", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
   { "id": "cerro_porteno", "nome": "Club Cerro Porteño", "nome_popular": "Cerro Porteño", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
-  { "id": "general_caballero_jlm", "nome": "Club General Caballero JLM", "nome_popular": "General Caballero JLM", "pais": "PY", "cidade": "Juan León Mallorquín" },
+  { "id": "general_caballero_jlm", "nome": "Club General Caballero JLM", "nome_popular": "General Caballero JLM", "pais": "PY", "cidade": "Juan León Mallorquín", "estadio": "Ka'arendy", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
   { "id": "guarani_paraguai", "nome": "Club Guaraní", "nome_popular": "Guaraní", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
   { "id": "libertad_paraguai", "nome": "Club Libertad", "nome_popular": "Libertad", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
   { "id": "nacional_paraguai", "nome": "Club Nacional", "nome_popular": "Nacional", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
@@ -11,5 +11,20 @@
   { "id": "san_lorenzo_paraguai", "nome": "Club Sportivo San Lorenzo", "nome_popular": "San Lorenzo", "pais": "PY", "cidade": "San Lorenzo", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
   { "id": "sportivo_2_de_mayo", "nome": "Club Sportivo 2 de Mayo", "nome_popular": "2 de Mayo", "pais": "PY", "cidade": "Pedro Juan Caballero", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
   { "id": "sportivo_luqueno", "nome": "Club Sportivo Luqueño", "nome_popular": "Sportivo Luqueño", "pais": "PY", "cidade": "Luque", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
-  { "id": "trinidense", "nome": "Club Sportivo Trinidense", "nome_popular": "Trinidense", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } }
+  { "id": "trinidense", "nome": "Club Sportivo Trinidense", "nome_popular": "Trinidense", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 } },
+  { "id": "doce_de_junio", "nome": "Club 12 de Junio", "nome_popular": "12 de Junio", "pais": "PY", "cidade": "Villa Hayes", "estadio": "Facundo de León Fossati", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "tres_de_noviembre", "nome": "Club 3 de Noviembre", "nome_popular": "3 de Noviembre", "pais": "PY", "cidade": "Asunción", "estadio": "Rubén Ramírez", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "atletico_tembetary", "nome": "Club Atlético Tembetary", "nome_popular": "Tembetary", "pais": "PY", "cidade": "Villa Elisa", "estadio": "Complejo Tembetary", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "benjamin_aceval", "nome": "Club Benjamín Aceval", "nome_popular": "Benjamín Aceval", "pais": "PY", "cidade": "Villa Hayes", "estadio": "Isidro Roussillón", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "deportivo_capiata", "nome": "Club Deportivo Capiatá", "nome_popular": "Deportivo Capiatá", "pais": "PY", "cidade": "Capiatá", "estadio": "Lic. Erico Galeano Segovia", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "deportivo_santani", "nome": "Club Deportivo Santaní", "nome_popular": "Deportivo Santaní", "pais": "PY", "cidade": "San Estanislao", "estadio": "Juan José Vázquez", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "encarnacion_fc", "nome": "Encarnación Fútbol Club", "nome_popular": "Encarnación FC", "pais": "PY", "cidade": "Encarnación", "estadio": "Villa Alegre", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "fernando_de_la_mora", "nome": "Club Fernando de la Mora", "nome_popular": "Fernando de la Mora", "pais": "PY", "cidade": "Asunción", "estadio": "Emiliano Ghezzi", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "guairena_fc", "nome": "Guaireña Fútbol Club", "nome_popular": "Guaireña", "pais": "PY", "cidade": "Villarrica", "estadio": "Parque del Guairá", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "independiente_fbc", "nome": "Independiente Football Club", "nome_popular": "Independiente CG", "pais": "PY", "cidade": "Asunción", "estadio": "Ricardo Gregor", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "paraguari_ac", "nome": "Paraguarí Atlético Club", "nome_popular": "Paraguarí", "pais": "PY", "cidade": "Paraguarí", "estadio": "General Bruguez", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "resistencia_py", "nome": "Club Resistencia", "nome_popular": "Resistencia", "pais": "PY", "cidade": "Asunción", "estadio": "Tomás Beggan Correa", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "sol_de_america", "nome": "Club Sol de América", "nome_popular": "Sol de América", "pais": "PY", "cidade": "Villa Elisa", "estadio": "Luis Alfonso Giagni", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "sportivo_carapegua", "nome": "Sportivo Carapeguá", "nome_popular": "Sportivo Carapeguá", "pais": "PY", "cidade": "Carapeguá", "estadio": "Municipal de Carapeguá", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "tacuary", "nome": "Club Tacuary", "nome_popular": "Tacuary", "pais": "PY", "cidade": "Asunción", "estadio": "Toribio Vargas", "divisao_nacional": { "pais": "PY", "nivel": 2 } }
 ]

@@ -1,0 +1,24 @@
+{
+  "id": "paraguai_segunda",
+  "nome": "División Intermedia do Paraguai",
+  "pais": "PY",
+  "nivel": 2,
+  "ano_referencia": 2026,
+  "formato": {
+    "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 },
+    "tabela_acumulada": {
+      "criterio": "media_de_pontos_das_ultimas_3_temporadas_define_os_3_rebaixados_a_primera_b_metropolitana_ou_nacional_conforme_a_sede_do_clube"
+    }
+  },
+  "premiacao": {
+    "acesso_proxima_divisao": 2,
+    "rebaixamento_proxima_divisao": 3
+  },
+  "classicos": [],
+  "times": [
+    "general_caballero_jlm", "doce_de_junio", "tres_de_noviembre", "atletico_tembetary",
+    "benjamin_aceval", "deportivo_capiata", "deportivo_santani", "encarnacion_fc",
+    "fernando_de_la_mora", "guairena_fc", "independiente_fbc", "paraguari_ac",
+    "resistencia_py", "sol_de_america", "sportivo_carapegua", "tacuary"
+  ]
+}

@@ -1086,9 +1086,11 @@ nesta rodada (confirmei só nome/cidade).
   normalmente lhe daria uma vaga de Libertadores 2026 — mas por estar
   rebaixado, a vaga passou pro vice-campeão da copa (2 de Mayo), que por
   isso está entre os 4 clubes paraguaios na Libertadores 2026 apesar de
-  não ter vencido nada na liga. Ele segue cadastrado em
-  `src/data/clubes/paraguai.json` sem `divisao_nacional` (a División
-  Intermedia não é modelada neste projeto) — mantido assim.
+  não ter vencido nada na liga. **Atualização**: a División Intermedia
+  foi modelada (ver seção "2ª divisão CONMEBOL — Paraguai" abaixo) — o
+  clube agora tem `divisao_nacional: {"pais": "PY", "nivel": 2}` e está
+  em `times[]` de `paraguai_segunda.json`, liderando a tabela com boa
+  folga até a rodada mais recente disputada (31/08/2026).
 - **Clássicos**: mantido o Superclásico Paraguayo (Cerro Porteño x
   Olimpia); adicionado o Clásico del Barrio Obrero (Cerro Porteño x
   Nacional, os dois clubes mais tradicionais do bairro Barrio Obrero em
@@ -1096,6 +1098,41 @@ nesta rodada (confirmei só nome/cidade).
   (ADN Digital, Agencia IP, Versus/VS Sports) cobrindo a edição real de
   2026. Cuidado: a pesquisa inicial chegou a supor "Libertad x Nacional"
   pra esse clássico, o que é **errado** — foi corrigido antes de gravar.
+
+## 2ª divisão CONMEBOL — Paraguai (División Intermedia)
+
+- **Estrutura do sistema paraguaio, mais complexa que um simples "2ª
+  divisão"**: a División Intermedia é uma segunda divisão nacional
+  única, mas desce pra **duas** terceiras divisões diferentes conforme a
+  sede do clube — "Primera División B" (clubes de Assunção e cidades a
+  menos de 50 km, ou seja, a região metropolitana) e "Primera División B
+  Nacional" (resto do país). Nenhuma das duas foi modelada (seriam 3º
+  nível), só documentado o mecanismo.
+- **Fonte**: fetch direto do HTML da Wikipédia ES ("División Intermedia
+  2026" e a página de desambiguação "División Intermedia (Paraguay)"),
+  tabela "Equipo/Ciudad/Estadio/Fundación" + texto de "Tabla de
+  promedios" + tabela de classificação com anotações de acesso/descenso,
+  extraídos com parser de HTML em Python (mesmo método usado em
+  Chile/Colômbia/Equador).
+- **Elenco 2026: 16 de 16 clubes confirmados**. `general_caballero_jlm`
+  já existia na base (ver atualização acima) — só ganhou
+  `divisao_nacional` nivel 2. Os outros 15 são novos em `paraguai.json`.
+- **Formato**: pontos corridos, turno e returno (30 rodadas, 16 times,
+  240 jogos no total — bate exatamente com ida e volta pra 16 times) —
+  já estava certo na modelagem inicial fraca, mantido.
+- **Acesso à Primera División — não totalmente confirmado**: a tabela de
+  classificação (ainda em andamento, 22-23 de 30 rodadas jogadas até
+  31/08/2026) só anota explicitamente "Ascienden a Primera División de
+  Paraguay" (verbo no plural) ao lado do 1º colocado — o plural sugere
+  que mais de um clube sobe, mas não encontrei confirmação explícita de
+  que o 2º colocado sobe direto ou se há repechaje. Modelado como
+  aproximação com `acesso_proxima_divisao: 2`; vale reconfirmar quando a
+  temporada real terminar (outubro de 2026) e a tabela final anotar
+  todos os acessos.
+- **Rebaixamento**: 3 clubes descem, confirmado com alta confiança (texto
+  do regulamento "Tabla de promedios" na própria Wikipédia) — por média
+  de pontos das últimas 3 temporadas (2024+2025+2026), não simples
+  posição final da temporada atual. `rebaixamento_proxima_divisao: 3`.
 
 ## Expansão CONMEBOL — Peru (1ª divisão) — auditoria de modelagem prévia
 
