@@ -559,9 +559,12 @@ habilidade nenhuma — só **acelera o crescimento** de atributos específicos.
 Cobre "Narrativa de carreira" e "Vida fora de campo" (`game-design.md`
 seções 5.1 e 5.3: lesões, imprensa regional, dilemas de proposta/lealdade,
 rivalidades pessoais, vida pessoal/mudança de cidade, relação com comissão
-técnica/elenco, patrocínios, reputação regional). Implementado em
-`src/progression/scenarios.ts`, com catálogo de 10 cenários (`CENARIOS`) e
-demo via `npx tsx src/cli/index.ts cenario`.
+técnica/elenco/diretoria, patrocínios, reputação regional, agente/contrato,
+convocação, momentos dentro de uma partida — pênalti decisivo, discussão
+com árbitro). Implementado em `src/progression/scenarios.ts`, com catálogo
+de 30 cenários (`CENARIOS`, propositalmente grande e variado pra que
+carreiras diferentes não repitam sempre os mesmos dilemas — ver pendência
+de condições de gatilho abaixo) e demo via `npx tsx src/cli/index.ts cenario`.
 
 - **Cenário** tem 2-3 **opções**; cada opção tem 1+ **resultados
   possíveis**, cada um com probabilidade própria (`resolverEscolha` sorteia

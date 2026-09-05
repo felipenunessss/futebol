@@ -10,6 +10,11 @@ import {
 } from "../../src/progression/scenarios.js";
 
 describe("catálogo de cenários", () => {
+  it("tem uma quantidade grande e diversa de cenários (todo id único)", () => {
+    expect(CENARIOS.length).toBeGreaterThanOrEqual(30);
+    expect(new Set(CENARIOS.map((c) => c.id)).size).toBe(CENARIOS.length);
+  });
+
   it("todo cenário tem entre 2 e 3 opções", () => {
     for (const cenario of CENARIOS) {
       expect(cenario.opcoes.length).toBeGreaterThanOrEqual(2);
