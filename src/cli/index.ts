@@ -21,7 +21,14 @@ import { converterChancesEmDesempenho } from "../progression/xp.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
-import { jogarCarreira, jogarTemporada, type CenarioResolvidoNaTemporada, type NegociacaoResolvidaNaTemporada, type ResultadoTemporadaDeCarreira } from "../career/career-loop.js";
+import {
+  jogarCarreira,
+  jogarTemporada,
+  type CenarioResolvidoNaTemporada,
+  type NegociacaoResolvidaNaTemporada,
+  type ResultadoTemporadaDeCarreira,
+  type ResumoPartidasDaTemporada,
+} from "../career/career-loop.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -436,12 +443,27 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     console.log(`  -> ${resolvido.escolha.resultado.impacto.narrativa} (${formatarImpacto(resolvido.escolha.resultado.impacto)})`);
   };
 
+  const onPartidasResumidas = (resumo: ResumoPartidasDaTemporada): void => {
+    console.log(`\n--- Partidas da temporada ---`);
+    for (const c of resumo.competicoes) {
+      if (c.erro) {
+        console.log(`  ✗ ${c.campeonatoId}: não simulada (${c.erro})`);
+      } else if (c.partidasDoJogador > 0) {
+        console.log(`  ✓ ${c.campeonatoId}: campeão ${nomeDoClube(c.campeao!)} | você jogou ${c.partidasDoJogador} partida(s) — ${c.golsDoJogador} gol(s), ${c.assistenciasDoJogador} assistência(s)`);
+      } else {
+        console.log(`  ✓ ${c.campeonatoId}: campeão ${nomeDoClube(c.campeao!)} (seu clube não disputou, ou você não jogou)`);
+      }
+    }
+    console.log(`  Overall: ${resumo.overallAntes} -> ${resumo.overallDepois}`);
+  };
+
   let continuar = true;
   while (continuar) {
     const resultado: ResultadoTemporadaDeCarreira = await jogarTemporada(estado, campeonatos, clubes, {
       escolherOpcao: escolherOpcaoInterativa,
       onNegociacaoResolvida,
       onCenarioResolvido,
+      onPartidasResumidas,
     });
     estado = resultado.estado;
 

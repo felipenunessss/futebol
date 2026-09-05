@@ -55,6 +55,41 @@ describe("jogarTemporada", () => {
     expect(resultado.cenariosResolvidos[1].momento).toBe("temporada_regular");
   });
 
+  it("devolve resumoPartidas com overall antes/depois e gols/assistências/campeão por competição", async () => {
+    const times = ["a", "b", "c", "d"];
+    const overallInicial = overallAtual(estadoDeTeste());
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    expect(resultado.resumoPartidas.overallAntes).toBe(overallInicial);
+    expect(resultado.resumoPartidas.overallDepois).toBe(overallAtual(resultado.estado));
+
+    const resumoBrasileirao = resultado.resumoPartidas.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
+    expect(resumoBrasileirao.erro).toBeUndefined();
+    expect(times).toContain(resumoBrasileirao.campeao);
+    expect(resumoBrasileirao.partidasDoJogador).toBeGreaterThan(0);
+    expect(resumoBrasileirao.golsDoJogador).toBeGreaterThanOrEqual(0);
+    expect(resumoBrasileirao.assistenciasDoJogador).toBeGreaterThanOrEqual(0);
+  });
+
+  it("chama onPartidasResumidas uma vez, antes do primeiro onCenarioResolvido", async () => {
+    const times = ["a", "b", "c", "d"];
+    const ordemDeChamadas: string[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onPartidasResumidas: () => {
+        ordemDeChamadas.push("partidas");
+      },
+      onCenarioResolvido: () => {
+        ordemDeChamadas.push("cenario");
+      },
+    });
+
+    expect(ordemDeChamadas[0]).toBe("partidas");
+    expect(ordemDeChamadas.filter((c) => c === "partidas")).toHaveLength(1);
+    expect(ordemDeChamadas.filter((c) => c === "cenario")).toHaveLength(5);
+  });
+
   it("devolve o resultado bruto da temporada (calendário de competições)", async () => {
     const times = ["a", "b", "c", "d"];
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });

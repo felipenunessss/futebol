@@ -52,11 +52,31 @@ export interface NegociacaoResolvidaNaTemporada {
   resultado: ResultadoNegociacao;
 }
 
+export interface ResumoCompeticaoNaTemporada {
+  campeonatoId: string;
+  /** Presente quando a competição não pôde ser simulada (ver `simulation/engine.ts` `ResultadoCompeticaoNaTemporada`) — as contagens abaixo ficam zeradas nesse caso. */
+  erro?: string;
+  /** Ausente quando a competição deu `erro`. */
+  campeao?: string;
+  partidasDoJogador: number;
+  golsDoJogador: number;
+  assistenciasDoJogador: number;
+}
+
+export interface ResumoPartidasDaTemporada {
+  overallAntes: number;
+  overallDepois: number;
+  /** Uma entrada por competição do calendário, na mesma ordem de `ResultadoTemporada.competicoes`. */
+  competicoes: ResumoCompeticaoNaTemporada[];
+}
+
 export interface ResultadoTemporadaDeCarreira {
   /** Estado do jogador ao final da temporada — já com a idade/temporada avançadas (ver `avancarTemporada`). */
   estado: EstadoDeCarreira;
   /** Resultado bruto do calendário de competições da temporada (`simulation/engine.ts`). */
   resultadoTemporada: ResultadoTemporada;
+  /** Resumo das partidas do jogador na temporada (gols/assistências/campeão por competição, overall antes/depois) — visão agregada, não partida a partida (ver `onPartidasResumidas` pra saber por quê). */
+  resumoPartidas: ResumoPartidasDaTemporada;
   /** Um cenário resolvido por período do calendário, na ordem em que aconteceram. */
   cenariosResolvidos: CenarioResolvidoNaTemporada[];
   /** Propostas de transferência negociadas na janela da temporada (só período mapeado pra `pre_temporada`, ver `market/transfers.ts` `estaNaJanelaDeTransferencia`) — vazio se nenhum clube demonstrou interesse. Para no primeiro `aceito`. */
@@ -87,6 +107,17 @@ export interface OpcoesJogarTemporada {
   responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
   /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
+  /**
+   * Chamado uma vez por temporada, logo depois de todas as partidas do
+   * calendário serem simuladas e o XP aplicado — antes do primeiro
+   * cenário do período ser sorteado. Não é partida a partida: `simularTemporada`
+   * roda a temporada inteira de uma vez (não período a período), então
+   * não dá pra saber o resultado de uma partida específica antes das
+   * outras sem reestruturar o motor de calendário — o resumo agregado
+   * (gols/assistências/campeão por competição, overall antes/depois) é
+   * o meio-termo prático (ver `ResumoPartidasDaTemporada`).
+   */
+  onPartidasResumidas?: (resumo: ResumoPartidasDaTemporada) => void | Promise<void>;
   /** Chamado assim que cada cenário do período é resolvido — útil pra mostrar o desfecho em tempo real numa interface interativa. */
   onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
   random?: () => number;
@@ -187,6 +218,7 @@ export async function jogarTemporada(
     responderProposta = contrapropostaPadrao,
     onNegociacaoResolvida,
     onCenarioResolvido,
+    onPartidasResumidas,
     random = Math.random,
   } = opcoes;
 
@@ -195,14 +227,36 @@ export async function jogarTemporada(
   const participacaoJogador: ParticipacaoJogadorClube = { clubeId: estado.clubeAtualId, jogador: estado.jogador, estiloTecnico };
   const resultadoTemporada = simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random);
 
+  const overallAntes = overallAtual(estado);
   let estadoAtual = estado;
+  const resumoCompeticoes: ResumoCompeticaoNaTemporada[] = [];
+
   for (const competicao of resultadoTemporada.competicoes) {
-    if (!competicao.resultado) continue;
+    if (!competicao.resultado) {
+      resumoCompeticoes.push({ campeonatoId: competicao.campeonatoId, erro: competicao.erro, partidasDoJogador: 0, golsDoJogador: 0, assistenciasDoJogador: 0 });
+      continue;
+    }
+
+    let golsDoJogador = 0;
+    let assistenciasDoJogador = 0;
     for (const partida of competicao.resultado.partidasDoJogador) {
       const desempenho = converterChancesEmDesempenho(partida.chancesJogador, MINUTOS_POR_PARTIDA_PADRAO, IMPORTANCIA_PADRAO);
       estadoAtual = aplicarDesempenhoPartida(estadoAtual, partida.chancesJogador, desempenho);
+      golsDoJogador += desempenho.gols;
+      assistenciasDoJogador += desempenho.assistencias;
     }
+
+    resumoCompeticoes.push({
+      campeonatoId: competicao.campeonatoId,
+      campeao: competicao.resultado.campeao,
+      partidasDoJogador: competicao.resultado.partidasDoJogador.length,
+      golsDoJogador,
+      assistenciasDoJogador,
+    });
   }
+
+  const resumoPartidas: ResumoPartidasDaTemporada = { overallAntes, overallDepois: overallAtual(estadoAtual), competicoes: resumoCompeticoes };
+  await onPartidasResumidas?.(resumoPartidas);
 
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
@@ -302,7 +356,7 @@ export async function jogarTemporada(
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
   estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
 
-  return { estado: estadoAtual, resultadoTemporada, cenariosResolvidos, negociacoesResolvidas };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ResultadoCarreiraDeVariasTemporadas {
