@@ -3793,4 +3793,815 @@ export const CENARIOS: Cenario[] = [
       },
     ],
   },
+  {
+    id: "convite_para_conselho_deliberativo",
+    titulo: "Convite pro conselho deliberativo",
+    descricao: "O clube convida você a integrar o conselho deliberativo, ainda na ativa.",
+    opcoes: [
+      {
+        id: "aceitar_o_conselho_deliberativo",
+        texto: "Aceitar integrar o conselho",
+        resultados: [
+          { probabilidade: 0.7, impacto: { relacoesInternas: 8, narrativa: "Sua voz no conselho ajuda a equilibrar decisões importantes do clube." } },
+          { probabilidade: 0.3, impacto: { moral: -5, narrativa: "O acúmulo de funções pesa mais do que o esperado na sua rotina." } },
+        ],
+      },
+      {
+        id: "recusar_o_conselho_por_enquanto",
+        texto: "Recusar por enquanto, focando só em jogar",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere adiar esse tipo de responsabilidade institucional." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ameaca_anonima_nas_redes",
+    titulo: "Ameaça anônima nas redes sociais",
+    descricao: "Uma mensagem ameaçadora anônima aparece nas suas redes sociais depois de um resultado ruim.",
+    opcoes: [
+      {
+        id: "denunciar_e_acionar_seguranca",
+        texto: "Denunciar formalmente e acionar a segurança do clube",
+        resultados: [
+          { probabilidade: 1, impacto: { moral: 5, narrativa: "A resposta institucional rápida traz segurança e tranquilidade." } },
+        ],
+      },
+      {
+        id: "ignorar_a_ameaca",
+        texto: "Ignorar a mensagem, tratando como exagero isolado",
+        resultados: [
+          { probabilidade: 0.6, impacto: { narrativa: "A mensagem realmente não passava de um exagero isolado." } },
+          { probabilidade: 0.4, impacto: { moral: -15, narrativa: "A situação escala e exige uma resposta mais séria depois." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "classico_de_maxima_rivalidade_regional",
+    titulo: "Clássico de máxima rivalidade regional",
+    descricao: "Você encara o clássico de maior rivalidade histórica da região, com clima de guerra nas arquibancadas.",
+    opcoes: [
+      {
+        id: "assumir_o_protagonismo_no_classico",
+        texto: "Assumir o protagonismo no clássico",
+        resultados: [
+          { probabilidade: 0.5, impacto: { reputacaoRegional: 20, moral: 15, narrativa: "Uma atuação decisiva no maior clássico da região vira história eterna com a torcida." } },
+          { probabilidade: 0.5, impacto: { reputacaoRegional: -10, moral: -12, narrativa: "A pressão do clássico pesa e a atuação fica bem abaixo do esperado." } },
+        ],
+      },
+      {
+        id: "jogar_dentro_do_seu_papel_no_classico",
+        texto: "Jogar dentro do seu papel normal, sem se expor demais",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 4, narrativa: "Uma atuação discreta, mas sólida, dentro do que se espera de você." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pressao_por_recorde_pessoal_de_gols",
+    titulo: "Pressão por recorde pessoal de gols",
+    descricao: "Você está a poucos gols de bater seu recorde pessoal numa única temporada.",
+    opcoes: [
+      {
+        id: "focar_no_recorde_pessoal",
+        texto: "Focar bastante em bater o recorde",
+        resultados: [
+          { probabilidade: 0.5, impacto: { atributos: { finalizacao: 3 }, reputacao: 12, narrativa: "O recorde é batido, e sua confiança dispara." } },
+          { probabilidade: 0.5, impacto: { moral: -8, narrativa: "A obsessão pelo número pessoal atrapalha o desempenho coletivo do time." } },
+        ],
+      },
+      {
+        id: "priorizar_o_coletivo_sobre_o_recorde",
+        texto: "Priorizar o coletivo, sem se preocupar com o número",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 5, narrativa: "O foco no coletivo é muito bem visto pelo grupo, mesmo sem bater o recorde." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "quebra_de_recorde_do_clube",
+    titulo: "Quebra de recorde histórico do clube",
+    descricao: "Você está próximo de quebrar um recorde histórico de artilharia do clube.",
+    opcoes: [
+      {
+        id: "buscar_a_quebra_do_recorde",
+        texto: "Buscar ativamente a quebra do recorde",
+        resultados: [
+          { probabilidade: 0.55, impacto: { reputacaoRegional: 20, moral: 15, narrativa: "A quebra do recorde histórico consagra seu nome no clube pra sempre." } },
+          { probabilidade: 0.45, impacto: { moral: -8, narrativa: "A pressão pelo recorde histórico pesa e afeta seu desempenho geral." } },
+        ],
+      },
+      {
+        id: "deixar_o_recorde_vir_naturalmente",
+        texto: "Deixar o recorde vir naturalmente, sem forçar",
+        resultados: [
+          { probabilidade: 1, impacto: { moral: 5, narrativa: "A tranquilidade ajuda a manter o rendimento normal do time." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "entrada_para_o_hall_da_fama",
+    titulo: "Convite pro hall da fama do clube",
+    descricao: "O clube anuncia sua entrada no hall da fama institucional, ainda durante a carreira ativa.",
+    opcoes: [
+      {
+        id: "participar_da_cerimonia_do_hall_da_fama",
+        texto: "Participar da cerimônia com discurso emocionado",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 15, moral: 8, narrativa: "O discurso emocionado marca época na história do clube." } },
+        ],
+      },
+      {
+        id: "participar_de_forma_discreta_do_hall_da_fama",
+        texto: "Participar de forma mais discreta",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 6, narrativa: "A homenagem acontece de forma mais simples, mas ainda assim significativa." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "testemunho_em_documentario_de_outro_jogador",
+    titulo: "Convite pra depor em documentário de outro jogador",
+    descricao: "Você é convidado a dar um depoimento num documentário sobre a carreira de outro jogador que admira.",
+    opcoes: [
+      {
+        id: "dar_um_depoimento_sincero",
+        texto: "Dar um depoimento sincero e detalhado",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacao: 6, relacoesInternas: 3, narrativa: "O depoimento é elogiado pela sinceridade e carinho com o colega." } },
+        ],
+      },
+      {
+        id: "recusar_o_depoimento",
+        texto: "Recusar o convite pra depoimento",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere não se envolver na produção do documentário." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "convite_para_selecionar_uniforme_do_clube",
+    titulo: "Convite pra opinar no novo uniforme",
+    descricao: "O departamento de marketing te convida pra opinar sobre o design do próximo uniforme do clube.",
+    opcoes: [
+      {
+        id: "dar_opiniao_ativa_sobre_uniforme",
+        texto: "Dar uma opinião ativa sobre o design",
+        resultados: [
+          { probabilidade: 0.7, impacto: { reputacaoRegional: 6, narrativa: "Sua sugestão é incorporada e bem recebida pela torcida." } },
+          { probabilidade: 0.3, impacto: { reputacaoRegional: -3, narrativa: "Sua sugestão não agrada parte da torcida, que prefere o design tradicional." } },
+        ],
+      },
+      {
+        id: "deixar_a_decisao_com_o_marketing",
+        texto: "Deixar a decisão inteiramente com o marketing",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "O uniforme segue seu processo normal de criação, sem sua interferência direta." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "reuniao_sobre_extensao_de_patrocinio_master",
+    titulo: "Reunião sobre patrocínio master do clube",
+    descricao: "A diretoria pede sua presença numa reunião importante sobre a renovação do patrocínio master do clube.",
+    opcoes: [
+      {
+        id: "participar_ativamente_da_reuniao",
+        texto: "Participar ativamente, dando sua visão de jogador",
+        resultados: [
+          { probabilidade: 0.65, impacto: { relacoesInternas: 8, narrativa: "Sua visão de jogador ajuda a fechar um acordo mais vantajoso pro clube." } },
+          { probabilidade: 0.35, impacto: { relacoesInternas: -3, narrativa: "Sua opinião diverge da diretoria e gera um leve atrito na reunião." } },
+        ],
+      },
+      {
+        id: "apenas_acompanhar_a_reuniao",
+        texto: "Apenas acompanhar, sem se posicionar muito",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "A reunião segue seu curso normal, com sua participação discreta." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "torcida_pede_permanencia_em_ano_de_saida",
+    titulo: "Torcida pede permanência num ano de possível saída",
+    descricao: "Com boatos de saída circulando, a torcida organiza uma campanha pedindo sua permanência no clube.",
+    opcoes: [
+      {
+        id: "sinalizar_permanencia_a_torcida",
+        texto: "Sinalizar publicamente vontade de permanecer",
+        resultados: [
+          { probabilidade: 0.6, impacto: { reputacaoRegional: 15, relacoesInternas: 5, narrativa: "O gesto fortalece imensamente o vínculo emocional com a torcida." } },
+          { probabilidade: 0.4, impacto: { moral: -8, narrativa: "A sinalização pública complica sua posição numa eventual negociação de saída." } },
+        ],
+      },
+      {
+        id: "manter_a_situacao_em_aberto",
+        texto: "Manter a situação em aberto, sem se comprometer",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: -5, narrativa: "A falta de sinalização clara frustra um pouco a torcida." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "oferta_de_dupla_funcao_em_campo",
+    titulo: "Oferta de dupla função em campo",
+    descricao: "O técnico sugere que você acumule uma função tática extra em campo, além da sua principal.",
+    opcoes: [
+      {
+        id: "aceitar_a_dupla_funcao",
+        texto: "Aceitar acumular a função extra",
+        resultados: [
+          { probabilidade: 0.5, impacto: { atributos: { visao_de_jogo: 2, movimentacao: 2 }, relacoesInternas: 6, narrativa: "A versatilidade extra te torna ainda mais valioso pro esquema tático." } },
+          { probabilidade: 0.5, impacto: { atributos: { resistencia: -3 }, moral: -8, narrativa: "O desgaste extra da dupla função cobra um preço físico alto." } },
+        ],
+      },
+      {
+        id: "recusar_a_dupla_funcao",
+        texto: "Recusar, preferindo manter o foco numa função só",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere manter a especialização na sua função original." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "desgaste_fisico_por_calendario_apertado",
+    titulo: "Desgaste físico por calendário apertado",
+    descricao: "Uma sequência de jogos a cada três dias cobra um pedágio físico alto do elenco inteiro.",
+    opcoes: [
+      {
+        id: "pedir_gestao_de_carga_individual",
+        texto: "Pedir uma gestão de carga individualizada ao preparador",
+        resultados: [
+          { probabilidade: 0.7, impacto: { atributos: { resistencia: 2 }, narrativa: "A gestão individualizada ajuda bastante a atravessar o calendário apertado." } },
+          { probabilidade: 0.3, impacto: { relacoesInternas: -3, narrativa: "O pedido é visto como querer tratamento diferenciado dos demais." } },
+        ],
+      },
+      {
+        id: "seguir_o_ritmo_padrao_do_elenco",
+        texto: "Seguir o mesmo ritmo padrão do restante do elenco",
+        resultados: [
+          { probabilidade: 0.5, impacto: { narrativa: "Você aguenta bem o ritmo intenso, sem problemas maiores." } },
+          { probabilidade: 0.5, impacto: { atributos: { resistencia: -4 }, moral: -8, narrativa: "O desgaste acumulado cobra seu preço nas semanas seguintes." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pedido_de_descanso_estrategico_do_departamento_medico",
+    titulo: "Pedido de descanso estratégico",
+    descricao: "O departamento médico recomenda que você descanse um jogo importante como prevenção.",
+    opcoes: [
+      {
+        id: "seguir_a_recomendacao_medica",
+        texto: "Seguir a recomendação médica à risca",
+        resultados: [
+          { probabilidade: 1, impacto: { atributos: { resistencia: 2 }, relacoesInternas: 5, narrativa: "A prevenção evita uma lesão maior no médio prazo." } },
+        ],
+      },
+      {
+        id: "insistir_em_jogar_apesar_da_recomendacao",
+        texto: "Insistir em jogar apesar da recomendação",
+        resultados: [
+          { probabilidade: 0.4, impacto: { moral: 8, narrativa: "Você joga bem e a decisão parece ter valido a pena dessa vez." } },
+          { probabilidade: 0.6, impacto: { atributos: { resistencia: -5 }, moral: -15, narrativa: "A insistência custa uma lesão que poderia ter sido evitada." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "retorno_de_lesao_com_receio_de_recair",
+    titulo: "Retorno de lesão com receio de recair",
+    descricao: "De volta aos gramados após uma lesão longa, um receio silencioso de recair te acompanha.",
+    opcoes: [
+      {
+        id: "jogar_com_confianca_total",
+        texto: "Jogar com confiança total, sem se poupar",
+        resultados: [
+          { probabilidade: 0.65, impacto: { atributos: { frieza: 2 }, moral: 10, narrativa: "A confiança total ajuda a recuperar seu melhor nível rapidamente." } },
+          { probabilidade: 0.35, impacto: { atributos: { resistencia: -3 }, moral: -10, narrativa: "O receio se confirma parcialmente, com um novo desconforto na região." } },
+        ],
+      },
+      {
+        id: "voltar_com_cautela_gradual",
+        texto: "Voltar com cautela, aumentando a carga aos poucos",
+        resultados: [
+          { probabilidade: 1, impacto: { atributos: { resistencia: 1 }, narrativa: "A volta gradual é mais segura, mesmo que mais lenta." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "comparacao_com_geracao_anterior_do_clube",
+    titulo: "Comparação com a geração anterior do clube",
+    descricao: "A imprensa compara sua geração atual do time com uma geração vitoriosa do passado do clube.",
+    opcoes: [
+      {
+        id: "assumir_a_comparacao_como_meta",
+        texto: "Assumir a comparação como meta a perseguir",
+        resultados: [
+          { probabilidade: 0.5, impacto: { moral: 10, reputacaoRegional: 8, narrativa: "A meta inspira o grupo, que passa a jogar à altura da comparação." } },
+          { probabilidade: 0.5, impacto: { moral: -10, narrativa: "A comparação pesa demais e o grupo parece nunca estar à altura." } },
+        ],
+      },
+      {
+        id: "descartar_a_comparacao",
+        texto: "Descartar a comparação, focando no presente",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "O grupo prefere construir sua própria identidade, sem olhar pro passado." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "proposta_de_ser_voz_do_elenco_em_negociacao_coletiva",
+    titulo: "Proposta de ser voz do elenco em negociação",
+    descricao: "O elenco escolhe você como representante numa negociação coletiva com a diretoria sobre condições de trabalho.",
+    opcoes: [
+      {
+        id: "aceitar_representar_o_elenco",
+        texto: "Aceitar representar o elenco na negociação",
+        resultados: [
+          { probabilidade: 0.6, impacto: { atributos: { lideranca: 3 }, relacoesInternas: 12, narrativa: "A negociação é bem-sucedida, e sua liderança sai fortalecida perante o grupo." } },
+          { probabilidade: 0.4, impacto: { relacoesInternas: -8, narrativa: "A negociação não avança, e parte do grupo fica frustrada com o resultado." } },
+        ],
+      },
+      {
+        id: "sugerir_outro_representante",
+        texto: "Sugerir que outro jogador mais experiente represente o grupo",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 3, narrativa: "O grupo respeita sua escolha e segue com outro representante." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "dilema_de_jogar_amistoso_de_selecao_com_risco_de_lesao",
+    titulo: "Amistoso de seleção com risco de lesão",
+    descricao: "Um amistoso de seleção sem grande importância competitiva ainda assim carrega risco físico real.",
+    opcoes: [
+      {
+        id: "jogar_o_amistoso_normalmente",
+        texto: "Jogar o amistoso normalmente",
+        resultados: [
+          { probabilidade: 0.8, impacto: { reputacao: 5, narrativa: "O amistoso passa sem incidentes, e sua presença é bem avaliada." } },
+          { probabilidade: 0.2, impacto: { atributos: { resistencia: -4 }, moral: -12, narrativa: "Um lance banal do amistoso resulta numa lesão que ninguém esperava." } },
+        ],
+      },
+      {
+        id: "pedir_para_jogar_so_um_tempo",
+        texto: "Pedir pra jogar só uma parte do amistoso",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "A gestão de risco é aceita pela comissão da seleção, sem problemas." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pedido_de_torcedor_para_participar_de_casamento",
+    titulo: "Torcedor pede participação em casamento",
+    descricao: "Um torcedor fervoroso pede que você grave uma mensagem surpresa pro casamento dele.",
+    opcoes: [
+      {
+        id: "gravar_a_mensagem_para_o_casamento",
+        texto: "Gravar a mensagem surpresa",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 10, moral: 5, narrativa: "A surpresa emociona o casal e viraliza como um gesto genuíno de carinho." } },
+        ],
+      },
+      {
+        id: "nao_conseguir_gravar_a_tempo",
+        texto: "Não conseguir gravar a tempo por conta da agenda",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: -3, narrativa: "O torcedor entende, mas fica visivelmente decepcionado." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "entrevista_sobre_planos_pos_aposentadoria",
+    titulo: "Entrevista sobre planos pós-aposentadoria",
+    descricao: "Um jornalista pergunta diretamente sobre seus planos pra depois de encerrar a carreira de jogador.",
+    opcoes: [
+      {
+        id: "compartilhar_planos_detalhados",
+        texto: "Compartilhar planos detalhados pro pós-carreira",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacao: 6, narrativa: "A maturidade em falar do futuro é bem recebida pelo público." } },
+        ],
+      },
+      {
+        id: "evitar_falar_do_futuro",
+        texto: "Evitar falar do assunto, focando só no presente",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere manter o foco total no momento atual da carreira." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "convite_para_ser_jurado_de_premiacao_esportiva",
+    titulo: "Convite pra ser jurado de premiação esportiva",
+    descricao: "Você é convidado pra integrar o júri de uma premiação anual do futebol nacional.",
+    opcoes: [
+      {
+        id: "aceitar_ser_jurado",
+        texto: "Aceitar o convite pra ser jurado",
+        resultados: [
+          { probabilidade: 0.7, impacto: { reputacao: 8, narrativa: "Sua participação no júri é vista como reconhecimento da sua bagagem no esporte." } },
+          { probabilidade: 0.3, impacto: { reputacao: -5, narrativa: "Um voto polêmico seu no júri gera crítica pública." } },
+        ],
+      },
+      {
+        id: "recusar_ser_jurado",
+        texto: "Recusar, preferindo não opinar sobre outros jogadores",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere manter distância desse tipo de julgamento público." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "disputa_judicial_de_imagem",
+    titulo: "Disputa judicial pelo uso da sua imagem",
+    descricao: "Uma empresa usa sua imagem sem autorização numa campanha publicitária.",
+    opcoes: [
+      {
+        id: "processar_pelo_uso_indevido",
+        texto: "Processar a empresa pelo uso indevido",
+        resultados: [
+          { probabilidade: 0.7, impacto: { reputacao: 8, moral: 5, narrativa: "A ação é bem-sucedida e reforça o respeito pela sua imagem." } },
+          { probabilidade: 0.3, impacto: { moral: -5, narrativa: "O processo se arrasta na justiça sem uma resolução rápida." } },
+        ],
+      },
+      {
+        id: "resolver_de_forma_amigavel",
+        texto: "Resolver de forma amigável, sem processo",
+        resultados: [
+          { probabilidade: 1, impacto: { moral: 3, narrativa: "A resolução amigável evita desgaste, mesmo sem grande repercussão." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "vazamento_de_valor_salarial",
+    titulo: "Vazamento do valor do seu salário",
+    descricao: "Seu valor salarial vaza pra imprensa, gerando debate público sobre o tema.",
+    opcoes: [
+      {
+        id: "comentar_o_vazamento_salarial",
+        texto: "Comentar publicamente sobre o vazamento",
+        resultados: [
+          { probabilidade: 0.4, impacto: { reputacao: 5, narrativa: "O comentário equilibrado ajuda a contextualizar o valor divulgado." } },
+          { probabilidade: 0.6, impacto: { reputacao: -8, relacoesInternas: -5, narrativa: "O comentário rende ainda mais debate, incomodando a diretoria." } },
+        ],
+      },
+      {
+        id: "nao_comentar_o_vazamento",
+        texto: "Não comentar o vazamento salarial",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "O assunto perde força naturalmente com o tempo." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "proposta_de_reality_show_do_clube",
+    titulo: "Proposta de reality show institucional do clube",
+    descricao: "O clube propõe um reality show institucional mostrando o dia a dia do CT, incluindo você.",
+    opcoes: [
+      {
+        id: "topar_o_reality_institucional",
+        texto: "Topar participar do reality institucional",
+        resultados: [
+          { probabilidade: 0.6, impacto: { reputacaoRegional: 10, narrativa: "O reality aproxima a torcida do dia a dia do elenco de forma positiva." } },
+          { probabilidade: 0.4, impacto: { relacoesInternas: -5, narrativa: "Alguns companheiros não gostam da exposição extra gerada pelo programa." } },
+        ],
+      },
+      {
+        id: "participar_minimamente_do_reality",
+        texto: "Participar apenas do mínimo necessário",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Sua presença discreta no programa passa despercebida." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "mudanca_de_horario_de_jogos_por_transmissao",
+    titulo: "Mudança de horário de jogos por transmissão",
+    descricao: "A emissora de TV solicita mudança nos horários dos jogos pra melhor audiência, afetando a rotina do elenco.",
+    opcoes: [
+      {
+        id: "aceitar_a_mudanca_de_horario",
+        texto: "Aceitar a mudança de horário sem questionar",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 3, narrativa: "A flexibilidade é bem vista pela diretoria e pela emissora." } },
+        ],
+      },
+      {
+        id: "questionar_o_impacto_na_rotina",
+        texto: "Questionar o impacto na rotina de preparação",
+        resultados: [
+          { probabilidade: 0.5, impacto: { relacoesInternas: 3, narrativa: "O questionamento leva a pequenos ajustes que ajudam a rotina do elenco." } },
+          { probabilidade: 0.5, impacto: { relacoesInternas: -5, narrativa: "O questionamento é ignorado, mas fica registrado como reclamação." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "jogo_em_altitude_elevada_no_exterior",
+    titulo: "Jogo em altitude elevada no exterior",
+    descricao: "Uma competição continental leva você a jogar numa cidade de altitude elevada, dificultando a respiração.",
+    opcoes: [
+      {
+        id: "seguir_protocolo_de_adaptacao_de_altitude",
+        texto: "Seguir o protocolo de adaptação de altitude do clube",
+        resultados: [
+          { probabilidade: 0.75, impacto: { atributos: { resistencia: 2 }, narrativa: "O protocolo de adaptação funciona bem, minimizando o desconforto." } },
+          { probabilidade: 0.25, impacto: { moral: -5, narrativa: "Mesmo com o protocolo, a altitude cobra um preço físico alto na partida." } },
+        ],
+      },
+      {
+        id: "jogar_sem_adaptacao_especial",
+        texto: "Jogar sem nenhuma adaptação especial",
+        resultados: [
+          { probabilidade: 0.3, impacto: { narrativa: "Surpreendentemente, seu corpo reage bem mesmo sem adaptação." } },
+          { probabilidade: 0.7, impacto: { atributos: { resistencia: -4 }, moral: -10, narrativa: "A falta de adaptação pesa muito na sua atuação em campo." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "reforco_contratado_na_mesma_posicao",
+    titulo: "Reforço de peso contratado na sua posição",
+    descricao: "O clube anuncia a contratação de um reforço badalado exatamente na sua posição.",
+    opcoes: [
+      {
+        id: "encarar_como_motivacao_extra",
+        texto: "Encarar a chegada como motivação extra",
+        resultados: [
+          { probabilidade: 0.6, impacto: { atributos: { frieza: 2 }, moral: 8, narrativa: "A concorrência saudável eleva seu nível de jogo consideravelmente." } },
+          { probabilidade: 0.4, impacto: { moral: -10, narrativa: "A chegada do reforço abala sua confiança sobre o futuro no clube." } },
+        ],
+      },
+      {
+        id: "pedir_esclarecimentos_sobre_o_plano",
+        texto: "Pedir esclarecimentos diretos sobre o plano da comissão",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 3, narrativa: "A conversa franca esclarece o papel de cada um dentro do novo planejamento." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pressao_por_gols_decisivos_em_mata_mata",
+    titulo: "Pressão por gols decisivos em mata-mata",
+    descricao: "Numa fase de mata-mata, a expectativa por gols decisivos seus cresce a cada rodada eliminatória.",
+    opcoes: [
+      {
+        id: "abracar_o_protagonismo_no_mata_mata",
+        texto: "Abraçar o protagonismo nos jogos decisivos",
+        resultados: [
+          { probabilidade: 0.5, impacto: { reputacao: 15, moral: 12, narrativa: "Você entrega gols decisivos e vira o nome do mata-mata inteiro." } },
+          { probabilidade: 0.5, impacto: { moral: -12, narrativa: "A pressão por protagonismo pesa, e as chances decisivas não convertem." } },
+        ],
+      },
+      {
+        id: "jogar_de_forma_coletiva_no_mata_mata",
+        texto: "Jogar de forma mais coletiva, sem buscar o protagonismo",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 5, narrativa: "O jogo coletivo ajuda o time a avançar, mesmo sem grandes números individuais seus." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "oferta_de_bicampeonato_bonus_contratual",
+    titulo: "Bônus contratual por bicampeonato",
+    descricao: "A diretoria propõe um bônus contratual extra caso o time conquiste o bicampeonato na temporada.",
+    opcoes: [
+      {
+        id: "aceitar_a_meta_de_bicampeonato",
+        texto: "Aceitar a meta com entusiasmo",
+        resultados: [
+          { probabilidade: 0.5, impacto: { moral: 12, reputacao: 10, narrativa: "A meta ambiciosa motiva o grupo inteiro ao longo da temporada." } },
+          { probabilidade: 0.5, impacto: { moral: -8, narrativa: "A meta alta demais vira fonte extra de pressão desnecessária." } },
+        ],
+      },
+      {
+        id: "tratar_como_meta_normal",
+        texto: "Tratar como só mais uma meta normal da temporada",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "A meta é encarada com tranquilidade, sem alarde extra." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "rescisao_amigavel_proposta_pelo_clube",
+    titulo: "Proposta de rescisão amigável",
+    descricao: "Fora dos planos técnicos, o clube propõe uma rescisão amigável de contrato antes do previsto.",
+    opcoes: [
+      {
+        id: "aceitar_a_rescisao_amigavel",
+        texto: "Aceitar a rescisão amigável",
+        resultados: [
+          { probabilidade: 0.6, impacto: { moral: 5, reputacao: 3, narrativa: "A saída negociada abre espaço pra uma nova oportunidade em outro clube." } },
+          { probabilidade: 0.4, impacto: { moral: -12, narrativa: "A saída antecipada pesa emocionalmente mais do que o esperado." } },
+        ],
+      },
+      {
+        id: "recusar_a_rescisao_e_lutar_por_espaco",
+        texto: "Recusar e lutar por espaço dentro do elenco",
+        resultados: [
+          { probabilidade: 0.4, impacto: { relacoesInternas: 5, moral: 8, narrativa: "A luta por espaço é recompensada com uma reviravolta na sua situação." } },
+          { probabilidade: 0.6, impacto: { relacoesInternas: -10, moral: -10, narrativa: "A recusa gera um ambiente desconfortável, sem mudar o cenário técnico." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "convite_para_selecao_permanente_de_lendas",
+    titulo: "Convite pra seleção permanente de lendas",
+    descricao: "Uma organização internacional convida você a integrar permanentemente uma seleção de lendas do futebol.",
+    opcoes: [
+      {
+        id: "aceitar_integrar_selecao_de_lendas",
+        texto: "Aceitar integrar a seleção de lendas",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacao: 12, narrativa: "O convite reforça publicamente seu status entre os grandes nomes do esporte." } },
+        ],
+      },
+      {
+        id: "recusar_selecao_de_lendas",
+        texto: "Recusar, preferindo focar na carreira ativa",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "Você prefere manter o foco total na carreira que ainda está em curso." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pedido_de_desculpas_publicas_por_declaracao_polemica",
+    titulo: "Pedido de desculpas por declaração polêmica",
+    descricao: "Uma declaração sua, tirada de contexto ou não, gera pedidos públicos de desculpas.",
+    opcoes: [
+      {
+        id: "pedir_desculpas_publicamente",
+        texto: "Pedir desculpas publicamente",
+        resultados: [
+          { probabilidade: 0.7, impacto: { reputacao: 8, narrativa: "O pedido sincero de desculpas é bem recebido e encerra a polêmica." } },
+          { probabilidade: 0.3, impacto: { reputacao: -5, narrativa: "O pedido soa pouco sincero e não convence totalmente o público." } },
+        ],
+      },
+      {
+        id: "manter_a_declaracao_original",
+        texto: "Manter a declaração original, sem recuar",
+        resultados: [
+          { probabilidade: 0.4, impacto: { reputacao: 5, narrativa: "A firmeza é respeitada por quem concorda com o ponto original." } },
+          { probabilidade: 0.6, impacto: { reputacao: -12, narrativa: "A falta de recuo prolonga bastante a polêmica." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "reencontro_com_torcida_apos_longa_lesao",
+    titulo: "Reencontro com a torcida após longa lesão",
+    descricao: "Depois de meses afastado por lesão grave, você finalmente reencontra a torcida no estádio.",
+    opcoes: [
+      {
+        id: "fazer_um_gesto_de_gratidao_a_torcida",
+        texto: "Fazer um gesto de gratidão à torcida pelo apoio durante a lesão",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 15, moral: 10, narrativa: "O gesto de gratidão emociona o estádio inteiro no seu retorno." } },
+        ],
+      },
+      {
+        id: "focar_apenas_no_jogo_no_retorno",
+        texto: "Focar apenas no jogo, sem gestos especiais",
+        resultados: [
+          { probabilidade: 1, impacto: { moral: 5, narrativa: "O retorno discreto ainda assim é celebrado pela torcida presente." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "ultimo_jogo_da_temporada_decisao_de_permanencia",
+    titulo: "Último jogo da temporada e decisão de permanência",
+    descricao: "No último jogo da temporada, com o contrato perto do fim, você precisa sinalizar sua decisão sobre o futuro no clube.",
+    opcoes: [
+      {
+        id: "anunciar_permanencia_no_ultimo_jogo",
+        texto: "Anunciar a permanência já no último jogo da temporada",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 15, relacoesInternas: 8, narrativa: "O anúncio no último jogo vira uma festa emocionante com a torcida." } },
+        ],
+      },
+      {
+        id: "deixar_a_decisao_para_a_pausa_da_temporada",
+        texto: "Deixar a decisão pra depois, durante a pausa da temporada",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "A decisão fica pra ser anunciada com calma, fora do calor do último jogo." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "goleiro_avanca_para_escanteio_decisivo",
+    titulo: "Goleiro avança pro escanteio decisivo",
+    descricao: "Nos acréscimos de um jogo que seu time precisa vencer, a comissão sinaliza pro goleiro subir pro escanteio ofensivo.",
+    opcoes: [
+      {
+        id: "apoiar_a_subida_do_goleiro",
+        texto: "Apoiar a subida arriscada do goleiro",
+        resultados: [
+          { probabilidade: 0.35, impacto: { moral: 15, reputacaoRegional: 12, narrativa: "A jogada arriscada dá certo, e o gol nos acréscimos vira história." } },
+          { probabilidade: 0.65, impacto: { moral: -10, narrativa: "A jogada não funciona, e o time ainda sofre um contra-ataque perigoso no fim." } },
+        ],
+      },
+      {
+        id: "sugerir_manter_o_goleiro_atras",
+        texto: "Sugerir manter o goleiro atrás por segurança",
+        resultados: [
+          { probabilidade: 1, impacto: { relacoesInternas: 2, narrativa: "A cautela é respeitada, ainda que o empate se mantenha até o fim." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "jogo_adiado_por_problemas_no_gramado",
+    titulo: "Jogo adiado por problemas no gramado",
+    descricao: "Um jogo muito aguardado é adiado de última hora por problemas estruturais no gramado do estádio.",
+    opcoes: [
+      {
+        id: "manter_a_rotina_apesar_do_adiamento",
+        texto: "Manter a rotina de preparação apesar do adiamento",
+        resultados: [
+          { probabilidade: 1, impacto: { atributos: { frieza: 1 }, narrativa: "A disciplina em manter a rotina ajuda a não perder o ritmo competitivo." } },
+        ],
+      },
+      {
+        id: "aproveitar_o_adiamento_para_descansar",
+        texto: "Aproveitar o adiamento pra descansar mais",
+        resultados: [
+          { probabilidade: 0.6, impacto: { atributos: { resistencia: 2 }, narrativa: "O descanso extra chega bem, recarregando as energias." } },
+          { probabilidade: 0.4, impacto: { moral: -5, narrativa: "A quebra de rotina atrapalha um pouco o ritmo competitivo do time." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "torcedor_famoso_elogia_publicamente",
+    titulo: "Torcedor famoso elogia você publicamente",
+    descricao: "Uma celebridade torcedora do seu clube te elogia publicamente nas redes sociais depois de uma boa atuação.",
+    opcoes: [
+      {
+        id: "agradecer_o_elogio_publicamente",
+        texto: "Agradecer o elogio publicamente",
+        resultados: [
+          { probabilidade: 0.85, impacto: { reputacao: 8, narrativa: "A troca simpática entre vocês viraliza de forma bem positiva." } },
+          { probabilidade: 0.15, impacto: { reputacao: -3, narrativa: "A resposta soa deslocada, e alguns veem como bajulação à celebridade." } },
+        ],
+      },
+      {
+        id: "nao_comentar_o_elogio",
+        texto: "Não comentar publicamente o elogio",
+        resultados: [
+          { probabilidade: 1, impacto: { narrativa: "O elogio circula sozinho pelas redes, sem sua participação direta." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "convite_para_clinica_de_futebol_infantil",
+    titulo: "Convite pra clínica de futebol infantil",
+    descricao: "Uma escolinha de futebol na sua região de origem te convida pra dar uma clínica especial pras crianças.",
+    opcoes: [
+      {
+        id: "dar_a_clinica_pessoalmente",
+        texto: "Dar a clínica pessoalmente pras crianças",
+        resultados: [
+          { probabilidade: 0.9, impacto: { reputacaoRegional: 15, moral: 8, narrativa: "A clínica emociona as crianças e as famílias, e vira um marco na comunidade." } },
+          { probabilidade: 0.1, impacto: { atributos: { resistencia: -1 }, narrativa: "O dia intenso de atividades cansa mais do que o esperado." } },
+        ],
+      },
+      {
+        id: "enviar_equipamentos_em_vez_de_ir",
+        texto: "Enviar equipamentos esportivos em vez de comparecer",
+        resultados: [
+          { probabilidade: 1, impacto: { reputacaoRegional: 6, narrativa: "A doação de equipamentos já ajuda bastante, mesmo sem sua presença." } },
+        ],
+      },
+    ],
+  },
 ];
