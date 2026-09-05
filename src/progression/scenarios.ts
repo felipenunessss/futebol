@@ -43,6 +43,20 @@ export interface Opcao {
   texto: string;
   /** 1 ou mais resultados possíveis, probabilidades somando 1. Uma opção "garantida" tem 1 resultado só, com probabilidade 1. */
   resultados: ResultadoPossivel[];
+  /**
+   * Marca uma opção de "buscar transferência" — ao ser escolhida, se
+   * houver interesse real de mercado no momento (`career/career-loop.ts`,
+   * `market/*.ts`), o desfecho não vem do sorteio de `resultados`: vem de
+   * uma negociação de transferência de verdade (proposta, contraproposta,
+   * confiança do clube). `resultados` continua servindo de molde de
+   * narrativa/impacto pro desfecho real — `resultados[0]` mapeia pro
+   * aceite da negociação, `resultados[último]` pra recusa (funciona pra
+   * exatamente 2 resultados, que é o caso de toda opção marcada assim
+   * hoje). Sem interesse real de mercado no momento (cenário sorteado
+   * fora da janela de transferência, por exemplo), resolve normal — por
+   * `resolverEscolha`, como qualquer outra opção.
+   */
+  disparaNegociacaoReal?: boolean;
 }
 
 export interface Cenario {
@@ -283,6 +297,7 @@ export const CENARIOS: Cenario[] = [
       {
         id: "aceitar_agora",
         texto: "Aceitar a proposta e sair agora mesmo",
+        disparaNegociacaoReal: true,
         resultados: [
           { probabilidade: 0.6, impacto: { atributos: { frieza: 3 }, moral: 10, narrativa: "A adaptação é rápida — o novo ambiente te motiva." } },
           { probabilidade: 0.4, impacto: { atributos: { frieza: -2 }, moral: -15, narrativa: "Você troca de clube em más condições e a adaptação é difícil no começo." } },
@@ -728,6 +743,7 @@ export const CENARIOS: Cenario[] = [
       {
         id: "seguir_o_conselho_do_agente",
         texto: "Seguir o conselho e pressionar por saída",
+        disparaNegociacaoReal: true,
         resultados: [
           { probabilidade: 0.5, impacto: { relacoesInternas: -15, reputacao: 8, narrativa: "A pressão funciona e abre caminho pra uma saída vantajosa — mas o clube não esquece." } },
           { probabilidade: 0.5, impacto: { relacoesInternas: -20, moral: -10, narrativa: "O pedido irrita a diretoria e você fica marcado como problema por um tempo." } },
@@ -751,6 +767,7 @@ export const CENARIOS: Cenario[] = [
       {
         id: "topar_o_desafio",
         texto: "Topar o desafio e se transferir",
+        disparaNegociacaoReal: true,
         resultados: [
           { probabilidade: 0.5, impacto: { reputacao: 20, moral: 10, narrativa: "A adaptação vai bem e sua carreira ganha um salto internacional." } },
           { probabilidade: 0.5, impacto: { moral: -15, atributos: { frieza: -2 }, narrativa: "O choque cultural e o idioma pesam mais do que o esperado no começo." } },

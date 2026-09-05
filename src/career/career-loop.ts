@@ -83,12 +83,24 @@ export interface OpcoesJogarTemporada {
  * ativas do calendário padrão (`simulation/engine.ts` `simularTemporada`),
  * aplica o XP de cada partida do jogador em ordem (`aplicarDesempenhoPartida`),
  * e por período do calendário: deriva o momento (`momentoDoPeriodo`),
- * resolve negociação de transferência se a janela estiver aberta
- * (`market/transfers.ts`/`market/negotiation.ts`), e sorteia+resolve um
- * cenário elegível pro contexto atual (já refletindo eventual troca de
- * clube). Por fim avança pra próxima temporada (`avancarTemporada`:
- * idade+1, declínio por idade, renda de patrocínio). Não muta o `estado`
- * recebido.
+ * verifica interesse real de mercado se a janela estiver aberta
+ * (`market/transfers.ts` `estaNaJanelaDeTransferencia`/
+ * `selecionarClubesInteressados`), e sorteia+resolve um cenário elegível
+ * pro contexto atual.
+ *
+ * **Cenário e mercado são a mesma coisa, não duas coisas coexistindo**:
+ * havendo interesse real de mercado nesse período, o sorteio prioriza um
+ * cenário "de transferência" (`Opcao.disparaNegociacaoReal`, ver
+ * `progression/scenarios.ts`) sobre o resto do catálogo — se o jogador
+ * escolhe a opção de buscar a saída, o desfecho não vem da probabilidade
+ * estática do cenário: vem de uma negociação de verdade
+ * (`market/negotiation.ts`), e só então aplica o impacto narrativo
+ * correspondente (favorável se aceita, desfavorável se recusada). Sem
+ * interesse real nesse período, cenários de transferência nem entram no
+ * sorteio (não teria proposta nenhuma por trás pra sustentar a cena).
+ *
+ * Por fim avança pra próxima temporada (`avancarTemporada`: idade+1,
+ * declínio por idade, renda de patrocínio). Não muta o `estado` recebido.
  *
  * **Simplificações documentadas** (não são bugs escondidos, ver pendências
  * em `docs/motor-de-partida.md`): toda partida é tratada como 90 minutos
@@ -132,13 +144,42 @@ export function jogarTemporada(
     const momento = momentoDoPeriodo(periodo.periodo);
     const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
 
+    let interessados: Club[] = [];
+    let valorDeMercado = 0;
     if (estaNaJanelaDeTransferencia(momento)) {
-      const valorDeMercado = calcularValorDeMercado({
+      valorDeMercado = calcularValorDeMercado({
         overall: overallAtual(estadoAtual),
         idade: estadoAtual.jogador.idade,
         reputacaoNacional: estadoAtual.reputacao.nacional,
       });
-      const interessados = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, valorDeMercado, { random });
+      interessados = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, valorDeMercado, { random });
+    }
+
+    const contexto: ContextoSorteio = {
+      idadeJogador: estadoAtual.jogador.idade,
+      reputacaoNacional: estadoAtual.reputacao.nacional,
+      reputacaoRegional: regiaoAtual !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtual] ?? 0) : 0,
+      moral: estadoAtual.moral,
+      relacoesInternas: estadoAtual.relacoesInternas,
+      momento,
+    };
+
+    // Cenários "de transferência" (opção com disparaNegociacaoReal) só entram no sorteio quando há
+    // interesse real de mercado nesse período — evitam prometer proposta que não existe mecanicamente.
+    // Havendo interesse real E ao menos um cenário de transferência elegível, o sorteio fica restrito
+    // a eles (não competem contra o resto do catálogo) — garante que a negociação real sempre venha
+    // acompanhada da moldura narrativa certa, em vez de só "coexistir" sem se referenciar.
+    const elegiveis = filtrarCenariosElegiveis(CENARIOS, contexto);
+    const elegiveisDeTransferencia = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaNegociacaoReal));
+    const elegiveisGerais = elegiveis.filter((c) => !c.opcoes.some((o) => o.disparaNegociacaoReal));
+    const poolDeSorteio = interessados.length > 0 && elegiveisDeTransferencia.length > 0 ? elegiveisDeTransferencia : elegiveisGerais;
+
+    const cenario = sortearCenario(poolDeSorteio, random);
+    const opcaoEscolhida = escolherOpcao(cenario);
+
+    let escolha: EscolhaResolvida;
+    if (opcaoEscolhida.disparaNegociacaoReal && interessados.length > 0) {
+      let negociacaoAceita: ResultadoNegociacao | undefined;
 
       for (const clube of interessados) {
         const proposta = gerarProposta(clube, valorDeMercado, random);
@@ -154,25 +195,21 @@ export function jogarTemporada(
 
         if (resultado.aceito && resultado.contrato) {
           estadoAtual = assinarContrato(estadoAtual, resultado.contrato);
+          negociacaoAceita = resultado;
           break;
         }
       }
+
+      // resultados[0] é o molde de narrativa/impacto pro desfecho favorável (negociação aceita),
+      // resultados[último] pro desfecho desfavorável (recusada) — ver Opcao.disparaNegociacaoReal.
+      const resultadoNarrativo = negociacaoAceita ? opcaoEscolhida.resultados[0] : opcaoEscolhida.resultados[opcaoEscolhida.resultados.length - 1];
+      escolha = { opcao: opcaoEscolhida, resultado: resultadoNarrativo };
+    } else {
+      escolha = resolverEscolha(opcaoEscolhida, random);
     }
 
-    const regiaoAtualParaCenario = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-    const contexto: ContextoSorteio = {
-      idadeJogador: estadoAtual.jogador.idade,
-      reputacaoNacional: estadoAtual.reputacao.nacional,
-      reputacaoRegional: regiaoAtualParaCenario !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtualParaCenario] ?? 0) : 0,
-      moral: estadoAtual.moral,
-      relacoesInternas: estadoAtual.relacoesInternas,
-      momento,
-    };
-
-    const cenario = sortearCenario(filtrarCenariosElegiveis(CENARIOS, contexto), random);
-    const opcaoEscolhida = escolherOpcao(cenario);
-    const escolha = resolverEscolha(opcaoEscolhida, random);
-    estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoAtualParaCenario);
+    const regiaoParaImpacto = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+    estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoParaImpacto);
 
     cenariosResolvidos.push({ periodo: periodo.periodo, momento, cenario, escolha });
   }

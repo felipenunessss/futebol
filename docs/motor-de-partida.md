@@ -807,18 +807,28 @@ existindo e coexistem com isso — ver ressalva abaixo).
   `assinarContrato(estado, contrato)` troca o clube e registra o
   contrato; `transferirParaClube` (já existia) continua disponível pra
   mover o jogador sem negociação, pra uso puramente narrativo.
-- **Ligado no game loop** (`career/career-loop.ts` `jogarTemporada`): a
-  cada período mapeado pra `pre_temporada`, seleciona clubes
-  interessados, gera+negocia uma proposta por clube (parando no primeiro
-  que aceitar), e só então sorteia o cenário do período — já no contexto
-  do clube novo, se houve transferência. No máximo uma transferência
-  aceita por temporada.
-- **Coexiste com os cenários narrativos de transferência** (`proposta_clube_grande`,
-  `proposta_do_exterior`, `agente_pressiona_transferencia`,
-  `progression/scenarios.ts`) — esses continuam sendo só narrativa/impacto
-  numérico (moral, reputação), não disparam uma negociação de verdade
-  nem mexem em `clubeAtualId`/`contratoAtual`. Não foram unificados com o
-  mercado nesta rodada — ver pendência.
+- **Unificado com os cenários narrativos de transferência** — não são mais
+  duas coisas "coexistindo sem se referenciar" (ver histórico na seção
+  6). `Opcao.disparaNegociacaoReal` (`progression/scenarios.ts`) marca a
+  opção de "buscar a saída" nos 3 cenários que já existiam
+  (`proposta_clube_grande`/`aceitar_agora`,
+  `proposta_do_exterior`/`topar_o_desafio`,
+  `agente_pressiona_transferencia`/`seguir_o_conselho_do_agente`). Em
+  `career/career-loop.ts` `jogarTemporada`, a cada período: se a janela de
+  transferência está aberta e existe interesse real de mercado
+  (`selecionarClubesInteressados` não vazio), o sorteio de cenário fica
+  restrito aos cenários "de transferência" elegíveis (em vez de competir
+  contra o catálogo inteiro) — garante que a negociação real sempre venha
+  acompanhada da moldura narrativa certa. **Sem** interesse real, cenários
+  de transferência nem entram no sorteio (nunca promete proposta que não
+  existe mecanicamente). Ao escolher a opção marcada, o desfecho não vem
+  da probabilidade estática do cenário: dispara a negociação de verdade
+  (gera+negocia uma proposta por clube interessado, parando no primeiro
+  que aceitar) — `resultados[0]` do cenário vira o molde de narrativa/
+  impacto se a negociação for aceita, `resultados[último]` se for
+  recusada. Escolher a opção de recusar/ficar continua 100% narrativo
+  (nenhuma negociação é tentada). No máximo uma transferência aceita por
+  temporada.
 - **Estimativas de design, não fórmulas validadas** (mesma ressalva de
   Elo/XP/valorização): todas as constantes de teto salarial, referência
   salarial, fatores de confiança e cláusula de rescisão foram calibradas
@@ -893,16 +903,22 @@ existindo e coexistem com isso — ver ressalva abaixo).
   5.2) — negociação de verdade (proposta, contraproposta, confiança,
   contrato) ligada em `jogarTemporada`, disparando durante o período
   mapeado pra `pre_temporada`.
-- **Mercado — limitações reais desta primeira versão** (não são bugs
-  escondidos): só uma negociação aceita por temporada (para no primeiro
-  clube que aceitar, não acumula múltiplas ofertas simultâneas de verdade
-  disputando entre si além do fator "concorrentes" agregado); não existe
-  renovação de contrato (jogador pode ficar anos além de
-  `temporadaDeVencimento` sem nada acontecer); não existe sistema de
-  minutagem que reduza o interesse de mercado de um jogador que não joga;
-  os cenários narrativos de transferência (`proposta_clube_grande` etc)
-  não foram unificados com a negociação real — continuam duas coisas
-  separadas que coexistem sem se referenciar; `clubeAtualId` inicial
+- ~~Cenários narrativos de transferência não ligados à negociação
+  real~~ **resolvida**: `Opcao.disparaNegociacaoReal` (ver seção 5.2) —
+  escolher a opção de buscar saída num cenário de transferência dispara a
+  negociação de verdade, e o sorteio de cenário só oferece um cenário de
+  transferência quando existe interesse real de mercado nesse período.
+- **Mercado — limitações reais desta versão** (não são bugs escondidos):
+  só uma negociação aceita por temporada (para no primeiro clube que
+  aceitar, não acumula múltiplas ofertas simultâneas de verdade disputando
+  entre si além do fator "concorrentes" agregado); só 3 cenários do
+  catálogo de 200 têm `disparaNegociacaoReal` (os outros ~197, incluindo
+  os ~145 com outros tipos de `gatilho`, não têm nenhuma ligação com
+  mercado — não faria sentido pra maioria, mas nada impede de marcar mais
+  opções de "buscar saída" em cenários futuros); não existe renovação de
+  contrato (jogador pode ficar anos além de `temporadaDeVencimento` sem
+  nada acontecer); não existe sistema de minutagem que reduza o interesse
+  de mercado de um jogador que não joga; `clubeAtualId` inicial
   (`criarEstadoInicial`) continua vindo de quem chama, sem nenhuma lista
   curada/filtrada de "clubes pra começar carreira" — `npx tsx
   src/cli/index.ts clubes [pais]` lista tudo, sem filtrar por tamanho/

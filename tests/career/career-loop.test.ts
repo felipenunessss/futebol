@@ -130,6 +130,35 @@ describe("jogarTemporada — negociação de transferência", () => {
     expect(resultado.estado.clubeAtualId).toBe("a");
     expect(resultado.estado.contratoAtual).toBeUndefined();
   });
+
+  it("com interesse real de mercado, o cenário do período de pré-temporada é um cenário de transferência (unificação cenário/mercado)", () => {
+    const clubes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
+    ];
+    const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
+
+    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
+
+    const cenarioDePreTemporada = resultado.cenariosResolvidos.find((c) => c.momento === "pre_temporada")!;
+    expect(cenarioDePreTemporada.cenario.opcoes.some((o) => o.disparaNegociacaoReal)).toBe(true);
+  });
+
+  it("sem nenhum clube interessado (todos com rating menor), nenhum cenário de transferência é sorteado e nenhuma negociação acontece", () => {
+    const clubes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1200, forca_financeira: "muito_baixa" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", rating_inicial: 1200, forca_financeira: "muito_baixa" },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", rating_inicial: 1200, forca_financeira: "muito_baixa" },
+    ];
+    const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
+
+    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
+
+    expect(resultado.negociacoesResolvidas).toEqual([]);
+    expect(resultado.cenariosResolvidos.some((c) => c.cenario.opcoes.some((o) => o.disparaNegociacaoReal))).toBe(false);
+    expect(resultado.estado.clubeAtualId).toBe("a");
+  });
 });
 
 describe("jogarCarreira", () => {
