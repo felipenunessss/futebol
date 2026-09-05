@@ -581,7 +581,41 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
   (partida real → XP → cenário → impacto → nova temporada) via
   `npx tsx src/cli/index.ts carreira`.
 
-## 5. Pendências / próximos passos
+## 5. Loop de calendário (implementado, cobertura parcial por design)
+
+`src/simulation/engine.ts` — `simularTemporada(temporada, campeonatos, clubes, participacaoJogador?)`
+lê `construirCalendarioPadrao` (`data/loaders/calendario.ts`), reúne todas
+as competições ativas em algum período do ano e simula cada uma.
+
+- **Despacho por combinação exata de blocos de `formato`** (`Object.keys`
+  ordenado) — só as 3 combinações estruturalmente inambíguas têm receita
+  automática: só `pontos_corridos`; só `mata_mata`; `fase_grupos` +
+  `mata_mata` (classificados do grupo alimentam o mata-mata direto — cobre
+  a maioria dos estaduais brasileiros). **Deliberadamente não tenta**
+  despachar combinações que dependem de interpretar o `criterio` em texto
+  livre de `tabela_acumulada`/`final_estadual` (Argentina, Uruguai,
+  Paraguai, Peru, Colômbia, Venezuela, Carioca, Paulistão A2, etc.) — isso
+  exige lógica bespoke por competição (ver `simularArgentina` em
+  `src/cli/index.ts` como exemplo), não é seguro generalizar.
+- **Falha isolada, não em cascata**: uma competição sem receita (ou com
+  dado incompatível — ex: Libertadores/Sul-Americana, cujo `times[]` inclui
+  clubes da fase preliminar além dos 32/56 do corpo principal, então a
+  validação de tamanho de `simularFaseDeGruposDoFormato` rejeita) aparece
+  com `erro` no resultado daquela competição específica, sem derrubar as
+  demais.
+- **Validado contra o calendário padrão real**: das 11 competições
+  referenciadas, 4 rodam automaticamente hoje (Brasileirão A/B/D, Copa do
+  Brasil) — as outras 7 falham de forma esperada e documentada (combinação
+  sem receita ou fase preliminar não coberta). Demo via
+  `npx tsx src/cli/index.ts temporada`.
+- **Bug real encontrado e corrigido nessa validação**: `calendario.ts`
+  referenciava `"mineiro_1"`/`"gauchao_1"`, mas o campo `id` real desses
+  dois arquivos é `"mineiro_modulo_1"`/`"gauchao_a"` (o nome do arquivo
+  segue a convenção `_1`/`_2` de outros estados, mas o `id` interno segue o
+  nome oficial da competição — inconsistência pré-existente, não
+  introduzida por esta mudança). Corrigido pra apontar pro `id` certo.
+
+## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
   267/678 clubes com rating real (ver seções 1.1-1.5), o resto no fallback
@@ -607,6 +641,14 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
   (`resolverConfronto` trata ida-e-volta corretamente, alternando o lado
   por perna). Validado com smoke test real (Boca Juniors no Apertura
   argentino, 29 partidas).
-- **Loop de calendário** (`src/simulation/engine.ts`): ainda stub — falta
-  orquestrar várias competições simultâneas de uma temporada, ver comentário
-  no próprio arquivo.
+- **Receitas de simulação bespoke pras competições com formato composto**
+  (ver seção 5): Argentina, Uruguai, Paraguai, Peru, Colômbia, Venezuela,
+  Carioca, Paulistão A1/A2, Mineiro, Gauchão, Libertadores/Sul-Americana
+  (fase preliminar) — hoje só têm exemplo manual em `src/cli/index.ts`
+  (`simularArgentina`), não uma receita registrada no `engine.ts`.
+- **Estado de carreira não persiste entre temporadas via `engine.ts`**:
+  `simularTemporada` devolve resultados por competição, mas quem aplica
+  `partidasDoJogador` ao `EstadoDeCarreira` (`career/Player.ts`) ainda é
+  responsabilidade de quem chama (ver `src/cli/index.ts` `simularCarreira`
+  pra um exemplo manual de uma partida só) — falta um laço que faça isso
+  pra todas as partidas de uma temporada inteira automaticamente.

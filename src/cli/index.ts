@@ -1,4 +1,5 @@
-import { loadCampeonatosNacionais, loadClubes } from "../data/loaders/index.js";
+import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../data/loaders/index.js";
+import { simularTemporada } from "../simulation/engine.js";
 import { simularMataMataDoFormato, type ResultadoMataMata } from "../simulation/knockout.js";
 import { obterRating } from "../simulation/rating.js";
 import { simularFaseUnicaDoFormato, somarTabelas, type LinhaTabela } from "../simulation/season.js";
@@ -193,6 +194,35 @@ function simularCarreira(): void {
   console.log(`Overall: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação: ${estado.reputacao}`);
 }
 
+/**
+ * Demonstra o loop de calendário: simula todas as competições ativas de
+ * uma temporada (ver `simulation/engine.ts`) com o jogador jogando pelo
+ * clube informado, mostrando quais competições rodaram automaticamente e
+ * quais ainda não têm receita (combinação de blocos de formato bespoke).
+ */
+function simularTemporadaCli(): void {
+  const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
+  const jogador = {
+    id: "jogador_temporada",
+    nome: "Jogador da Temporada",
+    posicao: "atacante" as const,
+    arquetipo_id: "finalizador",
+    idade: 22,
+    atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 60])),
+  };
+
+  const resultado = simularTemporada(2027, campeonatos, clubes, { clubeId: "corinthians", jogador, estiloTecnico: "equilibrado" });
+
+  console.log(`\n=== Temporada ${resultado.temporada} — ${resultado.competicoes.length} competições ativas no calendário ===\n`);
+  for (const c of resultado.competicoes) {
+    if (c.erro) {
+      console.log(`✗ ${c.campeonatoId}: ${c.erro}`);
+    } else {
+      console.log(`✓ ${c.campeonatoId}: campeão ${nomeDoClube(c.resultado!.campeao)} | partidas do Corinthians: ${c.resultado!.partidasDoJogador.length}`);
+    }
+  }
+}
+
 const comando = process.argv[2] ?? "copa-do-brasil";
 
 switch (comando) {
@@ -208,7 +238,10 @@ switch (comando) {
   case "carreira":
     simularCarreira();
     break;
+  case "temporada":
+    simularTemporadaCli();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario" ou "carreira".`);
+    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira" ou "temporada".`);
     process.exit(1);
 }
