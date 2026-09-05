@@ -554,20 +554,50 @@ habilidade nenhuma — só **acelera o crescimento** de atributos específicos.
   existe no schema; competição nacional > estadual; final > fase de
   grupos).
 
-## 4. Pendências / próximos passos
+## 4. Cenários de múltipla escolha da carreira (implementado)
 
-- **Dados**: popular `rating_inicial` real (Elo ou equivalente) pros
-  clubes com cobertura; calibrar fórmula de fallback pros demais. Frente
-  de pesquisa separada, fica pra depois — não faz parte desta rodada de
-  design.
-- **Atributos por posição**: definir a lista exata de atributos por
-  posição (goleiro tem um set bem diferente de um atacante) — pendência já
-  listada em `game-design.md` seção 8, item 1.
-- **Arquétipos das posições restantes** (goleiro, zagueiro, lateral,
-  volante, meia) com atributos prioritários — mesma pendência da seção 8.
+Cobre "Narrativa de carreira" (`game-design.md` seção 5.1: lesões,
+imprensa regional, dilemas de proposta/lealdade, rivalidades pessoais).
+Implementado em `src/progression/scenarios.ts`, com catálogo inicial de 4
+cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
+
+- **Cenário** tem 2-3 **opções**; cada opção tem 1+ **resultados
+  possíveis**, cada um com probabilidade própria (`resolverEscolha` sorteia
+  qual acontece — a mesma escolha pode dar certo ou errado, não é
+  determinística) e um **impacto**: delta de atributo (direto, não passa
+  pela curva de retorno decrescente de XP de partida — evento narrativo
+  pontual, não desempenho em campo), delta de moral, delta de reputação.
+- `aplicarImpacto` clampa atributo em 1-99 e moral/reputação em 0-100, sem
+  mutar o estado recebido.
+- **`moral`/`reputacao` não têm lar definitivo ainda**: hoje só existem como
+  campos soltos de `EstadoJogadorParaImpacto` (usado por este módulo), não
+  como parte de `Jogador`/estado de carreira persistente — isso depende de
+  `src/career/Player.ts` sair do stub (ver pendência abaixo).
+
+## 5. Pendências / próximos passos
+
+- **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
+  267/678 clubes com rating real (ver seções 1.1-1.5), o resto no fallback
+  por decisão de design documentada (clube sem exposição competitiva
+  nacional/continental não tem histórico público pra puxar).
+- **Estado de carreira persistente não existe ainda**: `src/career/Player.ts`
+  continua stub — não há hoje um lugar único que junte `Jogador`
+  (atributos), `moral`/`reputacao` (cenários, seção 4) e clube atual/
+  temporada. Isso é pré-requisito pra `engine.ts` e pro loop de carreira
+  de verdade (seção 6 do `game-design.md`).
+- **Cenários — condições de gatilho não definidas**: hoje `sortearCenario`
+  só sorteia da lista toda, sem noção de "quando" cada cenário pode
+  aparecer (ex: proposta de clube grande só faz sentido em janela de
+  transferência, lesão só em período de jogos) — falta ligar isso ao
+  calendário/game loop.
 - **Fórmulas exatas**: `K` do Elo por tipo de partida, curva exata de XP
   por atributo, pesos do duelo de zona (quanto o atributo do jogador pesa
   vs. o perfil gerado do resto do time) — hoje é desenho conceitual, as
   constantes ficam pra quando a implementação permitir calibrar por teste.
-- **Implementação**: nada em `src/simulation/`/`src/schemas/player.ts`
-  ainda — ainda são stubs. Este doc é a base pra sair do stub.
+- **Ligar `ParticipacaoJogador` em grupos/mata-mata/suíça**: hoje só
+  `simularPartida` isolada suporta a chance individual do jogador — os
+  simuladores de temporada/grupo/mata-mata/fase suíça ainda são só Camada
+  1 (agregado).
+- **Loop de calendário** (`src/simulation/engine.ts`): ainda stub — falta
+  orquestrar várias competições simultâneas de uma temporada, ver comentário
+  no próprio arquivo.

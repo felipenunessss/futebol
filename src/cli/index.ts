@@ -2,6 +2,8 @@ import { loadCampeonatosNacionais, loadClubes } from "../data/loaders/index.js";
 import { simularMataMataDoFormato, type ResultadoMataMata } from "../simulation/knockout.js";
 import { obterRating } from "../simulation/rating.js";
 import { simularFaseUnicaDoFormato, somarTabelas, type LinhaTabela } from "../simulation/season.js";
+import { CENARIOS, aplicarImpacto, resolverEscolha, sortearCenario, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
+import { ATRIBUTOS_POR_POSICAO } from "../schemas/player.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -91,6 +93,53 @@ function simularArgentina(): void {
   console.log(`Rebaixados (${liga.premiacao.rebaixamento_proxima_divisao}): ${tabelaAnual.slice(-liga.premiacao.rebaixamento_proxima_divisao!).map((l) => nomeDoClube(l.clubeId)).reverse().join(", ")}`);
 }
 
+function formatarImpacto(impacto: { atributos?: Partial<Record<string, number>>; moral?: number; reputacao?: number }): string {
+  const partes: string[] = [];
+  for (const [atributo, delta] of Object.entries(impacto.atributos ?? {})) {
+    partes.push(`${atributo} ${delta! > 0 ? "+" : ""}${delta}`);
+  }
+  if (impacto.moral) partes.push(`moral ${impacto.moral > 0 ? "+" : ""}${impacto.moral}`);
+  if (impacto.reputacao) partes.push(`reputação ${impacto.reputacao > 0 ? "+" : ""}${impacto.reputacao}`);
+  return partes.length > 0 ? partes.join(", ") : "sem impacto numérico";
+}
+
+/** Demonstra um cenário de carreira sorteado: mostra as opções, "escolhe" uma (a primeira, pra fins de demo) e resolve o resultado probabilístico. */
+function simularCenario(): void {
+  const cenario = sortearCenario(CENARIOS);
+
+  console.log(`\n=== ${cenario.titulo} ===`);
+  console.log(cenario.descricao);
+  console.log();
+
+  cenario.opcoes.forEach((opcao, indice) => {
+    console.log(`${indice + 1}. ${opcao.texto}`);
+    for (const resultado of opcao.resultados) {
+      const chance = `${Math.round(resultado.probabilidade * 100)}%`;
+      console.log(`   [${chance}] ${resultado.impacto.narrativa} (${formatarImpacto(resultado.impacto)})`);
+    }
+  });
+
+  const opcaoEscolhida = cenario.opcoes[0];
+  console.log(`\n-> Jogador escolhe: "${opcaoEscolhida.texto}"\n`);
+
+  const estadoAntes: EstadoJogadorParaImpacto = {
+    atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((atributo) => [atributo, 55])),
+    moral: 50,
+    reputacao: 50,
+  };
+  const escolha = resolverEscolha(opcaoEscolhida);
+  const estadoDepois = aplicarImpacto(estadoAntes, escolha.resultado.impacto);
+
+  console.log(`Resultado: ${escolha.resultado.impacto.narrativa}`);
+  console.log(`Moral: ${estadoAntes.moral} -> ${estadoDepois.moral} | Reputação: ${estadoAntes.reputacao} -> ${estadoDepois.reputacao}`);
+
+  const atributosAlterados = Object.keys(escolha.resultado.impacto.atributos ?? {});
+  if (atributosAlterados.length > 0) {
+    const antesDepois = atributosAlterados.map((a) => `${a} ${estadoAntes.atributos[a as keyof typeof estadoAntes.atributos]} -> ${estadoDepois.atributos[a as keyof typeof estadoDepois.atributos]}`);
+    console.log(`Atributos: ${antesDepois.join(", ")}`);
+  }
+}
+
 const comando = process.argv[2] ?? "copa-do-brasil";
 
 switch (comando) {
@@ -100,7 +149,10 @@ switch (comando) {
   case "argentina":
     simularArgentina();
     break;
+  case "cenario":
+    simularCenario();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil" ou "argentina".`);
+    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina" ou "cenario".`);
     process.exit(1);
 }
