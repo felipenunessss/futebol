@@ -693,6 +693,57 @@ as competições ativas em algum período do ano e simula cada uma.
   nome oficial da competição — inconsistência pré-existente, não
   introduzida por esta mudança). Corrigido pra apontar pro `id` certo.
 
+### 5.1. Game loop de carreira persistente (implementado)
+
+`src/career/career-loop.ts` — `jogarTemporada(estado, campeonatos, clubes,
+opcoes?)` junta todas as peças que antes só eram orquestradas na mão pela
+demo de CLI (`npx tsx src/cli/index.ts carreira`) numa única função pura:
+
+1. Monta a `ParticipacaoJogadorClube` a partir do `EstadoDeCarreira` (clube
+   atual, jogador, `estiloTecnico` — padrão `"equilibrado"`) e chama
+   `simularTemporada` (seção 5) pra rodar o calendário de competições
+   inteiro.
+2. Aplica o XP de **cada** partida do jogador em qualquer competição, em
+   ordem (`aplicarDesempenhoPartida`, `career/Player.ts`) — o overall
+   evolui partida a partida, não só uma vez por temporada.
+3. Percorre os períodos do calendário da temporada
+   (`construirCalendarioPadrao`) e sorteia+resolve um cenário elegível em
+   cada um, usando `momentoDoPeriodo` (seção 4) pra saber o momento de
+   cada período — o mesmo mecanismo que a demo de CLI já usava, agora sem
+   precisar chamar na mão.
+4. Ao final, chama `avancarTemporada` (idade+temporada+1, declínio por
+   idade, renda de patrocínio).
+
+Devolve `{ estado, resultadoTemporada, cenariosResolvidos }` — o novo
+`EstadoDeCarreira`, o resultado bruto do calendário (pra inspecionar quais
+competições rodaram) e a lista de cenários resolvidos na ordem em que
+aconteceram. **Não muta o `estado` recebido.**
+
+`jogarCarreira(estadoInicial, quantidadeDeTemporadas, campeonatos, clubes,
+opcoes?)` encadeia `jogarTemporada` N vezes, alimentando o estado final de
+uma temporada na próxima — o "save" avançando sozinho por várias
+temporadas seguidas. Devolve `{ estadoFinal, temporadas: [...] }` (uma
+entrada por temporada).
+
+- **`opcoes.escolherOpcao`** (padrão: sempre a primeira opção do cenário,
+  mesmo comportamento das demos de CLI) é injetável — outra função pode
+  plugar uma interface real (jogador humano escolhendo, IA, sempre a opção
+  mais segura, etc) sem mudar o loop.
+- **`opcoes.regiaoAtual`** decide onde deltas de reputação regional caem
+  (mesma regra de `aplicarImpacto`) — sem ela, cenários exigindo reputação
+  regional mínima nunca ficam elegíveis e nenhum delta regional é
+  aplicado.
+- **Simplificações documentadas, não bugs escondidos**: toda partida do
+  jogador é tratada como 90 minutos jogados e importância 1 — não existe
+  sistema de minutagem/banco nem diferenciação de fase (final de
+  mata-mata vs. fase de grupos) dentro de `partidasDoJogador` ainda (ver
+  pendências).
+- **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop [N]`
+  (padrão 3 temporadas) roda com o calendário completo (Brasil +
+  continentais + estaduais) e o Corinthians de verdade — overall subindo
+  de 39 pra 71 em 3 temporadas simuladas, patrimônio reagindo a
+  patrocínio assim que a reputação regional cruza o mínimo.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -746,9 +797,11 @@ as competições ativas em algum período do ano e simula cada uma.
   cobre Brasil + continentais hoje), então a receita foi validada
   chamando `receitaArgentina` direto (testes + smoke test contra dado
   real, campeão Boca Juniors), não ainda via `simularTemporada`.
-- **Estado de carreira não persiste entre temporadas via `engine.ts`**:
-  `simularTemporada` devolve resultados por competição, mas quem aplica
-  `partidasDoJogador` ao `EstadoDeCarreira` (`career/Player.ts`) ainda é
-  responsabilidade de quem chama (ver `src/cli/index.ts` `simularCarreira`
-  pra um exemplo manual de uma partida só) — falta um laço que faça isso
-  pra todas as partidas de uma temporada inteira automaticamente.
+- ~~Estado de carreira não persiste entre temporadas via `engine.ts`~~
+  **resolvida**: `career/career-loop.ts` `jogarTemporada`/`jogarCarreira`
+  (ver seção 5.1) fazem exatamente esse laço — aplicam `partidasDoJogador`
+  de toda competição da temporada ao `EstadoDeCarreira` automaticamente,
+  encadeando quantas temporadas quiser. **Ainda falta**: não há transferência
+  de clube nesse loop ainda (`clubeAtualId` fica fixo a temporada toda,
+  `transferirParaClube` existe mas nada chama automaticamente) — é a
+  próxima peça em aberto.

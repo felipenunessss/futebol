@@ -18,6 +18,7 @@ import { converterChancesEmDesempenho } from "../progression/xp.js";
 import { ATRIBUTOS_POR_POSICAO } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
+import { jogarCarreira } from "../career/career-loop.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -276,6 +277,50 @@ function simularTemporadaCli(): void {
   }
 }
 
+/**
+ * Demonstra o game loop persistente de carreira (`career/career-loop.ts`
+ * `jogarCarreira`): joga N temporadas seguidas com dados reais (calendário
+ * completo, clube de verdade), aplicando XP de cada partida e resolvendo
+ * cenários por período do calendário automaticamente, sem orquestrar cada
+ * passo na mão como `carreira` faz. `N` vem do 2º argumento da CLI
+ * (padrão 3).
+ */
+function simularCarreiraLoopCli(): void {
+  const quantidadeDeTemporadas = Number(process.argv[3] ?? 3);
+  const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
+  const clubeId = "corinthians";
+  const regiaoAtual = "SP";
+
+  let estado = criarEstadoInicial({
+    id: "jogador_loop",
+    nome: "Jogador do Loop",
+    posicao: "atacante",
+    arquetipoId: "finalizador",
+    clubeInicialId: clubeId,
+    temporadaInicial: 2027,
+  });
+
+  console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube: ${nomeDoClube(clubeId)}) ===`);
+  console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)}\n`);
+
+  const resultado = jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes, { regiaoAtual });
+
+  for (const temporada of resultado.temporadas) {
+    const competicoesOk = temporada.resultadoTemporada.competicoes.filter((c) => !c.erro);
+    console.log(
+      `--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
+    );
+    console.log(
+      `  ${competicoesOk.length}/${temporada.resultadoTemporada.competicoes.length} competições simuladas | ${temporada.cenariosResolvidos.length} cenários resolvidos`,
+    );
+    console.log(
+      `  Moral ${temporada.estado.moral} | Reputação nacional ${temporada.estado.reputacao.nacional} | Reputação SP ${temporada.estado.reputacao.porRegiao.SP ?? 0} | Relações internas ${temporada.estado.relacoesInternas} | Patrimônio ${temporada.estado.patrimonio}`,
+    );
+  }
+
+  console.log(`\n=== Fim: temporada ${resultado.estadoFinal.temporada} | idade ${resultado.estadoFinal.jogador.idade} | overall ${overallAtual(resultado.estadoFinal)} ===`);
+}
+
 const comando = process.argv[2] ?? "copa-do-brasil";
 
 switch (comando) {
@@ -294,7 +339,10 @@ switch (comando) {
   case "temporada":
     simularTemporadaCli();
     break;
+  case "carreira-loop":
+    simularCarreiraLoopCli();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira" ou "temporada".`);
+    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira", "temporada" ou "carreira-loop".`);
     process.exit(1);
 }
