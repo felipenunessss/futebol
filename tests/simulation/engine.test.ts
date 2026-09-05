@@ -147,4 +147,40 @@ describe("simularTemporada", () => {
 
     expect(competicao.resultado!.partidasDoJogador).toEqual([]);
   });
+
+  it("aoSimularConfrontoPontosCorridos é chamado com o campeonatoId certo, uma vez por confronto", () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonatos = [{ id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times }];
+    const clubes = times.map((id) => clube(id));
+    const campeonatoIds = new Set<string>();
+    let contagem = 0;
+
+    simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
+      aoSimularConfrontoPontosCorridos: (campeonatoId) => {
+        campeonatoIds.add(campeonatoId);
+        contagem++;
+      },
+    });
+
+    expect([...campeonatoIds]).toEqual(["brasileirao_serie_a"]);
+    expect(contagem).toBe((times.length - 1) * times.length); // ida e volta, 4 times: 12 confrontos
+  });
+
+  it("aoResolverConfrontoMataMata é chamado com o campeonatoId certo, uma vez por confronto", () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonatos = [{ id: "copa_do_brasil", formato: { mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } }, times }];
+    const clubes = times.map((id) => clube(id));
+    const campeonatoIds = new Set<string>();
+    let contagem = 0;
+
+    simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
+      aoResolverConfrontoMataMata: (campeonatoId) => {
+        campeonatoIds.add(campeonatoId);
+        contagem++;
+      },
+    });
+
+    expect([...campeonatoIds]).toEqual(["copa_do_brasil"]);
+    expect(contagem).toBe(3); // 2 semifinais + 1 final
+  });
 });

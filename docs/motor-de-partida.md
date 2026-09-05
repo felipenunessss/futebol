@@ -973,6 +973,67 @@ isso como uma **segunda fonte de XP**, independente da primeira:
   → 54 pelas sessões de treino seguintes — incremento pequeno por sessão,
   como esperado de uma fonte de XP secundária).
 
+### 5.5. Jogo a jogo com tabela ao vivo (implementado)
+
+Antes desta peça, `resumoPartidas` (seção 5.3) só dava um resumo
+agregado por competição — pedido explícito do usuário foi ver cada
+partida do clube do jogador de verdade: preparação (classificação dos
+dois times antes do jogo), o placar, e a tabela atualizada depois.
+Implementado adicionando um hook opcional na camada de simulação em si
+(`simulation/season.ts`/`simulation/knockout.ts`), não só na camada de
+carreira — qualquer chamador (não só o game loop) pode se inscrever.
+
+- **`simulation/season.ts`**: `simularTemporadaPontosCorridos`/
+  `simularFaseUnicaDoFormato` ganham um parâmetro opcional
+  `aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void`,
+  chamado depois de cada confronto (na ordem real de rodada) com
+  `tabelaAntes`/`tabelaDepois` — **cópias** (não a referência mutável
+  interna), pra poder guardar/exibir sem se preocupar com mutação
+  posterior. As cópias só são feitas quando o callback é passado (sem
+  custo extra pra quem não usa).
+- **`simulation/knockout.ts`**: `simularMataMataComEtapas`/
+  `simularMataMataSimples`/`simularMataMataDoFormato` ganham
+  `aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void`,
+  chamado por confronto resolvido (ida-e-volta conta como 1 evento
+  agregado, não 1 por perna — simplificação documentada). Mata-mata não
+  tem "tabela" (é chaveamento) — o evento só traz `etapa` + o confronto
+  (placar agregado, se foi nos pênaltis, vencedor).
+- **`simulation/engine.ts`**: `EventosSimulacaoTemporada` (dois campos,
+  um por tipo de hook acima, cada um recebendo também o `campeonatoId` —
+  `simularTemporada` roda várias competições ao mesmo tempo) — thread
+  através de todas as receitas (`receitaPontosCorridos`/`receitaMataMata`/
+  `receitaGruposEMataMata`/`receitaArgentina`). **Cobertura parcial**: a
+  fase de grupos de `receitaGruposEMataMata` ainda não emite evento — só
+  o mata-mata que segue emite (pendência; não afeta nada que já
+  funciona hoje, já que nenhuma competição do calendário real usa essa
+  receita com sucesso ainda, ver seção 5).
+- **`career/career-loop.ts`**: `onPartidaPontosCorridos`/
+  `onPartidaMataMata` em `OpcoesJogarTemporada` — `jogarTemporada` filtra
+  os eventos brutos de `simularTemporada` (que incluem TODOS os
+  confrontos da competição, de todos os times) pra só disparar quando o
+  confronto envolve o clube atual do jogador. **Síncronos, não
+  assíncronos** (diferente dos outros hooks do game loop): a temporada
+  inteira é simulada de uma vez só (`simularTemporada` não é
+  assíncrono), então não dá pra pausar/esperar entrada de usuário entre
+  partidas sem reescrever todo o motor de simulação como assíncrono —
+  os hooks servem pra **mostrar** o jogo a jogo conforme a temporada é
+  processada (dezenas de partidas por temporada, pausar em cada uma
+  seria tedioso de qualquer forma), não pra interagir partida a partida.
+- **CLI**: `exibirPartidaPontosCorridos`/`exibirPartidaMataMata`
+  (`src/cli/index.ts`) formatam cada evento — pontos corridos mostra
+  "preparação" (posição/pontos dos 2 times antes, de `tabelaAntes`),
+  placar, chances do jogador na partida (se teve) e a posição/pontos
+  atualizados depois (`tabelaDepois`); mata-mata mostra etapa, placar
+  agregado e classificado/eliminado. Ligado em `npx tsx src/cli/index.ts
+  jogar` (sempre ativo) e em `carreira-loop` via a flag `--jogo-a-jogo`
+  (opt-in, já que por padrão essa demo é o resumo compacto).
+- **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop
+  corinthians 1 --jogo-a-jogo` mostrou as 38 rodadas do Brasileirão
+  (posição/pontos antes e depois de cada uma) e os 2 confrontos da Copa
+  do Brasil (classificado na quinta fase, eliminado nas oitavas) — e o
+  mesmo fluxo funcionou dentro da carreira interativa (`jogar`), jogo a
+  jogo intercalado com as sessões de treino e os cenários da temporada.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1082,3 +1143,14 @@ isso como uma **segunda fonte de XP**, independente da primeira:
   parecido; `escolherFocoDeTreino` não tem acesso a nenhuma informação
   sobre qual atributo está mais "atrasado" pra sugerir foco — quem
   escolhe (humano ou automação) decide sem esse apoio.
+- **Jogo a jogo — limitações desta versão** (ver seção 5.5): fase de
+  grupos (`groups.ts`) ainda não emite evento de confronto (só o
+  mata-mata que segue, dentro de `receitaGruposEMataMata`) — não afeta
+  nada que já funciona hoje, já que nenhuma competição do calendário
+  real usa essa receita com sucesso ainda; fase suíça
+  (`swiss.ts`, usada por Paulistão/Carioca/Mineiro/Gauchão, que também
+  não têm receita funcionando ainda) também não tem hook; mata-mata
+  ida-e-volta emite 1 evento agregado por confronto, não 1 por perna —
+  quem quiser o placar perna a perna precisa olhar
+  `resultado.partidasDoJogador` (quando o clube do jogador estava
+  envolvido) em vez do evento.

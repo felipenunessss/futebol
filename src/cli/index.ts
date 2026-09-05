@@ -22,10 +22,11 @@ import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/play
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
 import {
-  jogarCarreira,
   jogarTemporada,
   type CenarioResolvidoNaTemporada,
   type NegociacaoResolvidaNaTemporada,
+  type PartidaDoJogadorMataMata,
+  type PartidaDoJogadorPontosCorridos,
   type ResultadoTemporadaDeCarreira,
   type ResumoPartidasDaTemporada,
   type TreinoResolvidoNaTemporada,
@@ -60,6 +61,48 @@ function imprimirTabela(tabela: LinhaTabela[]): void {
     const sg = String(linha.saldoDeGols).padStart(3);
     console.log(`${pos}  ${nome} ${pts} ${j} ${v} ${e} ${dd} ${gp} ${gc} ${sg}`);
   });
+}
+
+function posicaoNaTabela(tabela: LinhaTabela[], clubeId: string): { posicao: number; linha: LinhaTabela } {
+  const posicao = tabela.findIndex((l) => l.clubeId === clubeId) + 1;
+  return { posicao, linha: tabela[posicao - 1] };
+}
+
+function resumoDaLinha(tabela: LinhaTabela[], clubeId: string): string {
+  const { posicao, linha } = posicaoNaTabela(tabela, clubeId);
+  return `${posicao}º ${nomeDoClube(clubeId)} (${linha.pontos} pts, SG ${linha.saldoDeGols})`;
+}
+
+/**
+ * Mostra uma partida de pontos corridos do clube do jogador jogo a jogo:
+ * "preparação" (classificação dos dois times antes, vinda de
+ * `evento.tabelaAntes`), o placar, as chances individuais do jogador
+ * (se ele participou) e a classificação atualizada depois
+ * (`evento.tabelaDepois`). Usado tanto na carreira interativa quanto na
+ * demo `carreira-loop`.
+ */
+function exibirPartidaPontosCorridos(info: PartidaDoJogadorPontosCorridos, clubeId: string): void {
+  const { campeonatoId, evento } = info;
+  const { confronto, resultado, tabelaAntes, tabelaDepois } = evento;
+  const adversario = confronto.mandante === clubeId ? confronto.visitante : confronto.mandante;
+
+  console.log(`\n  [${campeonatoId}] Rodada ${confronto.rodada} — ${resumoDaLinha(tabelaAntes, clubeId)} x ${resumoDaLinha(tabelaAntes, adversario)}`);
+  console.log(`    ${nomeDoClube(confronto.mandante)} ${resultado.golsCasa} x ${resultado.golsFora} ${nomeDoClube(confronto.visitante)}`);
+  if (resultado.chancesJogador.length > 0) {
+    const sucessos = resultado.chancesJogador.filter((c) => c.sucesso).length;
+    console.log(`    Suas chances na partida: ${resultado.chancesJogador.length} (${sucessos} bem-sucedidas)`);
+  }
+  console.log(`    Depois da rodada: ${resumoDaLinha(tabelaDepois, clubeId)} x ${resumoDaLinha(tabelaDepois, adversario)}`);
+}
+
+/** Mostra um confronto de mata-mata do clube do jogador jogo a jogo — não tem "tabela" (é chaveamento), só o placar agregado e se avançou/foi eliminado. */
+function exibirPartidaMataMata(info: PartidaDoJogadorMataMata, clubeId: string): void {
+  const { campeonatoId, evento } = info;
+  const { etapa, confronto } = evento;
+  const decisao = confronto.decididoNosPenaltis ? " (nos pênaltis)" : "";
+  const desfecho = confronto.vencedor === clubeId ? "Classificado!" : "Eliminado.";
+
+  console.log(`\n  [${campeonatoId}] ${etapa}: ${nomeDoClube(confronto.timeA)} ${confronto.golsA} x ${confronto.golsB} ${nomeDoClube(confronto.timeB)}${decisao} — ${desfecho}`);
 }
 
 function simularCopaDoBrasil(): void {
@@ -290,11 +333,15 @@ function simularTemporadaCli(): void {
 
 /**
  * Demonstra o game loop persistente de carreira (`career/career-loop.ts`
- * `jogarCarreira`): joga N temporadas seguidas com dados reais (calendário
- * completo, clube de verdade), aplicando XP de cada partida e resolvendo
- * cenários por período do calendário automaticamente, sem orquestrar cada
- * passo na mão como `carreira` faz. `N` vem do 2º argumento da CLI
- * (padrão 3).
+ * `jogarTemporada`, chamado uma vez por temporada num laço aqui mesmo —
+ * não `jogarCarreira` — pra poder plugar os hooks de jogo a jogo com o
+ * clube certo a cada temporada): joga N temporadas seguidas com dados
+ * reais (calendário completo, clube de verdade), aplicando XP de cada
+ * partida e resolvendo cenários por período do calendário
+ * automaticamente, sem orquestrar cada passo na mão como `carreira` faz.
+ * `N` vem do 2º argumento da CLI (padrão 3). Passe `--jogo-a-jogo` pra
+ * ver cada partida do clube do jogador (preparação, placar, tabela
+ * antes/depois — ver `exibirPartidaPontosCorridos`/`exibirPartidaMataMata`).
  */
 async function simularCarreiraLoopCli(): Promise<void> {
   const clubeInicialId = process.argv[3] ?? "corinthians";
@@ -318,12 +365,17 @@ async function simularCarreiraLoopCli(): Promise<void> {
   console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube inicial: ${nomeDoClube(clubeInicialId)}) ===`);
   console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)}\n`);
 
-  const resultado = await jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes);
+  const mostrarJogoAJogo = process.argv.includes("--jogo-a-jogo");
 
-  for (const temporada of resultado.temporadas) {
+  for (let i = 0; i < quantidadeDeTemporadas; i++) {
+    const temporada = await jogarTemporada(estado, campeonatos, clubes, {
+      onPartidaPontosCorridos: mostrarJogoAJogo ? (info) => exibirPartidaPontosCorridos(info, estado.clubeAtualId) : undefined,
+      onPartidaMataMata: mostrarJogoAJogo ? (info) => exibirPartidaMataMata(info, estado.clubeAtualId) : undefined,
+    });
+
     const competicoesOk = temporada.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(
-      `--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | clube ${nomeDoClube(temporada.estado.clubeAtualId)} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
+      `\n--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | clube ${nomeDoClube(temporada.estado.clubeAtualId)} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
     );
     console.log(
       `  ${competicoesOk.length}/${temporada.resultadoTemporada.competicoes.length} competições simuladas | ${temporada.cenariosResolvidos.length} cenários resolvidos`,
@@ -341,11 +393,11 @@ async function simularCarreiraLoopCli(): Promise<void> {
     console.log(
       `  Moral ${temporada.estado.moral} | Reputação nacional ${temporada.estado.reputacao.nacional} | Relações internas ${temporada.estado.relacoesInternas} | Patrimônio ${temporada.estado.patrimonio}`,
     );
+
+    estado = temporada.estado;
   }
 
-  console.log(
-    `\n=== Fim: temporada ${resultado.estadoFinal.temporada} | clube ${nomeDoClube(resultado.estadoFinal.clubeAtualId)} | idade ${resultado.estadoFinal.jogador.idade} | overall ${overallAtual(resultado.estadoFinal)} ===`,
-  );
+  console.log(`\n=== Fim: temporada ${estado.temporada} | clube ${nomeDoClube(estado.clubeAtualId)} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)} ===`);
 }
 
 /**
@@ -469,6 +521,14 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     console.log(`  -> ${resolvido.escolha.resultado.impacto.narrativa} (${formatarImpacto(resolvido.escolha.resultado.impacto)})`);
   };
 
+  const onPartidaPontosCorridos = (info: PartidaDoJogadorPontosCorridos): void => {
+    exibirPartidaPontosCorridos(info, estado.clubeAtualId);
+  };
+
+  const onPartidaMataMata = (info: PartidaDoJogadorMataMata): void => {
+    exibirPartidaMataMata(info, estado.clubeAtualId);
+  };
+
   const onPartidasResumidas = (resumo: ResumoPartidasDaTemporada): void => {
     console.log(`\n--- Partidas da temporada ---`);
     for (const c of resumo.competicoes) {
@@ -492,6 +552,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       onCenarioResolvido,
       onPartidasResumidas,
       onTreinoResolvido,
+      onPartidaPontosCorridos,
+      onPartidaMataMata,
     });
     estado = resultado.estado;
 

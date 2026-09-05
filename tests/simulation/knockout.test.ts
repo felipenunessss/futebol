@@ -6,6 +6,7 @@ import {
   simularMataMataComEtapas,
   simularMataMataDoFormato,
   simularMataMataSimples,
+  type EventoConfrontoMataMata,
 } from "../../src/simulation/knockout.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
@@ -44,6 +45,29 @@ describe("simularMataMataSimples", () => {
     expect(resultado.etapas[0].vencedores).toHaveLength(4);
     expect(resultado.etapas[1].vencedores).toHaveLength(2);
     expect(resultado.etapas[2].vencedores).toHaveLength(1);
+  });
+
+  describe("aoResolverConfronto", () => {
+    it("é chamado uma vez por confronto de cada etapa, com o nome da etapa certo", () => {
+      const participantes = ["a", "b", "c", "d"];
+      const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+      const eventos: EventoConfrontoMataMata[] = [];
+
+      simularMataMataSimples(participantes, ["semifinal", "final"], true, ratings, () => Math.random(), undefined, (evento) => eventos.push(evento));
+
+      expect(eventos).toHaveLength(3); // 2 semifinais + 1 final
+      expect(eventos.filter((e) => e.etapa === "semifinal")).toHaveLength(2);
+      expect(eventos.filter((e) => e.etapa === "final")).toHaveLength(1);
+    });
+
+    it("sem o callback, o resultado final não muda (mesmo comportamento de antes)", () => {
+      const participantes = ["a", "b", "c", "d"];
+      const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+
+      const semCallback = simularMataMataSimples(participantes, ["semifinal", "final"], true, ratings, () => 0.5);
+      const comCallback = simularMataMataSimples(participantes, ["semifinal", "final"], true, ratings, () => 0.5, undefined, () => {});
+      expect(comCallback.campeao).toBe(semCallback.campeao);
+    });
   });
 });
 

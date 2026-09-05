@@ -1,7 +1,9 @@
 import type { Club } from "../schemas/club.js";
 import { buscarArquetipo } from "../schemas/player.js";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
-import { simularTemporada, type CampeonatoSimulavel, type ResultadoTemporada } from "../simulation/engine.js";
+import { simularTemporada, type CampeonatoSimulavel, type EventosSimulacaoTemporada, type ResultadoTemporada } from "../simulation/engine.js";
+import type { EventoConfrontoMataMata } from "../simulation/knockout.js";
+import type { EventoConfrontoPontosCorridos } from "../simulation/season.js";
 import type { ParticipacaoJogadorClube } from "../simulation/match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
 import { aplicarTreino, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
@@ -35,6 +37,16 @@ import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, ava
 const MINUTOS_POR_PARTIDA_PADRAO = 90;
 /** Importância uniforme pra toda partida — o motor ainda não distingue fase (final de mata-mata vs. fase de grupos) dentro de `partidasDoJogador` (pendência). */
 const IMPORTANCIA_PADRAO = 1;
+
+export interface PartidaDoJogadorPontosCorridos {
+  campeonatoId: string;
+  evento: EventoConfrontoPontosCorridos;
+}
+
+export interface PartidaDoJogadorMataMata {
+  campeonatoId: string;
+  evento: EventoConfrontoMataMata;
+}
 
 export interface CenarioResolvidoNaTemporada {
   periodo: string;
@@ -128,6 +140,22 @@ export interface OpcoesJogarTemporada {
   escolherFocoDeTreino?: (estado: EstadoDeCarreira) => FocoDeTreino | Promise<FocoDeTreino>;
   /** Chamado assim que cada sessão de treino do período é resolvida — útil pra mostrar o desfecho em tempo real numa interface interativa. */
   onTreinoResolvido?: (treino: TreinoResolvidoNaTemporada) => void | Promise<void>;
+  /**
+   * Chamado a cada confronto de pontos corridos que o clube atual do
+   * jogador disputa (`simulation/season.ts` `EventoConfrontoPontosCorridos`
+   * — inclui a tabela antes/depois desse confronto específico), na ordem
+   * em que os confrontos acontecem dentro da competição. **Síncrono, não
+   * assíncrono** (ao contrário dos outros hooks) — a temporada inteira é
+   * simulada de uma vez só (`simulation/engine.ts` `simularTemporada` não
+   * é assíncrono), então não dá pra pausar/esperar entrada de usuário
+   * entre partidas sem reescrever todo o motor de simulação como
+   * assíncrono; o hook serve pra **mostrar** o jogo a jogo em tempo real
+   * conforme a temporada é processada, não pra interagir partida a
+   * partida.
+   */
+  onPartidaPontosCorridos?: (info: PartidaDoJogadorPontosCorridos) => void;
+  /** Equivalente a `onPartidaPontosCorridos`, mas pra confrontos de mata-mata (`simulation/knockout.ts` `EventoConfrontoMataMata`) — também síncrono, mesma ressalva. */
+  onPartidaMataMata?: (info: PartidaDoJogadorMataMata) => void;
   /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
   /**
@@ -244,13 +272,32 @@ export async function jogarTemporada(
     onCenarioResolvido,
     onPartidasResumidas,
     onTreinoResolvido,
+    onPartidaPontosCorridos,
+    onPartidaMataMata,
     random = Math.random,
   } = opcoes;
 
   const clubePorId = new Map(clubes.map((c) => [c.id, c]));
+  const clubeNoInicioDaTemporada = estado.clubeAtualId;
 
   const participacaoJogador: ParticipacaoJogadorClube = { clubeId: estado.clubeAtualId, jogador: estado.jogador, estiloTecnico };
-  const resultadoTemporada = simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random);
+  const eventosDeSimulacao: EventosSimulacaoTemporada = {
+    aoSimularConfrontoPontosCorridos: onPartidaPontosCorridos
+      ? (campeonatoId, evento) => {
+          if (evento.confronto.mandante === clubeNoInicioDaTemporada || evento.confronto.visitante === clubeNoInicioDaTemporada) {
+            onPartidaPontosCorridos({ campeonatoId, evento });
+          }
+        }
+      : undefined,
+    aoResolverConfrontoMataMata: onPartidaMataMata
+      ? (campeonatoId, evento) => {
+          if (evento.confronto.timeA === clubeNoInicioDaTemporada || evento.confronto.timeB === clubeNoInicioDaTemporada) {
+            onPartidaMataMata({ campeonatoId, evento });
+          }
+        }
+      : undefined,
+  };
+  const resultadoTemporada = simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random, eventosDeSimulacao);
 
   const overallAntes = overallAtual(estado);
   let estadoAtual = estado;

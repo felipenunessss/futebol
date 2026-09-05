@@ -282,6 +282,60 @@ describe("jogarTemporada — negociação de transferência", () => {
   });
 });
 
+describe("jogarTemporada — jogo a jogo (onPartidaPontosCorridos/onPartidaMataMata)", () => {
+  it("onPartidaPontosCorridos só dispara pros confrontos do clube do jogador, na ordem certa", async () => {
+    const times = ["a", "b", "c", "d"];
+    const eventos: { campeonatoId: string; mandante: string; visitante: string }[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onPartidaPontosCorridos: (info) => {
+        eventos.push({ campeonatoId: info.campeonatoId, mandante: info.evento.confronto.mandante, visitante: info.evento.confronto.visitante });
+      },
+    });
+
+    expect(eventos.length).toBeGreaterThan(0);
+    expect(eventos.every((e) => e.campeonatoId === "brasileirao_serie_a")).toBe(true);
+    expect(eventos.every((e) => e.mandante === "a" || e.visitante === "a")).toBe(true);
+  });
+
+  it("evento traz tabelaAntes/tabelaDepois do confronto específico", async () => {
+    const times = ["a", "b", "c", "d"];
+    let primeiroEvento: { evento: { confronto: { mandante: string; visitante: string }; tabelaAntes: { clubeId: string; jogos: number }[]; tabelaDepois: { clubeId: string; jogos: number }[] } } | undefined;
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onPartidaPontosCorridos: (info) => {
+        primeiroEvento ??= info as typeof primeiroEvento;
+      },
+    });
+
+    expect(primeiroEvento).toBeDefined();
+    const linhaAntes = primeiroEvento!.evento.tabelaAntes.find((l) => l.clubeId === "a")!;
+    const linhaDepois = primeiroEvento!.evento.tabelaDepois.find((l) => l.clubeId === "a")!;
+    expect(linhaDepois.jogos).toBe(linhaAntes.jogos + 1);
+  });
+
+  it("onPartidaMataMata só dispara pros confrontos do clube do jogador", async () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonatos = [{ id: "copa_do_brasil", formato: { mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } }, times }];
+    const eventos: { campeonatoId: string; timeA: string; timeB: string }[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatos, times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onPartidaMataMata: (info) => {
+        eventos.push({ campeonatoId: info.campeonatoId, timeA: info.evento.confronto.timeA, timeB: info.evento.confronto.timeB });
+      },
+    });
+
+    // "a" joga a semifinal e, se avançar, também a final — 1 ou 2 eventos, nunca mais que isso nem zero
+    expect(eventos.length).toBeGreaterThanOrEqual(1);
+    expect(eventos.length).toBeLessThanOrEqual(2);
+    expect(eventos.every((e) => e.campeonatoId === "copa_do_brasil")).toBe(true);
+    expect(eventos.every((e) => e.timeA === "a" || e.timeB === "a")).toBe(true);
+  });
+});
+
 describe("jogarCarreira", () => {
   it("encadeia N temporadas, uma alimentando a próxima", async () => {
     const times = ["a", "b", "c", "d"];

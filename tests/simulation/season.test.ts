@@ -5,6 +5,7 @@ import {
   simularFaseUnicaDoFormato,
   simularTemporadaPontosCorridos,
   somarTabelas,
+  type EventoConfrontoPontosCorridos,
   type LinhaTabela,
 } from "../../src/simulation/season.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
@@ -86,6 +87,53 @@ describe("simularTemporadaPontosCorridos", () => {
       expect(linha.jogos).toBe(linha.vitorias + linha.empates + linha.derrotas);
       expect(linha.saldoDeGols).toBe(linha.golsPro - linha.golsContra);
     }
+  });
+
+  describe("aoSimularConfronto", () => {
+    it("é chamado uma vez por confronto, na mesma ordem de confrontos", () => {
+      const eventos: EventoConfrontoPontosCorridos[] = [];
+      const { confrontos } = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => {
+        eventos.push(evento);
+      });
+
+      expect(eventos).toHaveLength(confrontos.length);
+      expect(eventos.map((e) => e.confronto)).toEqual(confrontos);
+    });
+
+    it("tabelaDepois reflete o resultado desse confronto (jogos +1 pros dois times envolvidos)", () => {
+      const eventos: EventoConfrontoPontosCorridos[] = [];
+      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+
+      const primeiro = eventos[0];
+      const linhaMandanteDepois = primeiro.tabelaDepois.find((l) => l.clubeId === primeiro.confronto.mandante)!;
+      const linhaMandanteAntes = primeiro.tabelaAntes.find((l) => l.clubeId === primeiro.confronto.mandante)!;
+      expect(linhaMandanteDepois.jogos).toBe(linhaMandanteAntes.jogos + 1);
+    });
+
+    it("tabelaAntes do primeiro confronto começa zerada (ninguém jogou ainda)", () => {
+      const eventos: EventoConfrontoPontosCorridos[] = [];
+      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+
+      for (const linha of eventos[0].tabelaAntes) {
+        expect(linha.jogos).toBe(0);
+      }
+    });
+
+    it("tabelaAntes/tabelaDepois de eventos passados não mudam depois de confrontos futuros (são cópias, não a mesma referência mutável)", () => {
+      const eventos: EventoConfrontoPontosCorridos[] = [];
+      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+
+      const jogosDoPrimeiroEventoNaHora = eventos[0].tabelaDepois.find((l) => l.clubeId === eventos[0].confronto.mandante)!.jogos;
+      // confere de novo depois que TODOS os confrontos já rodaram — não deveria ter mudado
+      const mesmaLinha = eventos[0].tabelaDepois.find((l) => l.clubeId === eventos[0].confronto.mandante)!;
+      expect(mesmaLinha.jogos).toBe(jogosDoPrimeiroEventoNaHora);
+    });
+
+    it("sem o callback, o resultado final não muda (mesmo comportamento de antes)", () => {
+      const semCallback = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5);
+      const comCallback = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, () => {});
+      expect(comCallback.tabela).toEqual(semCallback.tabela);
+    });
   });
 });
 

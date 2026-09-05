@@ -39,6 +39,12 @@ export interface ResultadoMataMata {
   campeao: string;
 }
 
+/** Evento emitido a cada confronto de mata-mata resolvido (`aoResolverConfronto`) — dá pra mostrar o jogo a jogo em tempo real. Ida-e-volta conta como 1 evento só (agregado), não 1 por perna — simplificação documentada. */
+export interface EventoConfrontoMataMata {
+  etapa: string;
+  confronto: ResultadoConfrontoMataMata;
+}
+
 function emparelharPorForca(participantes: string[], ratings: Record<string, number>): [string, string][] {
   if (participantes.length % 2 !== 0) {
     throw new Error(`emparelharPorForca: número ímpar de participantes (${participantes.length})`);
@@ -120,6 +126,7 @@ export function simularMataMataComEtapas(
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
+  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
 ): ResultadoMataMata {
   let vivos: string[] = [];
   const resultadoEtapas: ResultadoEtapaMataMata[] = [];
@@ -133,7 +140,11 @@ export function simularMataMataComEtapas(
     }
 
     const pares = emparelharPorForca(vivos, ratings);
-    const confrontos = pares.map(([timeA, timeB]) => resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador));
+    const confrontos = pares.map(([timeA, timeB]) => {
+      const confronto = resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador);
+      aoResolverConfronto?.({ etapa: etapa.nome, confronto });
+      return confronto;
+    });
     const vencedores = confrontos.map((c) => c.vencedor);
 
     resultadoEtapas.push({ nome: etapa.nome, confrontos, vencedores });
@@ -155,6 +166,7 @@ export function simularMataMataSimples(
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
+  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
 ): ResultadoMataMata {
   const etapas: EtapaMataMata[] = fases.map((nome, indice) => ({
     nome,
@@ -162,7 +174,7 @@ export function simularMataMataSimples(
     entrantes: indice === 0 ? participantes : undefined,
   }));
 
-  return simularMataMataComEtapas(etapas, ratings, random, participacaoJogador);
+  return simularMataMataComEtapas(etapas, ratings, random, participacaoJogador, aoResolverConfronto);
 }
 
 /**
@@ -177,12 +189,13 @@ export function simularMataMataDoFormato(
   participantes: string[] = [],
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
+  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
 ): ResultadoMataMata {
   if (formato.etapas) {
-    return simularMataMataComEtapas(formato.etapas, ratings, random, participacaoJogador);
+    return simularMataMataComEtapas(formato.etapas, ratings, random, participacaoJogador, aoResolverConfronto);
   }
 
-  return simularMataMataSimples(participantes, formato.fases, formato.ida_e_volta, ratings, random, participacaoJogador);
+  return simularMataMataSimples(participantes, formato.fases, formato.ida_e_volta, ratings, random, participacaoJogador, aoResolverConfronto);
 }
 
 export interface ResultadoFinalEstadual {

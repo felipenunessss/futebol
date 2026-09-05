@@ -73,6 +73,20 @@ export interface PartidaDoJogador {
   resultado: ResultadoPartida;
 }
 
+/**
+ * Evento emitido a cada confronto simulado (`aoSimularConfronto`) — dá
+ * pra mostrar o jogo a jogo em tempo real (ex: CLI interativa) sem
+ * esperar a temporada inteira terminar. `tabelaAntes`/`tabelaDepois` são
+ * cópias (não a mesma referência mutável usada internamente), seguras
+ * pra guardar/exibir sem se preocupar com mutação posterior.
+ */
+export interface EventoConfrontoPontosCorridos {
+  confronto: Confronto;
+  resultado: ResultadoPartida;
+  tabelaAntes: LinhaTabela[];
+  tabelaDepois: LinhaTabela[];
+}
+
 export interface ResultadoTemporadaPontosCorridos {
   confrontos: Confronto[];
   /** Ordenada por pontos, saldo de gols, gols pró — mesmo critério clássico de desempate. */
@@ -104,12 +118,22 @@ export function atualizarLinha(linha: LinhaTabela, golsFeitos: number, golsSofri
   }
 }
 
+function ordenarTabela(tabela: LinhaTabela[]): LinhaTabela[] {
+  return [...tabela].sort((a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro);
+}
+
 /**
  * Simula uma temporada inteira de pontos corridos. Se `participacaoJogador`
  * for passado, as partidas do clube dele usam `ParticipacaoJogador` (Camada
  * 2 — chance individual resolvida por atributo) em vez do duelo agregado;
  * o resto da temporada continua Camada 1. `ratings` precisa ter uma
  * entrada por clube em `times` — ver `obterRating` em `simulation/rating.ts`.
+ *
+ * `aoSimularConfronto`, se passado, é chamado depois de cada confronto ser
+ * resolvido (na ordem em que `confrontos` já vem, que é ordem de rodada),
+ * com a tabela antes/depois desse confronto específico — dá pra mostrar o
+ * jogo a jogo em tempo real. As cópias só são feitas quando esse callback
+ * é passado (sem custo extra quando ninguém precisa disso).
  */
 export function simularTemporadaPontosCorridos(
   times: string[],
@@ -117,6 +141,7 @@ export function simularTemporadaPontosCorridos(
   idaEVolta: boolean,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
+  aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void,
 ): ResultadoTemporadaPontosCorridos {
   const confrontos = gerarConfrontosPontosCorridos(times, idaEVolta);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
@@ -128,19 +153,22 @@ export function simularTemporadaPontosCorridos(
     const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
     const resultado = simularPartida(perfilMandante, perfilVisitante, random, participacao);
 
+    const tabelaAntes = aoSimularConfronto ? ordenarTabela([...tabela.values()].map((linha) => ({ ...linha }))) : undefined;
+
     atualizarLinha(tabela.get(confronto.mandante)!, resultado.golsCasa, resultado.golsFora);
     atualizarLinha(tabela.get(confronto.visitante)!, resultado.golsFora, resultado.golsCasa);
+
+    if (aoSimularConfronto) {
+      const tabelaDepois = ordenarTabela([...tabela.values()].map((linha) => ({ ...linha })));
+      aoSimularConfronto({ confronto, resultado, tabelaAntes: tabelaAntes!, tabelaDepois });
+    }
 
     if (participacao) partidasDoJogador.push({ confronto, resultado });
   }
 
-  const tabelaOrdenada = [...tabela.values()].sort(
-    (a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro,
-  );
-
   return {
     confrontos,
-    tabela: tabelaOrdenada,
+    tabela: ordenarTabela([...tabela.values()]),
     ...(participacaoJogador ? { partidasDoJogador } : {}),
   };
 }
@@ -163,8 +191,9 @@ export function simularFaseUnicaDoFormato(
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
+  aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void,
 ): ResultadoFaseUnica {
-  const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random, participacaoJogador);
+  const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random, participacaoJogador, aoSimularConfronto);
   const classificados = tabela.slice(0, formato.classificam_proxima_fase).map((linha) => linha.clubeId);
 
   return { confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) };

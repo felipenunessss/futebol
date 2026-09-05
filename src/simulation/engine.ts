@@ -2,10 +2,25 @@ import type { FormatoEstadual } from "../schemas/championship.js";
 import type { Club } from "../schemas/club.js";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularFaseDeGruposDoFormato } from "./groups.js";
-import { simularMataMataDoFormato, simularMataMataSimples } from "./knockout.js";
+import { simularMataMataDoFormato, simularMataMataSimples, type EventoConfrontoMataMata } from "./knockout.js";
 import type { ParticipacaoJogadorClube, ResultadoPartida } from "./match.js";
 import { obterRating } from "./rating.js";
-import { simularFaseUnicaDoFormato, simularTemporadaPontosCorridos, somarTabelas } from "./season.js";
+import { simularFaseUnicaDoFormato, simularTemporadaPontosCorridos, somarTabelas, type EventoConfrontoPontosCorridos } from "./season.js";
+
+/**
+ * Hooks pra acompanhar jogo a jogo em tempo real (ex: CLI interativa),
+ * sem esperar a temporada/competição inteira terminar — ver
+ * `season.ts` `EventoConfrontoPontosCorridos`/`knockout.ts`
+ * `EventoConfrontoMataMata`. Cada evento já vem com `campeonatoId` pra
+ * quem consome saber de qual competição é (`simularTemporada` roda
+ * várias ao mesmo tempo). **Cobertura parcial**: só pontos_corridos e
+ * mata_mata têm hook hoje — a parte de fase_grupos de
+ * `receitaGruposEMataMata` ainda não emite eventos (pendência).
+ */
+export interface EventosSimulacaoTemporada {
+  aoSimularConfrontoPontosCorridos?: (campeonatoId: string, evento: EventoConfrontoPontosCorridos) => void;
+  aoResolverConfrontoMataMata?: (campeonatoId: string, evento: EventoConfrontoMataMata) => void;
+}
 
 /**
  * Loop de calendário — percorre o calendário mestre de uma temporada
@@ -52,8 +67,19 @@ function receitaPontosCorridos(
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
+  eventos?: EventosSimulacaoTemporada,
 ): ResultadoCampeonatoSimples {
-  const resultado = simularTemporadaPontosCorridos(campeonato.times, ratings, campeonato.formato.pontos_corridos!.ida_e_volta, random, participacaoJogador);
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const resultado = simularTemporadaPontosCorridos(
+    campeonato.times,
+    ratings,
+    campeonato.formato.pontos_corridos!.ida_e_volta,
+    random,
+    participacaoJogador,
+    aoSimularConfronto,
+  );
   return {
     campeao: resultado.tabela[0].clubeId,
     partidasDoJogador: (resultado.partidasDoJogador ?? []).map((p) => p.resultado),
@@ -65,8 +91,12 @@ function receitaMataMata(
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
+  eventos?: EventosSimulacaoTemporada,
 ): ResultadoCampeonatoSimples {
-  const resultado = simularMataMataDoFormato(campeonato.formato.mata_mata!, ratings, campeonato.times, random, participacaoJogador);
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+  const resultado = simularMataMataDoFormato(campeonato.formato.mata_mata!, ratings, campeonato.times, random, participacaoJogador, aoResolverConfronto);
   const partidasDoJogador = resultado.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
   return { campeao: resultado.campeao, partidasDoJogador };
 }
@@ -76,10 +106,23 @@ function receitaGruposEMataMata(
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
+  eventos?: EventosSimulacaoTemporada,
 ): ResultadoCampeonatoSimples {
+  // A fase de grupos ainda não emite evento (pendência) — só o mata-mata que segue.
   const grupos = simularFaseDeGruposDoFormato(campeonato.formato.fase_grupos!, campeonato.times, ratings, random, participacaoJogador);
   const mataMata = campeonato.formato.mata_mata!;
-  const resultadoMataMata = simularMataMataSimples(grupos.classificados, mataMata.fases, mataMata.ida_e_volta, ratings, random, participacaoJogador);
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+  const resultadoMataMata = simularMataMataSimples(
+    grupos.classificados,
+    mataMata.fases,
+    mataMata.ida_e_volta,
+    ratings,
+    random,
+    participacaoJogador,
+    aoResolverConfronto,
+  );
 
   const partidasDosGrupos = grupos.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
   const partidasDoMataMata = resultadoMataMata.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
@@ -92,6 +135,7 @@ type Receita = (
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
+  eventos?: EventosSimulacaoTemporada,
 ) => ResultadoCampeonatoSimples;
 
 /** Despacha pela combinação exata de blocos de `formato` — só cobre as 3 combinações estruturalmente inambíguas (ver comentário do arquivo). */
@@ -132,9 +176,13 @@ export function receitaArgentina(
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
+  eventos?: EventosSimulacaoTemporada,
 ): ResultadoCampeonatoSimples {
-  const apertura = simularFaseUnicaDoFormato(campeonato.formato.turno!, campeonato.times, ratings, random, participacaoJogador);
-  const clausura = simularFaseUnicaDoFormato(campeonato.formato.returno!, campeonato.times, ratings, random, participacaoJogador);
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const apertura = simularFaseUnicaDoFormato(campeonato.formato.turno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto);
+  const clausura = simularFaseUnicaDoFormato(campeonato.formato.returno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto);
   const tabelaAnual = somarTabelas([apertura.tabela, clausura.tabela]);
 
   const partidasDoJogador = [...(apertura.partidasDoJogador ?? []), ...(clausura.partidasDoJogador ?? [])].map((p) => p.resultado);
@@ -181,6 +229,7 @@ export function simularTemporada(
   clubes: Club[],
   participacaoJogador?: ParticipacaoJogadorClube,
   random: () => number = Math.random,
+  eventos?: EventosSimulacaoTemporada,
 ): ResultadoTemporada {
   const calendario = construirCalendarioPadrao(temporada);
   const idsAtivos = new Set(calendario.calendario.flatMap((periodo) => periodo.competicoes_ativas));
@@ -202,7 +251,7 @@ export function simularTemporada(
         participacaoJogador && campeonato.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
 
       const receita = escolherReceita(campeonato);
-      const resultado = receita(campeonato, ratings, participacaoNestaCompeticao, random);
+      const resultado = receita(campeonato, ratings, participacaoNestaCompeticao, random, eventos);
       competicoes.push({ campeonatoId, resultado });
     } catch (erro) {
       competicoes.push({ campeonatoId, erro: erro instanceof Error ? erro.message : String(erro) });
