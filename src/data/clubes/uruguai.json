@@ -21,12 +21,12 @@
   { "id": "fenix", "nome": "Centro Atlético Fénix", "nome_popular": "Fénix", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Capurro", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
   { "id": "huracan_uy", "nome": "Huracán Fútbol Club", "nome_popular": "Huracán", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
   { "id": "la_luz", "nome": "Club Atlético La Luz", "nome_popular": "La Luz", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "miramar_misiones", "nome": "Miramar Misiones", "nome_popular": "Miramar Misiones", "pais": "UY", "cidade": "Montevidéu", "estadio": "Charrúa", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
+  { "id": "miramar_misiones", "nome": "Miramar Misiones", "nome_popular": "Miramar Misiones", "pais": "UY", "cidade": "Montevidéu", "estadio": "Charrúa", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1441 },
   { "id": "oriental_uy", "nome": "Club Atlético Oriental", "nome_popular": "Oriental", "pais": "UY", "cidade": "La Paz", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
   { "id": "paysandu_uy", "nome": "Paysandú Fútbol Club", "nome_popular": "Paysandú", "pais": "UY", "cidade": "Paysandú", "estadio": "Artigas", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "plaza_colonia", "nome": "Club Plaza Colonia de Deportes", "nome_popular": "Plaza Colonia", "pais": "UY", "cidade": "Colonia del Sacramento", "estadio": "Juan Gaspar Prandi", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
+  { "id": "plaza_colonia", "nome": "Club Plaza Colonia de Deportes", "nome_popular": "Plaza Colonia", "pais": "UY", "cidade": "Colonia del Sacramento", "estadio": "Juan Gaspar Prandi", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1489 },
   { "id": "rentistas", "nome": "Club Atlético Rentistas", "nome_popular": "Rentistas", "pais": "UY", "cidade": "Montevidéu", "estadio": "Complejo Rentistas", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "river_plate_uy", "nome": "River Plate Fútbol Club", "nome_popular": "River Plate", "pais": "UY", "cidade": "Montevidéu", "estadio": "Federico Omar Saroldi", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
+  { "id": "river_plate_uy", "nome": "River Plate Fútbol Club", "nome_popular": "River Plate", "pais": "UY", "cidade": "Montevidéu", "estadio": "Federico Omar Saroldi", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1445 },
   { "id": "tacuarembo", "nome": "Tacuarembó Fútbol Club", "nome_popular": "Tacuarembó", "pais": "UY", "cidade": "Tacuarembó", "estadio": "Raúl Saturnino Goyenola", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
   { "id": "uruguay_montevideo", "nome": "Club Uruguay Montevideo", "nome_popular": "Uruguay Montevideo", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque ANCAP", "divisao_nacional": { "pais": "UY", "nivel": 2 } }
 ]
