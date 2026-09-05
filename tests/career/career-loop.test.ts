@@ -95,6 +95,43 @@ describe("jogarTemporada", () => {
   });
 });
 
+describe("jogarTemporada — negociação de transferência", () => {
+  it("clube mais forte financeiramente pode fazer proposta e o jogador assinar (clubeAtualId e contratoAtual mudam)", () => {
+    const clubes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", estado: "RJ", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+    ];
+    const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
+
+    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0 });
+
+    expect(resultado.negociacoesResolvidas.length).toBeGreaterThan(0);
+    const negociacaoAceita = resultado.negociacoesResolvidas.find((n) => n.resultado.aceito);
+    expect(negociacaoAceita).toBeDefined();
+    expect(resultado.estado.clubeAtualId).toBe(negociacaoAceita!.clubeOfertanteId);
+    expect(resultado.estado.contratoAtual).toBeDefined();
+    expect(resultado.estado.contratoAtual!.clubeId).toBe(resultado.estado.clubeAtualId);
+  });
+
+  it("negociação recusada (random alto) não muda o clube nem gera contratoAtual", () => {
+    const clubes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
+    ];
+    const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
+
+    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.999 });
+
+    expect(resultado.negociacoesResolvidas.every((n) => !n.resultado.aceito)).toBe(true);
+    expect(resultado.estado.clubeAtualId).toBe("a");
+    expect(resultado.estado.contratoAtual).toBeUndefined();
+  });
+});
+
 describe("jogarCarreira", () => {
   it("encadeia N temporadas, uma alimentando a próxima", () => {
     const times = ["a", "b", "c", "d"];

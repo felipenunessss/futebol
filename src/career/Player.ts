@@ -6,6 +6,7 @@ import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } 
 import { patrociniosDisponiveis } from "./patrocinios.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
+import type { Contrato } from "../schemas/contract.js";
 
 /**
  * Estado de carreira do jogador — o "save" da carreira. Junta o `Jogador`
@@ -30,6 +31,8 @@ export interface EstadoDeCarreira {
   relacoesInternas: number;
   /** Renda simples acumulada de patrocínios (`career/patrocinios.ts`) — não é a economia completa da Fase 4 (mercado de transferências), só um contador. */
   patrimonio: number;
+  /** Contrato com o clube atual (`market/negotiation.ts`) — ausente quando o jogador ainda não passou por uma negociação de mercado (ex: acabou de criar a carreira, ou foi movido por `transferirParaClube` sem negociação). */
+  contratoAtual?: Contrato;
 }
 
 export interface OpcoesEstadoInicial {
@@ -140,8 +143,14 @@ export function aplicarImpactoDeCenario(
   };
 }
 
+/** Move o jogador pra outro clube sem negociação (`contratoAtual` não muda) — pra movimentações puramente narrativas. Pra uma transferência com contrato de verdade, ver `assinarContrato`. */
 export function transferirParaClube(estado: EstadoDeCarreira, novoClubeId: string): EstadoDeCarreira {
   return { ...estado, clubeAtualId: novoClubeId };
+}
+
+/** Move o jogador pro clube do `Contrato` e registra o contrato como `contratoAtual` — resultado de uma negociação de mercado bem-sucedida (`market/negotiation.ts` `negociarTransferencia`). */
+export function assinarContrato(estado: EstadoDeCarreira, contrato: Contrato): EstadoDeCarreira {
+  return { ...estado, clubeAtualId: contrato.clubeId, contratoAtual: contrato };
 }
 
 /**

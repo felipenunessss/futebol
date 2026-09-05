@@ -34,10 +34,10 @@ src/
     campeonatos-nacionais/ — Brasileirão Séries A-D, Copa do Brasil, copas regionais
     loaders/               — funções para carregar/validar os dados acima (index.ts) e
                              lógica de resolução de vagas (vagas-nacionais.ts, gerar-copa-regional.ts)
-  simulation/  — motor de simulação de partida (Fase 2, ainda só stub)
-  progression/ — XP, níveis, arquétipos, perks (Fase 3, ainda só stub)
-  market/      — mercado de transferências (Fase 4, ainda só stub)
-  career/      — game loop / estado de carreira (ainda só stub)
+  simulation/  — motor de simulação de partida (Fase 2), rating tipo Elo, calendário de competições
+  progression/ — XP/atributos sem perks, arquétipos, curvas de idade, cenários de carreira com gatilho
+  market/      — mercado de transferências (Fase 4 adiantada): valorização, propostas, negociação
+  career/      — estado de carreira (Player.ts), patrocínios, game loop persistente (career-loop.ts)
   cli/         — CLI fina pra exercitar o motor
 
 scripts/

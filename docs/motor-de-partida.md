@@ -729,20 +729,106 @@ entrada por temporada).
   mesmo comportamento das demos de CLI) é injetável — outra função pode
   plugar uma interface real (jogador humano escolhendo, IA, sempre a opção
   mais segura, etc) sem mudar o loop.
-- **`opcoes.regiaoAtual`** decide onde deltas de reputação regional caem
-  (mesma regra de `aplicarImpacto`) — sem ela, cenários exigindo reputação
-  regional mínima nunca ficam elegíveis e nenhum delta regional é
-  aplicado.
+- **`regiaoAtual` é derivada automaticamente** de `Club.estado` a cada
+  período, a partir do `clubeAtualId` corrente — acompanha uma
+  transferência de clube dentro da própria temporada (ver seção 5.2).
+  `opcoes.regiaoAtual` só serve de fallback pra clube sem `estado` (a
+  maioria dos clubes fora do Brasil).
 - **Simplificações documentadas, não bugs escondidos**: toda partida do
   jogador é tratada como 90 minutos jogados e importância 1 — não existe
   sistema de minutagem/banco nem diferenciação de fase (final de
   mata-mata vs. fase de grupos) dentro de `partidasDoJogador` ainda (ver
   pendências).
-- **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop [N]`
-  (padrão 3 temporadas) roda com o calendário completo (Brasil +
-  continentais + estaduais) e o Corinthians de verdade — overall subindo
-  de 39 pra 71 em 3 temporadas simuladas, patrimônio reagindo a
-  patrocínio assim que a reputação regional cruza o mínimo.
+- **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop
+  [clubeInicialId] [N]` (padrão Corinthians, 3 temporadas) roda com o
+  calendário completo (Brasil + continentais + estaduais) — overall
+  subindo de 39 pra 71 em 3 temporadas simuladas com o Corinthians;
+  rodando com um clube pequeno (`portuguesa`) por 5 temporadas, o jogador
+  foi efetivamente transferido duas vezes (Portuguesa → Gama → ADT) por
+  negociação de mercado de verdade (ver seção 5.2). `npx tsx src/cli/index.ts
+  clubes [pais]` lista ids de clube pra escolher `clubeInicialId`.
+
+### 5.2. Mercado e negociação de transferências (adiantado da Fase 4, implementado)
+
+Fase 4 (`docs/game-design.md` seção 4) estava planejada pra depois do
+motor de partida/progressão — a pedido explícito, adiantamos a parte
+central dela (valorização + negociação ativa + teto salarial) pra já
+funcionar dentro do game loop persistente (seção 5.1), em vez de ficar só
+como cenário narrativo (`proposta_clube_grande` etc, que continuam
+existindo e coexistem com isso — ver ressalva abaixo).
+
+- **`src/market/valuation.ts`** — `calcularValorDeMercado({overall, idade,
+  reputacaoNacional})`: valor em reais fictícios (mesma escala de
+  `career/patrocinios.ts` e do exemplo original de `game-design.md` seção
+  4). Cresce com o cubo do overall acima de 40 (rookie sem overall
+  suficiente vale zero), tem um platô de idade 24-29 (multiplicador 1×,
+  caindo pra fora dessa faixa — mesmo espírito das curvas de
+  `progression/aging.ts`, mas pro valor, não pro atributo) e um bônus de
+  até 50% pela reputação nacional. **Sem perks** (o design original usava
+  "nível + perks" — aqui é overall derivado, coerente com o resto do
+  design sem perks).
+- **`src/market/transfers.ts`**:
+  - `estaNaJanelaDeTransferencia(momento)` — reaproveita
+    `MomentoDeCarreira` (seção 4) em vez de inventar um conceito de janela
+    separado; hoje só `pre_temporada` conta como aberta (mesma limitação
+    de granularidade do calendário documentada em `momentoDoPeriodo`).
+  - `tetoSalarialMensal(club)` — vem de `Club.forca_financeira`
+    (`muito_alta` a `muito_baixa`) quando disponível; sem isso, fallback
+    por `divisao_nacional.nivel`, mesmo padrão de
+    `simulation/rating.ts` `calcularRatingFallback`.
+  - `selecionarClubesInteressados(clubes, clubeAtualId, valorDeMercado,
+    opcoes?)` — só considera clube com rating esportivo
+    (`simulation/rating.ts`) igual ou maior que o atual e que consiga
+    bancar uma fração do valor de mercado do jogador; embaralha (com
+    `random` injetado) e recorta em até 3 (padrão).
+  - `gerarProposta(clube, valorDeMercado, random?)` — proposta inicial
+    abaixo do teto salarial do clube e da referência de valor de mercado
+    (valor de mercado ~ 2 anos de salário), deixando espaço de negociação.
+- **`src/market/negotiation.ts`**:
+  - `contrapropostaPadrao(proposta)` — estratégia padrão do jogador (pede
+    mais salário/luvas que a oferta inicial) — injetável
+    (`OpcoesJogarTemporada.responderProposta` no game loop).
+  - `calcularConfiancaDoClube(propostaClube, contraproposta, fatores)` —
+    0-100, substitui a "barra de confiança do clube" de `game-design.md`
+    seção 4: cai com o gap salarial pedido, sobe com overall/reputação do
+    jogador, cai com quantos outros clubes concorrem pela mesma
+    contratação (**substitui** o fator original "perks relevantes pro
+    esquema tático", que não existe nesse design sem perks).
+  - `negociarTransferencia(proposta, contraproposta, fatores,
+    temporadaAtual, random?)` — **probabilístico**, não determinístico
+    (mesma filosofia de risco/retorno dos cenários de carreira,
+    `progression/scenarios.ts`): sorteia se o clube aceita ponderado pela
+    confiança; se aceito, monta um `Contrato`
+    (`src/schemas/contract.ts`: salário mensal, luvas, cláusula de
+    rescisão estimada, anos, temporada de assinatura).
+- **`career/Player.ts`**: `EstadoDeCarreira.contratoAtual?: Contrato`
+  (ausente até a primeira negociação de mercado bem-sucedida — jogador
+  recém-criado não tem contrato registrado, simplificação documentada).
+  `assinarContrato(estado, contrato)` troca o clube e registra o
+  contrato; `transferirParaClube` (já existia) continua disponível pra
+  mover o jogador sem negociação, pra uso puramente narrativo.
+- **Ligado no game loop** (`career/career-loop.ts` `jogarTemporada`): a
+  cada período mapeado pra `pre_temporada`, seleciona clubes
+  interessados, gera+negocia uma proposta por clube (parando no primeiro
+  que aceitar), e só então sorteia o cenário do período — já no contexto
+  do clube novo, se houve transferência. No máximo uma transferência
+  aceita por temporada.
+- **Coexiste com os cenários narrativos de transferência** (`proposta_clube_grande`,
+  `proposta_do_exterior`, `agente_pressiona_transferencia`,
+  `progression/scenarios.ts`) — esses continuam sendo só narrativa/impacto
+  numérico (moral, reputação), não disparam uma negociação de verdade
+  nem mexem em `clubeAtualId`/`contratoAtual`. Não foram unificados com o
+  mercado nesta rodada — ver pendência.
+- **Estimativas de design, não fórmulas validadas** (mesma ressalva de
+  Elo/XP/valorização): todas as constantes de teto salarial, referência
+  salarial, fatores de confiança e cláusula de rescisão foram calibradas
+  só pra dar uma progressão que "sente" certa, não a partir de dado real
+  de mercado.
+- **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop
+  portuguesa 5` — Portuguesa (clube pequeno) recebeu propostas reais de
+  clubes maiores/mais ricos (nacionais e estrangeiros, a seleção não
+  filtra por país) todas as pré-temporadas, e o jogador foi efetivamente
+  transferido duas vezes ao longo de 5 temporadas simuladas.
 
 ## 6. Pendências / próximos passos
 
@@ -801,7 +887,23 @@ entrada por temporada).
   **resolvida**: `career/career-loop.ts` `jogarTemporada`/`jogarCarreira`
   (ver seção 5.1) fazem exatamente esse laço — aplicam `partidasDoJogador`
   de toda competição da temporada ao `EstadoDeCarreira` automaticamente,
-  encadeando quantas temporadas quiser. **Ainda falta**: não há transferência
-  de clube nesse loop ainda (`clubeAtualId` fica fixo a temporada toda,
-  `transferirParaClube` existe mas nada chama automaticamente) — é a
-  próxima peça em aberto.
+  encadeando quantas temporadas quiser.
+- ~~Transferência de clube não acontece automaticamente no loop~~
+  **resolvida**: mercado adiantado da Fase 4 (`src/market/*.ts`, ver seção
+  5.2) — negociação de verdade (proposta, contraproposta, confiança,
+  contrato) ligada em `jogarTemporada`, disparando durante o período
+  mapeado pra `pre_temporada`.
+- **Mercado — limitações reais desta primeira versão** (não são bugs
+  escondidos): só uma negociação aceita por temporada (para no primeiro
+  clube que aceitar, não acumula múltiplas ofertas simultâneas de verdade
+  disputando entre si além do fator "concorrentes" agregado); não existe
+  renovação de contrato (jogador pode ficar anos além de
+  `temporadaDeVencimento` sem nada acontecer); não existe sistema de
+  minutagem que reduza o interesse de mercado de um jogador que não joga;
+  os cenários narrativos de transferência (`proposta_clube_grande` etc)
+  não foram unificados com a negociação real — continuam duas coisas
+  separadas que coexistem sem se referenciar; `clubeAtualId` inicial
+  (`criarEstadoInicial`) continua vindo de quem chama, sem nenhuma lista
+  curada/filtrada de "clubes pra começar carreira" — `npx tsx
+  src/cli/index.ts clubes [pais]` lista tudo, sem filtrar por tamanho/
+  divisão.

@@ -286,39 +286,66 @@ function simularTemporadaCli(): void {
  * (padrão 3).
  */
 function simularCarreiraLoopCli(): void {
-  const quantidadeDeTemporadas = Number(process.argv[3] ?? 3);
+  const clubeInicialId = process.argv[3] ?? "corinthians";
+  const quantidadeDeTemporadas = Number(process.argv[4] ?? 3);
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
-  const clubeId = "corinthians";
-  const regiaoAtual = "SP";
+
+  if (!clubePorId.has(clubeInicialId)) {
+    console.error(`Clube "${clubeInicialId}" não encontrado. Use "npx tsx src/cli/index.ts clubes [pais]" pra listar ids válidos.`);
+    process.exit(1);
+  }
 
   let estado = criarEstadoInicial({
     id: "jogador_loop",
     nome: "Jogador do Loop",
     posicao: "atacante",
     arquetipoId: "finalizador",
-    clubeInicialId: clubeId,
+    clubeInicialId,
     temporadaInicial: 2027,
   });
 
-  console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube: ${nomeDoClube(clubeId)}) ===`);
+  console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube inicial: ${nomeDoClube(clubeInicialId)}) ===`);
   console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)}\n`);
 
-  const resultado = jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes, { regiaoAtual });
+  const resultado = jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes);
 
   for (const temporada of resultado.temporadas) {
     const competicoesOk = temporada.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(
-      `--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
+      `--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | clube ${nomeDoClube(temporada.estado.clubeAtualId)} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
     );
     console.log(
       `  ${competicoesOk.length}/${temporada.resultadoTemporada.competicoes.length} competições simuladas | ${temporada.cenariosResolvidos.length} cenários resolvidos`,
     );
+
+    for (const negociacao of temporada.negociacoesResolvidas) {
+      const termos = negociacao.contrapropostaJogador;
+      const desfecho = negociacao.resultado.aceito ? "ACEITA" : "recusada";
+      console.log(
+        `  [transferência] ${nomeDoClube(negociacao.clubeOfertanteId)}: contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
+      );
+    }
+
     console.log(
-      `  Moral ${temporada.estado.moral} | Reputação nacional ${temporada.estado.reputacao.nacional} | Reputação SP ${temporada.estado.reputacao.porRegiao.SP ?? 0} | Relações internas ${temporada.estado.relacoesInternas} | Patrimônio ${temporada.estado.patrimonio}`,
+      `  Moral ${temporada.estado.moral} | Reputação nacional ${temporada.estado.reputacao.nacional} | Relações internas ${temporada.estado.relacoesInternas} | Patrimônio ${temporada.estado.patrimonio}`,
     );
   }
 
-  console.log(`\n=== Fim: temporada ${resultado.estadoFinal.temporada} | idade ${resultado.estadoFinal.jogador.idade} | overall ${overallAtual(resultado.estadoFinal)} ===`);
+  console.log(
+    `\n=== Fim: temporada ${resultado.estadoFinal.temporada} | clube ${nomeDoClube(resultado.estadoFinal.clubeAtualId)} | idade ${resultado.estadoFinal.jogador.idade} | overall ${overallAtual(resultado.estadoFinal)} ===`,
+  );
+}
+
+/** Lista clubes disponíveis pra escolher como clube inicial de uma carreira (`criarEstadoInicial` `clubeInicialId`) — filtra por país via 2º argumento da CLI (ex: "BR"), sem filtro nenhum lista tudo. */
+function listarClubesCli(): void {
+  const filtroPais = process.argv[3];
+  const listados = filtroPais ? clubes.filter((c) => c.pais === filtroPais) : clubes;
+
+  console.log(`\n=== ${listados.length} clube(s)${filtroPais ? ` (país: ${filtroPais})` : ""} ===`);
+  for (const clube of [...listados].sort((a, b) => a.id.localeCompare(b.id))) {
+    const divisao = clube.divisao_nacional ? `${clube.pais} nível ${clube.divisao_nacional.nivel}` : "sem competição nacional";
+    console.log(`  ${clube.id} — ${clube.nome_popular ?? clube.nome} (${divisao})`);
+  }
 }
 
 const comando = process.argv[2] ?? "copa-do-brasil";
@@ -342,7 +369,10 @@ switch (comando) {
   case "carreira-loop":
     simularCarreiraLoopCli();
     break;
+  case "clubes":
+    listarClubesCli();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira", "temporada" ou "carreira-loop".`);
+    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira", "temporada", "carreira-loop" ou "clubes".`);
     process.exit(1);
 }

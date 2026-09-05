@@ -15,14 +15,18 @@ import {
   type EscolhaResolvida,
   type Opcao,
 } from "../progression/scenarios.js";
-import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, type EstadoDeCarreira } from "./Player.js";
+import { calcularValorDeMercado } from "../market/valuation.js";
+import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressados, type PropostaTransferencia, type TermosDeContrato } from "../market/transfers.js";
+import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
+import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
  * engine.ts` pro calendário de competições, `progression/scenarios.ts` pro
- * catálogo de cenários com gatilho, `career/Player.ts` pro estado do
- * jogador) numa única passagem de temporada, sem precisar orquestrar cada
- * partida/cenário na mão como a demo de `src/cli/index.ts` fazia.
+ * catálogo de cenários com gatilho, `market/*.ts` pra negociação de
+ * transferência, `career/Player.ts` pro estado do jogador) numa única
+ * passagem de temporada, sem precisar orquestrar cada partida/cenário/
+ * negociação na mão como a demo de `src/cli/index.ts` fazia.
  */
 
 /** Minutos jogados assumidos em toda partida do jogador — não existe sistema de minutagem/banco ainda (pendência, docs/motor-de-partida.md). */
@@ -37,6 +41,14 @@ export interface CenarioResolvidoNaTemporada {
   escolha: EscolhaResolvida;
 }
 
+export interface NegociacaoResolvidaNaTemporada {
+  periodo: string;
+  clubeOfertanteId: string;
+  proposta: PropostaTransferencia;
+  contrapropostaJogador: TermosDeContrato;
+  resultado: ResultadoNegociacao;
+}
+
 export interface ResultadoTemporadaDeCarreira {
   /** Estado do jogador ao final da temporada — já com a idade/temporada avançadas (ver `avancarTemporada`). */
   estado: EstadoDeCarreira;
@@ -44,14 +56,25 @@ export interface ResultadoTemporadaDeCarreira {
   resultadoTemporada: ResultadoTemporada;
   /** Um cenário resolvido por período do calendário, na ordem em que aconteceram. */
   cenariosResolvidos: CenarioResolvidoNaTemporada[];
+  /** Propostas de transferência negociadas na janela da temporada (só período mapeado pra `pre_temporada`, ver `market/transfers.ts` `estaNaJanelaDeTransferencia`) — vazio se nenhum clube demonstrou interesse. Para no primeiro `aceito`. */
+  negociacoesResolvidas: NegociacaoResolvidaNaTemporada[];
 }
 
 export interface OpcoesJogarTemporada {
   estiloTecnico?: EstiloTecnico;
-  /** UF/região do clube atual — decide onde deltas de reputação regional caem (ver `progression/scenarios.ts` `aplicarImpacto`) e filtra cenários por reputação regional. Sem ela, reputação regional fica sempre 0 no contexto e nenhum delta regional é aplicado. */
+  /**
+   * UF/região do clube atual — decide onde deltas de reputação regional
+   * caem (ver `progression/scenarios.ts` `aplicarImpacto`) e filtra
+   * cenários por reputação regional. Derivada automaticamente de
+   * `Club.estado` a cada período (então acompanha uma transferência de
+   * clube dentro da própria temporada); esta opção só serve de fallback
+   * pra clube sem `estado` (a maioria dos clubes fora do Brasil).
+   */
   regiaoAtual?: string;
   /** Como decidir qual opção de um cenário é escolhida — por padrão, sempre a primeira (mesmo comportamento das demos de CLI). Injete pra plugar uma interface real (jogador humano, IA, sempre a opção mais segura, etc). */
   escolherOpcao?: (cenario: Cenario) => Opcao;
+  /** Como o jogador contrapropõe uma oferta de transferência recebida — por padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais salário/luvas que a proposta inicial). Injete pra plugar outra estratégia. */
+  responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato;
   random?: () => number;
 }
 
@@ -59,16 +82,20 @@ export interface OpcoesJogarTemporada {
  * Joga uma temporada inteira da carreira: simula todas as competições
  * ativas do calendário padrão (`simulation/engine.ts` `simularTemporada`),
  * aplica o XP de cada partida do jogador em ordem (`aplicarDesempenhoPartida`),
- * sorteia e resolve um cenário elegível por período do calendário
- * (`momentoDoPeriodo` decide o momento de cada período), e por fim avança
- * pra próxima temporada (`avancarTemporada`: idade+1, declínio por idade,
- * renda de patrocínio). Não muta o `estado` recebido.
+ * e por período do calendário: deriva o momento (`momentoDoPeriodo`),
+ * resolve negociação de transferência se a janela estiver aberta
+ * (`market/transfers.ts`/`market/negotiation.ts`), e sorteia+resolve um
+ * cenário elegível pro contexto atual (já refletindo eventual troca de
+ * clube). Por fim avança pra próxima temporada (`avancarTemporada`:
+ * idade+1, declínio por idade, renda de patrocínio). Não muta o `estado`
+ * recebido.
  *
  * **Simplificações documentadas** (não são bugs escondidos, ver pendências
  * em `docs/motor-de-partida.md`): toda partida é tratada como 90 minutos
  * jogados e importância 1 — não existe sistema de minutagem/banco nem
  * diferenciação de fase (final vs. fase de grupos) dentro de
- * `partidasDoJogador` ainda.
+ * `partidasDoJogador` ainda. Uma negociação aceita por temporada, no
+ * máximo (para no primeiro clube que aceitar a contraproposta).
  */
 export function jogarTemporada(
   estado: EstadoDeCarreira,
@@ -76,7 +103,15 @@ export function jogarTemporada(
   clubes: Club[],
   opcoes: OpcoesJogarTemporada = {},
 ): ResultadoTemporadaDeCarreira {
-  const { estiloTecnico = "equilibrado", regiaoAtual, escolherOpcao = (cenario: Cenario) => cenario.opcoes[0], random = Math.random } = opcoes;
+  const {
+    estiloTecnico = "equilibrado",
+    regiaoAtual: regiaoAtualPadrao,
+    escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
+    responderProposta = contrapropostaPadrao,
+    random = Math.random,
+  } = opcoes;
+
+  const clubePorId = new Map(clubes.map((c) => [c.id, c]));
 
   const participacaoJogador: ParticipacaoJogadorClube = { clubeId: estado.clubeAtualId, jogador: estado.jogador, estiloTecnico };
   const resultadoTemporada = simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random);
@@ -91,12 +126,44 @@ export function jogarTemporada(
   }
 
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
+  const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
+
   for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario) {
     const momento = momentoDoPeriodo(periodo.periodo);
+    const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+
+    if (estaNaJanelaDeTransferencia(momento)) {
+      const valorDeMercado = calcularValorDeMercado({
+        overall: overallAtual(estadoAtual),
+        idade: estadoAtual.jogador.idade,
+        reputacaoNacional: estadoAtual.reputacao.nacional,
+      });
+      const interessados = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, valorDeMercado, { random });
+
+      for (const clube of interessados) {
+        const proposta = gerarProposta(clube, valorDeMercado, random);
+        const contraproposta = responderProposta(proposta);
+        const fatoresConfianca: FatoresConfianca = {
+          overall: overallAtual(estadoAtual),
+          reputacaoNacional: estadoAtual.reputacao.nacional,
+          concorrentes: interessados.length - 1,
+        };
+        const resultado = negociarTransferencia(proposta, contraproposta, fatoresConfianca, estadoAtual.temporada, random);
+
+        negociacoesResolvidas.push({ periodo: periodo.periodo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: contraproposta, resultado });
+
+        if (resultado.aceito && resultado.contrato) {
+          estadoAtual = assinarContrato(estadoAtual, resultado.contrato);
+          break;
+        }
+      }
+    }
+
+    const regiaoAtualParaCenario = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
     const contexto: ContextoSorteio = {
       idadeJogador: estadoAtual.jogador.idade,
       reputacaoNacional: estadoAtual.reputacao.nacional,
-      reputacaoRegional: regiaoAtual !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtual] ?? 0) : 0,
+      reputacaoRegional: regiaoAtualParaCenario !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtualParaCenario] ?? 0) : 0,
       moral: estadoAtual.moral,
       relacoesInternas: estadoAtual.relacoesInternas,
       momento,
@@ -105,14 +172,15 @@ export function jogarTemporada(
     const cenario = sortearCenario(filtrarCenariosElegiveis(CENARIOS, contexto), random);
     const opcaoEscolhida = escolherOpcao(cenario);
     const escolha = resolverEscolha(opcaoEscolhida, random);
-    estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoAtual);
+    estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoAtualParaCenario);
 
     cenariosResolvidos.push({ periodo: periodo.periodo, momento, cenario, escolha });
   }
 
-  estadoAtual = avancarTemporada(estadoAtual, regiaoAtual);
+  const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
 
-  return { estado: estadoAtual, resultadoTemporada, cenariosResolvidos };
+  return { estado: estadoAtual, resultadoTemporada, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ResultadoCarreiraDeVariasTemporadas {
@@ -121,7 +189,7 @@ export interface ResultadoCarreiraDeVariasTemporadas {
   temporadas: ResultadoTemporadaDeCarreira[];
 }
 
-/** Encadeia `jogarTemporada` por várias temporadas seguidas, alimentando o estado final de uma na próxima — o "save" indo de temporada em temporada sozinho. */
+/** Encadeia `jogarTemporada` por várias temporadas seguidas, alimentando o estado final de uma na próxima — o "save" indo de temporada em temporada sozinho, incluindo eventuais trocas de clube por transferência. */
 export function jogarCarreira(
   estadoInicial: EstadoDeCarreira,
   quantidadeDeTemporadas: number,
