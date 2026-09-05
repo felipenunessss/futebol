@@ -1,7 +1,7 @@
 [
   { "id": "ameliano", "nome": "Club Sportivo Ameliano", "nome_popular": "Ameliano", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1537 },
   { "id": "cerro_porteno", "nome": "Club Cerro Porteño", "nome_popular": "Cerro Porteño", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1645 },
-  { "id": "general_caballero_jlm", "nome": "Club General Caballero JLM", "nome_popular": "General Caballero JLM", "pais": "PY", "cidade": "Juan León Mallorquín", "estadio": "Ka'arendy", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "general_caballero_jlm", "nome": "Club General Caballero JLM", "nome_popular": "General Caballero JLM", "pais": "PY", "cidade": "Juan León Mallorquín", "estadio": "Ka'arendy", "divisao_nacional": { "pais": "PY", "nivel": 2 }, "rating_inicial": 1509 },
   { "id": "guarani_paraguai", "nome": "Club Guaraní", "nome_popular": "Guaraní", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1574 },
   { "id": "libertad_paraguai", "nome": "Club Libertad", "nome_popular": "Libertad", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1577 },
   { "id": "nacional_paraguai", "nome": "Club Nacional", "nome_popular": "Nacional", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1604 },
@@ -14,7 +14,7 @@
   { "id": "trinidense", "nome": "Club Sportivo Trinidense", "nome_popular": "Trinidense", "pais": "PY", "cidade": "Asunción", "divisao_nacional": { "pais": "PY", "nivel": 1 }, "rating_inicial": 1576 },
   { "id": "doce_de_junio", "nome": "Club 12 de Junio", "nome_popular": "12 de Junio", "pais": "PY", "cidade": "Villa Hayes", "estadio": "Facundo de León Fossati", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
   { "id": "tres_de_noviembre", "nome": "Club 3 de Noviembre", "nome_popular": "3 de Noviembre", "pais": "PY", "cidade": "Asunción", "estadio": "Rubén Ramírez", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
-  { "id": "atletico_tembetary", "nome": "Club Atlético Tembetary", "nome_popular": "Tembetary", "pais": "PY", "cidade": "Villa Elisa", "estadio": "Complejo Tembetary", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
+  { "id": "atletico_tembetary", "nome": "Club Atlético Tembetary", "nome_popular": "Tembetary", "pais": "PY", "cidade": "Villa Elisa", "estadio": "Complejo Tembetary", "divisao_nacional": { "pais": "PY", "nivel": 2 }, "rating_inicial": 1442 },
   { "id": "benjamin_aceval", "nome": "Club Benjamín Aceval", "nome_popular": "Benjamín Aceval", "pais": "PY", "cidade": "Villa Hayes", "estadio": "Isidro Roussillón", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
   { "id": "deportivo_capiata", "nome": "Club Deportivo Capiatá", "nome_popular": "Deportivo Capiatá", "pais": "PY", "cidade": "Capiatá", "estadio": "Lic. Erico Galeano Segovia", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
   { "id": "deportivo_santani", "nome": "Club Deportivo Santaní", "nome_popular": "Deportivo Santaní", "pais": "PY", "cidade": "San Estanislao", "estadio": "Juan José Vázquez", "divisao_nacional": { "pais": "PY", "nivel": 2 } },
