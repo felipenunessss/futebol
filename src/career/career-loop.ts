@@ -1,9 +1,10 @@
 import type { Club } from "../schemas/club.js";
+import { buscarArquetipo } from "../schemas/player.js";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularTemporada, type CampeonatoSimulavel, type ResultadoTemporada } from "../simulation/engine.js";
 import type { ParticipacaoJogadorClube } from "../simulation/match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
-import { converterChancesEmDesempenho } from "../progression/xp.js";
+import { aplicarTreino, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
 import {
   CENARIOS,
   filtrarCenariosElegiveis,
@@ -70,6 +71,15 @@ export interface ResumoPartidasDaTemporada {
   competicoes: ResumoCompeticaoNaTemporada[];
 }
 
+export interface TreinoResolvidoNaTemporada {
+  periodo: string;
+  foco: FocoDeTreino;
+  overallAntes: number;
+  overallDepois: number;
+  moralAntes: number;
+  moralDepois: number;
+}
+
 export interface ResultadoTemporadaDeCarreira {
   /** Estado do jogador ao final da temporada — já com a idade/temporada avançadas (ver `avancarTemporada`). */
   estado: EstadoDeCarreira;
@@ -77,6 +87,8 @@ export interface ResultadoTemporadaDeCarreira {
   resultadoTemporada: ResultadoTemporada;
   /** Resumo das partidas do jogador na temporada (gols/assistências/campeão por competição, overall antes/depois) — visão agregada, não partida a partida (ver `onPartidasResumidas` pra saber por quê). */
   resumoPartidas: ResumoPartidasDaTemporada;
+  /** Uma sessão de treino resolvida por período do calendário, na ordem em que aconteceram (ver `progression/xp.ts` `aplicarTreino`). */
+  treinosResolvidos: TreinoResolvidoNaTemporada[];
   /** Um cenário resolvido por período do calendário, na ordem em que aconteceram. */
   cenariosResolvidos: CenarioResolvidoNaTemporada[];
   /** Propostas de transferência negociadas na janela da temporada (só período mapeado pra `pre_temporada`, ver `market/transfers.ts` `estaNaJanelaDeTransferencia`) — vazio se nenhum clube demonstrou interesse. Para no primeiro `aceito`. */
@@ -105,6 +117,17 @@ export interface OpcoesJogarTemporada {
   escolherOpcao?: (cenario: Cenario) => Opcao | Promise<Opcao>;
   /** Como o jogador contrapropõe uma oferta de transferência recebida — por padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais salário/luvas que a proposta inicial). Injete pra plugar outra estratégia (também pode ser assíncrona). */
   responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
+  /**
+   * Como decidir o foco de treino de cada período — por padrão, sempre
+   * `"tecnico"` (escolha arbitrária, mesmo espírito do padrão de
+   * `escolherOpcao`). Injete pra plugar uma escolha real (jogador humano
+   * escolhendo via prompt, IA, etc — também pode ser assíncrona). Recebe
+   * o `EstadoDeCarreira` atual (já com o XP das partidas da temporada
+   * aplicado) pra poder decidir com base em atributos/moral atuais.
+   */
+  escolherFocoDeTreino?: (estado: EstadoDeCarreira) => FocoDeTreino | Promise<FocoDeTreino>;
+  /** Chamado assim que cada sessão de treino do período é resolvida — útil pra mostrar o desfecho em tempo real numa interface interativa. */
+  onTreinoResolvido?: (treino: TreinoResolvidoNaTemporada) => void | Promise<void>;
   /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
   /**
@@ -216,9 +239,11 @@ export async function jogarTemporada(
     regiaoAtual: regiaoAtualPadrao,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
+    escolherFocoDeTreino = () => "tecnico" as const,
     onNegociacaoResolvida,
     onCenarioResolvido,
     onPartidasResumidas,
+    onTreinoResolvido,
     random = Math.random,
   } = opcoes;
 
@@ -260,9 +285,35 @@ export async function jogarTemporada(
 
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
+  const treinosResolvidos: TreinoResolvidoNaTemporada[] = [];
 
   for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario) {
     const momento = momentoDoPeriodo(periodo.periodo);
+
+    const foco = await escolherFocoDeTreino(estadoAtual);
+    const overallAntesTreino = overallAtual(estadoAtual);
+    const moralAntesTreino = estadoAtual.moral;
+
+    if (foco === "descanso") {
+      const regiaoParaDescanso = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+      estadoAtual = aplicarImpactoDeCenario(estadoAtual, { moral: MORAL_RECUPERADA_NO_DESCANSO, narrativa: "" }, regiaoParaDescanso);
+    } else {
+      const arquetipo = buscarArquetipo(estadoAtual.jogador.arquetipo_id);
+      const atributosTreinados = aplicarTreino(estadoAtual.jogador, arquetipo, foco);
+      estadoAtual = { ...estadoAtual, jogador: { ...estadoAtual.jogador, atributos: atributosTreinados } };
+    }
+
+    const treinoResolvido: TreinoResolvidoNaTemporada = {
+      periodo: periodo.periodo,
+      foco,
+      overallAntes: overallAntesTreino,
+      overallDepois: overallAtual(estadoAtual),
+      moralAntes: moralAntesTreino,
+      moralDepois: estadoAtual.moral,
+    };
+    treinosResolvidos.push(treinoResolvido);
+    await onTreinoResolvido?.(treinoResolvido);
+
     const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
 
     let interessadosCompra: Club[] = [];
@@ -356,7 +407,7 @@ export async function jogarTemporada(
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
   estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
 
-  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, cenariosResolvidos, negociacoesResolvidas };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ResultadoCarreiraDeVariasTemporadas {

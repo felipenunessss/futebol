@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  aplicarTreino,
   aplicarXpAtributo,
   aplicarXpPartidaAoJogador,
+  ATRIBUTOS_POR_FOCO,
   calcularNotaPartida,
   calcularXpPartida,
   converterChancesEmDesempenho,
@@ -194,6 +196,82 @@ describe("aplicarXpPartidaAoJogador", () => {
     const jogador = jogadorBase();
     const valorOriginal = jogador.atributos.finalizacao;
     aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "finalizacao" })], 100);
+    expect(jogador.atributos.finalizacao).toBe(valorOriginal);
+  });
+});
+
+describe("aplicarTreino", () => {
+  const finalizador = buscarArquetipo("finalizador"); // prioritários: finalizacao, posicionamento_ofensivo, frieza
+
+  function jogadorBase(): Jogador {
+    return {
+      id: "j1",
+      nome: "Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 22,
+      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 50])),
+    };
+  }
+
+  it("foco físico sobe só os atributos físicos relevantes pra posição, não os técnicos/táticos", () => {
+    const jogador = jogadorBase();
+    const atributos = aplicarTreino(jogador, finalizador, "fisico");
+
+    for (const atributo of ATRIBUTOS_POR_FOCO.fisico) {
+      if (ATRIBUTOS_POR_POSICAO.atacante.includes(atributo)) {
+        expect(atributos[atributo]!).toBeGreaterThan(jogador.atributos[atributo]!);
+      }
+    }
+    for (const atributo of ATRIBUTOS_POR_FOCO.tatico) {
+      if (ATRIBUTOS_POR_POSICAO.atacante.includes(atributo)) {
+        expect(atributos[atributo]!).toBe(jogador.atributos[atributo]!);
+      }
+    }
+  });
+
+  it("foco técnico sobe atributos técnicos relevantes, não mexe nos físicos", () => {
+    const jogador = jogadorBase();
+    const atributos = aplicarTreino(jogador, finalizador, "tecnico");
+
+    expect(atributos.finalizacao!).toBeGreaterThan(jogador.atributos.finalizacao!);
+    expect(atributos.velocidade!).toBe(jogador.atributos.velocidade!);
+  });
+
+  it("atributo prioritário do arquétipo cresce mais que um não-prioritário no mesmo foco", () => {
+    const jogador = jogadorBase();
+    const atributos = aplicarTreino(jogador, finalizador, "tecnico"); // finalizacao é prioritário, drible não é
+
+    const ganhoPrioritario = atributos.finalizacao! - jogador.atributos.finalizacao!;
+    const ganhoNaoPrioritario = atributos.drible! - jogador.atributos.drible!;
+    expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
+  });
+
+  it("foco descanso não muda nenhum atributo", () => {
+    const jogador = jogadorBase();
+    const atributos = aplicarTreino(jogador, finalizador, "descanso");
+    expect(atributos).toEqual(jogador.atributos);
+  });
+
+  it("posição sem nenhum atributo no foco escolhido não quebra, só não tem efeito", () => {
+    const goleiro: Jogador = {
+      id: "g1",
+      nome: "Goleiro Teste",
+      posicao: "goleiro",
+      arquetipo_id: "muralha",
+      idade: 25,
+      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.goleiro.map((a) => [a, 50])),
+    };
+    const muralha = buscarArquetipo("muralha");
+    // goleiro não tem nenhum atributo tático na lista de ATRIBUTOS_POR_POSICAO.goleiro
+    const atributos = aplicarTreino(goleiro, muralha, "tatico");
+    expect(atributos).toEqual(goleiro.atributos);
+  });
+
+  it("não muta o objeto de atributos original do jogador", () => {
+    const jogador = jogadorBase();
+    const valorOriginal = jogador.atributos.finalizacao;
+    aplicarTreino(jogador, finalizador, "tecnico");
     expect(jogador.atributos.finalizacao).toBe(valorOriginal);
   });
 });

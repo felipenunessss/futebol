@@ -903,11 +903,12 @@ perguntando de verdade qual opção escolher em cada cenário.
   comportamento síncrono de quem não precisa disso (as demos
   `carreira`/`carreira-loop` continuam funcionando, só com um `await` a
   mais na chamada).
-- **Dois hooks novos em `OpcoesJogarTemporada`**: `onCenarioResolvido` e
-  `onNegociacaoResolvida`, chamados no momento exato em que cada
-  cenário/negociação é resolvido (não só no fim da temporada) — é o que
-  permite mostrar o desfecho em tempo real na tela, em vez de só depois
-  que a temporada inteira termina.
+- **Hooks em `OpcoesJogarTemporada`** chamados no momento exato em que
+  cada coisa é resolvida (não só no fim da temporada) — é o que permite
+  mostrar o desfecho em tempo real na tela: `onPartidasResumidas` (uma
+  vez por temporada, resumo agregado das partidas — ver ressalva
+  abaixo), `onTreinoResolvido` e `onCenarioResolvido` (uma vez por
+  período) e `onNegociacaoResolvida` (uma vez por proposta negociada).
 - **As opções são mostradas sem revelar probabilidade/resultado de
   antemão** — só o texto de cada opção; o desfecho (narrativa + impacto,
   ou o resultado real de uma negociação) só aparece depois de escolher.
@@ -926,6 +927,51 @@ perguntando de verdade qual opção escolher em cada cenário.
   5 cenários de uma temporada (incluindo uma negociação de transferência
   real com 3 propostas recusadas em sequência), resumo de fim de
   temporada, e encerramento ao digitar "sair".
+
+### 5.4. Treino com escolha de foco (implementado)
+
+`docs/game-design.md` seção 5.2 previa "sessões de treino semanais com
+escolha de foco (físico, técnico, tático, descanso)" — pilar que ficou
+pendente até agora, porque a única fonte de crescimento de atributo era
+passiva (XP de desempenho em partida). `progression/xp.ts` implementa
+isso como uma **segunda fonte de XP**, independente da primeira:
+
+- **`FocoDeTreino`**: `"fisico" | "tecnico" | "tatico" | "descanso"`.
+  `ATRIBUTOS_POR_FOCO` categoriza os 24 atributos nos 3 focos que
+  treinam algo (físico: velocidade/força/resistência/jogo
+  aéreo/reflexos; técnico: finalização/drible/passe/marcação/etc;
+  tático: visão de jogo/frieza/posicionamento/movimentação/liderança) —
+  **diferente** de `progression/aging.ts` `CATEGORIA_POR_ATRIBUTO` (que
+  só separa físico/mental/sem_declínio pra fins de curva de idade):
+  aqui "técnico" e "tático" são a mesma categoria "mental" da aging.ts,
+  separada em duas porque faz sentido escolher entre elas ao treinar.
+- **`aplicarTreino(jogador, arquetipo, foco)`** — concentra
+  `XP_POR_SESSAO_DE_TREINO` (250, estimativa de design, mesma ressalva
+  de sempre) só nos atributos do foco escolhido que são relevantes pra
+  posição do jogador, reaproveitando a mesma curva de retorno
+  decrescente e multiplicador de arquétipo de `aplicarXpAtributo`/
+  `aplicarXpPartidaAoJogador` — não é um sistema novo, é a mesma
+  mecânica de XP com uma fonte diferente. `"descanso"` não treina nada;
+  não tem atributo associado (a recuperação de `MORAL_RECUPERADA_NO_DESCANSO`
+  é responsabilidade de quem chama, ver abaixo). Posição sem nenhum
+  atributo no foco escolhido (ex: goleiro treinando "tático" — nenhum
+  atributo de goleiro é tático) não quebra, só não tem efeito.
+- **Ligado no game loop** (`career/career-loop.ts` `jogarTemporada`): a
+  cada período, antes do cenário, chama `escolherFocoDeTreino(estado)`
+  (padrão: sempre `"tecnico"`, mesmo espírito do padrão de
+  `escolherOpcao`) e aplica o treino — `"descanso"` soma
+  `MORAL_RECUPERADA_NO_DESCANSO` via `aplicarImpactoDeCenario` (reaproveita
+  o clamp 0-100 já existente em vez de inventar um novo). Resultado
+  registrado em `treinosResolvidos` (overall/moral antes e depois por
+  período) e no hook `onTreinoResolvido`.
+- **Interativo** (`npx tsx src/cli/index.ts jogar`): antes de cada
+  cenário do período, você escolhe o foco de treino da sessão (1-4) e
+  vê o overall (ou moral, se descanso) antes/depois imediatamente.
+- **Validado com dado real**: rodando a carreira interativa escolhendo
+  sempre foco técnico, o overall subiu de período em período dentro de
+  uma mesma temporada (39 → 53 pelas partidas, depois 53 → 53 → 53 → 54
+  → 54 pelas sessões de treino seguintes — incremento pequeno por sessão,
+  como esperado de uma fonte de XP secundária).
 
 ## 6. Pendências / próximos passos
 
@@ -1029,3 +1075,10 @@ perguntando de verdade qual opção escolher em cada cenário.
   (só o resumo agregado por competição, igual `carreira-loop`); não há
   "salvar e continuar depois" — a carreira só existe enquanto o
   processo do terminal está rodando.
+- **Treino — limitações desta versão** (ver seção 5.4): uma sessão por
+  período (5 por temporada), sem noção de carga de treino/fadiga real;
+  o XP de treino é uma constante fixa (`XP_POR_SESSAO_DE_TREINO`), não
+  varia por qualidade do CT do clube, comissão técnica, ou nada
+  parecido; `escolherFocoDeTreino` não tem acesso a nenhuma informação
+  sobre qual atributo está mais "atrasado" pra sugerir foco — quem
+  escolhe (humano ou automação) decide sem esse apoio.

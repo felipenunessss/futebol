@@ -103,7 +103,7 @@ const MULTIPLICADOR_PRIORITARIO = 1.5;
 /** Quanto do XP total da partida vai pro crescimento geral (espalhado por todos os atributos da posição) em vez de pros atributos usados em chances específicas. */
 const FRACAO_XP_GERAL = 0.3;
 
-function multiplicadorDoAtributo(atributo: Atributo, arquetipo: Arquetipo): number {
+export function multiplicadorDoAtributo(atributo: Atributo, arquetipo: Arquetipo): number {
   return arquetipo.atributos_prioritarios.includes(atributo) ? MULTIPLICADOR_PRIORITARIO : 1;
 }
 
@@ -139,6 +139,66 @@ export function aplicarXpPartidaAoJogador(
     const xpDaChance = xpPorChance * (chance.sucesso ? 1 : FATOR_XP_CHANCE_SEM_SUCESSO);
     const valorAtual = atributos[chance.atributoUsado] ?? 1;
     atributos[chance.atributoUsado] = aplicarXpAtributo(valorAtual, xpDaChance, multiplicadorDoAtributo(chance.atributoUsado, arquetipo));
+  }
+
+  return atributos;
+}
+
+/**
+ * Sessões de treino com escolha de foco — ver `docs/game-design.md` seção
+ * 5.2 ("sessões de treino semanais com escolha de foco: físico, técnico,
+ * tático, descanso"), pilar que ficou pendente até agora. É uma segunda
+ * fonte de XP, independente do desempenho em partida
+ * (`aplicarXpPartidaAoJogador`) — o jogador escolhe ativamente onde focar
+ * em vez de só crescer passivamente pelo que a simulação de partida
+ * gerar.
+ */
+export type FocoDeTreino = "fisico" | "tecnico" | "tatico" | "descanso";
+
+/**
+ * Categorização de atributo por foco de treino — diferente de
+ * `progression/aging.ts` `CATEGORIA_POR_ATRIBUTO` (que separa só
+ * físico/mental/sem_declínio pra fins de curva de idade); aqui "técnico"
+ * e "tático" separam o que era uma categoria "mental" só na aging.ts,
+ * porque faz sentido pro jogador escolher entre as duas ao treinar.
+ * `descanso` não tem atributos associados — não treina nada, só recupera
+ * moral (ver `aplicarTreino`).
+ */
+export const ATRIBUTOS_POR_FOCO: Record<Exclude<FocoDeTreino, "descanso">, Atributo[]> = {
+  fisico: ["velocidade", "forca_fisica", "resistencia", "jogo_aereo", "reflexos"],
+  tecnico: ["finalizacao", "drible", "cruzamento", "passe_curto", "passe_longo", "cabeceio", "desarme", "interceptacao", "marcacao", "protecao_de_bola", "posicionamento_goleiro", "saida_de_gol", "distribuicao"],
+  tatico: ["visao_de_jogo", "frieza", "posicionamento_ofensivo", "posicionamento_defensivo", "movimentacao", "lideranca"],
+};
+
+/** XP de uma sessão de treino — estimativa de design (mesma ressalva das demais constantes do jogo): concentrado em poucos atributos (só os do foco escolhido, e só os relevantes pra posição do jogador), rende mais por atributo que a fração equivalente do XP de partida, mas 5 sessões (uma por período) não dominam a progressão da temporada sozinhas. */
+const XP_POR_SESSAO_DE_TREINO = 250;
+
+/** Moral recuperada ao escolher "descanso" como foco — não treina nenhum atributo. */
+export const MORAL_RECUPERADA_NO_DESCANSO = 8;
+
+/**
+ * Aplica uma sessão de treino aos atributos do jogador — XP concentrado
+ * só nos atributos do `foco` escolhido que são relevantes pra posição do
+ * jogador (`ATRIBUTOS_POR_POSICAO`); `descanso` não muda nenhum atributo
+ * (a recuperação de moral é responsabilidade de quem chama, ver
+ * `MORAL_RECUPERADA_NO_DESCANSO`). Se a posição do jogador não tem
+ * nenhum atributo no foco escolhido (ex: goleiro treinando "tático" —
+ * `posicionamento_defensivo`/`posicionamento_ofensivo` não são atributos
+ * de goleiro), a sessão não tem efeito — não é erro, só um treino sem
+ * atributo relevante pra praticar. Não muta `jogador`; devolve os
+ * atributos atualizados.
+ */
+export function aplicarTreino(jogador: Jogador, arquetipo: Arquetipo, foco: FocoDeTreino): Atributos {
+  if (foco === "descanso") return { ...jogador.atributos };
+
+  const atributos: Atributos = { ...jogador.atributos };
+  const relevantes = ATRIBUTOS_POR_POSICAO[jogador.posicao].filter((atributo) => ATRIBUTOS_POR_FOCO[foco].includes(atributo));
+  if (relevantes.length === 0) return atributos;
+
+  const xpPorAtributo = XP_POR_SESSAO_DE_TREINO / relevantes.length;
+  for (const atributo of relevantes) {
+    const valorAtual = atributos[atributo] ?? 1;
+    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributo, multiplicadorDoAtributo(atributo, arquetipo));
   }
 
   return atributos;

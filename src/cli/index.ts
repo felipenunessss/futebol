@@ -17,7 +17,7 @@ import {
   type EstadoJogadorParaImpacto,
   type Opcao,
 } from "../progression/scenarios.js";
-import { converterChancesEmDesempenho } from "../progression/xp.js";
+import { converterChancesEmDesempenho, type FocoDeTreino } from "../progression/xp.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
@@ -28,6 +28,7 @@ import {
   type NegociacaoResolvidaNaTemporada,
   type ResultadoTemporadaDeCarreira,
   type ResumoPartidasDaTemporada,
+  type TreinoResolvidoNaTemporada,
 } from "../career/career-loop.js";
 
 const clubes = loadClubes();
@@ -430,6 +431,31 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     }
   };
 
+  const FOCOS_DE_TREINO: { foco: FocoDeTreino; rotulo: string }[] = [
+    { foco: "fisico", rotulo: "Físico (velocidade, força, resistência, jogo aéreo, reflexos)" },
+    { foco: "tecnico", rotulo: "Técnico (finalização, drible, passe, marcação, etc — depende da posição)" },
+    { foco: "tatico", rotulo: "Tático (visão de jogo, frieza, posicionamento, liderança)" },
+    { foco: "descanso", rotulo: "Descanso (recupera moral, não treina atributo)" },
+  ];
+
+  const escolherFocoDeTreinoInterativo = async (): Promise<FocoDeTreino> => {
+    console.log(`\n--- Sessão de treino ---`);
+    FOCOS_DE_TREINO.forEach((f, i) => console.log(`  ${i + 1}. ${f.rotulo}`));
+    while (true) {
+      const escolha = Number((await perguntar("Foco desta sessão (número): ")).trim());
+      if (escolha >= 1 && escolha <= FOCOS_DE_TREINO.length) return FOCOS_DE_TREINO[escolha - 1].foco;
+      console.log("Opção inválida, tente de novo.");
+    }
+  };
+
+  const onTreinoResolvido = (treino: TreinoResolvidoNaTemporada): void => {
+    if (treino.foco === "descanso") {
+      console.log(`  -> Moral: ${treino.moralAntes} -> ${treino.moralDepois}`);
+    } else {
+      console.log(`  -> Overall: ${treino.overallAntes} -> ${treino.overallDepois}`);
+    }
+  };
+
   const onNegociacaoResolvida = (negociacao: NegociacaoResolvidaNaTemporada): void => {
     const termos = negociacao.contrapropostaJogador;
     const desfecho = negociacao.resultado.aceito ? "ACEITA!" : "recusada.";
@@ -461,9 +487,11 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   while (continuar) {
     const resultado: ResultadoTemporadaDeCarreira = await jogarTemporada(estado, campeonatos, clubes, {
       escolherOpcao: escolherOpcaoInterativa,
+      escolherFocoDeTreino: escolherFocoDeTreinoInterativo,
       onNegociacaoResolvida,
       onCenarioResolvido,
       onPartidasResumidas,
+      onTreinoResolvido,
     });
     estado = resultado.estado;
 

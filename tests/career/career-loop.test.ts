@@ -61,7 +61,9 @@ describe("jogarTemporada", () => {
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.resumoPartidas.overallAntes).toBe(overallInicial);
-    expect(resultado.resumoPartidas.overallDepois).toBe(overallAtual(resultado.estado));
+    // overallDepois reflete só o XP das partidas — o estado final ainda passa por treino/cenários depois, então pode subir mais
+    expect(resultado.resumoPartidas.overallDepois).toBeGreaterThanOrEqual(resultado.resumoPartidas.overallAntes);
+    expect(overallAtual(resultado.estado)).toBeGreaterThanOrEqual(resultado.resumoPartidas.overallDepois);
 
     const resumoBrasileirao = resultado.resumoPartidas.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
     expect(resumoBrasileirao.erro).toBeUndefined();
@@ -145,6 +147,70 @@ describe("jogarTemporada", () => {
     });
 
     expect(cenariosVistos).toEqual(resultado.cenariosResolvidos.map((c) => c.periodo));
+  });
+});
+
+describe("jogarTemporada — treino", () => {
+  it("resolve uma sessão de treino por período (5), com o foco padrão 'tecnico'", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    expect(resultado.treinosResolvidos).toHaveLength(5);
+    expect(resultado.treinosResolvidos.every((t) => t.foco === "tecnico")).toBe(true);
+  });
+
+  it("permite injetar o foco de treino (ex: sempre 'fisico')", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherFocoDeTreino: () => "fisico",
+    });
+
+    expect(resultado.treinosResolvidos.every((t) => t.foco === "fisico")).toBe(true);
+  });
+
+  it("foco 'descanso' recupera moral em vez de treinar atributo", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherFocoDeTreino: () => "descanso",
+    });
+
+    for (const treino of resultado.treinosResolvidos) {
+      expect(treino.foco).toBe("descanso");
+      expect(treino.moralDepois).toBeGreaterThan(treino.moralAntes);
+    }
+  });
+
+  it("chama onTreinoResolvido uma vez por período, antes do onCenarioResolvido correspondente", async () => {
+    const times = ["a", "b", "c", "d"];
+    const ordemDeChamadas: string[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onTreinoResolvido: () => {
+        ordemDeChamadas.push("treino");
+      },
+      onCenarioResolvido: () => {
+        ordemDeChamadas.push("cenario");
+      },
+    });
+
+    // cada período gera "treino" seguido de "cenario", nessa ordem, 5 vezes
+    expect(ordemDeChamadas).toEqual(["treino", "cenario", "treino", "cenario", "treino", "cenario", "treino", "cenario", "treino", "cenario"]);
+  });
+
+  it("escolherFocoDeTreino assíncrono funciona (ex: prompt interativo)", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherFocoDeTreino: async () => {
+        await Promise.resolve();
+        return "tatico";
+      },
+    });
+
+    expect(resultado.treinosResolvidos.every((t) => t.foco === "tatico")).toBe(true);
   });
 });
 
