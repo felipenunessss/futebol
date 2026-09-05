@@ -29,7 +29,10 @@ describe("criarEstadoInicial", () => {
     expect(estado.clubeAtualId).toBe("corinthians");
     expect(estado.temporada).toBe(2027);
     expect(estado.moral).toBe(50);
-    expect(estado.reputacao).toBeLessThan(50);
+    expect(estado.reputacao.nacional).toBeLessThan(50);
+    expect(estado.reputacao.porRegiao).toEqual({});
+    expect(estado.relacoesInternas).toBe(50);
+    expect(estado.patrimonio).toBe(0);
   });
 
   it("atributos prioritários do arquétipo começam mais altos que os demais", () => {
@@ -103,11 +106,23 @@ describe("aplicarImpactoDeCenario", () => {
     const depois = aplicarImpactoDeCenario(estado, { atributos: { frieza: 5 }, moral: 10, reputacao: -5, narrativa: "x" });
 
     expect(depois.moral).toBe(estado.moral + 10);
-    expect(depois.reputacao).toBe(estado.reputacao - 5);
+    expect(depois.reputacao.nacional).toBe(estado.reputacao.nacional - 5);
     expect(depois.jogador.atributos.frieza).toBe(estado.jogador.atributos.frieza! + 5);
   });
 
-  it("preserva clube/temporada/posição — só mexe em atributos/moral/reputação", () => {
+  it("aplica reputação regional na região informada", () => {
+    const estado = estadoBase();
+    const depois = aplicarImpactoDeCenario(estado, { reputacaoRegional: 10, narrativa: "x" }, "SP");
+    expect(depois.reputacao.porRegiao.SP).toBe(10);
+  });
+
+  it("atualiza relações internas a partir do impacto", () => {
+    const estado = estadoBase();
+    const depois = aplicarImpactoDeCenario(estado, { relacoesInternas: -10, narrativa: "x" });
+    expect(depois.relacoesInternas).toBe(estado.relacoesInternas - 10);
+  });
+
+  it("preserva clube/temporada/posição — só mexe em atributos/moral/reputação/relações", () => {
     const estado = estadoBase();
     const depois = aplicarImpactoDeCenario(estado, { moral: 5, narrativa: "x" });
     expect(depois.clubeAtualId).toBe(estado.clubeAtualId);
@@ -137,5 +152,18 @@ describe("avancarTemporada", () => {
     const estado = estadoBase();
     avancarTemporada(estado);
     expect(estado.temporada).toBe(2027);
+  });
+
+  it("não soma patrimônio quando a reputação não libera nenhum patrocínio", () => {
+    const estado = estadoBase();
+    const depois = avancarTemporada(estado);
+    expect(depois.patrimonio).toBe(0);
+  });
+
+  it("soma ao patrimônio a renda dos patrocínios disponíveis pra reputação/região atuais", () => {
+    const estado = { ...estadoBase(), reputacao: { nacional: 50, porRegiao: { SP: 40 } } };
+    const depois = avancarTemporada(estado, "SP");
+    // nacional 50 libera marca_esportiva_nacional (min 40, 80_000); regional SP 40 libera loja_do_bairro (min 15, 5_000) e emissora_local (min 35, 20_000)
+    expect(depois.patrimonio).toBe(80_000 + 5_000 + 20_000);
   });
 });

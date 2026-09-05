@@ -1,17 +1,19 @@
 import type { DesempenhoPartida } from "../progression/xp.js";
 import { aplicarXpPartidaAoJogador, calcularXpPartida } from "../progression/xp.js";
 import { aplicarDeclinioPorIdade } from "../progression/aging.js";
-import type { ImpactoCarreira } from "../progression/scenarios.js";
-import { aplicarImpacto, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
+import type { ImpactoCarreira, Reputacao } from "../progression/scenarios.js";
+import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
+import { patrociniosDisponiveis } from "./patrocinios.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
 
 /**
  * Estado de carreira do jogador — o "save" da carreira. Junta o `Jogador`
  * (atributos/posição/arquétipo, `schemas/player.ts`) com o que só existe em
- * nível de carreira: clube atual, temporada, moral e reputação (que não
- * tinham lar antes desta peça — ver `docs/motor-de-partida.md` seção 4,
- * onde `progression/scenarios.ts` só operava num par solto de campos).
+ * nível de carreira: clube atual, temporada, moral, reputação, relações
+ * internas e patrimônio (que não tinham lar antes desta peça — ver
+ * `docs/motor-de-partida.md` seção 4, onde `progression/scenarios.ts` só
+ * operava num par solto de campos).
  *
  * Sem perks/nível como recurso separado (decisão já registrada em
  * `docs/motor-de-partida.md`) — o overall é sempre derivado dos atributos
@@ -23,8 +25,11 @@ export interface EstadoDeCarreira {
   temporada: number;
   /** 0-100. */
   moral: number;
-  /** 0-100. */
-  reputacao: number;
+  reputacao: Reputacao;
+  /** 0-100 — elenco/comissão técnica/diretoria agregados num número só (ver docs/motor-de-partida.md). Puramente conceitual até existir sistema de minutagem/renovação. */
+  relacoesInternas: number;
+  /** Renda simples acumulada de patrocínios (`career/patrocinios.ts`) — não é a economia completa da Fase 4 (mercado de transferências), só um contador. */
+  patrimonio: number;
 }
 
 export interface OpcoesEstadoInicial {
@@ -41,8 +46,8 @@ const IDADE_INICIAL_PADRAO = 18;
 const ATRIBUTO_PRIORITARIO_INICIAL = 45;
 const ATRIBUTO_NAO_PRIORITARIO_INICIAL = 35;
 const MORAL_INICIAL = 50;
-/** Jogador estreante começa desconhecido, não com reputação neutra. */
-const REPUTACAO_INICIAL = 10;
+const RELACOES_INTERNAS_INICIAL = 50;
+const PATRIMONIO_INICIAL = 0;
 
 /**
  * Cria o estado de carreira de um jogador novo — promessa jovem, não
@@ -76,7 +81,9 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
     clubeAtualId: opcoes.clubeInicialId,
     temporada: opcoes.temporadaInicial,
     moral: MORAL_INICIAL,
-    reputacao: REPUTACAO_INICIAL,
+    reputacao: criarReputacaoInicial(),
+    relacoesInternas: RELACOES_INTERNAS_INICIAL,
+    patrimonio: PATRIMONIO_INICIAL,
   };
 }
 
@@ -105,16 +112,31 @@ export function aplicarDesempenhoPartida(
   return { ...estado, jogador: { ...estado.jogador, atributos } };
 }
 
-/** Aplica o impacto de um resultado de cenário de carreira (`progression/scenarios.ts`) ao estado. */
-export function aplicarImpactoDeCenario(estado: EstadoDeCarreira, impacto: ImpactoCarreira): EstadoDeCarreira {
-  const parcial: EstadoJogadorParaImpacto = { atributos: estado.jogador.atributos, moral: estado.moral, reputacao: estado.reputacao };
-  const atualizado = aplicarImpacto(parcial, impacto);
+/**
+ * Aplica o impacto de um resultado de cenário de carreira
+ * (`progression/scenarios.ts`) ao estado. `regiaoAtual` (normalmente a UF
+ * do clube atual) decide onde eventuais deltas de reputação regional
+ * caem — sem ela, esses deltas ficam sem efeito (ver `aplicarImpacto`).
+ */
+export function aplicarImpactoDeCenario(
+  estado: EstadoDeCarreira,
+  impacto: ImpactoCarreira,
+  regiaoAtual?: string,
+): EstadoDeCarreira {
+  const parcial: EstadoJogadorParaImpacto = {
+    atributos: estado.jogador.atributos,
+    moral: estado.moral,
+    reputacao: estado.reputacao,
+    relacoesInternas: estado.relacoesInternas,
+  };
+  const atualizado = aplicarImpacto(parcial, impacto, regiaoAtual);
 
   return {
     ...estado,
     jogador: { ...estado.jogador, atributos: atualizado.atributos },
     moral: atualizado.moral,
     reputacao: atualizado.reputacao,
+    relacoesInternas: atualizado.relacoesInternas,
   };
 }
 
@@ -123,19 +145,26 @@ export function transferirParaClube(estado: EstadoDeCarreira, novoClubeId: strin
 }
 
 /**
- * Avança pra próxima temporada — idade e temporada +1, e aplica a curva de
- * pico/declínio por idade (`progression/aging.ts`): atributo físico decai
+ * Avança pra próxima temporada — idade e temporada +1, aplica a curva de
+ * pico/declínio por idade (`progression/aging.ts`: atributo físico decai
  * cedo e rápido depois do pico, mental decai tarde e devagar, liderança
- * nunca decai. Não afeta quem ainda não passou da idade de pico da
- * categoria.
+ * nunca decai — não afeta quem ainda não passou da idade de pico da
+ * categoria) e soma ao patrimônio a renda de todos os patrocínios
+ * disponíveis pra reputação/região atuais (`career/patrocinios.ts`) — não
+ * é negociação de contrato, só uma renda simples por temporada.
  */
-export function avancarTemporada(estado: EstadoDeCarreira): EstadoDeCarreira {
+export function avancarTemporada(estado: EstadoDeCarreira, regiaoAtual?: string): EstadoDeCarreira {
   const novaIdade = estado.jogador.idade + 1;
   const atributos = aplicarDeclinioPorIdade(estado.jogador.atributos, novaIdade);
+  const rendaPatrocinios = patrociniosDisponiveis(estado.reputacao, regiaoAtual).reduce(
+    (soma, patrocinio) => soma + patrocinio.valorPorTemporada,
+    0,
+  );
 
   return {
     ...estado,
     temporada: estado.temporada + 1,
     jogador: { ...estado.jogador, idade: novaIdade, atributos },
+    patrimonio: estado.patrimonio + rendaPatrocinios,
   };
 }

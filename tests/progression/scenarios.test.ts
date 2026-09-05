@@ -67,7 +67,12 @@ describe("resolverEscolha", () => {
 
 describe("aplicarImpacto", () => {
   function estadoBase(): EstadoJogadorParaImpacto {
-    return { atributos: { finalizacao: 50, frieza: 50 }, moral: 50, reputacao: 50 };
+    return {
+      atributos: { finalizacao: 50, frieza: 50 },
+      moral: 50,
+      reputacao: { nacional: 50, porRegiao: {} },
+      relacoesInternas: 50,
+    };
   }
 
   it("aplica delta positivo e negativo de atributo", () => {
@@ -77,30 +82,55 @@ describe("aplicarImpacto", () => {
   });
 
   it("clampa atributo entre 1 e 99", () => {
-    const estado: EstadoJogadorParaImpacto = { atributos: { finalizacao: 97 }, moral: 50, reputacao: 50 };
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), atributos: { finalizacao: 97 } };
     const comBonusGrande = aplicarImpacto(estado, { atributos: { finalizacao: 20 }, narrativa: "x" });
     expect(comBonusGrande.atributos.finalizacao).toBe(99);
 
-    const estadoBaixo: EstadoJogadorParaImpacto = { atributos: { finalizacao: 3 }, moral: 50, reputacao: 50 };
+    const estadoBaixo: EstadoJogadorParaImpacto = { ...estadoBase(), atributos: { finalizacao: 3 } };
     const comPenalidadeGrande = aplicarImpacto(estadoBaixo, { atributos: { finalizacao: -20 }, narrativa: "x" });
     expect(comPenalidadeGrande.atributos.finalizacao).toBe(1);
   });
 
-  it("clampa moral e reputação entre 0 e 100", () => {
-    const estado: EstadoJogadorParaImpacto = { atributos: {}, moral: 95, reputacao: 5 };
+  it("clampa moral e reputação nacional entre 0 e 100", () => {
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), atributos: {}, moral: 95, reputacao: { nacional: 5, porRegiao: {} } };
     const resultado = aplicarImpacto(estado, { moral: 20, reputacao: -20, narrativa: "x" });
     expect(resultado.moral).toBe(100);
-    expect(resultado.reputacao).toBe(0);
+    expect(resultado.reputacao.nacional).toBe(0);
+  });
+
+  it("aplica reputação regional só quando regiaoAtual é informada", () => {
+    const estado = estadoBase();
+    const semRegiao = aplicarImpacto(estado, { reputacaoRegional: 10, narrativa: "x" });
+    expect(semRegiao.reputacao.porRegiao).toEqual({});
+
+    const comRegiao = aplicarImpacto(estado, { reputacaoRegional: 10, narrativa: "x" }, "SP");
+    expect(comRegiao.reputacao.porRegiao.SP).toBe(10);
+  });
+
+  it("clampa reputação regional entre 0 e 100", () => {
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), reputacao: { nacional: 50, porRegiao: { SP: 95 } } };
+    const resultado = aplicarImpacto(estado, { reputacaoRegional: 20, narrativa: "x" }, "SP");
+    expect(resultado.reputacao.porRegiao.SP).toBe(100);
+  });
+
+  it("aplica delta de relações internas, clampado entre 0 e 100", () => {
+    const estado = estadoBase();
+    const resultado = aplicarImpacto(estado, { relacoesInternas: 10, narrativa: "x" });
+    expect(resultado.relacoesInternas).toBe(60);
+
+    const noTeto = aplicarImpacto({ ...estado, relacoesInternas: 95 }, { relacoesInternas: 20, narrativa: "x" });
+    expect(noTeto.relacoesInternas).toBe(100);
   });
 
   it("não muta o estado original", () => {
     const estado = estadoBase();
-    aplicarImpacto(estado, { atributos: { finalizacao: 10 }, moral: 10, narrativa: "x" });
+    aplicarImpacto(estado, { atributos: { finalizacao: 10 }, moral: 10, reputacaoRegional: 5, narrativa: "x" }, "SP");
     expect(estado.atributos.finalizacao).toBe(50);
     expect(estado.moral).toBe(50);
+    expect(estado.reputacao.porRegiao).toEqual({});
   });
 
-  it("impacto sem atributos/moral/reputação não muda nada além da narrativa", () => {
+  it("impacto sem atributos/moral/reputação/relações não muda nada além da narrativa", () => {
     const estado = estadoBase();
     const resultado = aplicarImpacto(estado, { narrativa: "nada acontece" });
     expect(resultado).toEqual(estado);

@@ -97,13 +97,21 @@ function simularArgentina(): void {
   console.log(`Rebaixados (${liga.premiacao.rebaixamento_proxima_divisao}): ${tabelaAnual.slice(-liga.premiacao.rebaixamento_proxima_divisao!).map((l) => nomeDoClube(l.clubeId)).reverse().join(", ")}`);
 }
 
-function formatarImpacto(impacto: { atributos?: Partial<Record<string, number>>; moral?: number; reputacao?: number }): string {
+function formatarImpacto(impacto: {
+  atributos?: Partial<Record<string, number>>;
+  moral?: number;
+  reputacao?: number;
+  reputacaoRegional?: number;
+  relacoesInternas?: number;
+}): string {
   const partes: string[] = [];
   for (const [atributo, delta] of Object.entries(impacto.atributos ?? {})) {
     partes.push(`${atributo} ${delta! > 0 ? "+" : ""}${delta}`);
   }
   if (impacto.moral) partes.push(`moral ${impacto.moral > 0 ? "+" : ""}${impacto.moral}`);
-  if (impacto.reputacao) partes.push(`reputação ${impacto.reputacao > 0 ? "+" : ""}${impacto.reputacao}`);
+  if (impacto.reputacao) partes.push(`reputação nacional ${impacto.reputacao > 0 ? "+" : ""}${impacto.reputacao}`);
+  if (impacto.reputacaoRegional) partes.push(`reputação regional ${impacto.reputacaoRegional > 0 ? "+" : ""}${impacto.reputacaoRegional}`);
+  if (impacto.relacoesInternas) partes.push(`relações internas ${impacto.relacoesInternas > 0 ? "+" : ""}${impacto.relacoesInternas}`);
   return partes.length > 0 ? partes.join(", ") : "sem impacto numérico";
 }
 
@@ -129,13 +137,14 @@ function simularCenario(): void {
   const estadoAntes: EstadoJogadorParaImpacto = {
     atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((atributo) => [atributo, 55])),
     moral: 50,
-    reputacao: 50,
+    reputacao: { nacional: 50, porRegiao: { SP: 20 } },
+    relacoesInternas: 50,
   };
   const escolha = resolverEscolha(opcaoEscolhida);
-  const estadoDepois = aplicarImpacto(estadoAntes, escolha.resultado.impacto);
+  const estadoDepois = aplicarImpacto(estadoAntes, escolha.resultado.impacto, "SP");
 
   console.log(`Resultado: ${escolha.resultado.impacto.narrativa}`);
-  console.log(`Moral: ${estadoAntes.moral} -> ${estadoDepois.moral} | Reputação: ${estadoAntes.reputacao} -> ${estadoDepois.reputacao}`);
+  console.log(`Moral: ${estadoAntes.moral} -> ${estadoDepois.moral} | Reputação nacional: ${estadoAntes.reputacao.nacional} -> ${estadoDepois.reputacao.nacional} | Reputação SP: ${estadoAntes.reputacao.porRegiao.SP} -> ${estadoDepois.reputacao.porRegiao.SP ?? estadoAntes.reputacao.porRegiao.SP} | Relações internas: ${estadoAntes.relacoesInternas} -> ${estadoDepois.relacoesInternas}`);
 
   const atributosAlterados = Object.keys(escolha.resultado.impacto.atributos ?? {});
   if (atributosAlterados.length > 0) {
@@ -163,9 +172,11 @@ function simularCarreira(): void {
     temporadaInicial: 2027,
   });
 
+  const regiaoAtual = "SP"; // corinthians e palmeiras são de SP
+
   console.log(`\n=== Carreira de ${estado.jogador.nome} ===`);
   console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Temporada: ${estado.temporada} | Idade: ${estado.jogador.idade}`);
-  console.log(`Overall inicial: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação: ${estado.reputacao}\n`);
+  console.log(`Overall inicial: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação nacional: ${estado.reputacao.nacional} | Relações internas: ${estado.relacoesInternas} | Patrimônio: ${estado.patrimonio}\n`);
 
   const ratingClube = obterRating(clubePorId.get(clubeId)!);
   const ratingRival = obterRating(clubePorId.get(rivalId)!);
@@ -185,13 +196,15 @@ function simularCarreira(): void {
   const escolha = resolverEscolha(opcaoEscolhida);
   console.log(`--- Cenário: ${cenario.titulo} ---`);
   console.log(`Escolha: "${opcaoEscolhida.texto}" -> ${escolha.resultado.impacto.narrativa}`);
-  estado = aplicarImpactoDeCenario(estado, escolha.resultado.impacto);
+  estado = aplicarImpactoDeCenario(estado, escolha.resultado.impacto, regiaoAtual);
 
-  estado = avancarTemporada(estado);
+  estado = avancarTemporada(estado, regiaoAtual);
 
   console.log(`\n=== Fim da temporada ===`);
   console.log(`Temporada: ${estado.temporada} | Idade: ${estado.jogador.idade}`);
-  console.log(`Overall: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação: ${estado.reputacao}`);
+  console.log(
+    `Overall: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação nacional: ${estado.reputacao.nacional} | Reputação SP: ${estado.reputacao.porRegiao.SP ?? 0} | Relações internas: ${estado.relacoesInternas} | Patrimônio: ${estado.patrimonio}`,
+  );
 }
 
 /**

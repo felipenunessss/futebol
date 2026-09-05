@@ -556,29 +556,53 @@ habilidade nenhuma — só **acelera o crescimento** de atributos específicos.
 
 ## 4. Cenários de múltipla escolha da carreira (implementado)
 
-Cobre "Narrativa de carreira" (`game-design.md` seção 5.1: lesões,
-imprensa regional, dilemas de proposta/lealdade, rivalidades pessoais).
-Implementado em `src/progression/scenarios.ts`, com catálogo inicial de 4
-cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
+Cobre "Narrativa de carreira" e "Vida fora de campo" (`game-design.md`
+seções 5.1 e 5.3: lesões, imprensa regional, dilemas de proposta/lealdade,
+rivalidades pessoais, vida pessoal/mudança de cidade, relação com comissão
+técnica/elenco, patrocínios, reputação regional). Implementado em
+`src/progression/scenarios.ts`, com catálogo de 10 cenários (`CENARIOS`) e
+demo via `npx tsx src/cli/index.ts cenario`.
 
 - **Cenário** tem 2-3 **opções**; cada opção tem 1+ **resultados
   possíveis**, cada um com probabilidade própria (`resolverEscolha` sorteia
   qual acontece — a mesma escolha pode dar certo ou errado, não é
   determinística) e um **impacto**: delta de atributo (direto, não passa
   pela curva de retorno decrescente de XP de partida — evento narrativo
-  pontual, não desempenho em campo), delta de moral, delta de reputação.
-- `aplicarImpacto` clampa atributo em 1-99 e moral/reputação em 0-100, sem
-  mutar o estado recebido.
-- **`moral`/`reputacao` agora têm lar**: `src/career/Player.ts`
-  (`EstadoDeCarreira`) junta `Jogador` + `clubeAtualId` + `temporada` +
-  `moral`/`reputacao` num só lugar — o "save" da carreira. Funções puras:
-  `criarEstadoInicial` (jovem promessa, atributos prioritários do
-  arquétipo um pouco acima dos demais), `overallAtual` (derivado, nunca
+  pontual, não desempenho em campo), delta de moral, delta de reputação
+  nacional, delta de reputação **regional**, delta de **relações
+  internas**.
+- `aplicarImpacto` clampa atributo em 1-99, moral/reputação/relações em
+  0-100, sem mutar o estado recebido. O delta de reputação regional só é
+  aplicado se quem chama informar `regiaoAtual` (normalmente a UF do clube
+  atual) — o cenário em si é genérico e não sabe de região; sem essa
+  informação o delta regional fica sem efeito, silenciosamente (documentado,
+  não é bug).
+- **Reputação agora é separada por escopo** (`Reputacao {nacional,
+  porRegiao}`, `progression/scenarios.ts`): reflete a ideia de "ídolo local
+  no estadual x desconhecido fora do estado" (`game-design.md` seção 5.3) —
+  região sem entrada em `porRegiao` equivale a 0.
+- **`relacoesInternas`** (`progression/scenarios.ts`/`career/Player.ts`): um
+  único número 0-100 agregando elenco + comissão técnica + diretoria (não
+  três stats separadas) — puramente conceitual até existir sistema de
+  minutagem/renovação de contrato que de fato leia esse valor.
+- **Patrocínios** (`src/career/patrocinios.ts`): catálogo `PATROCINIOS`
+  (regional ou nacional, cada um com `reputacaoMinima` e
+  `valorPorTemporada`), `patrociniosDisponiveis(reputacao, regiaoAtual?)`
+  filtra o catálogo pela reputação/região atuais. Não é negociação de
+  contrato nem economia da Fase 4 — é só uma renda simples somada ao
+  `patrimonio` do jogador a cada `avancarTemporada`.
+- **`moral`/`reputacao`/`relacoesInternas`/`patrimonio` têm lar**:
+  `src/career/Player.ts` (`EstadoDeCarreira`) junta `Jogador` +
+  `clubeAtualId` + `temporada` + esses campos num só lugar — o "save" da
+  carreira. Funções puras: `criarEstadoInicial` (jovem promessa, atributos
+  prioritários do arquétipo um pouco acima dos demais, reputação de
+  estreante via `criarReputacaoInicial`), `overallAtual` (derivado, nunca
   guardado), `aplicarDesempenhoPartida` (liga `chancesJogador` de
-  `simularPartida` ao XP), `aplicarImpactoDeCenario` (liga este módulo),
-  `transferirParaClube`, `avancarTemporada` (idade+temporada +1, **sem**
-  curva de pico/declínio ainda — ver pendência abaixo). Demo completa
-  (partida real → XP → cenário → impacto → nova temporada) via
+  `simularPartida` ao XP), `aplicarImpactoDeCenario` (liga este módulo,
+  aceita `regiaoAtual?` opcional), `transferirParaClube`, `avancarTemporada`
+  (idade+temporada +1, curva de pico/declínio, soma renda de patrocínios
+  disponíveis pra `regiaoAtual?` informada). Demo completa (partida real →
+  XP → cenário → impacto → nova temporada, com renda de patrocínio) via
   `npx tsx src/cli/index.ts carreira`.
 
 ## 5. Loop de calendário (implementado, cobertura parcial por design)
