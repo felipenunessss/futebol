@@ -3,7 +3,10 @@ import { simularMataMataDoFormato, type ResultadoMataMata } from "../simulation/
 import { obterRating } from "../simulation/rating.js";
 import { simularFaseUnicaDoFormato, somarTabelas, type LinhaTabela } from "../simulation/season.js";
 import { CENARIOS, aplicarImpacto, resolverEscolha, sortearCenario, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
+import { converterChancesEmDesempenho } from "../progression/xp.js";
 import { ATRIBUTOS_POR_POSICAO } from "../schemas/player.js";
+import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
+import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -140,6 +143,56 @@ function simularCenario(): void {
   }
 }
 
+/**
+ * Demonstra o ciclo de carreira de ponta a ponta: cria um jogador, simula
+ * uma partida real dele (clube vs. rival, com ParticipacaoJogador),
+ * aplica o XP ganho, dispara um cenário de carreira e aplica o impacto —
+ * o mesmo ciclo descrito em game-design.md seção 6.
+ */
+function simularCarreira(): void {
+  const clubeId = "corinthians";
+  const rivalId = "palmeiras";
+
+  let estado = criarEstadoInicial({
+    id: "jogador_carreira",
+    nome: "Jogador da Carreira",
+    posicao: "atacante",
+    arquetipoId: "finalizador",
+    clubeInicialId: clubeId,
+    temporadaInicial: 2027,
+  });
+
+  console.log(`\n=== Carreira de ${estado.jogador.nome} ===`);
+  console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Temporada: ${estado.temporada} | Idade: ${estado.jogador.idade}`);
+  console.log(`Overall inicial: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação: ${estado.reputacao}\n`);
+
+  const ratingClube = obterRating(clubePorId.get(clubeId)!);
+  const ratingRival = obterRating(clubePorId.get(rivalId)!);
+  const participacao: ParticipacaoJogador = { lado: "casa", jogador: estado.jogador, estiloTecnico: "equilibrado" };
+
+  const resultado = simularPartida(gerarPerfilTime(ratingClube), gerarPerfilTime(ratingRival), Math.random, participacao);
+  console.log(`--- Partida: ${nomeDoClube(clubeId)} ${resultado.golsCasa} x ${resultado.golsFora} ${nomeDoClube(rivalId)} ---`);
+  console.log(`Chances do jogador: ${resultado.chancesJogador.length} (${resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)\n`);
+
+  const desempenho = converterChancesEmDesempenho(resultado.chancesJogador, 90, 1.5); // clássico, importância maior
+  estado = aplicarDesempenhoPartida(estado, resultado.chancesJogador, desempenho);
+  console.log(`Gols: ${desempenho.gols} | Assistências: ${desempenho.assistencias} | Chances perdidas: ${desempenho.chancesPerdidas}`);
+  console.log(`Overall após a partida: ${overallAtual(estado)}\n`);
+
+  const cenario = sortearCenario(CENARIOS);
+  const opcaoEscolhida = cenario.opcoes[0];
+  const escolha = resolverEscolha(opcaoEscolhida);
+  console.log(`--- Cenário: ${cenario.titulo} ---`);
+  console.log(`Escolha: "${opcaoEscolhida.texto}" -> ${escolha.resultado.impacto.narrativa}`);
+  estado = aplicarImpactoDeCenario(estado, escolha.resultado.impacto);
+
+  estado = avancarTemporada(estado);
+
+  console.log(`\n=== Fim da temporada ===`);
+  console.log(`Temporada: ${estado.temporada} | Idade: ${estado.jogador.idade}`);
+  console.log(`Overall: ${overallAtual(estado)} | Moral: ${estado.moral} | Reputação: ${estado.reputacao}`);
+}
+
 const comando = process.argv[2] ?? "copa-do-brasil";
 
 switch (comando) {
@@ -152,7 +205,10 @@ switch (comando) {
   case "cenario":
     simularCenario();
     break;
+  case "carreira":
+    simularCarreira();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina" ou "cenario".`);
+    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario" ou "carreira".`);
     process.exit(1);
 }

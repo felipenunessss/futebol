@@ -569,10 +569,17 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
   pontual, não desempenho em campo), delta de moral, delta de reputação.
 - `aplicarImpacto` clampa atributo em 1-99 e moral/reputação em 0-100, sem
   mutar o estado recebido.
-- **`moral`/`reputacao` não têm lar definitivo ainda**: hoje só existem como
-  campos soltos de `EstadoJogadorParaImpacto` (usado por este módulo), não
-  como parte de `Jogador`/estado de carreira persistente — isso depende de
-  `src/career/Player.ts` sair do stub (ver pendência abaixo).
+- **`moral`/`reputacao` agora têm lar**: `src/career/Player.ts`
+  (`EstadoDeCarreira`) junta `Jogador` + `clubeAtualId` + `temporada` +
+  `moral`/`reputacao` num só lugar — o "save" da carreira. Funções puras:
+  `criarEstadoInicial` (jovem promessa, atributos prioritários do
+  arquétipo um pouco acima dos demais), `overallAtual` (derivado, nunca
+  guardado), `aplicarDesempenhoPartida` (liga `chancesJogador` de
+  `simularPartida` ao XP), `aplicarImpactoDeCenario` (liga este módulo),
+  `transferirParaClube`, `avancarTemporada` (idade+temporada +1, **sem**
+  curva de pico/declínio ainda — ver pendência abaixo). Demo completa
+  (partida real → XP → cenário → impacto → nova temporada) via
+  `npx tsx src/cli/index.ts carreira`.
 
 ## 5. Pendências / próximos passos
 
@@ -580,11 +587,10 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
   267/678 clubes com rating real (ver seções 1.1-1.5), o resto no fallback
   por decisão de design documentada (clube sem exposição competitiva
   nacional/continental não tem histórico público pra puxar).
-- **Estado de carreira persistente não existe ainda**: `src/career/Player.ts`
-  continua stub — não há hoje um lugar único que junte `Jogador`
-  (atributos), `moral`/`reputacao` (cenários, seção 4) e clube atual/
-  temporada. Isso é pré-requisito pra `engine.ts` e pro loop de carreira
-  de verdade (seção 6 do `game-design.md`).
+- **Curva de pico/declínio por idade não implementada**: `avancarTemporada`
+  só incrementa idade, não aplica nenhum efeito nos atributos ainda —
+  pendência conceitual da seção 3 (jovem cresce mais rápido no físico,
+  veterano estabiliza/decai), falta a fórmula.
 - **Cenários — condições de gatilho não definidas**: hoje `sortearCenario`
   só sorteia da lista toda, sem noção de "quando" cada cenário pode
   aparecer (ex: proposta de clube grande só faz sentido em janela de
