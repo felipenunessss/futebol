@@ -18,6 +18,10 @@ describe("catálogo de cenários", () => {
     expect(new Set(CENARIOS.map((c) => c.id)).size).toBe(CENARIOS.length);
   });
 
+  it("uma quantidade razoável de cenários já tem gatilho de elegibilidade definido", () => {
+    expect(CENARIOS.filter((c) => c.gatilho).length).toBeGreaterThanOrEqual(140);
+  });
+
   it("todo cenário tem entre 2 e 3 opções", () => {
     for (const cenario of CENARIOS) {
       expect(cenario.opcoes.length).toBeGreaterThanOrEqual(2);

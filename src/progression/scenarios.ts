@@ -288,6 +288,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_imprensa_classico",
     titulo: "Manchetes depois do clássico",
     descricao: "A imprensa local repercute sua atuação no clássico do fim de semana — pra bem ou pra mal, seu nome está em todo canto.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "responder_criticas",
@@ -310,6 +311,7 @@ export const CENARIOS: Cenario[] = [
     id: "rivalidade_pessoal",
     titulo: "Provocação de um rival",
     descricao: "Um jogador do time adversário te provocou publicamente antes do duelo direto entre vocês.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "retrucar_na_midia",
@@ -340,6 +342,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_cidade",
     titulo: "Mudança de cidade",
     descricao: "Você acabou de se transferir e precisa se estabelecer numa cidade nova.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "trazer_familia",
@@ -370,6 +373,7 @@ export const CENARIOS: Cenario[] = [
     id: "divergencia_tecnica",
     titulo: "Divergência tática com o técnico",
     descricao: "Você discorda do esquema tático usado nos últimos jogos e sente que isso limita seu desempenho.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "questionar_publicamente",
@@ -461,6 +465,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_torcida_organizada",
     titulo: "Reunião com a torcida organizada",
     descricao: "Depois de uma sequência de resultados ruins, a torcida organizada pede uma conversa com o elenco.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "aceitar_a_conversa",
@@ -767,6 +772,7 @@ export const CENARIOS: Cenario[] = [
     id: "novo_tecnico_chega",
     titulo: "Novo técnico no comando",
     descricao: "O clube troca de técnico no meio da temporada, e o novo comandante ainda não conhece bem o elenco.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "buscar_o_novo_tecnico",
@@ -925,6 +931,7 @@ export const CENARIOS: Cenario[] = [
     id: "rixa_com_torcida_visitante",
     titulo: "Provocação da torcida visitante",
     descricao: "Jogando fora de casa, a torcida do adversário te provoca durante o aquecimento.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "responder_com_gesto",
@@ -969,6 +976,7 @@ export const CENARIOS: Cenario[] = [
     id: "coreografia_da_torcida",
     titulo: "Coreografia dedicada a você",
     descricao: "A torcida organizada prepara uma coreografia especial em sua homenagem antes do jogo.",
+    gatilho: { reputacaoRegionalMinima: 20, momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "agradecer_publicamente",
@@ -991,6 +999,7 @@ export const CENARIOS: Cenario[] = [
     id: "jejum_de_vitorias",
     titulo: "Jejum de vitórias",
     descricao: "O time acumula rodadas sem vencer e o clima no elenco está pesado.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "puxar_reuniao_no_vestiario",
@@ -1013,6 +1022,7 @@ export const CENARIOS: Cenario[] = [
     id: "recepcao_no_aeroporto",
     titulo: "Recepção no aeroporto",
     descricao: "Ao voltar de uma viagem, uma multidão de torcedores espera no aeroporto — o clima pode ser calor ou cobrança, depende do momento do time.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "parar_para_interagir",
@@ -1079,6 +1089,7 @@ export const CENARIOS: Cenario[] = [
     id: "preparador_fisico_plano_diferente",
     titulo: "Plano de treino diferente do habitual",
     descricao: "O preparador físico propõe um plano de treino fora da sua zona de conforto, prometendo ganhos de performance.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "seguir_o_plano_a_risca",
@@ -1101,6 +1112,7 @@ export const CENARIOS: Cenario[] = [
     id: "analise_de_video_erro_recorrente",
     titulo: "Análise de vídeo aponta erro recorrente",
     descricao: "A comissão técnica te chama pra uma sessão de vídeo mostrando um erro que se repete há semanas.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "trabalhar_o_ajuste_com_afinco",
@@ -1124,6 +1136,7 @@ export const CENARIOS: Cenario[] = [
     id: "disputa_de_posicao_com_colega",
     titulo: "Disputa de posição com um companheiro",
     descricao: "Um companheiro de elenco disputa a mesma posição que você, e a titularidade está em jogo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "elevar_o_nivel_nos_treinos",
@@ -1146,6 +1159,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_esquema_antes_de_jogo_grande",
     titulo: "Mudança de esquema antes do jogo grande",
     descricao: "Às vésperas de um jogo decisivo, o técnico anuncia uma mudança tática que te tira da posição habitual.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "abracar_a_mudanca",
@@ -1169,6 +1183,7 @@ export const CENARIOS: Cenario[] = [
     id: "tirado_no_intervalo",
     titulo: "Substituído no intervalo",
     descricao: "O técnico decide te tirar de campo logo no intervalo, sem uma explicação clara.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "cobrar_explicacao_no_vestiario",
@@ -1191,6 +1206,7 @@ export const CENARIOS: Cenario[] = [
     id: "podcast_convite",
     titulo: "Convite pra um podcast de esportes",
     descricao: "Um podcast popular te convida pra uma conversa longa e sem roteiro fechado.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "topar_a_conversa_aberta",
@@ -1213,6 +1229,7 @@ export const CENARIOS: Cenario[] = [
     id: "documentario_sobre_carreira",
     titulo: "Proposta de documentário",
     descricao: "Uma produtora quer fazer um documentário sobre sua trajetória até aqui.",
+    gatilho: { reputacaoNacionalMinima: 50 },
     opcoes: [
       {
         id: "abrir_as_portas",
@@ -1235,6 +1252,7 @@ export const CENARIOS: Cenario[] = [
     id: "comparacao_publica_com_outro_jogador",
     titulo: "Comparado publicamente com outro jogador",
     descricao: "A imprensa começa a te comparar diretamente com outro jogador de destaque da mesma posição.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "usar_a_comparacao_como_motivacao",
@@ -1257,6 +1275,7 @@ export const CENARIOS: Cenario[] = [
     id: "pergunta_constrangedora_entrevista",
     titulo: "Pergunta constrangedora ao vivo",
     descricao: "Num programa ao vivo, um repórter faz uma pergunta constrangedora sobre sua vida pessoal.",
+    gatilho: { reputacaoNacionalMinima: 20 },
     opcoes: [
       {
         id: "responder_com_humor",
@@ -1279,6 +1298,7 @@ export const CENARIOS: Cenario[] = [
     id: "exposicao_da_vida_pessoal_pela_imprensa",
     titulo: "Vida pessoal exposta pela imprensa",
     descricao: "Um veículo de imprensa publica detalhes da sua vida pessoal sem sua autorização.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "buscar_medidas_legais",
@@ -1389,6 +1409,7 @@ export const CENARIOS: Cenario[] = [
     id: "renovacao_de_contrato",
     titulo: "Negociação de renovação de contrato",
     descricao: "Seu contrato está perto do fim e o clube abre negociação de renovação.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "negociar_com_firmeza",
@@ -1411,6 +1432,7 @@ export const CENARIOS: Cenario[] = [
     id: "bonus_por_titulo",
     titulo: "Bônus por título prometido",
     descricao: "A diretoria promete um bônus especial ao elenco caso o time seja campeão na reta final da temporada.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "cobrar_formalizacao_por_escrito",
@@ -1433,6 +1455,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_patamar_salarial",
     titulo: "Mudança de patamar salarial",
     descricao: "Depois de uma sequência de boas atuações, você se vê num novo patamar salarial dentro do elenco.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "manter_a_rotina_de_sempre",
@@ -1477,6 +1500,7 @@ export const CENARIOS: Cenario[] = [
     id: "clausula_de_rescisao_negociada",
     titulo: "Negociação de cláusula de rescisão",
     descricao: "O clube propõe reduzir sua cláusula de rescisão em troca de outros benefícios contratuais.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "aceitar_a_troca",
@@ -1499,6 +1523,7 @@ export const CENARIOS: Cenario[] = [
     id: "interesse_de_multiplos_clubes",
     titulo: "Múltiplos clubes de olho em você",
     descricao: "Numa mesma janela, mais de um clube demonstra interesse formal em contar com você.",
+    gatilho: { momentos: ["pre_temporada"], reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "deixar_o_mercado_aquecer",
@@ -1543,6 +1568,7 @@ export const CENARIOS: Cenario[] = [
     id: "boato_de_transferencia_antes_de_confirmado",
     titulo: "Boato de transferência antes da hora",
     descricao: "A imprensa noticia uma transferência sua antes de qualquer confirmação oficial do clube.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "desmentir_o_boato",
@@ -1565,6 +1591,7 @@ export const CENARIOS: Cenario[] = [
     id: "insonia_antes_de_jogo_decisivo",
     titulo: "Insônia antes de um jogo decisivo",
     descricao: "Na véspera de um jogo decisivo, a ansiedade tira seu sono.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "buscar_ajuda_do_departamento_medico",
@@ -1632,6 +1659,7 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_recorrente_de_desgaste",
     titulo: "Lesão recorrente de desgaste",
     descricao: "Uma dor que já apareceu outras vezes na temporada volta a incomodar.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "investir_em_tratamento_preventivo",
@@ -1655,6 +1683,7 @@ export const CENARIOS: Cenario[] = [
     id: "nascimento_de_filho",
     titulo: "Nascimento de um filho",
     descricao: "Seu filho nasce bem no meio de uma sequência importante de jogos da temporada.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "tirar_dias_de_folga",
@@ -1677,6 +1706,7 @@ export const CENARIOS: Cenario[] = [
     id: "casamento",
     titulo: "Casamento na reta final da temporada",
     descricao: "Você planeja seu casamento justamente na reta final de uma temporada decisiva.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "manter_a_data_do_casamento",
@@ -1699,6 +1729,7 @@ export const CENARIOS: Cenario[] = [
     id: "perda_na_familia",
     titulo: "Perda na família",
     descricao: "Uma perda familiar te atinge duramente bem no meio da temporada.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "afastar_se_temporariamente",
@@ -1743,6 +1774,7 @@ export const CENARIOS: Cenario[] = [
     id: "convocacao_torneio_continental",
     titulo: "Convocação pra torneio continental",
     descricao: "Você é convocado pela seleção pra um torneio continental de destaque.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "priorizar_o_torneio",
@@ -1765,6 +1797,7 @@ export const CENARIOS: Cenario[] = [
     id: "disputa_de_vaga_lista_final",
     titulo: "Disputa pela vaga na lista final",
     descricao: "Você briga com outro jogador por uma vaga na lista final de convocados pra um grande torneio.",
+    gatilho: { reputacaoNacionalMinima: 35 },
     opcoes: [
       {
         id: "treinar_no_limite",
@@ -1787,6 +1820,7 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_as_vesperas_de_torneio",
     titulo: "Lesão às vésperas de um grande torneio",
     descricao: "Um desconforto muscular aparece justamente às vésperas da estreia de um grande torneio.",
+    gatilho: { reputacaoNacionalMinima: 35 },
     opcoes: [
       {
         id: "arriscar_jogar_mesmo_assim",
@@ -1809,6 +1843,7 @@ export const CENARIOS: Cenario[] = [
     id: "curso_de_formacao",
     titulo: "Curso de formação de treinadores",
     descricao: "O clube oferece a jogadores do elenco um curso introdutório de formação de treinadores.",
+    gatilho: { idadeMinima: 26 },
     opcoes: [
       {
         id: "fazer_o_curso",
@@ -1939,6 +1974,7 @@ export const CENARIOS: Cenario[] = [
     id: "quase_expulsao",
     titulo: "Quase expulso em jogo tenso",
     descricao: "Numa partida de clima muito tenso, você chega perto de ser expulso após um lance polêmico.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "se_conter_no_limite",
@@ -1961,6 +1997,7 @@ export const CENARIOS: Cenario[] = [
     id: "assumir_cobranca_de_falta_decisiva",
     titulo: "Cobrança de falta decisiva",
     descricao: "Falta na entrada da área, no fim de um jogo empatado — alguém precisa bater.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "bater_a_falta",
@@ -1983,6 +2020,7 @@ export const CENARIOS: Cenario[] = [
     id: "gol_contra",
     titulo: "Gol contra num momento crucial",
     descricao: "Um desvio infeliz seu resulta num gol contra em um momento crucial da partida.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "pedir_a_bola_de_novo_rapido",
@@ -2005,6 +2043,7 @@ export const CENARIOS: Cenario[] = [
     id: "comemoracao_polemica",
     titulo: "Comemoração polêmica de gol",
     descricao: "Depois de marcar um gol importante, você pensa numa comemoração que pode ser vista como provocação.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "fazer_a_comemoracao_provocativa",
@@ -2027,6 +2066,7 @@ export const CENARIOS: Cenario[] = [
     id: "discussao_com_colega_durante_o_jogo",
     titulo: "Discussão com colega em campo",
     descricao: "No calor do jogo, uma falha de entrosamento gera uma discussão acalorada com um companheiro em campo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "resolver_ali_mesmo",
@@ -2071,6 +2111,7 @@ export const CENARIOS: Cenario[] = [
     id: "festa_na_vespera_de_jogo_importante",
     titulo: "Convite pra festa na véspera de jogo importante",
     descricao: "Amigos te convidam pra uma festa bem na véspera de um jogo decisivo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "ir_a_festa_com_moderacao",
@@ -2115,6 +2156,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_amistoso_de_pretemporada_no_exterior",
     titulo: "Amistoso de pré-temporada no exterior",
     descricao: "O clube viaja pro exterior pra uma série de amistosos de pré-temporada.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "aproveitar_para_se_destacar",
@@ -2137,6 +2179,7 @@ export const CENARIOS: Cenario[] = [
     id: "reencontro_com_ex_clube",
     titulo: "Reencontro com o ex-clube",
     descricao: "Você enfrenta pela primeira vez o clube que te formou como profissional.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "comemorar_gol_com_respeito",
@@ -2158,6 +2201,7 @@ export const CENARIOS: Cenario[] = [
     id: "jornalista_pede_furo_exclusivo",
     titulo: "Jornalista pede um furo exclusivo",
     descricao: "Um jornalista de confiança pede que você conceda um furo de reportagem exclusivo.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "conceder_o_furo",
@@ -2180,6 +2224,7 @@ export const CENARIOS: Cenario[] = [
     id: "bastidor_de_reality_show",
     titulo: "Convite pra um reality show esportivo",
     descricao: "Uma emissora convida você pra participar de um reality show sobre bastidores do futebol.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "participar_do_reality",
@@ -2245,6 +2290,7 @@ export const CENARIOS: Cenario[] = [
     id: "presidente_do_clube_pede_conselho",
     titulo: "Presidente do clube pede conselho",
     descricao: "O presidente do clube te procura em busca de conselhos sobre uma decisão importante da diretoria.",
+    gatilho: { relacoesInternasMinima: 55 },
     opcoes: [
       {
         id: "dar_sua_opiniao_sincera",
@@ -2289,6 +2335,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_virar_garoto_propaganda",
     titulo: "Proposta pra virar garoto-propaganda",
     descricao: "Uma grande marca de consumo propõe que você seja o rosto principal de uma campanha nacional.",
+    gatilho: { reputacaoNacionalMinima: 50 },
     opcoes: [
       {
         id: "aceitar_ser_o_rosto_da_marca",
@@ -2356,6 +2403,7 @@ export const CENARIOS: Cenario[] = [
     id: "treino_em_alta_altitude",
     titulo: "Treino em alta altitude",
     descricao: "O clube organiza uma pré-temporada de treinos em alta altitude, visando ganho de resistência.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "encarar_o_treino_intenso",
@@ -2378,6 +2426,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_regime_de_treino_fisico",
     titulo: "Mudança de regime de treino físico",
     descricao: "A comissão técnica decide mudar o regime de treinos físicos de toda a temporada.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "abracar_o_novo_regime",
@@ -2400,6 +2449,7 @@ export const CENARIOS: Cenario[] = [
     id: "entrevista_ao_vivo_no_intervalo",
     titulo: "Entrevista ao vivo no intervalo",
     descricao: "Você é chamado pra uma entrevista ao vivo bem no intervalo de um jogo apertado.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "falar_com_intensidade",
@@ -2422,6 +2472,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcida_rival_invade_hotel_da_delegacao",
     titulo: "Torcida rival cerca o hotel da delegação",
     descricao: "Em viagem, torcedores do time rival cercam o hotel da delegação na véspera do jogo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "manter_a_rotina_normal",
@@ -2444,6 +2495,7 @@ export const CENARIOS: Cenario[] = [
     id: "suspeita_de_dopping",
     titulo: "Suspeita de exame antidoping",
     descricao: "Um suplemento novo, receitado pelo departamento médico, levanta dúvidas sobre possível contaminação antes de um exame antidoping.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "suspender_o_suplemento_por_seguranca",
@@ -2466,6 +2518,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_ser_padrinho_de_evento_social",
     titulo: "Convite pra ser padrinho de evento social",
     descricao: "Uma ONG te convida pra ser padrinho de um evento de arrecadação pra crianças carentes.",
+    gatilho: { reputacaoRegionalMinima: 20 },
     opcoes: [
       {
         id: "aceitar_ser_padrinho",
@@ -2488,6 +2541,7 @@ export const CENARIOS: Cenario[] = [
     id: "reducao_de_minutos_em_campo",
     titulo: "Redução de minutos em campo",
     descricao: "O técnico começa a reduzir gradualmente seus minutos em campo, sem uma explicação direta.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "conversar_sobre_o_planejamento",
@@ -2510,6 +2564,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_posicao_tatica",
     titulo: "Mudança permanente de posição tática",
     descricao: "O técnico sugere uma mudança permanente pra uma nova posição no campo, argumentando ganho tático.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "topar_a_nova_posicao",
@@ -2533,6 +2588,7 @@ export const CENARIOS: Cenario[] = [
     id: "rivalidade_interna_por_titularidade",
     titulo: "Rivalidade interna por titularidade",
     descricao: "Uma rivalidade silenciosa cresce dentro do elenco entre você e outro jogador pela mesma vaga.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "transformar_em_competicao_saudavel",
@@ -2555,6 +2611,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_ser_capitao_da_selecao",
     titulo: "Proposta de ser capitão da seleção",
     descricao: "O técnico da seleção sugere seu nome pra capitanear o time nacional num torneio importante.",
+    gatilho: { reputacaoNacionalMinima: 60 },
     opcoes: [
       {
         id: "aceitar_a_capitania_da_selecao",
@@ -2577,6 +2634,7 @@ export const CENARIOS: Cenario[] = [
     id: "entrevista_sobre_racismo_no_futebol",
     titulo: "Entrevista sobre racismo no futebol",
     descricao: "Um veículo de imprensa te convida pra uma entrevista sobre racismo no futebol, tema sensível e importante.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "falar_abertamente_sobre_o_tema",
@@ -2599,6 +2657,7 @@ export const CENARIOS: Cenario[] = [
     id: "gesto_de_fair_play",
     titulo: "Oportunidade de um gesto de fair play",
     descricao: "Num lance de jogo, você percebe que poderia se aproveitar de um erro do árbitro em seu favor.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "avisar_o_arbitro_do_erro",
@@ -2621,6 +2680,7 @@ export const CENARIOS: Cenario[] = [
     id: "campanha_publicitaria_polemica",
     titulo: "Campanha publicitária polêmica",
     descricao: "Uma marca propõe uma campanha publicitária de tom mais ousado, que pode dividir opiniões.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "topar_a_campanha_ousada",
@@ -2686,6 +2746,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_transferencia_de_um_amigo_no_elenco",
     titulo: "Amigo do elenco pede conselho sobre sair",
     descricao: "Um grande amigo dentro do elenco te pede conselho sobre aceitar uma proposta de outro clube.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "incentivar_a_saida",
@@ -2708,6 +2769,7 @@ export const CENARIOS: Cenario[] = [
     id: "crise_de_ansiedade_pre_jogo",
     titulo: "Crise de ansiedade antes de um jogo",
     descricao: "Momentos antes de entrar em campo, uma crise de ansiedade forte te pega de surpresa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "buscar_o_psicologo_do_clube",
@@ -2731,6 +2793,7 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_de_um_titular_abre_espaco",
     titulo: "Lesão de um titular abre espaço",
     descricao: "A lesão de um jogador titular abre uma vaga inesperada na equipe.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "abraçar_a_oportunidade",
@@ -2775,6 +2838,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcida_faz_ato_de_protesto",
     titulo: "Torcida organiza ato de protesto",
     descricao: "Depois de resultados ruins, a torcida organiza um ato de protesto no entorno do centro de treinamento.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "sair_para_dialogar",
@@ -2797,6 +2861,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_com_portoes_fechados",
     titulo: "Jogo com portões fechados",
     descricao: "Por punição disciplinar, um jogo importante acontece com portões fechados, sem torcida no estádio.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "criar_motivacao_extra_no_vestiario",
@@ -2819,6 +2884,7 @@ export const CENARIOS: Cenario[] = [
     id: "viagem_longa_e_cansativa",
     titulo: "Viagem longa e cansativa",
     descricao: "Uma viagem excepcionalmente longa e desgastante antecede um jogo fora de casa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "priorizar_o_descanso_na_viagem",
@@ -2863,6 +2929,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_embaixador_do_clube",
     titulo: "Proposta de ser embaixador do clube",
     descricao: "O clube propõe que você seja embaixador institucional, representando a marca em eventos oficiais.",
+    gatilho: { reputacaoRegionalMinima: 30 },
     opcoes: [
       {
         id: "aceitar_ser_embaixador",
@@ -2884,6 +2951,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_alojamento_da_delegacao",
     titulo: "Mudança de alojamento da delegação",
     descricao: "Por questões de segurança, a delegação muda de hotel na véspera de um jogo importante.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "manter_a_rotina_apesar_da_mudanca",
@@ -2907,6 +2975,7 @@ export const CENARIOS: Cenario[] = [
     id: "crianca_hospitalizada_pede_visita",
     titulo: "Criança hospitalizada pede uma visita",
     descricao: "Uma criança internada, fã declarada sua, pede uma visita através das redes sociais da família.",
+    gatilho: { reputacaoRegionalMinima: 20 },
     opcoes: [
       {
         id: "visitar_a_crianca_no_hospital",
@@ -2928,6 +2997,7 @@ export const CENARIOS: Cenario[] = [
     id: "imprensa_estrangeira_pede_entrevista",
     titulo: "Imprensa estrangeira pede entrevista",
     descricao: "Depois de boas atuações, um veículo estrangeiro de peso pede uma entrevista exclusiva.",
+    gatilho: { reputacaoNacionalMinima: 55 },
     opcoes: [
       {
         id: "conceder_a_entrevista_estrangeira",
@@ -2950,6 +3020,7 @@ export const CENARIOS: Cenario[] = [
     id: "suspeita_de_favorecimento_de_arbitragem",
     titulo: "Suspeita de favorecimento na arbitragem",
     descricao: "Depois de uma sequência de decisões controversas a seu favor, surgem suspeitas públicas de favorecimento.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "se_pronunciar_contra_a_suspeita",
@@ -2972,6 +3043,7 @@ export const CENARIOS: Cenario[] = [
     id: "dilema_de_jogar_machucado_em_jogo_decisivo",
     titulo: "Jogar machucado numa final",
     descricao: "Com uma lesão leve, você tem a chance de jogar uma final histórica, mas o risco de agravar existe.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "jogar_a_final_mesmo_assim",
@@ -2994,6 +3066,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_por_gols_em_seca_de_artilharia",
     titulo: "Pressão por gols numa seca de artilharia",
     descricao: "Há semanas sem marcar, a cobrança da torcida e da imprensa por gols aumenta a cada jogo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "arriscar_mais_finalizacoes",
@@ -3059,6 +3132,7 @@ export const CENARIOS: Cenario[] = [
     id: "reencontro_com_familia_apos_longa_turne",
     titulo: "Reencontro com a família após longa turnê",
     descricao: "Depois de semanas de viagens seguidas, você finalmente reencontra a família em casa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "tirar_um_tempo_de_qualidade",
@@ -3102,6 +3176,7 @@ export const CENARIOS: Cenario[] = [
     id: "rumor_de_affair_na_midia",
     titulo: "Rumor de affair na mídia",
     descricao: "Um rumor infundado de affair envolvendo seu nome circula pelos veículos de fofoca.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "desmentir_o_rumor_publicamente",
@@ -3124,6 +3199,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_indicacao_de_jogador_para_o_clube",
     titulo: "Pedido de indicação de jogador",
     descricao: "A diretoria te pede uma indicação de reforço, já que você conhece bem o mercado de jogadores.",
+    gatilho: { relacoesInternasMinima: 50 },
     opcoes: [
       {
         id: "indicar_um_nome_de_confianca",
@@ -3190,6 +3266,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_ser_comentarista_de_um_jogo",
     titulo: "Convite pra comentar um jogo na TV",
     descricao: "Uma emissora te convida pra comentar ao vivo um jogo de outra competição, num dia de folga.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "aceitar_comentar_o_jogo",
@@ -3212,6 +3289,7 @@ export const CENARIOS: Cenario[] = [
     id: "exposicao_de_bastidores_do_vestiario_em_livro",
     titulo: "Convite pra lançar um livro de bastidores",
     descricao: "Uma editora propõe que você lance um livro contando bastidores da sua carreira e do vestiário.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "escrever_o_livro_com_detalhes",
@@ -3234,6 +3312,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcida_organizada_pede_ingressos",
     titulo: "Torcida organizada pede ingressos",
     descricao: "Uma torcida organizada pede que você intermedeie a compra de ingressos pra um jogo com procura alta.",
+    gatilho: { reputacaoRegionalMinima: 20 },
     opcoes: [
       {
         id: "ajudar_com_os_ingressos",
@@ -3256,6 +3335,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_em_estadio_lotado_pela_primeira_vez",
     titulo: "Primeira vez num estádio lotado",
     descricao: "Você joga pela primeira vez na carreira diante de um estádio completamente lotado.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "usar_a_energia_da_torcida",
@@ -3278,6 +3358,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_debaixo_de_chuva_forte",
     titulo: "Jogo debaixo de chuva forte",
     descricao: "Uma chuva forte transforma o gramado num desafio extra durante uma partida importante.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "adaptar_o_jogo_a_chuva",
@@ -3301,6 +3382,7 @@ export const CENARIOS: Cenario[] = [
     id: "calor_extremo_durante_a_partida",
     titulo: "Calor extremo durante a partida",
     descricao: "Uma partida acontece sob calor extremo, exigindo cuidado redobrado com hidratação e ritmo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "gerenciar_o_ritmo_com_cuidado",
@@ -3324,6 +3406,7 @@ export const CENARIOS: Cenario[] = [
     id: "arbitro_pede_desculpas_por_erro",
     titulo: "Árbitro pede desculpas por um erro",
     descricao: "Depois de um erro claro de arbitragem contra você, o árbitro procura pra se desculpar em particular.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "aceitar_as_desculpas_do_arbitro",
@@ -3346,6 +3429,7 @@ export const CENARIOS: Cenario[] = [
     id: "var_anula_gol_polemico",
     titulo: "VAR anula um gol polêmico",
     descricao: "Um gol seu é anulado pelo VAR numa decisão bastante controversa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "reclamar_com_o_var",
@@ -3368,6 +3452,7 @@ export const CENARIOS: Cenario[] = [
     id: "reclamacao_formal_contra_arbitragem",
     titulo: "Reclamação formal contra a arbitragem",
     descricao: "O clube pede que você assine uma reclamação formal contra a arbitragem de uma rodada.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "assinar_a_reclamacao",
@@ -3411,6 +3496,7 @@ export const CENARIOS: Cenario[] = [
     id: "troca_de_camisa_com_torcedor_durante_jogo",
     titulo: "Torcedor invade o campo pedindo a camisa",
     descricao: "No fim de um jogo, um torcedor invade o gramado pedindo pra trocar de camisa com você.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "trocar_a_camisa_com_o_torcedor",
@@ -3433,6 +3519,7 @@ export const CENARIOS: Cenario[] = [
     id: "entrada_dura_gera_climao_pos_jogo",
     titulo: "Entrada dura gera climão pós-jogo",
     descricao: "Uma entrada dura sua num adversário gera climão nos corredores depois do apito final.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "procurar_o_adversario_para_conversar",
@@ -3455,6 +3542,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_amistoso_contra_selecao_de_lendas",
     titulo: "Amistoso contra uma seleção de lendas",
     descricao: "Um evento especial coloca você em campo contra ídolos aposentados do futebol mundial.",
+    gatilho: { reputacaoNacionalMinima: 50 },
     opcoes: [
       {
         id: "jogar_com_intensidade_total",
@@ -3477,6 +3565,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_jogo_das_estrelas",
     titulo: "Convite pro Jogo das Estrelas",
     descricao: "Você é convidado pra representar seu campeonato num tradicional jogo das estrelas.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "participar_do_jogo_das_estrelas",
@@ -3499,6 +3588,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_autografo_de_crianca_com_doenca_grave",
     titulo: "Pedido de autógrafo de criança com doença grave",
     descricao: "A família de uma criança com doença grave pede um autógrafo e uma mensagem de força.",
+    gatilho: { reputacaoRegionalMinima: 15 },
     opcoes: [
       {
         id: "enviar_autografo_e_mensagem_pessoal",
@@ -3520,6 +3610,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcida_cobra_explicacoes_apos_eliminacao",
     titulo: "Torcida cobra explicações após eliminação",
     descricao: "Depois de uma eliminação inesperada, a torcida cobra explicações do elenco na saída do estádio.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "parar_para_explicar",
@@ -3542,6 +3633,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_ser_conselheiro_do_clube",
     titulo: "Proposta de ser conselheiro do clube",
     descricao: "Pensando no pós-carreira, o clube sugere que você comece a participar do conselho deliberativo.",
+    gatilho: { idadeMinima: 30 },
     opcoes: [
       {
         id: "aceitar_participar_do_conselho",
@@ -3563,6 +3655,7 @@ export const CENARIOS: Cenario[] = [
     id: "relacionamento_afetado_pela_rotina_de_jogos",
     titulo: "Relacionamento afetado pela rotina de jogos",
     descricao: "A rotina intensa de jogos e viagens começa a afetar seu relacionamento pessoal.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "reservar_tempo_de_qualidade",
@@ -3651,6 +3744,7 @@ export const CENARIOS: Cenario[] = [
     id: "reportagem_investigativa_sobre_financas",
     titulo: "Reportagem investigativa sobre finanças",
     descricao: "Uma reportagem investigativa levanta questões sobre a gestão financeira do seu patrimônio.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "abrir_as_financas_para_esclarecer",
@@ -3673,6 +3767,7 @@ export const CENARIOS: Cenario[] = [
     id: "onda_de_criticas_por_baixo_rendimento",
     titulo: "Onda de críticas por baixo rendimento",
     descricao: "Uma sequência de jogos abaixo do esperado gera uma onda forte de críticas da torcida e da imprensa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"], moralMaxima: 50 },
     opcoes: [
       {
         id: "buscar_apoio_psicologico_na_crise",
@@ -3719,6 +3814,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_decisivo_marcado_pela_chuva_de_papel",
     titulo: "Jogo decisivo com chuva de papel picado",
     descricao: "Antes de um jogo decisivo, a torcida organiza uma chuva de papel picado impressionante na entrada do time.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "usar_a_festa_como_impulso",
@@ -3764,6 +3860,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_ser_garoto_propaganda_de_orgao_publico",
     titulo: "Convite pra campanha de órgão público",
     descricao: "Um órgão público te convida pra estampar uma campanha de conscientização social.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "aceitar_a_campanha_publica",
@@ -3786,6 +3883,7 @@ export const CENARIOS: Cenario[] = [
     id: "crise_de_confianca_apos_sequencia_de_erros",
     titulo: "Crise de confiança após sequência de erros",
     descricao: "Uma sequência de erros técnicos seguidos abala sua confiança em campo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"], moralMaxima: 45 },
     opcoes: [
       {
         id: "conversar_com_o_tecnico_sobre_a_crise",
@@ -3851,6 +3949,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_ajuda_financeira_de_instituicao_social",
     titulo: "Pedido de ajuda de instituição social",
     descricao: "Uma instituição social da sua região de origem pede ajuda financeira pra continuar funcionando.",
+    gatilho: { reputacaoRegionalMinima: 15 },
     opcoes: [
       {
         id: "ajudar_a_instituicao_social",
@@ -3873,6 +3972,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_de_despedida_de_um_idolo_do_clube",
     titulo: "Jogo de despedida de um ídolo do clube",
     descricao: "Você participa do jogo de despedida de um ídolo histórico do clube.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "homenagear_o_idolo_em_campo",
@@ -3894,6 +3994,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_conselho_deliberativo",
     titulo: "Convite pro conselho deliberativo",
     descricao: "O clube convida você a integrar o conselho deliberativo, ainda na ativa.",
+    gatilho: { idadeMinima: 28 },
     opcoes: [
       {
         id: "aceitar_o_conselho_deliberativo",
@@ -3938,6 +4039,7 @@ export const CENARIOS: Cenario[] = [
     id: "classico_de_maxima_rivalidade_regional",
     titulo: "Clássico de máxima rivalidade regional",
     descricao: "Você encara o clássico de maior rivalidade histórica da região, com clima de guerra nas arquibancadas.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "assumir_o_protagonismo_no_classico",
@@ -3960,6 +4062,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_por_recorde_pessoal_de_gols",
     titulo: "Pressão por recorde pessoal de gols",
     descricao: "Você está a poucos gols de bater seu recorde pessoal numa única temporada.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"], moralMinima: 60 },
     opcoes: [
       {
         id: "focar_no_recorde_pessoal",
@@ -3982,6 +4085,7 @@ export const CENARIOS: Cenario[] = [
     id: "quebra_de_recorde_do_clube",
     titulo: "Quebra de recorde histórico do clube",
     descricao: "Você está próximo de quebrar um recorde histórico de artilharia do clube.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"], moralMinima: 60 },
     opcoes: [
       {
         id: "buscar_a_quebra_do_recorde",
@@ -4004,6 +4108,7 @@ export const CENARIOS: Cenario[] = [
     id: "entrada_para_o_hall_da_fama",
     titulo: "Convite pro hall da fama do clube",
     descricao: "O clube anuncia sua entrada no hall da fama institucional, ainda durante a carreira ativa.",
+    gatilho: { reputacaoNacionalMinima: 70, idadeMinima: 30 },
     opcoes: [
       {
         id: "participar_da_cerimonia_do_hall_da_fama",
@@ -4025,6 +4130,7 @@ export const CENARIOS: Cenario[] = [
     id: "testemunho_em_documentario_de_outro_jogador",
     titulo: "Convite pra depor em documentário de outro jogador",
     descricao: "Você é convidado a dar um depoimento num documentário sobre a carreira de outro jogador que admira.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "dar_um_depoimento_sincero",
@@ -4068,6 +4174,7 @@ export const CENARIOS: Cenario[] = [
     id: "reuniao_sobre_extensao_de_patrocinio_master",
     titulo: "Reunião sobre patrocínio master do clube",
     descricao: "A diretoria pede sua presença numa reunião importante sobre a renovação do patrocínio master do clube.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "participar_ativamente_da_reuniao",
@@ -4090,6 +4197,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcida_pede_permanencia_em_ano_de_saida",
     titulo: "Torcida pede permanência num ano de possível saída",
     descricao: "Com boatos de saída circulando, a torcida organiza uma campanha pedindo sua permanência no clube.",
+    gatilho: { reputacaoRegionalMinima: 30, momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "sinalizar_permanencia_a_torcida",
@@ -4112,6 +4220,7 @@ export const CENARIOS: Cenario[] = [
     id: "oferta_de_dupla_funcao_em_campo",
     titulo: "Oferta de dupla função em campo",
     descricao: "O técnico sugere que você acumule uma função tática extra em campo, além da sua principal.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "aceitar_a_dupla_funcao",
@@ -4134,6 +4243,7 @@ export const CENARIOS: Cenario[] = [
     id: "desgaste_fisico_por_calendario_apertado",
     titulo: "Desgaste físico por calendário apertado",
     descricao: "Uma sequência de jogos a cada três dias cobra um pedágio físico alto do elenco inteiro.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "pedir_gestao_de_carga_individual",
@@ -4157,6 +4267,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_descanso_estrategico_do_departamento_medico",
     titulo: "Pedido de descanso estratégico",
     descricao: "O departamento médico recomenda que você descanse um jogo importante como prevenção.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "seguir_a_recomendacao_medica",
@@ -4179,6 +4290,7 @@ export const CENARIOS: Cenario[] = [
     id: "retorno_de_lesao_com_receio_de_recair",
     titulo: "Retorno de lesão com receio de recair",
     descricao: "De volta aos gramados após uma lesão longa, um receio silencioso de recair te acompanha.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "jogar_com_confianca_total",
@@ -4223,6 +4335,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_de_ser_voz_do_elenco_em_negociacao_coletiva",
     titulo: "Proposta de ser voz do elenco em negociação",
     descricao: "O elenco escolhe você como representante numa negociação coletiva com a diretoria sobre condições de trabalho.",
+    gatilho: { relacoesInternasMinima: 55 },
     opcoes: [
       {
         id: "aceitar_representar_o_elenco",
@@ -4245,6 +4358,7 @@ export const CENARIOS: Cenario[] = [
     id: "dilema_de_jogar_amistoso_de_selecao_com_risco_de_lesao",
     titulo: "Amistoso de seleção com risco de lesão",
     descricao: "Um amistoso de seleção sem grande importância competitiva ainda assim carrega risco físico real.",
+    gatilho: { reputacaoNacionalMinima: 35 },
     opcoes: [
       {
         id: "jogar_o_amistoso_normalmente",
@@ -4267,6 +4381,7 @@ export const CENARIOS: Cenario[] = [
     id: "pedido_de_torcedor_para_participar_de_casamento",
     titulo: "Torcedor pede participação em casamento",
     descricao: "Um torcedor fervoroso pede que você grave uma mensagem surpresa pro casamento dele.",
+    gatilho: { reputacaoRegionalMinima: 20 },
     opcoes: [
       {
         id: "gravar_a_mensagem_para_o_casamento",
@@ -4288,6 +4403,7 @@ export const CENARIOS: Cenario[] = [
     id: "entrevista_sobre_planos_pos_aposentadoria",
     titulo: "Entrevista sobre planos pós-aposentadoria",
     descricao: "Um jornalista pergunta diretamente sobre seus planos pra depois de encerrar a carreira de jogador.",
+    gatilho: { idadeMinima: 30 },
     opcoes: [
       {
         id: "compartilhar_planos_detalhados",
@@ -4309,6 +4425,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_ser_jurado_de_premiacao_esportiva",
     titulo: "Convite pra ser jurado de premiação esportiva",
     descricao: "Você é convidado pra integrar o júri de uma premiação anual do futebol nacional.",
+    gatilho: { reputacaoNacionalMinima: 50 },
     opcoes: [
       {
         id: "aceitar_ser_jurado",
@@ -4331,6 +4448,7 @@ export const CENARIOS: Cenario[] = [
     id: "disputa_judicial_de_imagem",
     titulo: "Disputa judicial pelo uso da sua imagem",
     descricao: "Uma empresa usa sua imagem sem autorização numa campanha publicitária.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "processar_pelo_uso_indevido",
@@ -4353,6 +4471,7 @@ export const CENARIOS: Cenario[] = [
     id: "vazamento_de_valor_salarial",
     titulo: "Vazamento do valor do seu salário",
     descricao: "Seu valor salarial vaza pra imprensa, gerando debate público sobre o tema.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "comentar_o_vazamento_salarial",
@@ -4397,6 +4516,7 @@ export const CENARIOS: Cenario[] = [
     id: "mudanca_de_horario_de_jogos_por_transmissao",
     titulo: "Mudança de horário de jogos por transmissão",
     descricao: "A emissora de TV solicita mudança nos horários dos jogos pra melhor audiência, afetando a rotina do elenco.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "aceitar_a_mudanca_de_horario",
@@ -4419,6 +4539,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_em_altitude_elevada_no_exterior",
     titulo: "Jogo em altitude elevada no exterior",
     descricao: "Uma competição continental leva você a jogar numa cidade de altitude elevada, dificultando a respiração.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "seguir_protocolo_de_adaptacao_de_altitude",
@@ -4442,6 +4563,7 @@ export const CENARIOS: Cenario[] = [
     id: "reforco_contratado_na_mesma_posicao",
     titulo: "Reforço de peso contratado na sua posição",
     descricao: "O clube anuncia a contratação de um reforço badalado exatamente na sua posição.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "encarar_como_motivacao_extra",
@@ -4464,6 +4586,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_por_gols_decisivos_em_mata_mata",
     titulo: "Pressão por gols decisivos em mata-mata",
     descricao: "Numa fase de mata-mata, a expectativa por gols decisivos seus cresce a cada rodada eliminatória.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "abracar_o_protagonismo_no_mata_mata",
@@ -4486,6 +4609,7 @@ export const CENARIOS: Cenario[] = [
     id: "oferta_de_bicampeonato_bonus_contratual",
     titulo: "Bônus contratual por bicampeonato",
     descricao: "A diretoria propõe um bônus contratual extra caso o time conquiste o bicampeonato na temporada.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "aceitar_a_meta_de_bicampeonato",
@@ -4508,6 +4632,7 @@ export const CENARIOS: Cenario[] = [
     id: "rescisao_amigavel_proposta_pelo_clube",
     titulo: "Proposta de rescisão amigável",
     descricao: "Fora dos planos técnicos, o clube propõe uma rescisão amigável de contrato antes do previsto.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "aceitar_a_rescisao_amigavel",
@@ -4531,6 +4656,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_selecao_permanente_de_lendas",
     titulo: "Convite pra seleção permanente de lendas",
     descricao: "Uma organização internacional convida você a integrar permanentemente uma seleção de lendas do futebol.",
+    gatilho: { reputacaoNacionalMinima: 70, idadeMinima: 32 },
     opcoes: [
       {
         id: "aceitar_integrar_selecao_de_lendas",
@@ -4575,6 +4701,7 @@ export const CENARIOS: Cenario[] = [
     id: "reencontro_com_torcida_apos_longa_lesao",
     titulo: "Reencontro com a torcida após longa lesão",
     descricao: "Depois de meses afastado por lesão grave, você finalmente reencontra a torcida no estádio.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "fazer_um_gesto_de_gratidao_a_torcida",
@@ -4596,6 +4723,7 @@ export const CENARIOS: Cenario[] = [
     id: "ultimo_jogo_da_temporada_decisao_de_permanencia",
     titulo: "Último jogo da temporada e decisão de permanência",
     descricao: "No último jogo da temporada, com o contrato perto do fim, você precisa sinalizar sua decisão sobre o futuro no clube.",
+    gatilho: { momentos: ["reta_final"] },
     opcoes: [
       {
         id: "anunciar_permanencia_no_ultimo_jogo",
@@ -4617,6 +4745,7 @@ export const CENARIOS: Cenario[] = [
     id: "goleiro_avanca_para_escanteio_decisivo",
     titulo: "Goleiro avança pro escanteio decisivo",
     descricao: "Nos acréscimos de um jogo que seu time precisa vencer, a comissão sinaliza pro goleiro subir pro escanteio ofensivo.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "apoiar_a_subida_do_goleiro",
@@ -4639,6 +4768,7 @@ export const CENARIOS: Cenario[] = [
     id: "jogo_adiado_por_problemas_no_gramado",
     titulo: "Jogo adiado por problemas no gramado",
     descricao: "Um jogo muito aguardado é adiado de última hora por problemas estruturais no gramado do estádio.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "manter_a_rotina_apesar_do_adiamento",
@@ -4661,6 +4791,7 @@ export const CENARIOS: Cenario[] = [
     id: "torcedor_famoso_elogia_publicamente",
     titulo: "Torcedor famoso elogia você publicamente",
     descricao: "Uma celebridade torcedora do seu clube te elogia publicamente nas redes sociais depois de uma boa atuação.",
+    gatilho: { reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "agradecer_o_elogio_publicamente",
@@ -4683,6 +4814,7 @@ export const CENARIOS: Cenario[] = [
     id: "convite_para_clinica_de_futebol_infantil",
     titulo: "Convite pra clínica de futebol infantil",
     descricao: "Uma escolinha de futebol na sua região de origem te convida pra dar uma clínica especial pras crianças.",
+    gatilho: { reputacaoRegionalMinima: 15 },
     opcoes: [
       {
         id: "dar_a_clinica_pessoalmente",
