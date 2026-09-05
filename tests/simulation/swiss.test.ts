@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { FaseSuica } from "../../src/schemas/championship.js";
 import { gerarConfrontosFaseSuica, simularFaseSuica } from "../../src/simulation/swiss.js";
+import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
+import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
 
 // 8 times, 2 potes de 4 — dentro do pote: 3 jogos garantidos; fora: até completar jogos_por_time.
 const times = ["a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4"];
@@ -60,5 +62,23 @@ describe("simularFaseSuica", () => {
   it("classificados vêm do topo da tabela", () => {
     const resultado = simularFaseSuica(times, formato, ratings, () => Math.random());
     expect(resultado.classificados).toEqual(resultado.tabela.slice(0, 4).map((l) => l.clubeId));
+  });
+
+  it("sem participacaoJogador, partidasDoJogador fica ausente", () => {
+    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random());
+    expect(resultado.partidasDoJogador).toBeUndefined();
+  });
+
+  it("com participacaoJogador, retorna uma entrada por partida do clube dele", () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random(), participacao);
+    const jogosDeA1 = resultado.confrontos.filter((c) => c.mandante === "a1" || c.visitante === "a1").length;
+
+    expect(resultado.partidasDoJogador).toHaveLength(jogosDeA1);
+    for (const { confronto } of resultado.partidasDoJogador!) {
+      expect(confronto.mandante === "a1" || confronto.visitante === "a1").toBe(true);
+    }
   });
 });

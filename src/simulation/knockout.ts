@@ -1,14 +1,14 @@
 import type { EtapaMataMata, FinalEstadual, MataMata } from "../schemas/championship.js";
-import { gerarPerfilTime, probabilidadeDeVencer, simularPartida } from "./match.js";
+import { gerarPerfilTime, probabilidadeDeVencer, simularPartida, type ParticipacaoJogador, type ParticipacaoJogadorClube, type ResultadoPartida } from "./match.js";
 
 /**
  * Gerador/simulador de mata-mata (`formato.mata_mata`, ver
  * `schemas/championship.ts`) — cobre tanto o formato simples (`fases` +
  * `ida_e_volta` únicos, todo mundo entra na 1ª fase) quanto o formato com
  * entrada escalonada (`etapas`, usado por Copa do Brasil/Libertadores/
- * Sul-Americana). Camada 1 só (agregado) — nenhum dos confrontos é o
- * clube do jogador; ligar `ParticipacaoJogador` num mata-mata fica pra
- * um próximo incremento.
+ * Sul-Americana). Se `participacaoJogador` for passado, os confrontos que
+ * envolvem o clube dele usam `ParticipacaoJogador` (Camada 2) em cada
+ * jogo/perna; o resto do chaveamento continua Camada 1.
  *
  * Sem dado de sorteio real: os confrontos de cada etapa são emparelhados
  * por força (mais forte x mais fraco, 2º mais forte x 2º mais fraco, ...)
@@ -24,6 +24,8 @@ export interface ResultadoConfrontoMataMata {
   vencedor: string;
   /** true quando o agregado empatou e o vencedor saiu de pênaltis (aproximação: sorteio ponderado pelo rating geral, sem zona). */
   decididoNosPenaltis: boolean;
+  /** 1 entrada (jogo único) ou 2 (ida e volta) — só presente quando o clube do jogador estava nesse confronto. */
+  partidasDoJogador?: ResultadoPartida[];
 }
 
 export interface ResultadoEtapaMataMata {
@@ -53,6 +55,10 @@ function emparelharPorForca(participantes: string[], ratings: Record<string, num
   return pares;
 }
 
+function participacaoComoLado(participacao: ParticipacaoJogadorClube | undefined, lado: "casa" | "fora"): ParticipacaoJogador | undefined {
+  return participacao ? { lado, jogador: participacao.jogador, estiloTecnico: participacao.estiloTecnico } : undefined;
+}
+
 /** Exportado pra `simularFinalEstadualDoFormato` reaproveitar (uma final de estadual é, na essência, um confronto de mata-mata isolado). */
 export function resolverConfronto(
   timeA: string,
@@ -60,29 +66,45 @@ export function resolverConfronto(
   ratings: Record<string, number>,
   idaEVolta: boolean,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoConfrontoMataMata {
   const ratingA = ratings[timeA];
   const ratingB = ratings[timeB];
+  const ehTimeA = participacaoJogador?.clubeId === timeA;
+  const ehTimeB = participacaoJogador?.clubeId === timeB;
+  const partidasDoJogador: ResultadoPartida[] = [];
 
   let golsA: number;
   let golsB: number;
 
   if (idaEVolta) {
-    const jogo1 = simularPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random); // A em casa
-    const jogo2 = simularPartida(gerarPerfilTime(ratingB, random), gerarPerfilTime(ratingA, random), random); // B em casa
+    // jogo 1: A manda em casa
+    const participacaoJogo1 = ehTimeA ? participacaoComoLado(participacaoJogador, "casa") : ehTimeB ? participacaoComoLado(participacaoJogador, "fora") : undefined;
+    const jogo1 = simularPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacaoJogo1);
+    if (participacaoJogo1) partidasDoJogador.push(jogo1);
+
+    // jogo 2: B manda em casa
+    const participacaoJogo2 = ehTimeA ? participacaoComoLado(participacaoJogador, "fora") : ehTimeB ? participacaoComoLado(participacaoJogador, "casa") : undefined;
+    const jogo2 = simularPartida(gerarPerfilTime(ratingB, random), gerarPerfilTime(ratingA, random), random, participacaoJogo2);
+    if (participacaoJogo2) partidasDoJogador.push(jogo2);
+
     golsA = jogo1.golsCasa + jogo2.golsFora;
     golsB = jogo1.golsFora + jogo2.golsCasa;
   } else {
-    const jogo = simularPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random);
+    const participacao = ehTimeA ? participacaoComoLado(participacaoJogador, "casa") : ehTimeB ? participacaoComoLado(participacaoJogador, "fora") : undefined;
+    const jogo = simularPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacao);
+    if (participacao) partidasDoJogador.push(jogo);
     golsA = jogo.golsCasa;
     golsB = jogo.golsFora;
   }
 
-  if (golsA > golsB) return { timeA, timeB, golsA, golsB, vencedor: timeA, decididoNosPenaltis: false };
-  if (golsB > golsA) return { timeA, timeB, golsA, golsB, vencedor: timeB, decididoNosPenaltis: false };
+  const base = { timeA, timeB, golsA, golsB, ...(partidasDoJogador.length > 0 ? { partidasDoJogador } : {}) };
+
+  if (golsA > golsB) return { ...base, vencedor: timeA, decididoNosPenaltis: false };
+  if (golsB > golsA) return { ...base, vencedor: timeB, decididoNosPenaltis: false };
 
   const vencedor = random() < probabilidadeDeVencer(ratingA, ratingB) ? timeA : timeB;
-  return { timeA, timeB, golsA, golsB, vencedor, decididoNosPenaltis: true };
+  return { ...base, vencedor, decididoNosPenaltis: true };
 }
 
 /**
@@ -90,12 +112,14 @@ export function resolverConfronto(
  * ver `schemas/championship.ts`) — cada etapa soma seus `entrantes` (se
  * houver) aos vencedores que já vinham da etapa anterior, empareiam por
  * força, resolve os confrontos e passa os vencedores adiante. Termina
- * quando sobra 1 só time.
+ * quando sobra 1 só time. Se o clube do jogador for eliminado no meio do
+ * caminho, as etapas seguintes simplesmente não têm `partidasDoJogador`.
  */
 export function simularMataMataComEtapas(
   etapas: EtapaMataMata[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoMataMata {
   let vivos: string[] = [];
   const resultadoEtapas: ResultadoEtapaMataMata[] = [];
@@ -109,7 +133,7 @@ export function simularMataMataComEtapas(
     }
 
     const pares = emparelharPorForca(vivos, ratings);
-    const confrontos = pares.map(([timeA, timeB]) => resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random));
+    const confrontos = pares.map(([timeA, timeB]) => resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador));
     const vencedores = confrontos.map((c) => c.vencedor);
 
     resultadoEtapas.push({ nome: etapa.nome, confrontos, vencedores });
@@ -130,6 +154,7 @@ export function simularMataMataSimples(
   idaEVolta: boolean,
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoMataMata {
   const etapas: EtapaMataMata[] = fases.map((nome, indice) => ({
     nome,
@@ -137,7 +162,7 @@ export function simularMataMataSimples(
     entrantes: indice === 0 ? participantes : undefined,
   }));
 
-  return simularMataMataComEtapas(etapas, ratings, random);
+  return simularMataMataComEtapas(etapas, ratings, random, participacaoJogador);
 }
 
 /**
@@ -151,12 +176,13 @@ export function simularMataMataDoFormato(
   ratings: Record<string, number>,
   participantes: string[] = [],
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoMataMata {
   if (formato.etapas) {
-    return simularMataMataComEtapas(formato.etapas, ratings, random);
+    return simularMataMataComEtapas(formato.etapas, ratings, random, participacaoJogador);
   }
 
-  return simularMataMataSimples(participantes, formato.fases, formato.ida_e_volta, ratings, random);
+  return simularMataMataSimples(participantes, formato.fases, formato.ida_e_volta, ratings, random, participacaoJogador);
 }
 
 export interface ResultadoFinalEstadual {
@@ -178,6 +204,7 @@ export function simularFinalEstadualDoFormato(
   participantes: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFinalEstadual {
   if (participantes.length === 1) {
     return { campeao: participantes[0] };
@@ -187,6 +214,6 @@ export function simularFinalEstadualDoFormato(
     throw new Error(`simularFinalEstadualDoFormato: esperava 1 ou 2 participantes, recebeu ${participantes.length}`);
   }
 
-  const confronto = resolverConfronto(participantes[0], participantes[1], ratings, formato.ida_e_volta, random);
+  const confronto = resolverConfronto(participantes[0], participantes[1], ratings, formato.ida_e_volta, random, participacaoJogador);
   return { campeao: confronto.vencedor, confronto };
 }

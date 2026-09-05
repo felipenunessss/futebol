@@ -1,6 +1,7 @@
 import type { FaseGrupos, FaseQuadrangular } from "../schemas/championship.js";
-import type { Confronto, LinhaTabela } from "./season.js";
+import type { Confronto, LinhaTabela, PartidaDoJogador } from "./season.js";
 import { simularTemporadaPontosCorridos } from "./season.js";
+import type { ParticipacaoJogadorClube } from "./match.js";
 
 /**
  * Gerador/simulador de fase de grupos (`formato.fase_grupos`, ver
@@ -52,6 +53,8 @@ export interface ResultadoGrupo {
   tabela: LinhaTabela[];
   /** Times classificados desse grupo, na ordem da tabela (1º colocado primeiro). */
   classificados: string[];
+  /** Só presente no grupo que contém o clube do jogador (quando `participacaoJogador` foi passado). */
+  partidasDoJogador?: PartidaDoJogador[];
 }
 
 export interface ResultadoFaseDeGrupos {
@@ -67,11 +70,13 @@ export function simularFaseDeGrupos(
   idaEVolta: boolean,
   classificamPorGrupo: number,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFaseDeGrupos {
   const resultados: ResultadoGrupo[] = grupos.map((grupo) => {
-    const { confrontos, tabela } = simularTemporadaPontosCorridos(grupo.times, ratings, idaEVolta, random);
+    const participacaoDoGrupo = participacaoJogador && grupo.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
+    const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(grupo.times, ratings, idaEVolta, random, participacaoDoGrupo);
     const classificados = tabela.slice(0, classificamPorGrupo).map((linha) => linha.clubeId);
-    return { nome: grupo.nome, confrontos, tabela, classificados };
+    return { nome: grupo.nome, confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) };
   });
 
   return {
@@ -93,6 +98,7 @@ export function simularFaseDeGruposDoFormato(
   times: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFaseDeGrupos {
   const esperado = formato.num_grupos * formato.times_por_grupo;
   if (times.length !== esperado) {
@@ -102,7 +108,7 @@ export function simularFaseDeGruposDoFormato(
   }
 
   const grupos = dividirEmGruposPorForca(times, formato.num_grupos, ratings);
-  return simularFaseDeGrupos(grupos, ratings, formato.ida_e_volta, formato.classificam_por_grupo, random);
+  return simularFaseDeGrupos(grupos, ratings, formato.ida_e_volta, formato.classificam_por_grupo, random, participacaoJogador);
 }
 
 /**
@@ -121,6 +127,7 @@ export function simularFaseQuadrangularDoFormato(
   ratings: Record<string, number>,
   random: () => number = Math.random,
   idaEVolta = true,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFaseDeGrupos {
   if (!formato.ativa) {
     throw new Error("simularFaseQuadrangularDoFormato: formato.ativa é false — essa fase não deveria estar rodando");
@@ -131,5 +138,6 @@ export function simularFaseQuadrangularDoFormato(
     times,
     ratings,
     random,
+    participacaoJogador,
   );
 }

@@ -600,10 +600,13 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
   por atributo, pesos do duelo de zona (quanto o atributo do jogador pesa
   vs. o perfil gerado do resto do time) — hoje é desenho conceitual, as
   constantes ficam pra quando a implementação permitir calibrar por teste.
-- **Ligar `ParticipacaoJogador` em grupos/mata-mata/suíça**: hoje só
-  `simularPartida` isolada suporta a chance individual do jogador — os
-  simuladores de temporada/grupo/mata-mata/fase suíça ainda são só Camada
-  1 (agregado).
+- ~~Ligar `ParticipacaoJogador` em grupos/mata-mata/suíça~~ **resolvido**:
+  `season.ts`/`groups.ts`/`knockout.ts`/`swiss.ts` aceitam um
+  `ParticipacaoJogadorClube` opcional (`match.ts`) e devolvem
+  `partidasDoJogador` com o resultado de cada partida do clube dele
+  (`resolverConfronto` trata ida-e-volta corretamente, alternando o lado
+  por perna). Validado com smoke test real (Boca Juniors no Apertura
+  argentino, 29 partidas).
 - **Loop de calendário** (`src/simulation/engine.ts`): ainda stub — falta
   orquestrar várias competições simultâneas de uma temporada, ver comentário
   no próprio arquivo.

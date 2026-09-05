@@ -7,6 +7,8 @@ import {
   somarTabelas,
   type LinhaTabela,
 } from "../../src/simulation/season.js";
+import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
+import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
 
 describe("gerarConfrontosPontosCorridos", () => {
   it("turno único com número par de times: cada time joga contra todos os outros exatamente uma vez", () => {
@@ -138,5 +140,56 @@ describe("somarTabelas", () => {
     const turno: LinhaTabela[] = [linha({ clubeId: "a", pontos: 3 }), linha({ clubeId: "b", pontos: 9 })];
     const acumulado = somarTabelas([turno]);
     expect(acumulado[0].clubeId).toBe("b");
+  });
+});
+
+describe("simularTemporadaPontosCorridos com participação do jogador", () => {
+  const times = ["a", "b", "c", "d"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const jogador: Jogador = {
+    id: "j1",
+    nome: "Teste",
+    posicao: "atacante",
+    arquetipo_id: buscarArquetipo("finalizador").id,
+    idade: 22,
+    atributos: { finalizacao: 90 },
+  };
+  const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+
+  it("sem participacaoJogador, partidasDoJogador fica ausente", () => {
+    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random());
+    expect(resultado.partidasDoJogador).toBeUndefined();
+  });
+
+  it("com participacaoJogador, retorna uma entrada por partida do clube dele (ida e volta = joga contra todos 2x)", () => {
+    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+    expect(resultado.partidasDoJogador).toHaveLength(2 * (times.length - 1));
+  });
+
+  it("toda partida listada em partidasDoJogador realmente envolve o clube do jogador", () => {
+    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+    for (const { confronto } of resultado.partidasDoJogador!) {
+      expect(confronto.mandante === "a" || confronto.visitante === "a").toBe(true);
+    }
+  });
+
+  it("existem confrontos entre outros times que não entram em partidasDoJogador", () => {
+    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+    const outroConfrontoQualquer = resultado.confrontos.find((c) => c.mandante !== "a" && c.visitante !== "a");
+    expect(outroConfrontoQualquer).toBeDefined();
+    expect(resultado.partidasDoJogador!.some((p) => p.confronto === outroConfrontoQualquer)).toBe(false);
+  });
+});
+
+describe("simularFaseUnicaDoFormato com participação do jogador", () => {
+  it("propaga partidasDoJogador quando participacaoJogador é passado", () => {
+    const times = ["a", "b", "c", "d"];
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+    const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 1 };
+
+    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random(), participacao);
+    expect(resultado.partidasDoJogador).toHaveLength(times.length - 1);
   });
 });

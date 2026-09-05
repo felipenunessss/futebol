@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { EtapaMataMata, FinalEstadual, MataMata } from "../../src/schemas/championship.js";
 import {
+  resolverConfronto,
   simularFinalEstadualDoFormato,
   simularMataMataComEtapas,
   simularMataMataDoFormato,
   simularMataMataSimples,
 } from "../../src/simulation/knockout.js";
+import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
+import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
 
 describe("simularMataMataSimples", () => {
   it("4 times, 2 fases (semifinal+final): produz 1 campeão que estava entre os 4", () => {
@@ -120,5 +123,51 @@ describe("simularFinalEstadualDoFormato", () => {
   it("lança erro com número de participantes diferente de 1 ou 2", () => {
     expect(() => simularFinalEstadualDoFormato(formato, [], ratings)).toThrow();
     expect(() => simularFinalEstadualDoFormato(formato, ["a", "b", "c"], ratings)).toThrow();
+  });
+});
+
+describe("resolverConfronto com participação do jogador", () => {
+  const ratings = { a: 1600, b: 1600 };
+  const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+
+  it("jogo único: 1 partida em partidasDoJogador quando o clube do jogador está no confronto", () => {
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+    const confronto = resolverConfronto("a", "b", ratings, false, () => Math.random(), participacao);
+    expect(confronto.partidasDoJogador).toHaveLength(1);
+  });
+
+  it("ida e volta: 2 partidas em partidasDoJogador (uma por perna)", () => {
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+    const confronto = resolverConfronto("a", "b", ratings, true, () => Math.random(), participacao);
+    expect(confronto.partidasDoJogador).toHaveLength(2);
+  });
+
+  it("sem participacaoJogador, partidasDoJogador fica ausente", () => {
+    const confronto = resolverConfronto("a", "b", ratings, true, () => Math.random());
+    expect(confronto.partidasDoJogador).toBeUndefined();
+  });
+
+  it("clube do jogador fora do confronto: partidasDoJogador fica ausente", () => {
+    const participacao: ParticipacaoJogadorClube = { clubeId: "outro_clube", jogador, estiloTecnico: "equilibrado" };
+    const confronto = resolverConfronto("a", "b", ratings, true, () => Math.random(), participacao);
+    expect(confronto.partidasDoJogador).toBeUndefined();
+  });
+});
+
+describe("simularMataMataComEtapas com participação do jogador", () => {
+  const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+  const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+
+  it("propaga a participação em todas as etapas em que o clube do jogador segue vivo", () => {
+    const etapas: EtapaMataMata[] = [
+      { nome: "semifinal", ida_e_volta: false, entrantes: ["a", "b", "c", "d"] },
+      { nome: "final", ida_e_volta: false },
+    ];
+    // random baixo favorece força maior — jogador com finalizacao muito alta tende a levar "a" adiante
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+    const resultado = simularMataMataComEtapas(etapas, ratings, () => 0.1, participacao);
+
+    const confrontoSemifinalDoA = resultado.etapas[0].confrontos.find((c) => c.timeA === "a" || c.timeB === "a")!;
+    expect(confrontoSemifinalDoA.partidasDoJogador).toHaveLength(1);
   });
 });

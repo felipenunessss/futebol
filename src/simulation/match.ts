@@ -88,6 +88,30 @@ export interface ParticipacaoJogador {
   estiloTecnico: EstiloTecnico;
 }
 
+/**
+ * Mesma ideia de `ParticipacaoJogador`, mas em nível de clube (sem "lado"
+ * fixo) — usada por quem orquestra várias partidas do mesmo clube ao longo
+ * de uma competição (`season.ts`, `groups.ts`, `knockout.ts`, `swiss.ts`),
+ * que só sabem o lado de cada confronto específico na hora de montá-lo.
+ */
+export interface ParticipacaoJogadorClube {
+  clubeId: string;
+  jogador: Jogador;
+  estiloTecnico: EstiloTecnico;
+}
+
+/** Deriva a `ParticipacaoJogador` (com lado) de um confronto específico, ou `undefined` se o clube do jogador não está nesse confronto. */
+export function participacaoNoConfronto(
+  participacao: ParticipacaoJogadorClube | undefined,
+  mandante: string,
+  visitante: string,
+): ParticipacaoJogador | undefined {
+  if (!participacao) return undefined;
+  if (participacao.clubeId === mandante) return { lado: "casa", jogador: participacao.jogador, estiloTecnico: participacao.estiloTecnico };
+  if (participacao.clubeId === visitante) return { lado: "fora", jogador: participacao.jogador, estiloTecnico: participacao.estiloTecnico };
+  return undefined;
+}
+
 const CHANCES_BASE_POR_PARTIDA = 10;
 /** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.3 = até 80%/20% num duelo muito dominante). */
 const VANTAGEM_MAXIMA_DE_MEIO = 0.3;

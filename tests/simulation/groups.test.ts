@@ -7,6 +7,8 @@ import {
   simularFaseQuadrangularDoFormato,
 } from "../../src/simulation/groups.js";
 import type { FaseGrupos, FaseQuadrangular } from "../../src/schemas/championship.js";
+import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
+import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
 
 describe("dividirEmGruposPorForca", () => {
   const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -94,5 +96,31 @@ describe("simularFaseQuadrangularDoFormato", () => {
   it("lança erro se formato.ativa for false", () => {
     const inativo: FaseQuadrangular = { ...formato, ativa: false };
     expect(() => simularFaseQuadrangularDoFormato(inativo, times, ratings)).toThrow(/ativa/);
+  });
+});
+
+describe("simularFaseDeGrupos com participação do jogador", () => {
+  const grupos = [
+    { nome: "Grupo A", times: ["a", "b", "c", "d"] },
+    { nome: "Grupo B", times: ["e", "f", "g", "h"] },
+  ];
+  const ratings = Object.fromEntries(grupos.flatMap((g) => g.times).map((t) => [t, 1600]));
+  const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+
+  it("só o grupo que contém o clube do jogador ganha partidasDoJogador", () => {
+    const participacao: ParticipacaoJogadorClube = { clubeId: "e", jogador, estiloTecnico: "equilibrado" }; // está no Grupo B
+    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random(), participacao);
+
+    const grupoA = resultado.grupos.find((g) => g.nome === "Grupo A")!;
+    const grupoB = resultado.grupos.find((g) => g.nome === "Grupo B")!;
+
+    expect(grupoA.partidasDoJogador).toBeUndefined();
+    expect(grupoB.partidasDoJogador).toBeDefined();
+    expect(grupoB.partidasDoJogador!.length).toBeGreaterThan(0);
+  });
+
+  it("sem participacaoJogador, nenhum grupo tem partidasDoJogador", () => {
+    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
+    for (const grupo of resultado.grupos) expect(grupo.partidasDoJogador).toBeUndefined();
   });
 });

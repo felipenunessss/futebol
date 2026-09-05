@@ -1,5 +1,5 @@
 import type { FaseUnica } from "../schemas/championship.js";
-import { gerarPerfilTime, simularPartida } from "./match.js";
+import { gerarPerfilTime, participacaoNoConfronto, simularPartida, type ParticipacaoJogadorClube, type ResultadoPartida } from "./match.js";
 
 /**
  * Confrontos e tabela de uma temporada de pontos corridos — o formato mais
@@ -68,10 +68,17 @@ export interface LinhaTabela {
   saldoDeGols: number;
 }
 
+export interface PartidaDoJogador {
+  confronto: Confronto;
+  resultado: ResultadoPartida;
+}
+
 export interface ResultadoTemporadaPontosCorridos {
   confrontos: Confronto[];
   /** Ordenada por pontos, saldo de gols, gols pró — mesmo critério clássico de desempate. */
   tabela: LinhaTabela[];
+  /** Só presente quando `participacaoJogador` foi passado — uma entrada por partida do clube dele, na ordem em que aconteceram. */
+  partidasDoJogador?: PartidaDoJogador[];
 }
 
 /** Exportado pra outros geradores de confronto (ex: `swiss.ts`) montarem tabela sem duplicar essa lógica. */
@@ -98,35 +105,44 @@ export function atualizarLinha(linha: LinhaTabela, golsFeitos: number, golsSofri
 }
 
 /**
- * Simula uma temporada inteira de pontos corridos (Camada 1 — nenhum time é
- * o do jogador; pra incluir o clube do jogador, resolva as partidas dele à
- * parte com `ParticipacaoJogador` e substitua o resultado antes de montar a
- * tabela). `ratings` precisa ter uma entrada por clube em `times` — ver
- * `obterRating` em `simulation/rating.ts`.
+ * Simula uma temporada inteira de pontos corridos. Se `participacaoJogador`
+ * for passado, as partidas do clube dele usam `ParticipacaoJogador` (Camada
+ * 2 — chance individual resolvida por atributo) em vez do duelo agregado;
+ * o resto da temporada continua Camada 1. `ratings` precisa ter uma
+ * entrada por clube em `times` — ver `obterRating` em `simulation/rating.ts`.
  */
 export function simularTemporadaPontosCorridos(
   times: string[],
   ratings: Record<string, number>,
   idaEVolta: boolean,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoTemporadaPontosCorridos {
   const confrontos = gerarConfrontosPontosCorridos(times, idaEVolta);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
+  const partidasDoJogador: PartidaDoJogador[] = [];
 
   for (const confronto of confrontos) {
     const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
     const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
-    const resultado = simularPartida(perfilMandante, perfilVisitante, random);
+    const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
+    const resultado = simularPartida(perfilMandante, perfilVisitante, random, participacao);
 
     atualizarLinha(tabela.get(confronto.mandante)!, resultado.golsCasa, resultado.golsFora);
     atualizarLinha(tabela.get(confronto.visitante)!, resultado.golsFora, resultado.golsCasa);
+
+    if (participacao) partidasDoJogador.push({ confronto, resultado });
   }
 
   const tabelaOrdenada = [...tabela.values()].sort(
     (a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro,
   );
 
-  return { confrontos, tabela: tabelaOrdenada };
+  return {
+    confrontos,
+    tabela: tabelaOrdenada,
+    ...(participacaoJogador ? { partidasDoJogador } : {}),
+  };
 }
 
 export interface ResultadoFaseUnica extends ResultadoTemporadaPontosCorridos {
@@ -146,11 +162,12 @@ export function simularFaseUnicaDoFormato(
   times: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFaseUnica {
-  const { confrontos, tabela } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random);
+  const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random, participacaoJogador);
   const classificados = tabela.slice(0, formato.classificam_proxima_fase).map((linha) => linha.clubeId);
 
-  return { confrontos, tabela, classificados };
+  return { confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) };
 }
 
 /**

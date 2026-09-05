@@ -1,6 +1,6 @@
 import type { FaseSuica } from "../schemas/championship.js";
-import { gerarPerfilTime, simularPartida } from "./match.js";
-import { atualizarLinha, linhaVazia, type Confronto, type LinhaTabela } from "./season.js";
+import { gerarPerfilTime, participacaoNoConfronto, simularPartida, type ParticipacaoJogadorClube } from "./match.js";
+import { atualizarLinha, linhaVazia, type Confronto, type LinhaTabela, type PartidaDoJogador } from "./season.js";
 
 /**
  * Gerador/simulador de fase suíça (`formato.fase_suica`, ver
@@ -114,6 +114,8 @@ export interface ResultadoFaseSuica {
   tabela: LinhaTabela[];
   /** Top `classificam_mata_mata` da tabela. */
   classificados: string[];
+  /** Só presente quando `participacaoJogador` foi passado — uma entrada por partida do clube dele. */
+  partidasDoJogador?: PartidaDoJogador[];
 }
 
 export function simularFaseSuica(
@@ -121,17 +123,22 @@ export function simularFaseSuica(
   formato: FaseSuica,
   ratings: Record<string, number>,
   random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
 ): ResultadoFaseSuica {
   const confrontos = gerarConfrontosFaseSuica(times, formato, random);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
+  const partidasDoJogador: PartidaDoJogador[] = [];
 
   for (const confronto of confrontos) {
     const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
     const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
-    const resultado = simularPartida(perfilMandante, perfilVisitante, random);
+    const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
+    const resultado = simularPartida(perfilMandante, perfilVisitante, random, participacao);
 
     atualizarLinha(tabela.get(confronto.mandante)!, resultado.golsCasa, resultado.golsFora);
     atualizarLinha(tabela.get(confronto.visitante)!, resultado.golsFora, resultado.golsCasa);
+
+    if (participacao) partidasDoJogador.push({ confronto, resultado });
   }
 
   const tabelaOrdenada = [...tabela.values()].sort(
@@ -142,5 +149,6 @@ export function simularFaseSuica(
     confrontos,
     tabela: tabelaOrdenada,
     classificados: tabelaOrdenada.slice(0, formato.classificam_mata_mata).map((linha) => linha.clubeId),
+    ...(participacaoJogador ? { partidasDoJogador } : {}),
   };
 }
