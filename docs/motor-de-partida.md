@@ -182,6 +182,103 @@ correspondente) — migrar esses clubes pra `brasil.json` fica de fora
 do escopo desta tarefa (é reorganização de dado, não pesquisa de
 rating).
 
+### 1.3. Pendência de dados — resolvida parcialmente (2ª divisões CONMEBOL)
+
+**Fonte usada**: mesma da seção 1.1/1.2 — [clubelo.com](https://clubelo.com)
+(Club Elo), tabela por país embutida no HTML (fetch de `clubelo.com/<País>`,
+processado por modelo), snapshot do dia **2026-09-05**. Escala nativa,
+sem reescala. Casos de risco (nomes truncados, entradas duplicadas)
+reconferidos com consulta separada à página do clube individual (slug
+`clubelo.com/<slug>`), da mesma forma que nas rodadas anteriores.
+
+**Cobertura por competição** (clubes com `rating_inicial` populado / total
+de clubes na competição):
+
+| Competição | Confirmados |
+|---|---|
+| Argentina — Primera Nacional | 36/36 |
+| Chile — Liga de Ascenso | 2/16 |
+| Colômbia — Primera B | 2/16 |
+| Equador — Serie B | 2/12 |
+| Paraguai — División Intermedia | 2/16 |
+| Peru — Liga 2 | 0/18 |
+| Uruguai — Segunda División Profesional | 3/14 |
+| Venezuela — Segunda División | 0/17 |
+| **Total** | **47/145** |
+
+**Argentina foi a exceção positiva**: a Primera Nacional tem cobertura
+completa (36/36) porque o Club Elo trata as duas zonas da Primera
+Nacional como parte da mesma pirâmide nacional que já rastreia em
+detalhe (mesma fonte que deu 30/30 pra Liga Profesional na seção 1.1;
+o número mudou pra 30 no snapshot desta rodada por atualização normal
+de Elo, não é regressão). As outras 7 competições têm cobertura bem
+mais baixa — o Club Elo só continua rastreando individualmente clubes
+de 2ª divisão que caíram recentemente de 1ª ou têm relevância histórica
+(mesmo padrão da categoria "Lower" documentado na seção 1.2 pro
+Brasileirão Série D); a maioria dos clubes "de baixo" de cada país
+simplesmente não tem entrada na fonte.
+
+**Casos de ambiguidade e não-cobertura documentados**:
+
+- **`san_martin_sj` e `san_martin_tucuman` (Argentina)**: a tabela por
+  país mostra o primeiro truncado como "San Juan" (sem o prefixo "San
+  Martín") — casado por slug (`/san-martin-de-san-juan`) confirmado via
+  página individual do clube. `san_martin_tucuman` casado por slug
+  `/san-martin-de-tucuman`. Sem risco de troca entre os dois: slugs e
+  cidades batem exatamente.
+- **Peru — Liga 2, 0/18 confirmado**: a fonte lista `Binacional`,
+  `Ayacucho FC` e `Alianza Universi[dad]` **cada um duas vezes**, com
+  ratings diferentes (ex: Binacional aparece como 1380 e como "1436p"),
+  sem nenhuma indicação de qual entrada corresponde a qual contexto (a
+  mesma ambiguidade documentada na seção 1.1 pro caso `juan_pablo_ii`,
+  que também aparece na tabela peruana). Não deu pra confirmar via
+  página individual do clube (as tentativas de acessar `/Binacional` e
+  variações caíram na home genérica do site, não numa página dedicada).
+  Sem forma segura de saber qual valor usar — os 3 clubes ficaram sem
+  `rating_inicial`. Os outros 15 clubes da Liga 2 (`academia_cantolao`,
+  `ada_jaen`, `bentin_tacna_heroica`, `carlos_a_mannucci`,
+  `comerciantes_fc`, `deportivo_llacuabamba`, `estudiantil_cni`,
+  `fc_san_marcos`, `pirata_fc`, `santos_fc_pe`, `sport_huancayo_b`,
+  `union_comercio_pe`, `union_minas`, `universidad_cesar_vallejo`,
+  `universidad_san_martin`) simplesmente não têm nenhuma entrada na
+  fonte — `comerciantes_fc` (Comerciantes FC, Iquitos) foi checado
+  contra "Comerciantes Uni" da fonte (Nível 1) e confirmado ser clube
+  diferente (Comerciantes Unidos), não usado. `sport_huancayo_b` (time
+  reserva) não tem entrada própria — só o time principal (Nível 1)
+  aparece na fonte, então nada foi atribuído (regra do time B/reserva
+  só usar rating se a fonte tiver entrada específica pra ele).
+- **Venezuela — Segunda División, 0/17 confirmado — fonte inacessível
+  nesta rodada**: diferente da seção 1.1 (onde a Liga FUTVE saiu 14/14
+  no snapshot de 2026-09-04), desta vez o fetch de `clubelo.com/Venezuela`
+  consistentemente devolveu a página geral do site truncada **antes**
+  de chegar na seção da Venezuela (a ordenação de países na página
+  parece ser por força/Elo agregado, não alfabética, e o conteúdo
+  processado corta sempre depois de "Sweden", bem antes de "Venezuela"
+  — confirmado pedindo explicitamente a lista de todos os países
+  presentes no conteúdo recebido, em múltiplas tentativas). Tentativas
+  alternativas: API dedicada (`api.clubelo.com`) segue inacessível
+  (mesmo timeout de rede da seção 1.1); `clubelo.com/VEN` (código do
+  país) carrega uma página *diferente* da Venezuela (resultados de
+  partida e estatísticas cabeça-a-cabeça contra outras seleções/países),
+  não a tabela de ranking de clubes por nível — não tinha rating
+  utilizável ali. Não é falta de busca, é limitação real de acesso à
+  fonte nesta janela de tempo — fica pra uma próxima rodada tentar de
+  novo (o tamanho da página cresce com o tempo, pode voltar a caber ou
+  pode ser preciso outra estratégia de fetch).
+- **Chile, Colômbia, Equador, Paraguai, Uruguai**: nenhuma ambiguidade
+  nos casos confirmados — nomes batem exatamente ou de forma óbvia
+  (ex: "Iquique" = `deportes_iquique`, "Envigado" = `envigado_fc`,
+  "Vinotinto" = `vinotinto_ecuador`, "General Cabañero" truncado =
+  `general_caballero_jlm` confirmado por slug `/General-Caballer`). Os
+  clubes restantes de cada uma dessas competições não têm entrada na
+  fonte — cobertura baixa de 2ª divisão é o esperado, não indica erro
+  de busca.
+
+**Cobertura fora do escopo desta rodada**: Bolívia não tem 2ª divisão
+modelada (fora do projeto). Copa do Brasil, Libertadores/Sul-Americana,
+estaduais brasileiros e qualquer outra pendência continuam de fora,
+como já documentado nas seções 1.1/1.2.
+
 ## 2. Motor de partida — duelo por zona (estilo FM/Brasfoot)
 
 Nenhum clube (fora o do jogador) tem elenco persistido — a força de cada
