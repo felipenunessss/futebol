@@ -75,7 +75,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1563
   },
   {
     "id": "gremio_prudente",
@@ -95,7 +96,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1534
   },
   {
     "id": "ituano",
@@ -107,7 +109,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1490
   },
   {
     "id": "juventus_sp",

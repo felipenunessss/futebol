@@ -19,7 +19,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1510
   },
   {
     "id": "guarany_bage",
@@ -71,7 +72,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1489
   },
   {
     "id": "aimore",

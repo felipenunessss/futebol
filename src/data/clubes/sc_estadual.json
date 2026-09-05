@@ -10,7 +10,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1554
   },
   {
     "id": "carlos_renaux",
@@ -45,7 +46,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1534
   },
   {
     "id": "camboriu_fc",
@@ -86,6 +88,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 3
-    }
+    },
+    "rating_inicial": 1483
   }
 ]
