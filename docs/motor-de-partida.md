@@ -108,6 +108,80 @@ pesquisa se algum dia for necessário): 2ª divisões de todos os países,
 Copa do Brasil, Libertadores/Sul-Americana, e qualquer campeonato estadual
 brasileiro — todos continuam usando só o fallback de `calcularRatingFallback`.
 
+### 1.2. Pendência de dados — resolvida parcialmente (Série B, C e D)
+
+**Fonte usada**: mesma da seção 1.1 — [clubelo.com](https://clubelo.com)
+(Club Elo), tabela por país embutida no HTML de `clubelo.com/Brazil`,
+desta vez com snapshot do dia **2026-09-05**. Escala nativa do Club Elo,
+sem reescala. Nesta rodada a extração foi feita via fetch de página
+processado por modelo (não parsing bruto do HTML como na 1.1); pra
+mitigar risco de erro de transcrição de número, cada valor "de risco"
+(nomes truncados, clubes com rating idêntico ao vizinho, nomes
+ambíguos) foi reconferido com uma consulta separada à página do clube
+individual (`clubelo.com/<slug>`), conferindo o link/slug bruto (ex:
+`/athletic-mg`, `/cr-brasil-al`, `/operario-ferroviario-pr`) pra
+confirmar identidade, não só o nome de exibição.
+
+Nota: os valores de Série A obtidos neste mesmo snapshot (2026-09-05)
+vieram visivelmente diferentes dos da seção 1.1 (ex: Flamengo 1860 vs
+1839) — Elo muda a cada partida jogada, e há rodadas do Brasileirão
+entre os dois snapshots (2026-09-04 → 2026-09-05); isso é esperado e
+**não foi usado pra sobrescrever nada da Série A**, já coberta e fora
+do escopo desta rodada.
+
+**Cobertura por competição** (clubes com `rating_inicial` populado /
+total de clubes na competição):
+
+| Competição | Confirmados |
+|---|---|
+| Brasileirão Série B | 20/20 |
+| Brasileirão Série C | 20/20 |
+| Brasileirão Série D | 4/96 |
+| **Total desta rodada** | **44/136** |
+
+**Cobertura da Série D é baixa por limitação real da fonte, não por
+falta de busca**: a tabela por país do Club Elo pra Brasil só lista
+Level 1 (20, Série A), Level 2 (20, Série B), Level 3 (20, Série C) e
+uma categoria "Lower" com só um punhado de clubes adicionais que a
+fonte ainda rastreia por terem caído recentemente de divisão mais alta
+— nesta rodada, exatamente 4: **CSA**, **Retrô**, **ABC** (RN) e
+**Tombense**. Os outros 92 clubes da Série D (a maioria nunca disputou
+Série C ou fez pouca campanha continental/nacional relevante) não têm
+nenhuma entrada na fonte — confirmado testando reconsultas exaustivas
+à mesma página pedindo "todo clube brasileiro além dos 60 primeiros".
+Ficam sem `rating_inicial`, usando o fallback.
+
+**Casos de ambiguidade resolvidos**:
+
+- **`mac` (Maranhão Atlético Clube, Série C)**: casado com a entrada
+  "Maranhao" (código `MAR`) da fonte, rating 1522 — nome de exibição
+  da fonte bate com o nome oficial completo do clube ("Maranhão"), e é
+  o único clube do estado do Maranhão presente na Série C (os outros
+  clubes maranhenses da base — Moto Club, IAPE, Sampaio Corrêa-MA,
+  Imperatriz — estão na Série D e não aparecem na tabela da fonte, sem
+  risco de confundir um com o outro).
+- **`abc_rn` (Série D)**: casado com a entrada "ABC" da fonte (sem
+  sufixo de estado) — único clube "ABC" na base, tradicional o
+  suficiente pra Club Elo não precisar de sufixo.
+- **Ratings coincidentes entre clubes diferentes** (ex: `brusque_fc`,
+  `inter_de_limeira` e `maringa_fc` todos em 1534; `athletic_club_mg` e
+  `avai` ambos em 1591): reconferido individualmente que não é erro de
+  transcrição — são apenas empates genuínos de Elo arredondado entre
+  clubes de força parecida, cada um confirmado por slug/código próprio
+  na fonte.
+
+**Nota estrutural encontrada durante a pesquisa** (não é bug, só
+documentando pra quem for mexer de novo): nem todo clube de Série
+B/C/D mora em `src/data/clubes/brasil.json` — vários (ex:
+`botafogo_sp`, `sao_bernardo`, `ferroviaria`, `abc_rn`, `csa`, `retro`,
+e boa parte dos clubes de Série D) ainda estão cadastrados só no
+`<uf>_estadual.json` do seu estado, apesar de já jogarem competição
+nacional. O campo `rating_inicial` foi adicionado no arquivo onde o
+clube efetivamente mora hoje (`brasil.json` ou o `_estadual.json`
+correspondente) — migrar esses clubes pra `brasil.json` fica de fora
+do escopo desta tarefa (é reorganização de dado, não pesquisa de
+rating).
+
 ## 2. Motor de partida — duelo por zona (estilo FM/Brasfoot)
 
 Nenhum clube (fora o do jogador) tem elenco persistido — a força de cada
