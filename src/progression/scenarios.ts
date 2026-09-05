@@ -136,6 +136,50 @@ export function filtrarCenariosElegiveis(cenarios: Cenario[], contexto: Contexto
   return cenarios.filter((cenario) => cenarioElegivel(cenario, contexto));
 }
 
+/**
+ * Mapeia o `periodo` (string livre, ver `PeriodoCalendario` em
+ * `schemas/calendar.ts`/`data/loaders/calendario.ts`) pro `MomentoDeCarreira`
+ * mais próximo. Não importa nada de `data/loaders` de propósito — o tipo do
+ * campo já é só `string`, então este módulo de progressão não precisa
+ * depender do módulo de dados de calendário.
+ *
+ * **Limitação real, documentada**: o calendário padrão brasileiro tem só 5
+ * períodos, e o último (`"mai-nov"`) cobre 7 meses inteiros — de maio até
+ * novembro, incluindo tanto o meio da temporada quanto a reta final de
+ * verdade (rodadas finais do Brasileirão/Libertadores em outubro-novembro).
+ * Não dá pra distinguir isso só pelo nome do período; por isso período
+ * nenhum aqui mapeia pra `"reta_final"` — quem sabe a rodada/fase exata
+ * (não só o mês) deve usar `momentoPorProgresso` em vez deste, que é mais
+ * preciso pra decidir reta final. Período desconhecido cai no padrão
+ * permissivo `"temporada_regular"`.
+ */
+export function momentoDoPeriodo(periodo: string): MomentoDeCarreira {
+  const momentoPorPeriodo: Record<string, MomentoDeCarreira> = {
+    "jan-1a_quinz": "pre_temporada", // ainda dentro da janela de transferência/pré-temporada real, mesmo com os primeiros jogos de estadual já rolando
+    fev: "temporada_regular",
+    mar: "temporada_regular",
+    abr: "temporada_regular",
+    "mai-nov": "temporada_regular",
+  };
+
+  return momentoPorPeriodo[periodo] ?? "temporada_regular";
+}
+
+/**
+ * Deriva o momento a partir do progresso da temporada (`0` = início da
+ * pré-temporada, `1` = fim, depois de tudo decidido) — mais preciso que
+ * `momentoDoPeriodo` pra decidir `"reta_final"`, que não é um mês fixo
+ * (depende do formato/tamanho de cada competição, varia por país). Útil
+ * pra quem já sabe em que rodada/fase da temporada está, não só em que mês
+ * do calendário.
+ */
+export function momentoPorProgresso(progresso: number): MomentoDeCarreira {
+  if (progresso <= 0) return "pre_temporada";
+  if (progresso >= 1) return "pos_temporada";
+  if (progresso >= 0.85) return "reta_final";
+  return "temporada_regular";
+}
+
 export interface EscolhaResolvida {
   opcao: Opcao;
   resultado: ResultadoPossivel;

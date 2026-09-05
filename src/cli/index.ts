@@ -1,3 +1,4 @@
+import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../data/loaders/index.js";
 import { simularTemporada } from "../simulation/engine.js";
 import { simularMataMataDoFormato, type ResultadoMataMata } from "../simulation/knockout.js";
@@ -7,6 +8,7 @@ import {
   CENARIOS,
   aplicarImpacto,
   filtrarCenariosElegiveis,
+  momentoDoPeriodo,
   resolverEscolha,
   sortearCenario,
   type ContextoSorteio,
@@ -174,9 +176,14 @@ function simularCenario(): void {
 
 /**
  * Demonstra o ciclo de carreira de ponta a ponta: cria um jogador, simula
- * uma partida real dele (clube vs. rival, com ParticipacaoJogador),
- * aplica o XP ganho, dispara um cenário de carreira e aplica o impacto —
- * o mesmo ciclo descrito em game-design.md seção 6.
+ * uma partida real dele (clube vs. rival, com ParticipacaoJogador), aplica
+ * o XP ganho, e percorre os **períodos reais do calendário da temporada**
+ * (`data/loaders/calendario.ts`) sorteando um cenário elegível em cada um —
+ * o momento (`pre_temporada`/`temporada_regular`/etc) vem de
+ * `momentoDoPeriodo(periodo.periodo)`, não de um valor fixo, então o
+ * catálogo elegível muda de período pra período (ex: propostas de clube
+ * grande só aparecem no período `jan-1a_quinz`, mapeado pra
+ * `pre_temporada`) — o mesmo ciclo descrito em game-design.md seção 6.
  */
 function simularCarreira(): void {
   const clubeId = "corinthians";
@@ -210,20 +217,26 @@ function simularCarreira(): void {
   console.log(`Gols: ${desempenho.gols} | Assistências: ${desempenho.assistencias} | Chances perdidas: ${desempenho.chancesPerdidas}`);
   console.log(`Overall após a partida: ${overallAtual(estado)}\n`);
 
-  const contextoCenario: ContextoSorteio = {
-    idadeJogador: estado.jogador.idade,
-    reputacaoNacional: estado.reputacao.nacional,
-    reputacaoRegional: estado.reputacao.porRegiao[regiaoAtual] ?? 0,
-    moral: estado.moral,
-    relacoesInternas: estado.relacoesInternas,
-    momento: "temporada_regular", // acabou de jogar uma partida real, não é pré/pós-temporada
-  };
-  const cenario = sortearCenario(filtrarCenariosElegiveis(CENARIOS, contextoCenario));
-  const opcaoEscolhida = cenario.opcoes[0];
-  const escolha = resolverEscolha(opcaoEscolhida);
-  console.log(`--- Cenário: ${cenario.titulo} ---`);
-  console.log(`Escolha: "${opcaoEscolhida.texto}" -> ${escolha.resultado.impacto.narrativa}`);
-  estado = aplicarImpactoDeCenario(estado, escolha.resultado.impacto, regiaoAtual);
+  console.log(`--- Cenários da temporada (um sorteio por período do calendário) ---`);
+  for (const periodo of construirCalendarioPadrao(estado.temporada).calendario) {
+    const momento = momentoDoPeriodo(periodo.periodo);
+    const contextoCenario: ContextoSorteio = {
+      idadeJogador: estado.jogador.idade,
+      reputacaoNacional: estado.reputacao.nacional,
+      reputacaoRegional: estado.reputacao.porRegiao[regiaoAtual] ?? 0,
+      moral: estado.moral,
+      relacoesInternas: estado.relacoesInternas,
+      momento,
+    };
+    const elegiveis = filtrarCenariosElegiveis(CENARIOS, contextoCenario);
+    const cenario = sortearCenario(elegiveis);
+    const opcaoEscolhida = cenario.opcoes[0];
+    const escolha = resolverEscolha(opcaoEscolhida);
+    estado = aplicarImpactoDeCenario(estado, escolha.resultado.impacto, regiaoAtual);
+
+    console.log(`[${periodo.periodo} / ${momento}, ${elegiveis.length}/${CENARIOS.length} elegíveis] ${cenario.titulo} -> "${opcaoEscolhida.texto}" -> ${escolha.resultado.impacto.narrativa}`);
+  }
+  console.log();
 
   estado = avancarTemporada(estado, regiaoAtual);
 

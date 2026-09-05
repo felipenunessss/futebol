@@ -626,6 +626,25 @@ de condições de gatilho abaixo) e demo via `npx tsx src/cli/index.ts cenario`.
   o caso de quem ainda não ligou isso ao calendário. Demo via
   `npx tsx src/cli/index.ts cenario [momento]` (ex: `cenario pre_temporada`)
   mostra quantos dos 200 cenários ficam elegíveis pro momento escolhido.
+- **Momento ligado ao calendário real** (`momentoDoPeriodo`,
+  `momentoPorProgresso`, ambos em `progression/scenarios.ts`):
+  `momentoDoPeriodo(periodo)` mapeia o `periodo` (string livre de
+  `PeriodoCalendario`) pro `MomentoDeCarreira` mais próximo — hoje só
+  `"jan-1a_quinz"` vira `pre_temporada` (ainda dentro da janela de
+  transferência real, mesmo com os primeiros jogos de estadual já
+  rolando), o resto (`fev`/`mar`/`abr`/`mai-nov`) vira `temporada_regular`.
+  **Limitação real, não escondida**: o período `"mai-nov"` sozinho cobre 7
+  meses — de meio de temporada a reta final de verdade (rodadas finais de
+  Brasileirão/Libertadores em out-nov) — e o calendário padrão não tem
+  granularidade pra distinguir isso, então nenhum período mapeia pra
+  `"reta_final"` hoje. Pra quem já sabe a rodada/fase exata (não só o mês),
+  `momentoPorProgresso(progresso 0-1)` é mais preciso (`>= 0.85` já conta
+  como reta final). `src/cli/index.ts` `carreira` usa `momentoDoPeriodo`
+  de verdade: percorre os períodos de `construirCalendarioPadrao` da
+  temporada do jogador e sorteia um cenário elegível em cada um, mostrando
+  o catálogo elegível mudar de tamanho por período (ex: só ~72/200
+  elegíveis em `jan-1a_quinz`/`pre_temporada` contra ~123/200 no resto do
+  ano, na prática — os números variam com o estado do jogador).
   **Reclassificação concluída**: dos 200 cenários do catálogo, 146 têm
   `gatilho` definido (idade/reputação/moral/relações/momento, conforme o
   que cada narrativa pressupõe — ex: convocação de seleção exige
@@ -693,9 +712,17 @@ as competições ativas em algum período do ano e simula cada uma.
   mecanismo implementado e catálogo reclassificado (`Gatilho`/
   `ContextoSorteio`/`cenarioElegivel`/`filtrarCenariosElegiveis`, ver seção
   4) — 146/200 cenários têm `gatilho`, os outros 54 ficam elegíveis sempre
-  por decisão deliberada (são atemporais). **Ainda falta**: ligar
-  `ContextoSorteio.momento` a um calendário/game loop de verdade — hoje
-  quem chama define o momento manualmente (ex: `src/cli/index.ts`).
+  por decisão deliberada (são atemporais). `ContextoSorteio.momento` já
+  vem do calendário real via `momentoDoPeriodo`/`momentoPorProgresso`
+  (`src/cli/index.ts` `carreira` percorre os períodos de
+  `construirCalendarioPadrao` de verdade, não é mais um valor fixo).
+  **Ainda falta**: isso só está ligado na demo da CLI — não existe ainda
+  um "game loop" de carreira de verdade que persista `EstadoDeCarreira`
+  automaticamente através de uma temporada inteira (ver pendência
+  separada abaixo, "Estado de carreira não persiste entre temporadas via
+  `engine.ts`") nem que distinga `reta_final` de fato dentro do período
+  `"mai-nov"` (a granularidade do calendário padrão não permite isso hoje
+  — ver seção 4).
 - **Fórmulas exatas**: `K` do Elo por tipo de partida, curva exata de XP
   por atributo, pesos do duelo de zona (quanto o atributo do jogador pesa
   vs. o perfil gerado do resto do time) — hoje é desenho conceitual, as

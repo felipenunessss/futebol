@@ -4,6 +4,8 @@ import {
   aplicarImpacto,
   cenarioElegivel,
   filtrarCenariosElegiveis,
+  momentoDoPeriodo,
+  momentoPorProgresso,
   resolverEscolha,
   sortearCenario,
   type Cenario,
@@ -223,5 +225,35 @@ describe("cenarioElegivel / filtrarCenariosElegiveis", () => {
     const cenario = CENARIOS.find((c) => c.id === "proposta_clube_grande")!;
     expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "reta_final" })).toBe(false);
     expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "pre_temporada" })).toBe(true);
+  });
+});
+
+describe("momentoDoPeriodo", () => {
+  it("mapeia os 5 períodos do calendário padrão real", () => {
+    expect(momentoDoPeriodo("jan-1a_quinz")).toBe("pre_temporada");
+    expect(momentoDoPeriodo("fev")).toBe("temporada_regular");
+    expect(momentoDoPeriodo("mar")).toBe("temporada_regular");
+    expect(momentoDoPeriodo("abr")).toBe("temporada_regular");
+    expect(momentoDoPeriodo("mai-nov")).toBe("temporada_regular");
+  });
+
+  it("período desconhecido cai no padrão permissivo temporada_regular", () => {
+    expect(momentoDoPeriodo("periodo-que-nao-existe")).toBe("temporada_regular");
+  });
+});
+
+describe("momentoPorProgresso", () => {
+  it("extremos: 0 é pré-temporada, 1 é pós-temporada", () => {
+    expect(momentoPorProgresso(0)).toBe("pre_temporada");
+    expect(momentoPorProgresso(1)).toBe("pos_temporada");
+  });
+
+  it("progresso alto (>= 0.85) é reta final", () => {
+    expect(momentoPorProgresso(0.85)).toBe("reta_final");
+    expect(momentoPorProgresso(0.99)).toBe("reta_final");
+  });
+
+  it("progresso intermediário é temporada regular", () => {
+    expect(momentoPorProgresso(0.5)).toBe("temporada_regular");
   });
 });
