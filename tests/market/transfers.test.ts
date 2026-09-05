@@ -51,30 +51,59 @@ describe("gerarProposta", () => {
 });
 
 describe("selecionarClubesInteressados", () => {
+  const jogadorDecente = { overall: 70, idade: 27, reputacaoNacional: 30 }; // ratingDeInteresse ~1830, alcança até ~1980
+
   it("nunca inclui o próprio clube atual", () => {
     const clubes = [clube("atual", { forca_financeira: "alta", rating_inicial: 1600 }), clube("b", { forca_financeira: "alta", rating_inicial: 1600 })];
-    const interessados = selecionarClubesInteressados(clubes, "atual", 100_000, { random: () => 0.5 });
+    const interessados = selecionarClubesInteressados(clubes, "atual", jogadorDecente, { random: () => 0.5 });
     expect(interessados.map((c) => c.id)).not.toContain("atual");
   });
 
   it("não inclui clube com rating menor que o atual", () => {
     const clubeAtual = clube("atual", { rating_inicial: 1800 });
     const clubeFraco = clube("fraco", { rating_inicial: 1200, forca_financeira: "muito_alta" });
-    const interessados = selecionarClubesInteressados([clubeAtual, clubeFraco], "atual", 0, { random: () => 0.5 });
+    const interessados = selecionarClubesInteressados([clubeAtual, clubeFraco], "atual", jogadorDecente, { random: () => 0.5 });
     expect(interessados.map((c) => c.id)).not.toContain("fraco");
   });
 
   it("não inclui clube que não pode bancar o valor de mercado do jogador", () => {
+    const jogadorCaro = { overall: 90, idade: 27, reputacaoNacional: 80 };
     const clubeAtual = clube("atual", { rating_inicial: 1600 });
     const clubePobre = clube("pobre", { rating_inicial: 1600, forca_financeira: "muito_baixa" });
-    const interessados = selecionarClubesInteressados([clubeAtual, clubePobre], "atual", 100_000_000, { random: () => 0.5 });
+    const interessados = selecionarClubesInteressados([clubeAtual, clubePobre], "atual", jogadorCaro, { random: () => 0.5 });
     expect(interessados.map((c) => c.id)).not.toContain("pobre");
   });
 
   it("respeita quantidadeMaxima", () => {
     const clubeAtual = clube("atual", { rating_inicial: 1600 });
     const candidatos = ["b", "c", "d", "e", "f"].map((id) => clube(id, { rating_inicial: 1600, forca_financeira: "alta" }));
-    const interessados = selecionarClubesInteressados([clubeAtual, ...candidatos], "atual", 0, { random: () => 0.5, quantidadeMaxima: 2 });
+    const interessados = selecionarClubesInteressados([clubeAtual, ...candidatos], "atual", jogadorDecente, { random: () => 0.5, quantidadeMaxima: 2 });
     expect(interessados.length).toBeLessThanOrEqual(2);
+  });
+
+  it("jogador fraco não atrai clube muito mais forte, mesmo sendo upgrade e financeiramente capaz (interesse factível com o desempenho)", () => {
+    const jogadorFraco = { overall: 39, idade: 18, reputacaoNacional: 10 }; // ratingDeInteresse ~1449, alcança até ~1599
+    const clubeAtual = clube("atual", { rating_inicial: 1400 });
+    const clubeGigante = clube("gigante", { rating_inicial: 2000, forca_financeira: "muito_alta" });
+    const interessados = selecionarClubesInteressados([clubeAtual, clubeGigante], "atual", jogadorFraco, { random: () => 0.5 });
+    expect(interessados.map((c) => c.id)).not.toContain("gigante");
+  });
+
+  it("jogador bom o bastante atrai clube dentro do alcance, mesmo clube atual sendo fraco", () => {
+    const clubeAtual = clube("atual", { rating_inicial: 1400 });
+    const clubeAlcancavel = clube("alcancavel", { rating_inicial: 1900, forca_financeira: "muito_alta" }); // dentro de ~1980 pro jogadorDecente
+    const interessados = selecionarClubesInteressados([clubeAtual, clubeAlcancavel], "atual", jogadorDecente, { random: () => 0.5 });
+    expect(interessados.map((c) => c.id)).toContain("alcancavel");
+  });
+
+  it("exigirUpgrade: false permite clube com rating menor que o atual (venda forçada)", () => {
+    const clubeAtual = clube("atual", { rating_inicial: 1800 });
+    const clubeMenor = clube("menor", { rating_inicial: 1200, forca_financeira: "muito_alta" });
+
+    const comExigencia = selecionarClubesInteressados([clubeAtual, clubeMenor], "atual", jogadorDecente, { random: () => 0.5 });
+    expect(comExigencia.map((c) => c.id)).not.toContain("menor");
+
+    const semExigencia = selecionarClubesInteressados([clubeAtual, clubeMenor], "atual", jogadorDecente, { random: () => 0.5, exigirUpgrade: false });
+    expect(semExigencia.map((c) => c.id)).toContain("menor");
   });
 });

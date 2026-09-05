@@ -321,8 +321,9 @@ function simularCarreiraLoopCli(): void {
     for (const negociacao of temporada.negociacoesResolvidas) {
       const termos = negociacao.contrapropostaJogador;
       const desfecho = negociacao.resultado.aceito ? "ACEITA" : "recusada";
+      const rotulo = negociacao.tipo === "venda_forcada" ? "venda forçada" : "transferência";
       console.log(
-        `  [transferência] ${nomeDoClube(negociacao.clubeOfertanteId)}: contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
+        `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)}: contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
       );
     }
 

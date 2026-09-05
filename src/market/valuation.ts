@@ -54,3 +54,27 @@ export function calcularValorDeMercado(perfil: PerfilDeMercado): number {
 
   return Math.round(base * multiplicadorIdade * multiplicadorReputacao);
 }
+
+const RATING_BASE = 1000;
+const PONTOS_DE_RATING_POR_OVERALL = 11;
+const PONTOS_DE_RATING_POR_REPUTACAO = 2;
+
+/**
+ * Rating "equivalente" do jogador, na mesma escala tipo Elo dos clubes
+ * (`simulation/rating.ts`, ~1000-2100) — usado por
+ * `market/transfers.ts` `selecionarClubesInteressados` pra garantir que o
+ * interesse de um clube (comprando ou vendendo) seja plausível com o
+ * **desempenho real do jogador** (overall, que é derivado de XP de
+ * partida — não um número solto), não só com o rating do clube atual
+ * dele. Sem isso, um jogador fraco num clube fraco atrairia qualquer
+ * clube "melhor que o atual", incluindo gigantes — o que não faz
+ * sentido. Reputação nacional soma pontos à parte (joga mais visibilidade
+ * pro jogador, mesmo sem uma final de mercado tão alta). Estimativa de
+ * design (mesma ressalva de `calcularValorDeMercado`), calibrada pra ficar
+ * na mesma faixa numérica do rating de clube: rookie overall 39/reputação
+ * 10 fica em ~1449 (nível 2-3), um `overall` 85/reputação 70 fica em
+ * ~2075 (patamar de clube de elite).
+ */
+export function calcularRatingDeInteresse(perfil: PerfilDeMercado): number {
+  return RATING_BASE + perfil.overall * PONTOS_DE_RATING_POR_OVERALL + perfil.reputacaoNacional * PONTOS_DE_RATING_POR_REPUTACAO;
+}

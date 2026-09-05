@@ -1,6 +1,7 @@
 import type { Club, ForcaFinanceira } from "../schemas/club.js";
 import { obterRating } from "../simulation/rating.js";
 import type { MomentoDeCarreira } from "../progression/scenarios.js";
+import { calcularRatingDeInteresse, calcularValorDeMercado, type PerfilDeMercado } from "./valuation.js";
 
 /**
  * Janelas de transferência e teto salarial por clube — ver
@@ -78,28 +79,48 @@ export function gerarProposta(clube: Club, valorDeMercado: number, random: () =>
 export interface OpcoesSelecaoDeInteressados {
   quantidadeMaxima?: number;
   random?: () => number;
+  /**
+   * Se `false`, não exige que o clube interessado tenha rating maior ou
+   * igual ao clube atual — usado pra venda forçada (`career/club-finances.ts`),
+   * onde o clube atual pode aceitar vender pra qualquer comprador capaz de
+   * pagar, não só clubes maiores. Padrão `true` (interesse "de compra"
+   * comum, clube maior sondando o jogador).
+   */
+  exigirUpgrade?: boolean;
 }
 
 const QUANTIDADE_MAXIMA_PADRAO_DE_INTERESSADOS = 3;
 /** Só considera clube cujo teto salarial (em 2 anos, mesma referência de `gerarProposta`) cubra ao menos essa fração do valor de mercado do jogador. */
 const FRACAO_MINIMA_DE_VALOR_DE_MERCADO_COBERTA = 0.5;
+/**
+ * Margem acima do rating "equivalente" do jogador (`calcularRatingDeInteresse`)
+ * que ainda conta como alcançável — mesma unidade de `QUEDA_POR_NIVEL` de
+ * `simulation/rating.ts` (~1 nível de divisão acima do que a qualidade
+ * atual sustentaria, como uma chance de "salto"). Sem esse teto, um
+ * jogador fraco atrairia qualquer clube com rating maior que o do clube
+ * atual dele, incluindo gigantes — o pedido explícito era garantir que
+ * isso fosse factível com o desempenho real do jogador (overall).
+ */
+const MARGEM_DE_RATING_ALCANCAVEL = 150;
 
 /**
- * Seleciona quais clubes demonstram interesse no jogador nesta janela —
- * só considera clube com rating esportivo (`simulation/rating.ts`) igual
- * ou maior que o clube atual (não faz sentido um clube pior tentar
- * "comprar" o jogador nesse modelo simplificado) e que consiga bancar
- * pelo menos uma fração do valor de mercado dele. Embaralha (Fisher-Yates
- * com `random` injetado, pra ficar determinístico em teste) e recorta em
- * `quantidadeMaxima`.
+ * Seleciona quais clubes demonstram interesse no jogador nesta janela.
+ * Três filtros: (1) por padrão, rating esportivo (`simulation/rating.ts`)
+ * igual ou maior que o clube atual (desligável via `exigirUpgrade: false`
+ * pra venda forçada); (2) rating não pode passar muito do que o
+ * **desempenho real do jogador** sustenta (`calcularRatingDeInteresse`,
+ * que vem do overall — derivado de XP de partida, não de rating de
+ * clube), com uma margem de "salto" — impede um jogador fraco atrair
+ * gigantes só porque o clube atual dele é fraco; (3) capacidade
+ * financeira de bancar pelo menos uma fração do valor de mercado dele.
+ * Embaralha (Fisher-Yates com `random` injetado, pra ficar determinístico
+ * em teste) e recorta em `quantidadeMaxima`.
  */
-export function selecionarClubesInteressados(
-  clubes: Club[],
-  clubeAtualId: string,
-  valorDeMercado: number,
-  opcoes: OpcoesSelecaoDeInteressados = {},
-): Club[] {
-  const { quantidadeMaxima = QUANTIDADE_MAXIMA_PADRAO_DE_INTERESSADOS, random = Math.random } = opcoes;
+export function selecionarClubesInteressados(clubes: Club[], clubeAtualId: string, perfil: PerfilDeMercado, opcoes: OpcoesSelecaoDeInteressados = {}): Club[] {
+  const { quantidadeMaxima = QUANTIDADE_MAXIMA_PADRAO_DE_INTERESSADOS, random = Math.random, exigirUpgrade = true } = opcoes;
+
+  const valorDeMercado = calcularValorDeMercado(perfil);
+  const ratingMaximoAlcancavel = calcularRatingDeInteresse(perfil) + MARGEM_DE_RATING_ALCANCAVEL;
 
   const clubeAtual = clubes.find((c) => c.id === clubeAtualId);
   const ratingAtual = clubeAtual ? obterRating(clubeAtual) : 0;
@@ -107,7 +128,8 @@ export function selecionarClubesInteressados(
   const candidatos = clubes.filter(
     (c) =>
       c.id !== clubeAtualId &&
-      obterRating(c) >= ratingAtual &&
+      (!exigirUpgrade || obterRating(c) >= ratingAtual) &&
+      obterRating(c) <= ratingMaximoAlcancavel &&
       tetoSalarialMensal(c) * MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL >= valorDeMercado * FRACAO_MINIMA_DE_VALOR_DE_MERCADO_COBERTA,
   );
 

@@ -57,6 +57,17 @@ export interface Opcao {
    * `resolverEscolha`, como qualquer outra opção.
    */
   disparaNegociacaoReal?: boolean;
+  /**
+   * Marca a opção de "cooperar com a venda" num cenário de venda forçada
+   * (clube precisando de dinheiro, `career/club-finances.ts` `precisaVender`)
+   * — mesmo mecanismo de `disparaNegociacaoReal` (desfecho vem de uma
+   * negociação real, `resultados[0]`/`resultados[último]` servem de
+   * molde), mas os clubes candidatos não precisam ter rating maior que o
+   * atual (um clube desesperado por caixa vende pra qualquer comprador
+   * capaz de pagar, não só clubes maiores — ver `selecionarClubesInteressados`
+   * `exigirUpgrade: false`).
+   */
+  disparaVendaForcada?: boolean;
 }
 
 export interface Cenario {
@@ -4890,6 +4901,31 @@ export const CENARIOS: Cenario[] = [
         texto: "Enviar equipamentos esportivos em vez de comparecer",
         resultados: [
           { probabilidade: 1, impacto: { reputacaoRegional: 6, narrativa: "A doação de equipamentos já ajuda bastante, mesmo sem sua presença." } },
+        ],
+      },
+    ],
+  },
+  {
+    id: "venda_forcada_por_necessidade_financeira",
+    titulo: "O clube precisa vender",
+    descricao: "As contas do clube não fecham, e a diretoria avisa: pra equilibrar o caixa, você é o nome mais valioso do elenco pra negociar.",
+    gatilho: { momentos: ["pre_temporada"] },
+    opcoes: [
+      {
+        id: "aceitar_a_saida",
+        texto: "Aceitar a saída e ajudar o clube a se equilibrar",
+        disparaVendaForcada: true,
+        resultados: [
+          { probabilidade: 0.7, impacto: { relacoesInternas: 10, moral: -5, narrativa: "A diretoria agradece a compreensão — a saída sai rápida e sem desgaste." } },
+          { probabilidade: 0.3, impacto: { relacoesInternas: 5, moral: -20, narrativa: "Mesmo colaborando, a pressa da negociação deixa um gosto amargo — a sensação é de ser descartado." } },
+        ],
+      },
+      {
+        id: "resistir_a_saida",
+        texto: "Resistir e tentar convencer a diretoria a te manter",
+        resultados: [
+          { probabilidade: 0.4, impacto: { relacoesInternas: -10, moral: 10, narrativa: "A diretoria escuta e segura a venda por enquanto, mas o aperto financeiro não desaparece." } },
+          { probabilidade: 0.6, impacto: { relacoesInternas: -20, moral: -15, narrativa: "A diretoria não recua — as contas não fecham de outro jeito, e a relação sai arranhada da conversa." } },
         ],
       },
     ],

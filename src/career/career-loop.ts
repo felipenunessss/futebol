@@ -15,9 +15,10 @@ import {
   type EscolhaResolvida,
   type Opcao,
 } from "../progression/scenarios.js";
-import { calcularValorDeMercado } from "../market/valuation.js";
+import { calcularValorDeMercado, type PerfilDeMercado } from "../market/valuation.js";
 import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressados, type PropostaTransferencia, type TermosDeContrato } from "../market/transfers.js";
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
+import { precisaVender } from "./club-finances.js";
 import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
@@ -43,6 +44,8 @@ export interface CenarioResolvidoNaTemporada {
 
 export interface NegociacaoResolvidaNaTemporada {
   periodo: string;
+  /** "compra" = clube maior demonstrou interesse; "venda_forcada" = o próprio clube atual precisava do dinheiro e aceitou vender pra qualquer comprador capaz de pagar (`career/club-finances.ts` `precisaVender`). */
+  tipo: "compra" | "venda_forcada";
   clubeOfertanteId: string;
   proposta: PropostaTransferencia;
   contrapropostaJogador: TermosDeContrato;
@@ -79,6 +82,45 @@ export interface OpcoesJogarTemporada {
 }
 
 /**
+ * Roda a negociação real com cada clube interessado (compra ou venda
+ * forçada, mesma mecânica pro comprador — o que muda entre os dois casos
+ * é só quem entra na lista de `interessados`, ver `selecionarClubesInteressados`
+ * `exigirUpgrade`), parando no primeiro que aceitar. Registra toda
+ * tentativa (aceita ou não) em `negociacoesResolvidas`.
+ */
+function resolverNegociacaoDeTransferencia(
+  estado: EstadoDeCarreira,
+  interessados: Club[],
+  valorDeMercado: number,
+  tipo: NegociacaoResolvidaNaTemporada["tipo"],
+  periodo: string,
+  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato,
+  random: () => number,
+  negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
+): { estado: EstadoDeCarreira; aceita: boolean } {
+  let estadoAtual = estado;
+
+  for (const clube of interessados) {
+    const proposta = gerarProposta(clube, valorDeMercado, random);
+    const contraproposta = responderProposta(proposta);
+    const fatoresConfianca: FatoresConfianca = {
+      overall: overallAtual(estadoAtual),
+      reputacaoNacional: estadoAtual.reputacao.nacional,
+      concorrentes: interessados.length - 1,
+    };
+    const resultado = negociarTransferencia(proposta, contraproposta, fatoresConfianca, estadoAtual.temporada, random);
+
+    negociacoesResolvidas.push({ periodo, tipo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: contraproposta, resultado });
+
+    if (resultado.aceito && resultado.contrato) {
+      return { estado: assinarContrato(estadoAtual, resultado.contrato), aceita: true };
+    }
+  }
+
+  return { estado: estadoAtual, aceita: false };
+}
+
+/**
  * Joga uma temporada inteira da carreira: simula todas as competições
  * ativas do calendário padrão (`simulation/engine.ts` `simularTemporada`),
  * aplica o XP de cada partida do jogador em ordem (`aplicarDesempenhoPartida`),
@@ -89,15 +131,24 @@ export interface OpcoesJogarTemporada {
  * pro contexto atual.
  *
  * **Cenário e mercado são a mesma coisa, não duas coisas coexistindo**:
- * havendo interesse real de mercado nesse período, o sorteio prioriza um
- * cenário "de transferência" (`Opcao.disparaNegociacaoReal`, ver
- * `progression/scenarios.ts`) sobre o resto do catálogo — se o jogador
- * escolhe a opção de buscar a saída, o desfecho não vem da probabilidade
- * estática do cenário: vem de uma negociação de verdade
+ * havendo interesse real de mercado nesse período — de **compra** (clube
+ * maior sondando, `Opcao.disparaNegociacaoReal`) ou de **venda forçada**
+ * (o próprio clube atual precisando do dinheiro,
+ * `career/club-finances.ts` `precisaVender`, `Opcao.disparaVendaForcada`,
+ * ambos em `progression/scenarios.ts`) — o sorteio prioriza um cenário
+ * "de transferência" do tipo certo sobre o resto do catálogo (venda
+ * forçada tem prioridade se os dois calharem no mesmo período). Se o
+ * jogador escolhe a opção de buscar/aceitar a saída, o desfecho não vem
+ * da probabilidade estática do cenário: vem de uma negociação de verdade
  * (`market/negotiation.ts`), e só então aplica o impacto narrativo
  * correspondente (favorável se aceita, desfavorável se recusada). Sem
  * interesse real nesse período, cenários de transferência nem entram no
- * sorteio (não teria proposta nenhuma por trás pra sustentar a cena).
+ * sorteio (não teria proposta nenhuma por trás pra sustentar a cena). O
+ * interesse de compra é filtrado por `calcularRatingDeInteresse`
+ * (`market/valuation.ts`) pra ficar factível com o desempenho real do
+ * jogador (overall), não só com o rating do clube atual dele — venda
+ * forçada dispensa essa exigência de "clube maior" (o clube desesperado
+ * vende pra qualquer comprador capaz de pagar).
  *
  * Por fim avança pra próxima temporada (`avancarTemporada`: idade+1,
  * declínio por idade, renda de patrocínio). Não muta o `estado` recebido.
@@ -144,15 +195,23 @@ export function jogarTemporada(
     const momento = momentoDoPeriodo(periodo.periodo);
     const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
 
-    let interessados: Club[] = [];
+    let interessadosCompra: Club[] = [];
+    let interessadosVenda: Club[] = [];
     let valorDeMercado = 0;
+
     if (estaNaJanelaDeTransferencia(momento)) {
-      valorDeMercado = calcularValorDeMercado({
+      const perfil: PerfilDeMercado = {
         overall: overallAtual(estadoAtual),
         idade: estadoAtual.jogador.idade,
         reputacaoNacional: estadoAtual.reputacao.nacional,
-      });
-      interessados = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, valorDeMercado, { random });
+      };
+      valorDeMercado = calcularValorDeMercado(perfil);
+      interessadosCompra = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random });
+
+      const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
+      if (clubeAtualObj && precisaVender(clubeAtualObj, random)) {
+        interessadosVenda = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random, exigirUpgrade: false });
+      }
     }
 
     const contexto: ContextoSorteio = {
@@ -164,46 +223,53 @@ export function jogarTemporada(
       momento,
     };
 
-    // Cenários "de transferência" (opção com disparaNegociacaoReal) só entram no sorteio quando há
-    // interesse real de mercado nesse período — evitam prometer proposta que não existe mecanicamente.
-    // Havendo interesse real E ao menos um cenário de transferência elegível, o sorteio fica restrito
+    // Cenários "de transferência" (compra ou venda forçada) só entram no sorteio quando há o
+    // interesse real correspondente nesse período — evita prometer proposta que não existe
+    // mecanicamente. Havendo interesse real E ao menos um cenário elegível, o sorteio fica restrito
     // a eles (não competem contra o resto do catálogo) — garante que a negociação real sempre venha
-    // acompanhada da moldura narrativa certa, em vez de só "coexistir" sem se referenciar.
+    // acompanhada da moldura narrativa certa, em vez de só "coexistir" sem se referenciar. Venda
+    // forçada tem prioridade sobre interesse de compra quando os dois calham no mesmo período.
     const elegiveis = filtrarCenariosElegiveis(CENARIOS, contexto);
-    const elegiveisDeTransferencia = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaNegociacaoReal));
-    const elegiveisGerais = elegiveis.filter((c) => !c.opcoes.some((o) => o.disparaNegociacaoReal));
-    const poolDeSorteio = interessados.length > 0 && elegiveisDeTransferencia.length > 0 ? elegiveisDeTransferencia : elegiveisGerais;
+    const elegiveisDeVenda = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaVendaForcada));
+    const elegiveisDeCompra = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaNegociacaoReal));
+    const elegiveisGerais = elegiveis.filter((c) => !c.opcoes.some((o) => o.disparaVendaForcada || o.disparaNegociacaoReal));
+
+    let poolDeSorteio: Cenario[];
+    if (interessadosVenda.length > 0 && elegiveisDeVenda.length > 0) {
+      poolDeSorteio = elegiveisDeVenda;
+    } else if (interessadosCompra.length > 0 && elegiveisDeCompra.length > 0) {
+      poolDeSorteio = elegiveisDeCompra;
+    } else {
+      poolDeSorteio = elegiveisGerais;
+    }
 
     const cenario = sortearCenario(poolDeSorteio, random);
     const opcaoEscolhida = escolherOpcao(cenario);
 
+    const negociacaoAplicavel =
+      opcaoEscolhida.disparaVendaForcada && interessadosVenda.length > 0
+        ? { interessados: interessadosVenda, tipo: "venda_forcada" as const }
+        : opcaoEscolhida.disparaNegociacaoReal && interessadosCompra.length > 0
+          ? { interessados: interessadosCompra, tipo: "compra" as const }
+          : undefined;
+
     let escolha: EscolhaResolvida;
-    if (opcaoEscolhida.disparaNegociacaoReal && interessados.length > 0) {
-      let negociacaoAceita: ResultadoNegociacao | undefined;
-
-      for (const clube of interessados) {
-        const proposta = gerarProposta(clube, valorDeMercado, random);
-        const contraproposta = responderProposta(proposta);
-        const fatoresConfianca: FatoresConfianca = {
-          overall: overallAtual(estadoAtual),
-          reputacaoNacional: estadoAtual.reputacao.nacional,
-          concorrentes: interessados.length - 1,
-        };
-        const resultado = negociarTransferencia(proposta, contraproposta, fatoresConfianca, estadoAtual.temporada, random);
-
-        negociacoesResolvidas.push({ periodo: periodo.periodo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: contraproposta, resultado });
-
-        if (resultado.aceito && resultado.contrato) {
-          estadoAtual = assinarContrato(estadoAtual, resultado.contrato);
-          negociacaoAceita = resultado;
-          break;
-        }
-      }
+    if (negociacaoAplicavel) {
+      const { estado: novoEstado, aceita } = resolverNegociacaoDeTransferencia(
+        estadoAtual,
+        negociacaoAplicavel.interessados,
+        valorDeMercado,
+        negociacaoAplicavel.tipo,
+        periodo.periodo,
+        responderProposta,
+        random,
+        negociacoesResolvidas,
+      );
+      estadoAtual = novoEstado;
 
       // resultados[0] é o molde de narrativa/impacto pro desfecho favorável (negociação aceita),
-      // resultados[último] pro desfecho desfavorável (recusada) — ver Opcao.disparaNegociacaoReal.
-      const resultadoNarrativo = negociacaoAceita ? opcaoEscolhida.resultados[0] : opcaoEscolhida.resultados[opcaoEscolhida.resultados.length - 1];
-      escolha = { opcao: opcaoEscolhida, resultado: resultadoNarrativo };
+      // resultados[último] pro desfecho desfavorável (recusada) — ver Opcao.disparaNegociacaoReal/disparaVendaForcada.
+      escolha = { opcao: opcaoEscolhida, resultado: aceita ? opcaoEscolhida.resultados[0] : opcaoEscolhida.resultados[opcaoEscolhida.resultados.length - 1] };
     } else {
       escolha = resolverEscolha(opcaoEscolhida, random);
     }

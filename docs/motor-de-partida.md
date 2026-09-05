@@ -766,7 +766,14 @@ existindo e coexistem com isso — ver ressalva abaixo).
   `progression/aging.ts`, mas pro valor, não pro atributo) e um bônus de
   até 50% pela reputação nacional. **Sem perks** (o design original usava
   "nível + perks" — aqui é overall derivado, coerente com o resto do
-  design sem perks).
+  design sem perks). Também expõe `calcularRatingDeInteresse({overall,
+  idade, reputacaoNacional})` — rating "equivalente" do jogador na mesma
+  escala tipo Elo dos clubes (`simulation/rating.ts`, ~1000-2100): rookie
+  overall 39/reputação 10 fica em ~1449, estrela overall 90/reputação 90
+  fica em ~2170. Existe especificamente pra garantir que o **interesse de
+  mercado seja factível com o desempenho real do jogador** (overall, que
+  é derivado de XP de partida) — ver `selecionarClubesInteressados`
+  abaixo.
 - **`src/market/transfers.ts`**:
   - `estaNaJanelaDeTransferencia(momento)` — reaproveita
     `MomentoDeCarreira` (seção 4) em vez de inventar um conceito de janela
@@ -776,11 +783,19 @@ existindo e coexistem com isso — ver ressalva abaixo).
     (`muito_alta` a `muito_baixa`) quando disponível; sem isso, fallback
     por `divisao_nacional.nivel`, mesmo padrão de
     `simulation/rating.ts` `calcularRatingFallback`.
-  - `selecionarClubesInteressados(clubes, clubeAtualId, valorDeMercado,
-    opcoes?)` — só considera clube com rating esportivo
-    (`simulation/rating.ts`) igual ou maior que o atual e que consiga
-    bancar uma fração do valor de mercado do jogador; embaralha (com
-    `random` injetado) e recorta em até 3 (padrão).
+  - `selecionarClubesInteressados(clubes, clubeAtualId, perfil, opcoes?)`
+    — 3 filtros: (1) por padrão, rating esportivo
+    (`simulation/rating.ts`) igual ou maior que o clube atual
+    (desligável via `opcoes.exigirUpgrade: false`, usado pela venda
+    forçada abaixo); (2) rating do clube interessado não pode passar
+    muito de `calcularRatingDeInteresse` do jogador (+ margem de ~1
+    nível de divisão) — **resolve o pedido explícito de garantir que
+    interesse de clube maior seja plausível com o desempenho do
+    jogador**, não só com o rating do clube atual dele (antes disso, um
+    jogador fraco num clube fraco atraía qualquer clube "melhor que o
+    atual", incluindo gigantes); (3) capacidade financeira de bancar uma
+    fração do valor de mercado. Embaralha (com `random` injetado) e
+    recorta em até 3 (padrão).
   - `gerarProposta(clube, valorDeMercado, random?)` — proposta inicial
     abaixo do teto salarial do clube e da referência de valor de mercado
     (valor de mercado ~ 2 anos de salário), deixando espaço de negociação.
@@ -807,38 +822,66 @@ existindo e coexistem com isso — ver ressalva abaixo).
   `assinarContrato(estado, contrato)` troca o clube e registra o
   contrato; `transferirParaClube` (já existia) continua disponível pra
   mover o jogador sem negociação, pra uso puramente narrativo.
+- **Venda forçada por necessidade financeira** (`career/club-finances.ts`
+  `precisaVender(club, random?)`, `Opcao.disparaVendaForcada`,
+  `progression/scenarios.ts` `venda_forcada_por_necessidade_financeira`):
+  a cada janela de transferência, o clube atual pode precisar vender o
+  jogador pra fazer caixa — probabilidade por temporada calibrada por
+  `Club.forca_financeira` (2% pra `muito_alta` até 40% pra
+  `muito_baixa`; 15% sem dado financeiro). **Não é simulação de fluxo de
+  caixa de verdade** (fica pra uma peça bem maior de Fase 4) — é só uma
+  probabilidade. Quando dispara, os compradores candidatos vêm de
+  `selecionarClubesInteressados` com `exigirUpgrade: false` (um clube
+  desesperado por caixa vende pra qualquer comprador capaz de pagar, não
+  só clubes maiores) — ainda respeitando o teto de
+  `calcularRatingDeInteresse`. O cenário tem 2 opções: "aceitar a saída"
+  (`disparaVendaForcada: true`, dispara a negociação de verdade) e
+  "resistir" (100% narrativo — só desgasta ou não a relação com a
+  diretoria, não força uma transferência incoerente com o resultado
+  narrativo — ver ressalva abaixo).
 - **Unificado com os cenários narrativos de transferência** — não são mais
   duas coisas "coexistindo sem se referenciar" (ver histórico na seção
-  6). `Opcao.disparaNegociacaoReal` (`progression/scenarios.ts`) marca a
-  opção de "buscar a saída" nos 3 cenários que já existiam
+  6). `Opcao.disparaNegociacaoReal` marca a opção de "buscar a saída" nos
+  3 cenários de interesse de compra que já existiam
   (`proposta_clube_grande`/`aceitar_agora`,
   `proposta_do_exterior`/`topar_o_desafio`,
-  `agente_pressiona_transferencia`/`seguir_o_conselho_do_agente`). Em
+  `agente_pressiona_transferencia`/`seguir_o_conselho_do_agente`);
+  `Opcao.disparaVendaForcada` marca a opção equivalente no cenário de
+  venda forçada (ambos os campos em `progression/scenarios.ts`). Em
   `career/career-loop.ts` `jogarTemporada`, a cada período: se a janela de
-  transferência está aberta e existe interesse real de mercado
-  (`selecionarClubesInteressados` não vazio), o sorteio de cenário fica
-  restrito aos cenários "de transferência" elegíveis (em vez de competir
-  contra o catálogo inteiro) — garante que a negociação real sempre venha
-  acompanhada da moldura narrativa certa. **Sem** interesse real, cenários
-  de transferência nem entram no sorteio (nunca promete proposta que não
-  existe mecanicamente). Ao escolher a opção marcada, o desfecho não vem
-  da probabilidade estática do cenário: dispara a negociação de verdade
-  (gera+negocia uma proposta por clube interessado, parando no primeiro
-  que aceitar) — `resultados[0]` do cenário vira o molde de narrativa/
-  impacto se a negociação for aceita, `resultados[último]` se for
-  recusada. Escolher a opção de recusar/ficar continua 100% narrativo
-  (nenhuma negociação é tentada). No máximo uma transferência aceita por
-  temporada.
+  transferência está aberta e existe interesse real (de compra ou de
+  venda forçada), o sorteio de cenário fica restrito aos cenários "de
+  transferência" do tipo correspondente elegíveis (em vez de competir
+  contra o catálogo inteiro) — venda forçada tem prioridade se os dois
+  calharem no mesmo período. Garante que a negociação real sempre venha
+  acompanhada da moldura narrativa certa. **Sem** interesse real (de
+  nenhum dos dois tipos), cenários de transferência nem entram no sorteio
+  (nunca promete proposta que não existe mecanicamente). Ao escolher a
+  opção marcada, o desfecho não vem da probabilidade estática do cenário:
+  dispara a negociação de verdade (gera+negocia uma proposta por clube
+  interessado, parando no primeiro que aceitar) — `resultados[0]` do
+  cenário vira o molde de narrativa/impacto se a negociação for aceita,
+  `resultados[último]` se for recusada. Escolher a opção de recusar/ficar
+  continua 100% narrativo (nenhuma negociação é tentada) — pra evitar o
+  desfecho incoerente de "narrativa diz que você foi vendido mesmo
+  resistindo, mas mecanicamente nada mudou", o cenário de venda forçada
+  foi desenhado pra "resistir" nunca resultar em venda (só desgaste ou
+  alívio na relação com a diretoria). No máximo uma transferência aceita
+  por temporada.
 - **Estimativas de design, não fórmulas validadas** (mesma ressalva de
   Elo/XP/valorização): todas as constantes de teto salarial, referência
-  salarial, fatores de confiança e cláusula de rescisão foram calibradas
-  só pra dar uma progressão que "sente" certa, não a partir de dado real
-  de mercado.
+  salarial, fatores de confiança, cláusula de rescisão, rating de
+  interesse e probabilidade de venda forçada foram calibradas só pra dar
+  uma progressão que "sente" certa, não a partir de dado real de mercado.
 - **Validado com dado real**: `npx tsx src/cli/index.ts carreira-loop
-  portuguesa 5` — Portuguesa (clube pequeno) recebeu propostas reais de
-  clubes maiores/mais ricos (nacionais e estrangeiros, a seleção não
-  filtra por país) todas as pré-temporadas, e o jogador foi efetivamente
-  transferido duas vezes ao longo de 5 temporadas simuladas.
+  portuguesa 10` — Portuguesa (clube pequeno, sem `forca_financeira`
+  cadastrada) teve 8 negociações de transferência ao longo de 10
+  temporadas simuladas (mistura de interesse de compra e venda forçada),
+  o jogador foi efetivamente transferido 6 vezes, e — com o teto de
+  `calcularRatingDeInteresse` em vigor — os clubes interessados ficaram
+  consistentemente no mesmo patamar do overall real do jogador (que
+  estagnou em ~57-58 por várias temporadas), em vez de atrair gigantes
+  desproporcionais como acontecia antes dessa mudança.
 
 ## 6. Pendências / próximos passos
 
@@ -908,17 +951,29 @@ existindo e coexistem com isso — ver ressalva abaixo).
   escolher a opção de buscar saída num cenário de transferência dispara a
   negociação de verdade, e o sorteio de cenário só oferece um cenário de
   transferência quando existe interesse real de mercado nesse período.
+- ~~Interesse de clube maior não era factível com o desempenho do
+  jogador~~ **resolvida**: `calcularRatingDeInteresse` (ver seção 5.2)
+  passou a limitar `selecionarClubesInteressados` pelo overall/reputação
+  reais do jogador, não só pelo rating do clube atual dele.
+- ~~Sem cenário de venda forçada por necessidade financeira do clube~~
+  **resolvida**: `career/club-finances.ts` `precisaVender` +
+  `venda_forcada_por_necessidade_financeira` (ver seção 5.2).
 - **Mercado — limitações reais desta versão** (não são bugs escondidos):
   só uma negociação aceita por temporada (para no primeiro clube que
   aceitar, não acumula múltiplas ofertas simultâneas de verdade disputando
-  entre si além do fator "concorrentes" agregado); só 3 cenários do
-  catálogo de 200 têm `disparaNegociacaoReal` (os outros ~197, incluindo
-  os ~145 com outros tipos de `gatilho`, não têm nenhuma ligação com
-  mercado — não faria sentido pra maioria, mas nada impede de marcar mais
-  opções de "buscar saída" em cenários futuros); não existe renovação de
-  contrato (jogador pode ficar anos além de `temporadaDeVencimento` sem
-  nada acontecer); não existe sistema de minutagem que reduza o interesse
-  de mercado de um jogador que não joga; `clubeAtualId` inicial
+  entre si além do fator "concorrentes" agregado); venda forçada e
+  interesse de compra nunca acontecem no mesmo período (prioridade fixa
+  pra venda forçada, não uma disputa entre os dois); só 4 cenários do
+  catálogo de 201 têm `disparaNegociacaoReal`/`disparaVendaForcada` (os
+  outros ~197, incluindo os ~145 com outros tipos de `gatilho`, não têm
+  nenhuma ligação com mercado — não faria sentido pra maioria, mas nada
+  impede de marcar mais opções de "buscar saída"/"aceitar venda" em
+  cenários futuros); `precisaVender` é probabilidade pura, não uma
+  simulação de fluxo de caixa (clube não fica "mais endividado" com o
+  tempo, a chance por temporada é sempre a mesma); não existe renovação
+  de contrato (jogador pode ficar anos além de `temporadaDeVencimento`
+  sem nada acontecer); não existe sistema de minutagem que reduza o
+  interesse de mercado de um jogador que não joga; `clubeAtualId` inicial
   (`criarEstadoInicial`) continua vindo de quem chama, sem nenhuma lista
   curada/filtrada de "clubes pra começar carreira" — `npx tsx
   src/cli/index.ts clubes [pais]` lista tudo, sem filtrar por tamanho/

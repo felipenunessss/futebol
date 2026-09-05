@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calcularValorDeMercado } from "../../src/market/valuation.js";
+import { calcularRatingDeInteresse, calcularValorDeMercado } from "../../src/market/valuation.js";
 
 describe("calcularValorDeMercado", () => {
   it("jogador com overall muito baixo vale zero", () => {
@@ -30,5 +30,27 @@ describe("calcularValorDeMercado", () => {
 
   it("nunca devolve valor negativo", () => {
     expect(calcularValorDeMercado({ overall: 1, idade: 45, reputacaoNacional: 0 })).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe("calcularRatingDeInteresse", () => {
+  it("overall maior gera rating de interesse maior, tudo mais igual", () => {
+    const menor = calcularRatingDeInteresse({ overall: 40, idade: 20, reputacaoNacional: 10 });
+    const maior = calcularRatingDeInteresse({ overall: 80, idade: 20, reputacaoNacional: 10 });
+    expect(maior).toBeGreaterThan(menor);
+  });
+
+  it("reputação nacional maior também aumenta o rating de interesse", () => {
+    const semReputacao = calcularRatingDeInteresse({ overall: 60, idade: 25, reputacaoNacional: 0 });
+    const comReputacao = calcularRatingDeInteresse({ overall: 60, idade: 25, reputacaoNacional: 100 });
+    expect(comReputacao).toBeGreaterThan(semReputacao);
+  });
+
+  it("fica na mesma ordem de grandeza do rating de clube (simulation/rating.ts, ~1000-2100)", () => {
+    const rookie = calcularRatingDeInteresse({ overall: 39, idade: 18, reputacaoNacional: 10 });
+    const estrela = calcularRatingDeInteresse({ overall: 90, idade: 27, reputacaoNacional: 90 });
+    expect(rookie).toBeGreaterThan(1000);
+    expect(rookie).toBeLessThan(1600);
+    expect(estrela).toBeGreaterThan(1900);
   });
 });

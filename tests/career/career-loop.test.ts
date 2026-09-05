@@ -133,8 +133,10 @@ describe("jogarTemporada — negociação de transferência", () => {
 
   it("com interesse real de mercado, o cenário do período de pré-temporada é um cenário de transferência (unificação cenário/mercado)", () => {
     const clubes: Club[] = [
-      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
-      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", estado: "RJ", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
