@@ -625,10 +625,15 @@ as competições ativas em algum período do ano e simula cada uma.
   267/678 clubes com rating real (ver seções 1.1-1.5), o resto no fallback
   por decisão de design documentada (clube sem exposição competitiva
   nacional/continental não tem histórico público pra puxar).
-- **Curva de pico/declínio por idade não implementada**: `avancarTemporada`
-  só incrementa idade, não aplica nenhum efeito nos atributos ainda —
-  pendência conceitual da seção 3 (jovem cresce mais rápido no físico,
-  veterano estabiliza/decai), falta a fórmula.
+- ~~Curva de pico/declínio por idade~~ **resolvida**: `progression/aging.ts`
+  (`aplicarDeclinioPorIdade`), ligada em `avancarTemporada`. Físico
+  (velocidade, força, resistência, jogo aéreo, reflexos) tem pico aos 26 e
+  decai 2 pontos/temporada depois; mental/técnico (o resto, exceto
+  liderança) tem pico aos 30 e decai 0.8/temporada; liderança nunca decai.
+  Antes do pico, nada muda automaticamente aqui — o crescimento de jovem
+  continua vindo só do multiplicador de XP do arquétipo
+  (`progression/xp.ts`). Constantes são estimativa de design, não fórmula
+  validada — mesma ressalva de "Fórmulas exatas" abaixo.
 - **Cenários — condições de gatilho não definidas**: hoje `sortearCenario`
   só sorteia da lista toda, sem noção de "quando" cada cenário pode
   aparecer (ex: proposta de clube grande só faz sentido em janela de

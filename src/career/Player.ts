@@ -1,5 +1,6 @@
 import type { DesempenhoPartida } from "../progression/xp.js";
 import { aplicarXpPartidaAoJogador, calcularXpPartida } from "../progression/xp.js";
+import { aplicarDeclinioPorIdade } from "../progression/aging.js";
 import type { ImpactoCarreira } from "../progression/scenarios.js";
 import { aplicarImpacto, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
@@ -122,14 +123,19 @@ export function transferirParaClube(estado: EstadoDeCarreira, novoClubeId: strin
 }
 
 /**
- * Avança pra próxima temporada — idade e temporada +1. **Não aplica curva
- * de pico/declínio por idade nos atributos ainda** (pendência documentada
- * em `docs/motor-de-partida.md` seção 5) — só o incremento de idade.
+ * Avança pra próxima temporada — idade e temporada +1, e aplica a curva de
+ * pico/declínio por idade (`progression/aging.ts`): atributo físico decai
+ * cedo e rápido depois do pico, mental decai tarde e devagar, liderança
+ * nunca decai. Não afeta quem ainda não passou da idade de pico da
+ * categoria.
  */
 export function avancarTemporada(estado: EstadoDeCarreira): EstadoDeCarreira {
+  const novaIdade = estado.jogador.idade + 1;
+  const atributos = aplicarDeclinioPorIdade(estado.jogador.atributos, novaIdade);
+
   return {
     ...estado,
     temporada: estado.temporada + 1,
-    jogador: { ...estado.jogador, idade: estado.jogador.idade + 1 },
+    jogador: { ...estado.jogador, idade: novaIdade, atributos },
   };
 }
