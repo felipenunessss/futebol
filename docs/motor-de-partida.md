@@ -562,7 +562,7 @@ rivalidades pessoais, vida pessoal/mudança de cidade, relação com comissão
 técnica/elenco/diretoria, patrocínios, reputação regional, agente/contrato,
 convocação, momentos dentro de uma partida — pênalti decisivo, discussão
 com árbitro). Implementado em `src/progression/scenarios.ts`, com catálogo
-de 30 cenários (`CENARIOS`, propositalmente grande e variado pra que
+de 200 cenários (`CENARIOS`, propositalmente grande e variado pra que
 carreiras diferentes não repitam sempre os mesmos dilemas — ver pendência
 de condições de gatilho abaixo) e demo via `npx tsx src/cli/index.ts cenario`.
 

@@ -11,7 +11,7 @@ import {
 
 describe("catálogo de cenários", () => {
   it("tem uma quantidade grande e diversa de cenários (todo id único)", () => {
-    expect(CENARIOS.length).toBeGreaterThanOrEqual(30);
+    expect(CENARIOS.length).toBeGreaterThanOrEqual(200);
     expect(new Set(CENARIOS.map((c) => c.id)).size).toBe(CENARIOS.length);
   });
 
