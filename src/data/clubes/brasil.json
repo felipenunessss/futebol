@@ -206,7 +206,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1685
   },
   {
     "id": "athletico_pr",
@@ -250,7 +251,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1636
   },
   {
     "id": "vitoria",
@@ -279,7 +281,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1673
   },
   {
     "id": "juventude",
@@ -293,7 +296,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1668
   },
   {
     "id": "sport_recife",
@@ -307,7 +311,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1612
   },
   {
     "id": "nautico",
@@ -321,7 +326,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1644
   },
   {
     "id": "santa_cruz",
@@ -349,7 +355,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1628
   },
   {
     "id": "crb",
@@ -363,7 +370,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1631
   },
   {
     "id": "coritiba",
@@ -392,7 +400,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1591
   },
   {
     "id": "chapecoense",
@@ -421,7 +430,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "media"
+    "forca_financeira": "media",
+    "rating_inicial": 1629
   },
   {
     "id": "vila_nova",
@@ -435,7 +445,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1620
   },
   {
     "id": "guarani",
@@ -463,7 +474,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1463
   },
   {
     "id": "novorizontino",
@@ -477,7 +489,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "muito_baixa"
+    "forca_financeira": "muito_baixa",
+    "rating_inicial": 1695
   },
   {
     "id": "mirassol",
@@ -506,7 +519,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa"
+    "forca_financeira": "baixa",
+    "rating_inicial": 1544
   },
   {
     "id": "tombense",
@@ -532,7 +546,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1591
   },
   {
     "id": "remo",
@@ -560,7 +575,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1604
   },
   {
     "id": "londrina",
@@ -573,7 +589,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1527
   },
   {
     "id": "atletico_goianiense",
@@ -586,7 +603,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1638
   },
   {
     "id": "confianca",

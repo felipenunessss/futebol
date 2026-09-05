@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1594
   },
   {
     "id": "portuguesa",
@@ -33,7 +34,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 2
-    }
+    },
+    "rating_inicial": 1568
   },
   {
     "id": "primavera",
