@@ -279,6 +279,95 @@ modelada (fora do projeto). Copa do Brasil, Libertadores/Sul-Americana,
 estaduais brasileiros e qualquer outra pendência continuam de fora,
 como já documentado nas seções 1.1/1.2.
 
+### 1.4. Pendência de dados — investigada (estaduais: SP, RJ, MG, RS)
+
+**Fonte usada**: mesma das seções 1.1/1.2/1.3 — [clubelo.com](https://clubelo.com)
+(Club Elo), tabela por país embutida no HTML de `clubelo.com/Brazil`,
+snapshot do dia **2026-09-05**. Além da tabela por país, esta rodada
+tentou também páginas de clube individual (`clubelo.com/<slug>`, em
+várias variações de capitalização/hífen) pra alguns clubes tradicionais
+que pareciam candidatos plausíveis a ter rating próprio mesmo fora da
+tabela principal (Portuguesa-SP, Bangu, Boa Esporte, Ipatinga, Brasil de
+Pelotas, Passo Fundo) — todas essas tentativas caíram na home genérica do
+site, sem página dedicada, confirmando que o clube não tem entrada
+rastreada individualmente pelo Club Elo.
+
+**Resultado principal desta rodada: nenhum `rating_inicial` novo foi
+adicionado.** Os 4 estados (SP, RJ, MG, RS) somam **138 clubes únicos**
+entre `<uf>_estadual.json` e os clubes de `brasil.json` que jogam
+estadual nesses estados; **29 já tinham `rating_inicial`** — todos
+populados em rodadas anteriores (seção 1.1, pelo Brasileirão Série A, e
+seção 1.2, pela Série B/C/D) — e os **109 restantes não têm nenhuma
+entrada no Club Elo**, nem na tabela por país (que lista integralmente
+Level 1/2/3 + a categoria "Lower", conferida linha a linha nesta rodada:
+exatamente 20+20+20+4 = 64 clubes pro Brasil, sem clube novo desde a
+seção 1.2) nem em página individual.
+
+**Cobertura por estado** (clubes com `rating_inicial` / total de clubes
+únicos do estadual, incluindo os que moram em `brasil.json`):
+
+| Estado (competições) | Confirmados | Confirmados nesta rodada |
+|---|---|---|
+| SP (Paulistão A1-A4) | 14/64 | 0 |
+| RJ (Carioca A, A2) | 5/22 | 0 |
+| MG (Mineiro 1, 2) | 5/24 | 0 |
+| RS (Gauchão 1, 2) | 5/28 | 0 |
+| **Total** | **29/138** | **0** |
+
+Os confirmados em cada estado vêm todos de clubes que também disputam
+competição nacional (Série A/B/C, já cobertos nas seções 1.1/1.2):
+
+- **SP**: `corinthians`, `palmeiras`, `sao_paulo`, `santos`,
+  `red_bull_bragantino`, `guarani`, `ponte_preta`, `novorizontino`,
+  `mirassol` (Série A/B/C, em `brasil.json`) + `sao_bernardo`,
+  `botafogo_sp`, `ferroviaria`, `inter_de_limeira`, `ituano` (Série
+  B/C/"Lower", em `sp_estadual.json`).
+- **RJ**: `flamengo`, `fluminense`, `vasco_da_gama`, `botafogo` (Série A,
+  em `brasil.json`) + `volta_redonda` ("Lower"/Série C, em
+  `rj_estadual.json`).
+- **MG**: `cruzeiro`, `atletico_mg`, `america_mg` (Série A/B, em
+  `brasil.json`) + `tombense`, `athletic_club_mg` ("Lower"/Série B, em
+  `brasil.json`).
+- **RS**: `gremio`, `internacional`, `juventude` (Série A/B, em
+  `brasil.json`) + `caxias`, `ypiranga_rs` (Série C, em `rs_estadual.json`).
+
+**Clubes de Série D sem `rating_inicial` que jogam estadual desses 4
+estados** (checados individualmente e ausentes da tabela/página do Club
+Elo, mesma limitação já documentada na seção 1.2 pros outros 92 clubes
+da Série D): `velo_clube`, `noroeste`, `xv_de_piracicaba` (SP, Paulistão
+A1/A2); `nova_iguacu`, `portuguesa_rj`, `sampaio_correa_rj`, `america_rj`
+(RJ, Carioca A/A2); `uberlandia_ec`, `pouso_alegre` (MG, Mineiro 1);
+`sao_jose_rs`, `sao_luiz` (RS, Gauchão 1).
+
+**Clubes puramente estaduais (sem competição nacional) — nenhum com
+cobertura**: todos os demais clubes de `sp_estadual.json` (ex:
+`portuguesa`, `primavera`, `capivariano`, e a totalidade do Paulistão
+A3/A4), `rj_estadual.json` (ex: `bangu`, `boavista_rj`, `madureira`,
+`americano`, `duque_de_caxias`, `olaria`), `mg_estadual.json` (ex: `urt`,
+`betim_fc`, `boa_esporte`, `caldense`, `villa_nova`, `ipatinga_fc`) e
+`rs_estadual.json` (ex: `avenida`, `guarany_bage`, `novo_hamburgo`,
+`brasil_pelotas`, `passo_fundo`, `pelotas`) — nenhum apareceu na tabela
+por país nem tem página individual própria. Isso bate com a expectativa
+documentada no design (`game-design.md`/pedido desta rodada): divisão
+estadual inferior/clube amador ou semi-profissional pequeno, sem
+histórico de competição continental ou nacional relevante, não é
+rastreado pelo Club Elo.
+
+**Nenhuma ambiguidade de nome encontrada** — como nenhum clube novo foi
+casado com a fonte nesta rodada, não houve caso de nome truncado,
+entrada duplicada ou clube-satélite pra resolver (diferente das seções
+1.1-1.3). Único cuidado ativo: confirmar que "Guarani" (SP, `guarani`,
+1547) e "Santa Cruz" (PE, `santa_cruz`, 1505) da tabela nacional — já
+atribuídos em rodada anterior — não fossem confundidos com os clubes
+homônimos `guarani_mg` (MG), `guarani_va` (RS) e `santa_cruz_rs` (RS);
+confirmado que os já atribuídos permanecem corretos e os homônimos
+seguem sem `rating_inicial`.
+
+**Cobertura fora do escopo desta rodada**: todos os outros estados
+brasileiros (só SP/RJ/MG/RS foram investigados nesta rodada), Copa do
+Brasil, Libertadores/Sul-Americana e qualquer outra pendência já listada
+nas seções 1.1-1.3.
+
 ## 2. Motor de partida — duelo por zona (estilo FM/Brasfoot)
 
 Nenhum clube (fora o do jogador) tem elenco persistido — a força de cada
