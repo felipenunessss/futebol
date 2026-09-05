@@ -607,6 +607,31 @@ de condições de gatilho abaixo) e demo via `npx tsx src/cli/index.ts cenario`.
   disponíveis pra `regiaoAtual?` informada). Demo completa (partida real →
   XP → cenário → impacto → nova temporada, com renda de patrocínio) via
   `npx tsx src/cli/index.ts carreira`.
+- **Gatilhos — cenário elegível conforme o contexto** (`Cenario.gatilho?`,
+  `ContextoSorteio`, `cenarioElegivel`, `filtrarCenariosElegiveis`, todos em
+  `progression/scenarios.ts`): resolve a pendência de "sortear da lista
+  toda sem noção de quando" (ver histórico na seção 6). `Gatilho` é um
+  conjunto de condições opcionais — idade mín/máx, reputação nacional
+  mín/máx, reputação regional mín/máx, moral mín/máx, relações internas
+  mín/máx, e `momentos` (`MomentoDeCarreira`: `pre_temporada` |
+  `temporada_regular` | `reta_final` | `pos_temporada`, uma categoria
+  simples de fase da temporada, não o `periodo` granular de
+  `data/loaders/calendario.ts`). Cenário sem `gatilho` é elegível sempre —
+  compatível com o catálogo anterior. `filtrarCenariosElegiveis(CENARIOS,
+  contexto)` deve ser chamado antes de `sortearCenario` pra restringir o
+  sorteio ao que faz sentido agora; sem filtrar antes, `sortearCenario`
+  continua funcionando exatamente como antes (sorteia de qualquer lista
+  passada, sem saber de gatilho). Se `ContextoSorteio.momento` não for
+  informado, gatilhos de `momentos` ficam permissivos (não filtram) — é
+  o caso de quem ainda não ligou isso ao calendário. Demo via
+  `npx tsx src/cli/index.ts cenario [momento]` (ex: `cenario pre_temporada`)
+  mostra quantos dos 200 cenários ficam elegíveis pro momento escolhido.
+  **Cobertura parcial**: só uma amostra inicial de ~14 cenários (os mais
+  óbvios: proposta de clube grande, lesão, convocação de seleção, reserva
+  insatisfeito, capitania, pênalti decisivo, etc.) tem `gatilho` definido
+  até agora — os ~186 restantes do catálogo de 200 ainda não foram
+  reclassificados (não é erro, só ficam elegíveis sempre até alguém
+  adicionar gatilho a eles).
 
 ## 5. Loop de calendário (implementado, cobertura parcial por design)
 
@@ -661,11 +686,12 @@ as competições ativas em algum período do ano e simula cada uma.
   continua vindo só do multiplicador de XP do arquétipo
   (`progression/xp.ts`). Constantes são estimativa de design, não fórmula
   validada — mesma ressalva de "Fórmulas exatas" abaixo.
-- **Cenários — condições de gatilho não definidas**: hoje `sortearCenario`
-  só sorteia da lista toda, sem noção de "quando" cada cenário pode
-  aparecer (ex: proposta de clube grande só faz sentido em janela de
-  transferência, lesão só em período de jogos) — falta ligar isso ao
-  calendário/game loop.
+- ~~Cenários — condições de gatilho não definidas~~ **resolvida
+  parcialmente**: mecanismo implementado (`Gatilho`/`ContextoSorteio`/
+  `cenarioElegivel`/`filtrarCenariosElegiveis`, ver seção 4) — falta
+  reclassificar a maior parte dos 200 cenários (só ~14 têm `gatilho` hoje)
+  e ligar `ContextoSorteio.momento` a um calendário/game loop de verdade
+  (hoje quem chama define o momento manualmente, ex: `src/cli/index.ts`).
 - **Fórmulas exatas**: `K` do Elo por tipo de partida, curva exata de XP
   por atributo, pesos do duelo de zona (quanto o atributo do jogador pesa
   vs. o perfil gerado do resto do time) — hoje é desenho conceitual, as

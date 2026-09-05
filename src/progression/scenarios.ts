@@ -51,6 +51,89 @@ export interface Cenario {
   descricao: string;
   /** 2 ou 3 escolhas. */
   opcoes: Opcao[];
+  /** Condições sob as quais o cenário faz sentido acontecer. Omitido = elegível a qualquer momento (era o comportamento único antes deste campo existir). */
+  gatilho?: Gatilho;
+}
+
+/**
+ * Fase ampla da temporada, do ponto de vista de "que tipo de assunto de
+ * carreira faz sentido agora" — não é o `periodo` granular de
+ * `data/loaders/calendario.ts` (esse é por competição/mês); é uma
+ * categoria simples que quem monta o `ContextoSorteio` decide a partir do
+ * contexto que tiver disponível (calendário real, ou um valor fixo em
+ * demos que ainda não têm calendário ligado).
+ *
+ * - `pre_temporada`: pré-temporada / entressafra — janela de
+ *   transferência, negociação de contrato, planejamento, ainda sem jogos
+ *   valendo pontos.
+ * - `temporada_regular`: meio da temporada, jogos normais rolando.
+ * - `reta_final`: fase decisiva da temporada (mata-mata, briga direta por
+ *   título/rebaixamento/vaga).
+ * - `pos_temporada`: temporada encerrada, balanço do ano, decisões sobre o
+ *   futuro (aposentadoria, renovação, etc.).
+ */
+export type MomentoDeCarreira = "pre_temporada" | "temporada_regular" | "reta_final" | "pos_temporada";
+
+/**
+ * Condições de elegibilidade de um cenário — todo campo é opcional; um
+ * `Gatilho` com nenhum campo definido (ou um `Cenario` sem `gatilho`) é
+ * elegível sempre. Os campos de min/max são inclusivos e comparam contra
+ * o `ContextoSorteio` correspondente; `momentos`, se definido, só filtra
+ * o cenário quando o `ContextoSorteio.momento` é informado — sem essa
+ * informação (ex: chamador que ainda não ligou o calendário) o cenário
+ * continua elegível, permissivo por padrão.
+ */
+export interface Gatilho {
+  idadeMinima?: number;
+  idadeMaxima?: number;
+  reputacaoNacionalMinima?: number;
+  reputacaoNacionalMaxima?: number;
+  /** Reputação na região atual do jogador (`ContextoSorteio.reputacaoRegional`), não a nacional. */
+  reputacaoRegionalMinima?: number;
+  reputacaoRegionalMaxima?: number;
+  moralMinima?: number;
+  moralMaxima?: number;
+  relacoesInternasMinima?: number;
+  relacoesInternasMaxima?: number;
+  /** Momentos em que o cenário faz sentido (ver `MomentoDeCarreira`). Omitido = qualquer momento. */
+  momentos?: MomentoDeCarreira[];
+}
+
+/** Contexto atual do jogador/carreira usado pra decidir quais cenários são elegíveis (ver `filtrarCenariosElegiveis`). */
+export interface ContextoSorteio {
+  idadeJogador: number;
+  reputacaoNacional: number;
+  /** Reputação na região atual do jogador (0 se a região não tiver entrada em `Reputacao.porRegiao`). */
+  reputacaoRegional: number;
+  moral: number;
+  relacoesInternas: number;
+  /** Omitido = não filtra por momento, mesmo que algum cenário declare `gatilho.momentos`. */
+  momento?: MomentoDeCarreira;
+}
+
+/** Confere se um cenário é elegível num contexto — usado por `filtrarCenariosElegiveis`. */
+export function cenarioElegivel(cenario: Cenario, contexto: ContextoSorteio): boolean {
+  const g = cenario.gatilho;
+  if (!g) return true;
+
+  if (g.idadeMinima !== undefined && contexto.idadeJogador < g.idadeMinima) return false;
+  if (g.idadeMaxima !== undefined && contexto.idadeJogador > g.idadeMaxima) return false;
+  if (g.reputacaoNacionalMinima !== undefined && contexto.reputacaoNacional < g.reputacaoNacionalMinima) return false;
+  if (g.reputacaoNacionalMaxima !== undefined && contexto.reputacaoNacional > g.reputacaoNacionalMaxima) return false;
+  if (g.reputacaoRegionalMinima !== undefined && contexto.reputacaoRegional < g.reputacaoRegionalMinima) return false;
+  if (g.reputacaoRegionalMaxima !== undefined && contexto.reputacaoRegional > g.reputacaoRegionalMaxima) return false;
+  if (g.moralMinima !== undefined && contexto.moral < g.moralMinima) return false;
+  if (g.moralMaxima !== undefined && contexto.moral > g.moralMaxima) return false;
+  if (g.relacoesInternasMinima !== undefined && contexto.relacoesInternas < g.relacoesInternasMinima) return false;
+  if (g.relacoesInternasMaxima !== undefined && contexto.relacoesInternas > g.relacoesInternasMaxima) return false;
+  if (g.momentos && contexto.momento && !g.momentos.includes(contexto.momento)) return false;
+
+  return true;
+}
+
+/** Filtra o catálogo pros cenários elegíveis num contexto — chame antes de `sortearCenario` pra sortear só entre o que faz sentido agora. */
+export function filtrarCenariosElegiveis(cenarios: Cenario[], contexto: ContextoSorteio): Cenario[] {
+  return cenarios.filter((cenario) => cenarioElegivel(cenario, contexto));
 }
 
 export interface EscolhaResolvida {
@@ -151,6 +234,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_clube_grande",
     titulo: "Proposta de um clube grande",
     descricao: "No meio do estadual, um clube maior te sondou. O técnico do seu time atual pediu discrição — a decisão é sua.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "aceitar_agora",
@@ -181,6 +265,7 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_treino",
     titulo: "Lesão durante o treino",
     descricao: "Numa sessão de treino, você sente uma dor muscular incomum. O departamento médico pede pra você decidir como seguir.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "jogar_mesmo_assim",
@@ -420,6 +505,7 @@ export const CENARIOS: Cenario[] = [
     id: "pressao_para_cobrar_penalti",
     titulo: "A cobrança é sua?",
     descricao: "Pênalti nos acréscimos de um jogo decisivo. O grupo olha pra você esperando que assuma a cobrança.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "aceitar_cobrar",
@@ -443,6 +529,7 @@ export const CENARIOS: Cenario[] = [
     id: "reagir_a_cartao_duvidoso",
     titulo: "Cartão duvidoso do árbitro",
     descricao: "O árbitro te mostra um cartão amarelo que você considera injusto, no meio de uma partida tensa.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "reclamar_com_o_arbitro",
@@ -465,6 +552,7 @@ export const CENARIOS: Cenario[] = [
     id: "reserva_insatisfeito",
     titulo: "Parado no banco",
     descricao: "Você está há semanas no banco de reservas sem entender bem o motivo.",
+    gatilho: { moralMaxima: 60, momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "cobrar_o_tecnico",
@@ -496,6 +584,7 @@ export const CENARIOS: Cenario[] = [
     id: "capitania_oferecida",
     titulo: "Oferta de capitania",
     descricao: "O técnico sugere seu nome pra ser o novo capitão do elenco.",
+    gatilho: { relacoesInternasMinima: 55, idadeMinima: 21 },
     opcoes: [
       {
         id: "aceitar_capitania",
@@ -518,6 +607,7 @@ export const CENARIOS: Cenario[] = [
     id: "convocacao_selecao_nacional",
     titulo: "Convocação para a seleção",
     descricao: "Seu nome aparece pela primeira vez numa lista de convocados da seleção nacional.",
+    gatilho: { reputacaoNacionalMinima: 40 },
     opcoes: [
       {
         id: "aproveitar_a_oportunidade",
@@ -584,6 +674,7 @@ export const CENARIOS: Cenario[] = [
     id: "agente_pressiona_transferencia",
     titulo: "Seu agente quer uma saída",
     descricao: "Seu empresário insiste que está na hora de sair do clube pra um lugar com mais projeção.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "seguir_o_conselho_do_agente",
@@ -606,6 +697,7 @@ export const CENARIOS: Cenario[] = [
     id: "proposta_do_exterior",
     titulo: "Proposta vinda do exterior",
     descricao: "Um clube estrangeiro te sonda com uma proposta que mudaria sua carreira.",
+    gatilho: { momentos: ["pre_temporada"], reputacaoNacionalMinima: 30 },
     opcoes: [
       {
         id: "topar_o_desafio",
@@ -628,6 +720,7 @@ export const CENARIOS: Cenario[] = [
     id: "suspensao_por_cartao",
     titulo: "Suspenso por acúmulo de cartões",
     descricao: "Você cumpre suspensão automática e vai desfalcar o time num jogo importante.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "acompanhar_de_perto_do_elenco",
@@ -650,6 +743,7 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_grave_temporada",
     titulo: "Lesão grave, temporada em risco",
     descricao: "Um exame aponta uma lesão séria — o departamento médico apresenta duas linhas de tratamento.",
+    gatilho: { momentos: ["temporada_regular", "reta_final"] },
     opcoes: [
       {
         id: "cirurgia_e_recuperacao_padrao",
@@ -740,6 +834,7 @@ export const CENARIOS: Cenario[] = [
     id: "amistoso_beneficente",
     titulo: "Convite pra amistoso beneficente",
     descricao: "Uma instituição de caridade te convida pra um amistoso em prol de uma causa social.",
+    gatilho: { momentos: ["pre_temporada", "pos_temporada"] },
     opcoes: [
       {
         id: "participar_do_amistoso",
@@ -762,6 +857,7 @@ export const CENARIOS: Cenario[] = [
     id: "mentoria_de_jovem_promessa",
     titulo: "Um garoto da base pede conselhos",
     descricao: "Uma jovem promessa da base do clube te procura pedindo orientação pra carreira.",
+    gatilho: { idadeMinima: 24 },
     opcoes: [
       {
         id: "aceitar_mentorar",
@@ -784,6 +880,7 @@ export const CENARIOS: Cenario[] = [
     id: "reuniao_de_metas_com_diretoria",
     titulo: "Reunião de metas com a diretoria",
     descricao: "A diretoria convoca uma reunião pra alinhar as expectativas de resultado pro resto da temporada.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "cobrar_investimento_no_elenco",

@@ -3,7 +3,15 @@ import { simularTemporada } from "../simulation/engine.js";
 import { simularMataMataDoFormato, type ResultadoMataMata } from "../simulation/knockout.js";
 import { obterRating } from "../simulation/rating.js";
 import { simularFaseUnicaDoFormato, somarTabelas, type LinhaTabela } from "../simulation/season.js";
-import { CENARIOS, aplicarImpacto, resolverEscolha, sortearCenario, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
+import {
+  CENARIOS,
+  aplicarImpacto,
+  filtrarCenariosElegiveis,
+  resolverEscolha,
+  sortearCenario,
+  type ContextoSorteio,
+  type EstadoJogadorParaImpacto,
+} from "../progression/scenarios.js";
 import { converterChancesEmDesempenho } from "../progression/xp.js";
 import { ATRIBUTOS_POR_POSICAO } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
@@ -115,11 +123,22 @@ function formatarImpacto(impacto: {
   return partes.length > 0 ? partes.join(", ") : "sem impacto numérico";
 }
 
-/** Demonstra um cenário de carreira sorteado: mostra as opções, "escolhe" uma (a primeira, pra fins de demo) e resolve o resultado probabilístico. */
+/**
+ * Demonstra um cenário de carreira sorteado: mostra as opções, "escolhe" uma
+ * (a primeira, pra fins de demo) e resolve o resultado probabilístico. O
+ * momento do calendário (`pre_temporada`, `temporada_regular`, `reta_final`,
+ * `pos_temporada`) pode ser passado como segundo argumento da CLI — sem ele,
+ * usa `temporada_regular` — e é usado por `filtrarCenariosElegiveis` pra só
+ * sortear entre cenários que fazem sentido nesse momento (ver `gatilho` em
+ * `progression/scenarios.ts`).
+ */
 function simularCenario(): void {
-  const cenario = sortearCenario(CENARIOS);
+  const momento = (process.argv[3] as ContextoSorteio["momento"]) ?? "temporada_regular";
+  const contexto: ContextoSorteio = { idadeJogador: 25, reputacaoNacional: 30, reputacaoRegional: 20, moral: 50, relacoesInternas: 50, momento };
+  const elegiveis = filtrarCenariosElegiveis(CENARIOS, contexto);
+  const cenario = sortearCenario(elegiveis);
 
-  console.log(`\n=== ${cenario.titulo} ===`);
+  console.log(`\n=== ${cenario.titulo} (momento: ${momento}, ${elegiveis.length}/${CENARIOS.length} cenários elegíveis) ===`);
   console.log(cenario.descricao);
   console.log();
 
@@ -191,7 +210,15 @@ function simularCarreira(): void {
   console.log(`Gols: ${desempenho.gols} | Assistências: ${desempenho.assistencias} | Chances perdidas: ${desempenho.chancesPerdidas}`);
   console.log(`Overall após a partida: ${overallAtual(estado)}\n`);
 
-  const cenario = sortearCenario(CENARIOS);
+  const contextoCenario: ContextoSorteio = {
+    idadeJogador: estado.jogador.idade,
+    reputacaoNacional: estado.reputacao.nacional,
+    reputacaoRegional: estado.reputacao.porRegiao[regiaoAtual] ?? 0,
+    moral: estado.moral,
+    relacoesInternas: estado.relacoesInternas,
+    momento: "temporada_regular", // acabou de jogar uma partida real, não é pré/pós-temporada
+  };
+  const cenario = sortearCenario(filtrarCenariosElegiveis(CENARIOS, contextoCenario));
   const opcaoEscolhida = cenario.opcoes[0];
   const escolha = resolverEscolha(opcaoEscolhida);
   console.log(`--- Cenário: ${cenario.titulo} ---`);

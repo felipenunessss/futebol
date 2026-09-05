@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   CENARIOS,
   aplicarImpacto,
+  cenarioElegivel,
+  filtrarCenariosElegiveis,
   resolverEscolha,
   sortearCenario,
   type Cenario,
+  type ContextoSorteio,
   type EstadoJogadorParaImpacto,
   type Opcao,
 } from "../../src/progression/scenarios.js";
@@ -157,5 +160,64 @@ describe("sortearCenario", () => {
     const cenarios: Cenario[] = CENARIOS;
     const primeiro = sortearCenario(cenarios, () => 0);
     expect(primeiro).toBe(cenarios[0]);
+  });
+});
+
+describe("cenarioElegivel / filtrarCenariosElegiveis", () => {
+  function contextoBase(): ContextoSorteio {
+    return { idadeJogador: 25, reputacaoNacional: 50, reputacaoRegional: 50, moral: 50, relacoesInternas: 50 };
+  }
+
+  it("cenário sem gatilho é sempre elegível", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [] };
+    expect(cenarioElegivel(cenario, contextoBase())).toBe(true);
+  });
+
+  it("gatilho de idade mínima/máxima filtra corretamente", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { idadeMinima: 24, idadeMaxima: 30 } };
+    expect(cenarioElegivel(cenario, { ...contextoBase(), idadeJogador: 23 })).toBe(false);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), idadeJogador: 24 })).toBe(true);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), idadeJogador: 31 })).toBe(false);
+  });
+
+  it("gatilho de reputação nacional mínima filtra corretamente", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { reputacaoNacionalMinima: 40 } };
+    expect(cenarioElegivel(cenario, { ...contextoBase(), reputacaoNacional: 39 })).toBe(false);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), reputacaoNacional: 40 })).toBe(true);
+  });
+
+  it("gatilho de reputação regional é independente da nacional", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { reputacaoRegionalMinima: 40 } };
+    expect(cenarioElegivel(cenario, { ...contextoBase(), reputacaoNacional: 100, reputacaoRegional: 10 })).toBe(false);
+  });
+
+  it("gatilho de moral e relações internas filtram corretamente", () => {
+    const cenarioMoral: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { moralMaxima: 60 } };
+    expect(cenarioElegivel(cenarioMoral, { ...contextoBase(), moral: 70 })).toBe(false);
+
+    const cenarioRelacoes: Cenario = { id: "y", titulo: "y", descricao: "y", opcoes: [], gatilho: { relacoesInternasMinima: 55 } };
+    expect(cenarioElegivel(cenarioRelacoes, { ...contextoBase(), relacoesInternas: 50 })).toBe(false);
+  });
+
+  it("gatilho de momento só filtra quando o contexto informa um momento", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { momentos: ["pre_temporada"] } };
+    expect(cenarioElegivel(cenario, contextoBase())).toBe(true); // sem momento no contexto, permissivo
+    expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "pre_temporada" })).toBe(true);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "temporada_regular" })).toBe(false);
+  });
+
+  it("filtrarCenariosElegiveis remove só os inelegíveis, preservando o resto", () => {
+    const cenarios: Cenario[] = [
+      { id: "a", titulo: "a", descricao: "a", opcoes: [], gatilho: { idadeMinima: 30 } },
+      { id: "b", titulo: "b", descricao: "b", opcoes: [] },
+    ];
+    const filtrados = filtrarCenariosElegiveis(cenarios, contextoBase());
+    expect(filtrados.map((c) => c.id)).toEqual(["b"]);
+  });
+
+  it("cenários reais com gatilho de momento respeitam o filtro (proposta_clube_grande só em pré-temporada)", () => {
+    const cenario = CENARIOS.find((c) => c.id === "proposta_clube_grande")!;
+    expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "reta_final" })).toBe(false);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "pre_temporada" })).toBe(true);
   });
 });
