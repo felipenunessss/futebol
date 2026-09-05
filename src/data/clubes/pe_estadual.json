@@ -32,7 +32,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "rating_inicial": 1519
   },
   {
     "id": "decisao",

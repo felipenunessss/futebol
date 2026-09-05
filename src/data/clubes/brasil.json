@@ -535,7 +535,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "rating_inicial": 1464
   },
   {
     "id": "athletic_club_mg",
@@ -632,7 +633,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "rating_inicial": 1526
   },
   {
     "id": "paysandu",
