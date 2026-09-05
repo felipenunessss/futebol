@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { simularTemporada } from "../../src/simulation/engine.js";
+import { receitaArgentina, simularTemporada, type CampeonatoSimulavel } from "../../src/simulation/engine.js";
 import type { Club } from "../../src/schemas/club.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
@@ -55,6 +55,8 @@ describe("simularTemporada", () => {
   });
 
   it("competição com combinação de blocos sem receita vem com erro, sem derrubar as outras", () => {
+    // "carioca_a" tem a MESMA combinação de blocos que "argentina_primera" (final_estadual+returno+turno),
+    // mas não tem receita por id registrada — confirma que a receita da Argentina é por id, não por formato.
     // "carioca_a" e "brasileirao_serie_a" são ids referenciados pelo calendário padrão de verdade (calendario.ts)
     const campeonatos = [
       { id: "carioca_a", formato: { turno: { ida_e_volta: false, classificam_proxima_fase: 0 }, returno: { ida_e_volta: false, classificam_proxima_fase: 0 }, final_estadual: { criterio: "x", ida_e_volta: true } }, times: ["a", "b"] },
@@ -89,6 +91,48 @@ describe("simularTemporada", () => {
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
 
     expect(competicao.resultado!.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+
+  it("receitaArgentina simula como Tabla Anual (soma turno+returno), não como final de jogo isolada", () => {
+    // "argentina_primera" ainda não é referenciada pelo calendário padrão (ver comentário da receita
+    // em engine.ts), então testamos a função diretamente em vez de passar por simularTemporada.
+    const times = ["a", "b", "c", "d"];
+    const campeonato: CampeonatoSimulavel = {
+      id: "argentina_primera",
+      formato: {
+        turno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        returno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        final_estadual: { criterio: "tabela_anual_soma_pontos_apertura_e_clausura_define_campeao_de_liga", ida_e_volta: false },
+      },
+      times,
+    };
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+    const resultado = receitaArgentina(campeonato, ratings, undefined, () => Math.random());
+
+    expect(times).toContain(resultado.campeao);
+    expect(resultado.partidasDoJogador).toEqual([]);
+  });
+
+  it("receitaArgentina propaga partidasDoJogador do Apertura e do Clausura combinados", () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonato: CampeonatoSimulavel = {
+      id: "argentina_primera",
+      formato: {
+        turno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        returno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        final_estadual: { criterio: "tabela_anual_soma_pontos_apertura_e_clausura_define_campeao_de_liga", ida_e_volta: false },
+      },
+      times,
+    };
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = receitaArgentina(campeonato, ratings, participacao, () => Math.random());
+
+    // "a" joga contra os outros 3, uma vez no turno e uma no returno = 6 partidas
+    expect(resultado.partidasDoJogador).toHaveLength(2 * (times.length - 1));
   });
 
   it("clube do jogador fora da competição: partidasDoJogador fica vazio", () => {

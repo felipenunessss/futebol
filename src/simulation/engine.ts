@@ -5,7 +5,7 @@ import { simularFaseDeGruposDoFormato } from "./groups.js";
 import { simularMataMataDoFormato, simularMataMataSimples } from "./knockout.js";
 import type { ParticipacaoJogadorClube, ResultadoPartida } from "./match.js";
 import { obterRating } from "./rating.js";
-import { simularTemporadaPontosCorridos } from "./season.js";
+import { simularFaseUnicaDoFormato, simularTemporadaPontosCorridos, somarTabelas } from "./season.js";
 
 /**
  * Loop de calendário — percorre o calendário mestre de uma temporada
@@ -16,19 +16,23 @@ import { simularTemporadaPontosCorridos } from "./season.js";
  * etc) de um jeito que só dá pra simular corretamente sabendo o significado
  * específico daquele campeonato — o `criterio` desses blocos é texto livre
  * (ver `docs/dados-a-verificar.md`), não dá pra interpretar de forma
- * genérica e seguro. Este motor só despacha automaticamente as 3
- * combinações de blocos **estruturalmente inambíguas**:
+ * genérica e segura só pela combinação de blocos (o Carioca usa a mesma
+ * combinação `final_estadual`+`returno`+`turno` que a Argentina, com
+ * significado bem diferente — lá é final de verdade, aqui é reconciliação
+ * por tabela). Por isso `escolherReceita` primeiro confere um registro por
+ * **id específico** (`RECEITAS_POR_ID`, pras competições já com lógica
+ * bespoke conhecida — hoje só `argentina_primera`) antes de cair no
+ * despacho genérico, que só cobre as 3 combinações de blocos
+ * **estruturalmente inambíguas**:
  *
  * - só `pontos_corridos` (ex: Brasileirão A/B, Chile, Bolívia)
  * - só `mata_mata` (ex: Copa do Brasil)
  * - `fase_grupos` + `mata_mata`, classificados do grupo alimentando o
  *   mata-mata direto (a maioria dos estaduais brasileiros)
  *
- * Qualquer outra combinação de blocos (a maioria dos países CONMEBOL, e
- * alguns estaduais como Paulistão A1/A2) não tem receita automática —
- * aparece como `erro` no resultado da competição em vez de quebrar a
- * temporada inteira. Ver exemplos de simulação bespoke pra esses casos em
- * `src/cli/index.ts` (`simularArgentina`).
+ * Qualquer competição fora dessas 4 receitas (id específico + 3 genéricas)
+ * não tem simulação automática ainda — aparece como `erro` no resultado
+ * da competição em vez de quebrar a temporada inteira.
  */
 
 export interface ResultadoCampeonatoSimples {
@@ -37,7 +41,7 @@ export interface ResultadoCampeonatoSimples {
   partidasDoJogador: ResultadoPartida[];
 }
 
-interface CampeonatoSimulavel {
+export interface CampeonatoSimulavel {
   id: string;
   formato: FormatoEstadual;
   times: string[];
@@ -91,7 +95,7 @@ type Receita = (
 ) => ResultadoCampeonatoSimples;
 
 /** Despacha pela combinação exata de blocos de `formato` — só cobre as 3 combinações estruturalmente inambíguas (ver comentário do arquivo). */
-function despacharReceita(formato: FormatoEstadual): Receita {
+function despacharReceitaGenerica(formato: FormatoEstadual): Receita {
   const blocos = Object.keys(formato).sort().join(",");
 
   switch (blocos) {
@@ -104,6 +108,52 @@ function despacharReceita(formato: FormatoEstadual): Receita {
     default:
       throw new Error(`sem receita de simulação genérica pra combinação de blocos [${blocos}]`);
   }
+}
+
+/**
+ * Argentina: `turno`+`returno` são Apertura/Clausura; o `final_estadual`
+ * não é uma final de jogo de verdade, é reaproveitado pra representar a
+ * Tabla Anual (soma dos pontos dos dois torneios define o Campeón de Liga
+ * — ver `final_estadual.criterio` no próprio dado e
+ * `docs/dados-a-verificar.md`). Mesma combinação de blocos
+ * (`final_estadual,returno,turno`) que o Carioca usa com significado
+ * diferente (lá é uma final de verdade) — por isso não dá pra despachar
+ * isso por formato genérico, só por id específico (ver `RECEITAS_POR_ID`).
+ */
+/**
+ * Exportada (diferente das outras receitas) porque `argentina_primera`
+ * ainda não é referenciada pelo calendário padrão (`calendario.ts` só
+ * cobre Brasil + competições continentais hoje) — então não dá pra
+ * exercitar essa receita via `simularTemporada` ainda, só testando a
+ * função diretamente.
+ */
+export function receitaArgentina(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+): ResultadoCampeonatoSimples {
+  const apertura = simularFaseUnicaDoFormato(campeonato.formato.turno!, campeonato.times, ratings, random, participacaoJogador);
+  const clausura = simularFaseUnicaDoFormato(campeonato.formato.returno!, campeonato.times, ratings, random, participacaoJogador);
+  const tabelaAnual = somarTabelas([apertura.tabela, clausura.tabela]);
+
+  const partidasDoJogador = [...(apertura.partidasDoJogador ?? []), ...(clausura.partidasDoJogador ?? [])].map((p) => p.resultado);
+
+  return { campeao: tabelaAnual[0].clubeId, partidasDoJogador };
+}
+
+/**
+ * Receitas registradas por id — pra competições cuja combinação de blocos
+ * é ambígua (o mesmo formato pode significar coisas diferentes em
+ * campeonatos diferentes, ver `receitaArgentina`). Checada antes da
+ * despacho genérico por formato.
+ */
+const RECEITAS_POR_ID: Record<string, Receita> = {
+  argentina_primera: receitaArgentina,
+};
+
+function escolherReceita(campeonato: CampeonatoSimulavel): Receita {
+  return RECEITAS_POR_ID[campeonato.id] ?? despacharReceitaGenerica(campeonato.formato);
 }
 
 export interface ResultadoCompeticaoNaTemporada {
@@ -151,7 +201,7 @@ export function simularTemporada(
       const participacaoNestaCompeticao =
         participacaoJogador && campeonato.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
 
-      const receita = despacharReceita(campeonato.formato);
+      const receita = escolherReceita(campeonato);
       const resultado = receita(campeonato, ratings, participacaoNestaCompeticao, random);
       competicoes.push({ campeonatoId, resultado });
     } catch (erro) {

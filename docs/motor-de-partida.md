@@ -587,16 +587,20 @@ cenários (`CENARIOS`) e demo via `npx tsx src/cli/index.ts cenario`.
 lê `construirCalendarioPadrao` (`data/loaders/calendario.ts`), reúne todas
 as competições ativas em algum período do ano e simula cada uma.
 
-- **Despacho por combinação exata de blocos de `formato`** (`Object.keys`
-  ordenado) — só as 3 combinações estruturalmente inambíguas têm receita
-  automática: só `pontos_corridos`; só `mata_mata`; `fase_grupos` +
-  `mata_mata` (classificados do grupo alimentam o mata-mata direto — cobre
-  a maioria dos estaduais brasileiros). **Deliberadamente não tenta**
-  despachar combinações que dependem de interpretar o `criterio` em texto
-  livre de `tabela_acumulada`/`final_estadual` (Argentina, Uruguai,
-  Paraguai, Peru, Colômbia, Venezuela, Carioca, Paulistão A2, etc.) — isso
-  exige lógica bespoke por competição (ver `simularArgentina` em
-  `src/cli/index.ts` como exemplo), não é seguro generalizar.
+- **`escolherReceita` confere primeiro um registro por id** (`RECEITAS_POR_ID`
+  — hoje só `argentina_primera` → `receitaArgentina`, ver seção 6) **antes**
+  de cair no despacho genérico por combinação exata de blocos de `formato`
+  (`Object.keys` ordenado) — só 3 combinações são estruturalmente
+  inambíguas o bastante pra despachar por formato sozinho: só
+  `pontos_corridos`; só `mata_mata`; `fase_grupos`+`mata_mata`
+  (classificados do grupo alimentam o mata-mata direto — cobre a maioria
+  dos estaduais brasileiros). **Por que precisa do registro por id**: o
+  Carioca usa a mesma combinação de blocos que a Argentina
+  (`final_estadual`+`returno`+`turno`) com significado bem diferente —
+  não dá pra despachar isso só pela combinação de blocos, precisa saber
+  qual competição é. Combinações ainda sem receita nenhuma (a maioria dos
+  países CONMEBOL, Carioca, Paulistão A1/A2, etc.) — ver pendência na
+  seção 6.
 - **Falha isolada, não em cascata**: uma competição sem receita (ou com
   dado incompatível — ex: Libertadores/Sul-Americana, cujo `times[]` inclui
   clubes da fase preliminar além dos 32/56 do corpo principal, então a
@@ -642,10 +646,17 @@ as competições ativas em algum período do ano e simula cada uma.
   por perna). Validado com smoke test real (Boca Juniors no Apertura
   argentino, 29 partidas).
 - **Receitas de simulação bespoke pras competições com formato composto**
-  (ver seção 5): Argentina, Uruguai, Paraguai, Peru, Colômbia, Venezuela,
-  Carioca, Paulistão A1/A2, Mineiro, Gauchão, Libertadores/Sul-Americana
-  (fase preliminar) — hoje só têm exemplo manual em `src/cli/index.ts`
-  (`simularArgentina`), não uma receita registrada no `engine.ts`.
+  (ver seção 5): **Argentina resolvida** (`receitaArgentina`, registrada
+  por id em `RECEITAS_POR_ID` — precisou ser por id, não por formato,
+  porque o Carioca usa a mesma combinação de blocos `final_estadual`+
+  `returno`+`turno` com significado diferente, final de verdade em vez de
+  reconciliação por tabela). Ainda faltam: Uruguai, Paraguai, Peru,
+  Colômbia, Venezuela, Carioca, Paulistão A1/A2, Mineiro, Gauchão,
+  Libertadores/Sul-Americana (fase preliminar). Nota: `argentina_primera`
+  ainda não é referenciada pelo calendário padrão (`calendario.ts` só
+  cobre Brasil + continentais hoje), então a receita foi validada
+  chamando `receitaArgentina` direto (testes + smoke test contra dado
+  real, campeão Boca Juniors), não ainda via `simularTemporada`.
 - **Estado de carreira não persiste entre temporadas via `engine.ts`**:
   `simularTemporada` devolve resultados por competição, mas quem aplica
   `partidasDoJogador` ao `EstadoDeCarreira` (`career/Player.ts`) ainda é
