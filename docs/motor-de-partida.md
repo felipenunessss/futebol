@@ -883,6 +883,50 @@ existindo e coexistem com isso — ver ressalva abaixo).
   estagnou em ~57-58 por várias temporadas), em vez de atrair gigantes
   desproporcionais como acontecia antes dessa mudança.
 
+### 5.3. Carreira interativa (implementado)
+
+`jogarTemporada`/`jogarCarreira` (`career/career-loop.ts`) sempre
+aceitaram `escolherOpcao`/`responderProposta` injetáveis (ver seção
+5.1) — a peça que faltava era só uma interface de verdade plugando
+essas funções a uma entrada humana em vez de "sempre a primeira opção".
+`npx tsx src/cli/index.ts jogar` é essa interface: cria o personagem
+(nome, posição, arquétipo — filtrado pela posição escolhida via
+`ARQUETIPOS` — e clube inicial, com um atalho `listar [pais]` embutido
+no próprio prompt) e depois joga temporada por temporada, te
+perguntando de verdade qual opção escolher em cada cenário.
+
+- **`escolherOpcao`/`responderProposta` agora podem ser assíncronos**
+  (`Opcao | Promise<Opcao>`, `TermosDeContrato | Promise<TermosDeContrato>`)
+  — por isso `jogarTemporada`/`jogarCarreira` viraram `async`/retornam
+  `Promise`. Isso é o que permite esperar de verdade a resposta do
+  terminal (`node:readline/promises`) no meio do loop, sem quebrar o
+  comportamento síncrono de quem não precisa disso (as demos
+  `carreira`/`carreira-loop` continuam funcionando, só com um `await` a
+  mais na chamada).
+- **Dois hooks novos em `OpcoesJogarTemporada`**: `onCenarioResolvido` e
+  `onNegociacaoResolvida`, chamados no momento exato em que cada
+  cenário/negociação é resolvido (não só no fim da temporada) — é o que
+  permite mostrar o desfecho em tempo real na tela, em vez de só depois
+  que a temporada inteira termina.
+- **As opções são mostradas sem revelar probabilidade/resultado de
+  antemão** — só o texto de cada opção; o desfecho (narrativa + impacto,
+  ou o resultado real de uma negociação) só aparece depois de escolher.
+  Mais parecido com jogar de verdade do que a exibição de
+  `npx tsx src/cli/index.ts cenario`, que mostra tudo de antemão (essa
+  continua existindo como ferramenta de inspeção do catálogo, não como
+  "jogo").
+- **Contraproposta de transferência continua automática**
+  (`contrapropostaPadrao`) nesta versão — negociar os termos (salário,
+  luvas, anos) na mão é a próxima extensão natural, ainda não feita.
+- **Validado com um terminal de verdade** (não só piping de respostas
+  pré-definidas, que fecha o stdin antes da hora e quebra
+  `readline/promises` — comportamento conhecido do Node, não é bug do
+  jogo): rodei via um pseudo-terminal (`pty`) simulando alguém digitando
+  as respostas, e o fluxo completo funcionou — criação de personagem,
+  5 cenários de uma temporada (incluindo uma negociação de transferência
+  real com 3 propostas recusadas em sequência), resumo de fim de
+  temporada, e encerramento ao digitar "sair".
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -978,3 +1022,10 @@ existindo e coexistem com isso — ver ressalva abaixo).
   curada/filtrada de "clubes pra começar carreira" — `npx tsx
   src/cli/index.ts clubes [pais]` lista tudo, sem filtrar por tamanho/
   divisão.
+- **Carreira interativa — limitações desta primeira versão** (ver seção
+  5.3): contraproposta de negociação continua automática
+  (`contrapropostaPadrao`), o jogador não escolhe os termos; não há
+  como ver o placar/eventos de uma partida específica durante o loop
+  (só o resumo agregado por competição, igual `carreira-loop`); não há
+  "salvar e continuar depois" — a carreira só existe enquanto o
+  processo do terminal está rodando.

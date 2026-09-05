@@ -74,10 +74,21 @@ export interface OpcoesJogarTemporada {
    * pra clube sem `estado` (a maioria dos clubes fora do Brasil).
    */
   regiaoAtual?: string;
-  /** Como decidir qual opção de um cenário é escolhida — por padrão, sempre a primeira (mesmo comportamento das demos de CLI). Injete pra plugar uma interface real (jogador humano, IA, sempre a opção mais segura, etc). */
-  escolherOpcao?: (cenario: Cenario) => Opcao;
-  /** Como o jogador contrapropõe uma oferta de transferência recebida — por padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais salário/luvas que a proposta inicial). Injete pra plugar outra estratégia. */
-  responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato;
+  /**
+   * Como decidir qual opção de um cenário é escolhida — por padrão,
+   * sempre a primeira (mesmo comportamento das demos de CLI). Injete pra
+   * plugar uma interface real (jogador humano escolhendo via prompt, IA,
+   * sempre a opção mais segura, etc). Pode ser assíncrona (ex: esperar o
+   * jogador digitar uma resposta no terminal) — `jogarTemporada`/
+   * `jogarCarreira` são `async` justamente pra suportar isso.
+   */
+  escolherOpcao?: (cenario: Cenario) => Opcao | Promise<Opcao>;
+  /** Como o jogador contrapropõe uma oferta de transferência recebida — por padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais salário/luvas que a proposta inicial). Injete pra plugar outra estratégia (também pode ser assíncrona). */
+  responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
+  /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
+  onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
+  /** Chamado assim que cada cenário do período é resolvido — útil pra mostrar o desfecho em tempo real numa interface interativa. */
+  onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
   random?: () => number;
 }
 
@@ -88,21 +99,22 @@ export interface OpcoesJogarTemporada {
  * `exigirUpgrade`), parando no primeiro que aceitar. Registra toda
  * tentativa (aceita ou não) em `negociacoesResolvidas`.
  */
-function resolverNegociacaoDeTransferencia(
+async function resolverNegociacaoDeTransferencia(
   estado: EstadoDeCarreira,
   interessados: Club[],
   valorDeMercado: number,
   tipo: NegociacaoResolvidaNaTemporada["tipo"],
   periodo: string,
-  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato,
+  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>,
   random: () => number,
   negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
-): { estado: EstadoDeCarreira; aceita: boolean } {
+  onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>,
+): Promise<{ estado: EstadoDeCarreira; aceita: boolean }> {
   let estadoAtual = estado;
 
   for (const clube of interessados) {
     const proposta = gerarProposta(clube, valorDeMercado, random);
-    const contraproposta = responderProposta(proposta);
+    const contraproposta = await responderProposta(proposta);
     const fatoresConfianca: FatoresConfianca = {
       overall: overallAtual(estadoAtual),
       reputacaoNacional: estadoAtual.reputacao.nacional,
@@ -110,7 +122,9 @@ function resolverNegociacaoDeTransferencia(
     };
     const resultado = negociarTransferencia(proposta, contraproposta, fatoresConfianca, estadoAtual.temporada, random);
 
-    negociacoesResolvidas.push({ periodo, tipo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: contraproposta, resultado });
+    const negociacao: NegociacaoResolvidaNaTemporada = { periodo, tipo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: contraproposta, resultado };
+    negociacoesResolvidas.push(negociacao);
+    await onNegociacaoResolvida?.(negociacao);
 
     if (resultado.aceito && resultado.contrato) {
       return { estado: assinarContrato(estadoAtual, resultado.contrato), aceita: true };
@@ -160,17 +174,19 @@ function resolverNegociacaoDeTransferencia(
  * `partidasDoJogador` ainda. Uma negociação aceita por temporada, no
  * máximo (para no primeiro clube que aceitar a contraproposta).
  */
-export function jogarTemporada(
+export async function jogarTemporada(
   estado: EstadoDeCarreira,
   campeonatos: CampeonatoSimulavel[],
   clubes: Club[],
   opcoes: OpcoesJogarTemporada = {},
-): ResultadoTemporadaDeCarreira {
+): Promise<ResultadoTemporadaDeCarreira> {
   const {
     estiloTecnico = "equilibrado",
     regiaoAtual: regiaoAtualPadrao,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
+    onNegociacaoResolvida,
+    onCenarioResolvido,
     random = Math.random,
   } = opcoes;
 
@@ -244,7 +260,7 @@ export function jogarTemporada(
     }
 
     const cenario = sortearCenario(poolDeSorteio, random);
-    const opcaoEscolhida = escolherOpcao(cenario);
+    const opcaoEscolhida = await escolherOpcao(cenario);
 
     const negociacaoAplicavel =
       opcaoEscolhida.disparaVendaForcada && interessadosVenda.length > 0
@@ -255,7 +271,7 @@ export function jogarTemporada(
 
     let escolha: EscolhaResolvida;
     if (negociacaoAplicavel) {
-      const { estado: novoEstado, aceita } = resolverNegociacaoDeTransferencia(
+      const { estado: novoEstado, aceita } = await resolverNegociacaoDeTransferencia(
         estadoAtual,
         negociacaoAplicavel.interessados,
         valorDeMercado,
@@ -264,6 +280,7 @@ export function jogarTemporada(
         responderProposta,
         random,
         negociacoesResolvidas,
+        onNegociacaoResolvida,
       );
       estadoAtual = novoEstado;
 
@@ -277,7 +294,9 @@ export function jogarTemporada(
     const regiaoParaImpacto = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
     estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoParaImpacto);
 
-    cenariosResolvidos.push({ periodo: periodo.periodo, momento, cenario, escolha });
+    const resolvido: CenarioResolvidoNaTemporada = { periodo: periodo.periodo, momento, cenario, escolha };
+    cenariosResolvidos.push(resolvido);
+    await onCenarioResolvido?.(resolvido);
   }
 
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
@@ -293,18 +312,18 @@ export interface ResultadoCarreiraDeVariasTemporadas {
 }
 
 /** Encadeia `jogarTemporada` por várias temporadas seguidas, alimentando o estado final de uma na próxima — o "save" indo de temporada em temporada sozinho, incluindo eventuais trocas de clube por transferência. */
-export function jogarCarreira(
+export async function jogarCarreira(
   estadoInicial: EstadoDeCarreira,
   quantidadeDeTemporadas: number,
   campeonatos: CampeonatoSimulavel[],
   clubes: Club[],
   opcoes: OpcoesJogarTemporada = {},
-): ResultadoCarreiraDeVariasTemporadas {
+): Promise<ResultadoCarreiraDeVariasTemporadas> {
   let estado = estadoInicial;
   const temporadas: ResultadoTemporadaDeCarreira[] = [];
 
   for (let i = 0; i < quantidadeDeTemporadas; i++) {
-    const resultado = jogarTemporada(estado, campeonatos, clubes, opcoes);
+    const resultado = await jogarTemporada(estado, campeonatos, clubes, opcoes);
     temporadas.push(resultado);
     estado = resultado.estado;
   }

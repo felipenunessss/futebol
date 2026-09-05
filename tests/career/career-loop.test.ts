@@ -26,28 +26,28 @@ function estadoDeTeste() {
 }
 
 describe("jogarTemporada", () => {
-  it("avança idade e temporada em 1, como avancarTemporada", () => {
+  it("avança idade e temporada em 1, como avancarTemporada", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.estado.temporada).toBe(2028);
     expect(resultado.estado.jogador.idade).toBe(19);
   });
 
-  it("aplica XP das partidas do jogador — overall muda em relação ao estado inicial", () => {
+  it("aplica XP das partidas do jogador — overall muda em relação ao estado inicial", async () => {
     const times = ["a", "b", "c", "d"];
     const estadoInicial = estadoDeTeste();
     const overallInicial = overallAtual(estadoInicial);
 
-    const resultado = jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     // com random fixo em 0.5, o jogador participa de partidas reais do clube "a" — overall não deve ficar idêntico ao inicial
     expect(overallAtual(resultado.estado)).not.toBe(overallInicial);
   });
 
-  it("resolve um cenário por período do calendário padrão (5 períodos)", () => {
+  it("resolve um cenário por período do calendário padrão (5 períodos)", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.cenariosResolvidos).toHaveLength(5);
     expect(resultado.cenariosResolvidos.map((c) => c.periodo)).toEqual(["jan-1a_quinz", "fev", "mar", "abr", "mai-nov"]);
@@ -55,9 +55,9 @@ describe("jogarTemporada", () => {
     expect(resultado.cenariosResolvidos[1].momento).toBe("temporada_regular");
   });
 
-  it("devolve o resultado bruto da temporada (calendário de competições)", () => {
+  it("devolve o resultado bruto da temporada (calendário de competições)", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.resultadoTemporada.temporada).toBe(2027);
     const competicao = resultado.resultadoTemporada.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a");
@@ -65,26 +65,26 @@ describe("jogarTemporada", () => {
     expect(times).toContain(competicao?.resultado?.campeao);
   });
 
-  it("não muta o estado recebido", () => {
+  it("não muta o estado recebido", async () => {
     const times = ["a", "b", "c", "d"];
     const estadoInicial = estadoDeTeste();
-    jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    await jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
     expect(estadoInicial.temporada).toBe(2027);
   });
 
-  it("aplica reputação regional só quando regiaoAtual é informada", () => {
+  it("aplica reputação regional só quando regiaoAtual é informada", async () => {
     const times = ["a", "b", "c", "d"];
-    const semRegiao = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.9 });
-    const comRegiao = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.9, regiaoAtual: "SP" });
+    const semRegiao = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.9 });
+    const comRegiao = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.9, regiaoAtual: "SP" });
 
     expect(semRegiao.estado.reputacao.porRegiao).toEqual({});
     // não garantimos que algum cenário resolvido mexeu em reputação regional, só que o mecanismo aceita a região sem quebrar
     expect(comRegiao.estado.reputacao).toBeDefined();
   });
 
-  it("permite injetar a escolha de opção (ex: sempre a última em vez da primeira)", () => {
+  it("permite injetar a escolha de opção (ex: sempre a última em vez da primeira)", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
       random: () => 0.5,
       escolherOpcao: (cenario) => cenario.opcoes[cenario.opcoes.length - 1],
     });
@@ -93,10 +93,28 @@ describe("jogarTemporada", () => {
       expect(resolvido.escolha.opcao).toBe(resolvido.cenario.opcoes[resolvido.cenario.opcoes.length - 1]);
     }
   });
+
+  it("aceita escolherOpcao assíncrono (ex: prompt interativo) e chama onCenarioResolvido/onNegociacaoResolvida", async () => {
+    const times = ["a", "b", "c", "d"];
+    const cenariosVistos: string[] = [];
+
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherOpcao: async (cenario) => {
+        await Promise.resolve(); // simula um await real, tipo esperar entrada do usuário
+        return cenario.opcoes[0];
+      },
+      onCenarioResolvido: (resolvido) => {
+        cenariosVistos.push(resolvido.periodo);
+      },
+    });
+
+    expect(cenariosVistos).toEqual(resultado.cenariosResolvidos.map((c) => c.periodo));
+  });
 });
 
 describe("jogarTemporada — negociação de transferência", () => {
-  it("clube mais forte financeiramente pode fazer proposta e o jogador assinar (clubeAtualId e contratoAtual mudam)", () => {
+  it("clube mais forte financeiramente pode fazer proposta e o jogador assinar (clubeAtualId e contratoAtual mudam)", async () => {
     const clubes: Club[] = [
       { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
       { id: "b", nome: "b", pais: "BR", cidade: "Cidade", estado: "RJ", rating_inicial: 1800, forca_financeira: "muito_alta" },
@@ -105,7 +123,7 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0 });
 
     expect(resultado.negociacoesResolvidas.length).toBeGreaterThan(0);
     const negociacaoAceita = resultado.negociacoesResolvidas.find((n) => n.resultado.aceito);
@@ -115,7 +133,7 @@ describe("jogarTemporada — negociação de transferência", () => {
     expect(resultado.estado.contratoAtual!.clubeId).toBe(resultado.estado.clubeAtualId);
   });
 
-  it("negociação recusada (random alto) não muda o clube nem gera contratoAtual", () => {
+  it("negociação recusada (random alto) não muda o clube nem gera contratoAtual", async () => {
     const clubes: Club[] = [
       { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1600, forca_financeira: "baixa" },
       { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
@@ -124,14 +142,14 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.999 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.999 });
 
     expect(resultado.negociacoesResolvidas.every((n) => !n.resultado.aceito)).toBe(true);
     expect(resultado.estado.clubeAtualId).toBe("a");
     expect(resultado.estado.contratoAtual).toBeUndefined();
   });
 
-  it("com interesse real de mercado, o cenário do período de pré-temporada é um cenário de transferência (unificação cenário/mercado)", () => {
+  it("com interesse real de mercado, o cenário do período de pré-temporada é um cenário de transferência (unificação cenário/mercado)", async () => {
     const clubes: Club[] = [
       { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
       { id: "b", nome: "b", pais: "BR", cidade: "Cidade", estado: "RJ", rating_inicial: 1800, forca_financeira: "muito_alta" },
@@ -140,13 +158,13 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
 
     const cenarioDePreTemporada = resultado.cenariosResolvidos.find((c) => c.momento === "pre_temporada")!;
     expect(cenarioDePreTemporada.cenario.opcoes.some((o) => o.disparaNegociacaoReal)).toBe(true);
   });
 
-  it("sem nenhum clube interessado (todos com rating menor), nenhum cenário de transferência é sorteado e nenhuma negociação acontece", () => {
+  it("sem nenhum clube interessado (todos com rating menor), nenhum cenário de transferência é sorteado e nenhuma negociação acontece", async () => {
     const clubes: Club[] = [
       { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1800, forca_financeira: "muito_alta" },
       { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1200, forca_financeira: "muito_baixa" },
@@ -155,7 +173,7 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
 
     expect(resultado.negociacoesResolvidas).toEqual([]);
     expect(resultado.cenariosResolvidos.some((c) => c.cenario.opcoes.some((o) => o.disparaNegociacaoReal))).toBe(false);
@@ -164,9 +182,9 @@ describe("jogarTemporada — negociação de transferência", () => {
 });
 
 describe("jogarCarreira", () => {
-  it("encadeia N temporadas, uma alimentando a próxima", () => {
+  it("encadeia N temporadas, uma alimentando a próxima", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = jogarCarreira(estadoDeTeste(), 3, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+    const resultado = await jogarCarreira(estadoDeTeste(), 3, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.temporadas).toHaveLength(3);
     expect(resultado.temporadas.map((t) => t.estado.temporada)).toEqual([2028, 2029, 2030]);

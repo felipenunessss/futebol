@@ -1,3 +1,4 @@
+import { createInterface } from "node:readline/promises";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../data/loaders/index.js";
 import { simularTemporada } from "../simulation/engine.js";
@@ -11,14 +12,16 @@ import {
   momentoDoPeriodo,
   resolverEscolha,
   sortearCenario,
+  type Cenario,
   type ContextoSorteio,
   type EstadoJogadorParaImpacto,
+  type Opcao,
 } from "../progression/scenarios.js";
 import { converterChancesEmDesempenho } from "../progression/xp.js";
-import { ATRIBUTOS_POR_POSICAO } from "../schemas/player.js";
+import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
-import { jogarCarreira } from "../career/career-loop.js";
+import { jogarCarreira, jogarTemporada, type CenarioResolvidoNaTemporada, type NegociacaoResolvidaNaTemporada, type ResultadoTemporadaDeCarreira } from "../career/career-loop.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -285,7 +288,7 @@ function simularTemporadaCli(): void {
  * passo na mão como `carreira` faz. `N` vem do 2º argumento da CLI
  * (padrão 3).
  */
-function simularCarreiraLoopCli(): void {
+async function simularCarreiraLoopCli(): Promise<void> {
   const clubeInicialId = process.argv[3] ?? "corinthians";
   const quantidadeDeTemporadas = Number(process.argv[4] ?? 3);
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
@@ -307,7 +310,7 @@ function simularCarreiraLoopCli(): void {
   console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube inicial: ${nomeDoClube(clubeInicialId)}) ===`);
   console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)}\n`);
 
-  const resultado = jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes);
+  const resultado = await jogarCarreira(estado, quantidadeDeTemporadas, campeonatos, clubes);
 
   for (const temporada of resultado.temporadas) {
     const competicoesOk = temporada.resultadoTemporada.competicoes.filter((c) => !c.erro);
@@ -335,6 +338,127 @@ function simularCarreiraLoopCli(): void {
   console.log(
     `\n=== Fim: temporada ${resultado.estadoFinal.temporada} | clube ${nomeDoClube(resultado.estadoFinal.clubeAtualId)} | idade ${resultado.estadoFinal.jogador.idade} | overall ${overallAtual(resultado.estadoFinal)} ===`,
   );
+}
+
+/**
+ * Carreira **interativa**: você cria o jogador (nome, posição, arquétipo,
+ * clube inicial) e joga temporada por temporada, escolhendo de verdade
+ * cada cenário que aparece (via `career/career-loop.ts` `jogarTemporada`
+ * `escolherOpcao`) — ao contrário de `carreira`/`carreira-loop`, que
+ * sempre escolhem a primeira opção sozinhas. As opções são mostradas sem
+ * revelar probabilidade/resultado de antemão (você só descobre o desfecho
+ * depois de escolher, via os hooks `onCenarioResolvido`/
+ * `onNegociacaoResolvida`) — mais parecido com realmente jogar. A
+ * contraproposta numa negociação de transferência continua automática
+ * (`contrapropostaPadrao`) nesta versão — negociar os termos na mão fica
+ * pra uma próxima rodada.
+ */
+async function jogarCarreiraInterativaCli(): Promise<void> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const perguntar = (texto: string) => rl.question(texto);
+
+  console.log("\n=== Criação de carreira ===");
+  const nome = (await perguntar("Nome do jogador: ")).trim() || "Jogador Sem Nome";
+
+  const posicoes: Posicao[] = ["goleiro", "zagueiro", "lateral", "volante", "meia", "atacante"];
+  console.log("\nPosições:");
+  posicoes.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
+  let posicao: Posicao;
+  while (true) {
+    const escolha = Number((await perguntar("Escolha a posição (número): ")).trim());
+    if (escolha >= 1 && escolha <= posicoes.length) {
+      posicao = posicoes[escolha - 1];
+      break;
+    }
+    console.log("Opção inválida, tente de novo.");
+  }
+
+  const arquetiposDaPosicao = ARQUETIPOS.filter((a) => a.posicao === posicao);
+  console.log(`\nArquétipos de ${posicao}:`);
+  arquetiposDaPosicao.forEach((a, i) => console.log(`  ${i + 1}. ${a.nome} (prioriza: ${a.atributos_prioritarios.join(", ")})`));
+  let arquetipoId: string;
+  while (true) {
+    const escolha = Number((await perguntar("Escolha o arquétipo (número): ")).trim());
+    if (escolha >= 1 && escolha <= arquetiposDaPosicao.length) {
+      arquetipoId = arquetiposDaPosicao[escolha - 1].id;
+      break;
+    }
+    console.log("Opção inválida, tente de novo.");
+  }
+
+  let clubeInicialId: string | undefined;
+  while (!clubeInicialId) {
+    const resposta = (await perguntar("\nClube inicial (digite o id, ex: corinthians — ou 'listar BR' pra ver ids de um país): ")).trim();
+    if (resposta.toLowerCase().startsWith("listar")) {
+      const filtroPais = resposta.split(/\s+/)[1];
+      const listados = filtroPais ? clubes.filter((c) => c.pais.toLowerCase() === filtroPais.toLowerCase()) : clubes;
+      console.log(`\n${listados.length} clube(s)${filtroPais ? ` (país: ${filtroPais})` : ""}:`);
+      for (const c of [...listados].sort((a, b) => a.id.localeCompare(b.id)).slice(0, 60)) {
+        console.log(`  ${c.id} — ${c.nome_popular ?? c.nome}`);
+      }
+      if (listados.length > 60) console.log(`  ... e mais ${listados.length - 60} (filtre por país pra uma lista menor)`);
+      continue;
+    }
+    if (clubePorId.has(resposta)) {
+      clubeInicialId = resposta;
+    } else {
+      console.log(`Clube "${resposta}" não encontrado.`);
+    }
+  }
+
+  let estado = criarEstadoInicial({ id: "jogador_interativo", nome, posicao, arquetipoId, clubeInicialId, temporadaInicial: 2027 });
+  const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
+
+  console.log(`\n=== ${estado.jogador.nome} (${posicao}) — ${nomeDoClube(clubeInicialId)}, temporada ${estado.temporada} ===`);
+  console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)}\n`);
+
+  const escolherOpcaoInterativa = async (cenario: Cenario): Promise<Opcao> => {
+    console.log(`\n--- ${cenario.titulo} ---`);
+    console.log(cenario.descricao);
+    cenario.opcoes.forEach((o, i) => console.log(`  ${i + 1}. ${o.texto}`));
+    while (true) {
+      const escolha = Number((await perguntar("Sua escolha (número): ")).trim());
+      if (escolha >= 1 && escolha <= cenario.opcoes.length) return cenario.opcoes[escolha - 1];
+      console.log("Opção inválida, tente de novo.");
+    }
+  };
+
+  const onNegociacaoResolvida = (negociacao: NegociacaoResolvidaNaTemporada): void => {
+    const termos = negociacao.contrapropostaJogador;
+    const desfecho = negociacao.resultado.aceito ? "ACEITA!" : "recusada.";
+    const rotulo = negociacao.tipo === "venda_forcada" ? "Venda forçada" : "Proposta de transferência";
+    console.log(
+      `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)} — contraproposta automática: R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos -> ${desfecho}`,
+    );
+  };
+
+  const onCenarioResolvido = (resolvido: CenarioResolvidoNaTemporada): void => {
+    console.log(`  -> ${resolvido.escolha.resultado.impacto.narrativa} (${formatarImpacto(resolvido.escolha.resultado.impacto)})`);
+  };
+
+  let continuar = true;
+  while (continuar) {
+    const resultado: ResultadoTemporadaDeCarreira = await jogarTemporada(estado, campeonatos, clubes, {
+      escolherOpcao: escolherOpcaoInterativa,
+      onNegociacaoResolvida,
+      onCenarioResolvido,
+    });
+    estado = resultado.estado;
+
+    const competicoesOk = resultado.resultadoTemporada.competicoes.filter((c) => !c.erro);
+    console.log(`\n=== Fim da temporada ${resultado.resultadoTemporada.temporada} — agora ${estado.temporada} ===`);
+    console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Idade: ${estado.jogador.idade} | Overall: ${overallAtual(estado)}`);
+    console.log(`${competicoesOk.length}/${resultado.resultadoTemporada.competicoes.length} competições simuladas`);
+    console.log(
+      `Moral ${estado.moral} | Reputação nacional ${estado.reputacao.nacional} | Relações internas ${estado.relacoesInternas} | Patrimônio R$${estado.patrimonio}`,
+    );
+
+    const resposta = (await perguntar("\nEnter pra jogar a próxima temporada, ou 'sair' pra encerrar: ")).trim().toLowerCase();
+    if (resposta === "sair" || resposta === "s" || resposta === "parar") continuar = false;
+  }
+
+  console.log(`\n=== Carreira encerrada em ${estado.temporada}, aos ${estado.jogador.idade} anos, overall ${overallAtual(estado)} ===`);
+  rl.close();
 }
 
 /** Lista clubes disponíveis pra escolher como clube inicial de uma carreira (`criarEstadoInicial` `clubeInicialId`) — filtra por país via 2º argumento da CLI (ex: "BR"), sem filtro nenhum lista tudo. */
@@ -368,12 +492,17 @@ switch (comando) {
     simularTemporadaCli();
     break;
   case "carreira-loop":
-    simularCarreiraLoopCli();
+    await simularCarreiraLoopCli();
     break;
   case "clubes":
     listarClubesCli();
     break;
+  case "jogar":
+    await jogarCarreiraInterativaCli();
+    break;
   default:
-    console.error(`Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira", "temporada", "carreira-loop" ou "clubes".`);
+    console.error(
+      `Comando desconhecido: "${comando}". Use "copa-do-brasil", "argentina", "cenario", "carreira", "temporada", "carreira-loop", "clubes" ou "jogar".`,
+    );
     process.exit(1);
 }
