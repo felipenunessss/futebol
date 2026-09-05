@@ -368,6 +368,127 @@ brasileiros (só SP/RJ/MG/RS foram investigados nesta rodada), Copa do
 Brasil, Libertadores/Sul-Americana e qualquer outra pendência já listada
 nas seções 1.1-1.3.
 
+### 1.5. Pendência de dados — investigada e encerrada (demais 23 estados)
+
+**Fonte usada**: mesma das seções anteriores — [clubelo.com](https://clubelo.com)
+(Club Elo), tabela por país embutida no HTML de `clubelo.com/Brazil`,
+snapshot do dia **2026-09-05**. Escopo: todos os estados brasileiros
+não cobertos na seção 1.4 — **BA, PR, SC, PE, GO, DF, MT, MS, ES, CE,
+RN, PB, SE, AL, PI, MA, PA, AM, TO, RO, AC, RR, AP** (23 estados) — os
+204 clubes cadastrados em `src/data/clubes/<uf>_estadual.json` desses
+estados, mais os clubes desses mesmos estados que moram em
+`brasil.json` (33 clubes, checados só por completude — fora do escopo
+de edição desta rodada).
+
+**Resultado: nenhum `rating_inicial` novo foi adicionado. Esta é a
+última rodada planejada da frente de pesquisa de `rating_inicial` —
+ver conclusão geral ao final desta seção.**
+
+**Passo 1 — recheck da tabela por país**: a tabela por país do Club
+Elo pra Brasil (Level 1/2/3 + "Lower") segue com exatamente **64
+clubes** (20+20+20+4), os mesmos já atribuídos nas seções 1.1/1.2 —
+nenhum clube novo apareceu desde o snapshot da seção 1.2. Isso já era
+esperado (documentado na própria tarefa desta rodada): a tabela por
+país só rastreia a pirâmide nacional (Série A-D), não clube que só
+disputa estadual.
+
+Cruzando os 204 clubes dos 23 estados contra `divisao_nacional`: **11
+já tinham `rating_inicial`**, todos clubes de Série C/Nível 3 ou da
+categoria "Lower" de Série D já atribuídos nas seções 1.1/1.2 (moram no
+`<uf>_estadual.json` do seu estado em vez de `brasil.json`, mesma nota
+estrutural da seção 1.2) — `maringa_fc`/`brusque_fc`/`figueirense`/
+`barra_fc` (PR/SC), `retro` (PE), `anapolis_fc` (GO), `floresta` (CE),
+`abc_rn` (RN), `botafogo_pb` (PB), `itabaiana` (SE), `mac` (MA). Os
+demais clubes com `divisao_nacional` nível 4 (Série D) desses 23
+estados — `atletico_alagoinhas`/`jacuipense`/`juazeirense`/`porto_ba`
+(BA), `fc_cascavel`/`cianorte`/`azuriz` (PR), `joinville`/`marcilio_dias`
+(SC), `maguary`/`decisao`/`central_pe` (PE), `aparecidense`/`abecat`/
+`crac`/`goiatuba`/`inhumas` (GO), `luverdense`/`mixto` (MT),
+`ivinhema` (MS), `real_noroeste` (ES), `ferroviario_ce`/`maracana_ce`/
+`iguatu`/`tirol`/`atletico_cearense` (CE), `america_rn`/`laguna` (RN),
+`serra_branca`/`sousa`/`treze` (PB), `lagarto`/`sergipe_fc` (SE),
+`asa`/`cse` (AL), `fluminense_pi`/`piaui_ec`/`altos`/`parnahyba` (PI),
+`imperatriz`/`iape`/`sampaio_correa_ma`/`moto_club` (MA), `tuna_luso`/
+`aguia_de_maraba` (PA), `manaus_fc`/`nacional_am`/`manauara` (AM),
+`araguaina`/`tocantinopolis` (TO), `porto_velho_ec`/`guapore_fc` (RO),
+`independencia_ac`/`galvez`/`humaita_ac` (AC), `monte_roraima`/
+`sao_raimundo_rr`/`gas` (RR), `oratorio`/`trem` (AP), `gama`/`ceilandia`/
+`capital_cf`/`brasiliense` (DF) — **nenhum** tem entrada na tabela
+(confirmado no recheck do passo 1; mesmo padrão exaustivo já documentado
+na seção 1.2 pros 92 clubes de Série D sem cobertura). O restante dos
+204 clubes não tem `divisao_nacional` nenhuma (clube puramente
+estadual) e, por natureza, nunca foi candidato à tabela por país.
+
+**Passo 2 — checagem individual de candidatos notáveis**: como a
+tarefa desta rodada instruiu explicitamente a não gastar tempo tentando
+slugs pra clube pequeno, mas a investigar individualmente qualquer
+clube que parecesse "tradicional de capital com histórico relevante",
+avaliei os clubes puramente estaduais (sem `divisao_nacional`) desses
+23 estados por relevância histórica e escolhi 3 candidatos plausíveis
+pra checagem de página individual (`clubelo.com/<slug>`): **Campinense
+Clube** (PB — "Raposa", disputou Copa Sul-Americana 2009, referência
+de continental relevance), **Desportiva Ferroviária** (ES — clube
+tradicional de Cariacica, disputou Série B nas décadas de 1980-90) e
+**Galícia Esporte Clube** (BA — um dos clubes mais antigos de Salvador,
+fundado 1913). As três tentativas caíram na home genérica do site
+(`clubelo.com/Campinense`, `/Desportiva`, `/Galicia`), sem página
+dedicada — mesmo resultado da seção 1.4 pros equivalentes de SP/RJ/MG/RS
+(Portuguesa-SP, Bangu, Boa Esporte, Ipatinga, Brasil de Pelotas, Passo
+Fundo). Não fiz mais tentativas de slug pra esses 3 nem pra outros
+clubes menores — dado que nem clubes tradicionais com passagem recente
+por Série A (Ipatinga) ou relevância continental documentada
+(Campinense) aparecem, não há razão pra esperar cobertura em clube
+ainda menor.
+
+**Cobertura por estado** (clubes com `rating_inicial` / total de
+clubes únicos do estadual — nenhum confirmado nesta rodada em nenhum
+estado):
+
+| Estado | Confirmados / total | Estado | Confirmados / total |
+|---|---|---|---|
+| BA | 0/18 | SE | 1/9 |
+| PR | 1/7 | AL | 0/6 |
+| SC | 3/8 | PI | 0/8 |
+| PE | 1/15 | MA | 1/8 |
+| GO | 1/9 | PA | 0/10 |
+| DF | 0/10 | AM | 0/7 |
+| MT | 0/6 | TO | 0/8 |
+| MS | 0/9 | RO | 0/7 |
+| ES | 0/7 | AC | 0/8 |
+| CE | 1/9 | RR | 0/9 |
+| RN | 1/8 | AP | 0/8 |
+| PB | 1/10 | | |
+| **Total** | **11/204** | | |
+
+(Os 11 confirmados vêm todos de rodadas anteriores — seções 1.1/1.2 —
+por o clube também disputar Série C/D nacional; **0 novos** nesta
+rodada.)
+
+**Conclusão da frente de pesquisa de `rating_inicial` (encerrada)**:
+com SP/RJ/MG/RS (seção 1.4) e os demais 23 estados (esta seção) ambos
+resultando em zero cobertura nova de clube puramente estadual, dá pra
+fechar esta frente como **explorada até o limite razoável da fonte
+disponível**: o Club Elo rastreia bem a pirâmide nacional brasileira
+(Série A/B/C, mais um punhado de Série D com queda recente ou
+relevância histórica) e as primeiras/segundas divisões CONMEBOL, mas
+não tem cobertura de campeonato estadual brasileiro — nem para os
+maiores estados/mercados (SP, RJ, MG, RS) nem para os menores. Não há
+próxima rodada planejada pra `rating_inicial`; os cerca de 570 clubes
+sem rating real (todo clube puramente estadual, mais a maioria da
+Série D e das 2ªs divisões CONMEBOL) seguem usando
+`calcularRatingFallback` (`src/simulation/rating.ts`) — isso é o
+resultado esperado e aceitável do design original (seção 1, acima):
+fallback por `nivel` de divisão + `forca_financeira` pra clube sem
+exposição competitiva nacional/continental relevante. Se uma fonte de
+rating histórico diferente (ex: dados de federação estadual, ranking
+CBF) for encontrada no futuro, popular esses clubes pode ser retomado
+como pendência nova — mas não faz parte do escopo original desta
+frente (Club Elo).
+
+**Cobertura fora do escopo desta rodada**: Copa do Brasil,
+Libertadores/Sul-Americana e qualquer outra pendência já listada nas
+seções 1.1-1.4 (não mudaram de status).
+
 ## 2. Motor de partida — duelo por zona (estilo FM/Brasfoot)
 
 Nenhum clube (fora o do jogador) tem elenco persistido — a força de cada
