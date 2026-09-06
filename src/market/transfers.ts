@@ -1,7 +1,7 @@
 import type { Club, ForcaFinanceira } from "../schemas/club.js";
 import { obterRating } from "../simulation/rating.js";
 import type { MomentoDeCarreira } from "../progression/scenarios.js";
-import { statusOferecido, type StatusNoClube } from "../career/status.js";
+import { statusMinimoPorIdade, statusOferecido, type StatusNoClube } from "../career/status.js";
 import { calcularRatingDeInteresse, calcularValorDeMercado, type PerfilDeMercado } from "./valuation.js";
 
 /**
@@ -67,16 +67,21 @@ const ANOS_VARIACAO = 3;
  * simples (valor de mercado ~ 2 anos de salário), respeita o teto salarial
  * do clube, e abre abaixo do próprio teto/referência (70-90%) pra deixar
  * espaço de negociação (`market/negotiation.ts`). O status oferecido
- * (`career/status.ts` `statusOferecido`) vem da diferença de rating entre
- * o clube ofertante e o clube atual do jogador — `ratingClubeAtual: 0`
- * (sem clube ainda, início de carreira) sempre cai no caso "clube bem mais
- * forte", mantendo `statusAtual` (tipicamente `"promessa"`) sem precisar
- * de um caminho especial pra isso. Estimativa de design.
+ * (`career/status.ts` `statusOferecido`) combina a diferença de rating
+ * entre o clube ofertante e o clube atual do jogador, a concorrência
+ * interna do ofertante (proxy: `forca_financeira`) e a fase atual dele
+ * (sorteada aqui com o `random` injetado — não existe simulação de forma
+ * de equipe de verdade, ver `career/status.ts`). `ratingClubeAtual: 0`
+ * (sem clube ainda, início de carreira) sempre pesa como "clube bem mais
+ * forte" nesse cálculo, então cai naturalmente pro piso permitido pra
+ * idade (`statusMinimoPorIdade`) sem precisar de um caminho especial pra
+ * isso. Estimativa de design.
  */
 export function gerarProposta(
   clube: Club,
   valorDeMercado: number,
   statusAtual: StatusNoClube,
+  idadeJogador: number,
   ratingClubeAtual: number,
   random: () => number = Math.random,
 ): PropostaTransferencia {
@@ -86,7 +91,13 @@ export function gerarProposta(
   const salarioMensal = Math.max(1, Math.round(salarioReferencia * fatorDeAbertura));
   const luvas = Math.round(salarioMensal * (LUVAS_MINIMO_EM_SALARIOS + random() * LUVAS_VARIACAO_EM_SALARIOS));
   const anos = ANOS_MINIMO + Math.floor(random() * ANOS_VARIACAO);
-  const status = statusOferecido(statusAtual, ratingClubeAtual, obterRating(clube));
+  const status = statusOferecido(statusAtual, {
+    idadeJogador,
+    ratingClubeAtual,
+    ratingClubeOfertante: obterRating(clube),
+    concorrenciaDoClube: clube.forca_financeira,
+    faseDaEquipe: random() * 2 - 1,
+  });
 
   return { clubeOfertanteId: clube.id, propostaInicial: { salarioMensal, luvas, anos }, statusOferecido: status };
 }
@@ -164,10 +175,11 @@ const QUANTIDADE_PADRAO_DE_PROPOSTAS_INICIAIS = 3;
  * receber 3 propostas em vez de escolher o clube inicial direto.
  * Reaproveita `selecionarClubesInteressados` sem clube atual (`""` nunca
  * bate com nenhum id real, então nada é excluído nem usado como
- * referência de upgrade) e `ratingClubeAtual: 0` em `gerarProposta` —
- * isso já garante `statusOferecido` = `"promessa"` pra toda proposta
- * (ver `career/status.ts` `statusOferecido`), sem precisar de um caminho
- * especial só pro início de carreira.
+ * referência de upgrade) e `ratingClubeAtual: 0` em `gerarProposta` — o
+ * status de estreia usa `statusMinimoPorIdade(perfil.idade)` em vez de
+ * assumir sempre `"promessa"`: um jogador que começa a carreira mais
+ * velho (`idadeInicial` customizada) já estreia como `"reserva"` no
+ * mínimo, sem precisar de um caminho especial só pro início de carreira.
  */
 export function gerarPropostasIniciais(
   clubes: Club[],
@@ -177,6 +189,7 @@ export function gerarPropostasIniciais(
 ): PropostaTransferencia[] {
   const valorDeMercado = calcularValorDeMercado(perfil);
   const interessados = selecionarClubesInteressados(clubes, "", perfil, { random, quantidadeMaxima: quantidade, exigirUpgrade: false });
+  const statusDeEstreia = statusMinimoPorIdade(perfil.idade); // "promessa" pra jovem, "reserva" pra quem já começa depois dos 22 (ver career/status.ts)
 
-  return interessados.map((clube) => gerarProposta(clube, valorDeMercado, "promessa", 0, random));
+  return interessados.map((clube) => gerarProposta(clube, valorDeMercado, statusDeEstreia, perfil.idade, 0, random));
 }

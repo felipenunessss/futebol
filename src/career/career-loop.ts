@@ -215,7 +215,7 @@ async function resolverNegociacaoDeTransferencia(
   let estadoAtual = estado;
 
   for (const clube of interessados) {
-    const proposta = gerarProposta(clube, valorDeMercado, estadoAtual.statusNoClube, ratingClubeAtual, random);
+    const proposta = gerarProposta(clube, valorDeMercado, estadoAtual.statusNoClube, estadoAtual.jogador.idade, ratingClubeAtual, random);
     const contraproposta = await responderProposta(proposta);
     const fatoresConfianca: FatoresConfianca = {
       overall: overallAtual(estadoAtual),
@@ -325,7 +325,6 @@ export async function jogarTemporada(
   const overallAntes = overallAtual(estado);
   let estadoAtual = estado;
   const resumoCompeticoes: ResumoCompeticaoNaTemporada[] = [];
-  const minutosDaTemporada = minutosEsperadosPorStatus(estadoAtual.statusNoClube);
   let somaDeNotas = 0;
   let partidasComNota = 0;
 
@@ -338,7 +337,9 @@ export async function jogarTemporada(
     let golsDoJogador = 0;
     let assistenciasDoJogador = 0;
     for (const partida of competicao.resultado.partidasDoJogador) {
-      const desempenho = converterChancesEmDesempenho(partida.chancesJogador, minutosDaTemporada, IMPORTANCIA_PADRAO);
+      // sorteado por partida, não uma vez por temporada — variação de verdade jogo a jogo (ver career/status.ts).
+      const minutosDaPartida = minutosEsperadosPorStatus(estadoAtual.statusNoClube, random);
+      const desempenho = converterChancesEmDesempenho(partida.chancesJogador, minutosDaPartida, IMPORTANCIA_PADRAO);
       estadoAtual = aplicarDesempenhoPartida(estadoAtual, partida.chancesJogador, desempenho);
       golsDoJogador += desempenho.gols;
       assistenciasDoJogador += desempenho.assistencias;
@@ -366,7 +367,7 @@ export async function jogarTemporada(
   if (partidasComNota > 0) {
     const notaMedia = somaDeNotas / partidasComNota;
     const statusAnterior = estadoAtual.statusNoClube;
-    const statusNovo = evoluirStatus(statusAnterior, notaMedia);
+    const statusNovo = evoluirStatus(statusAnterior, notaMedia, estadoAtual.jogador.idade);
     estadoAtual = mudarStatusNoClube(estadoAtual, statusNovo);
     statusAtualizado = { statusAnterior, statusNovo, notaMedia, partidasJogadas: partidasComNota };
     await onStatusAtualizado?.(statusAtualizado);

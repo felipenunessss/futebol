@@ -7,7 +7,7 @@ import { patrociniosDisponiveis } from "./patrocinios.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
 import type { Contrato } from "../schemas/contract.js";
-import type { StatusNoClube } from "./status.js";
+import { statusMinimoPorIdade, type StatusNoClube } from "./status.js";
 
 /**
  * Estado de carreira do jogador — o "save" da carreira. Junta o `Jogador`
@@ -90,7 +90,9 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
     reputacao: criarReputacaoInicial(),
     relacoesInternas: RELACOES_INTERNAS_INICIAL,
     patrimonio: PATRIMONIO_INICIAL,
-    statusNoClube: "promessa",
+    // "promessa" pro caso comum (jovem estreante); começando mais velho (idadeInicial customizada
+    // acima de 22), o piso por idade já entra em vigor desde a criação (ver career/status.ts).
+    statusNoClube: statusMinimoPorIdade(opcoes.idadeInicial ?? IDADE_INICIAL_PADRAO),
   };
 }
 

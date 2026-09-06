@@ -1045,37 +1045,73 @@ prestígio das propostas de mercado — inclusive o caso concreto pedido:
 
 - **`career/status.ts`** (novo módulo) — `StatusNoClube`: `"promessa" |
   "reserva" | "titular" | "idolo"`, só sobe/desce 1 degrau por vez.
-  - `minutosEsperadosPorStatus`: 15/45/90/90 minutos — impacta
-    diretamente o desempenho: `progression/xp.ts` já escala XP e nota
-    por `minutosJogados/90`, então um "promessa" cresce mais devagar
-    que um "titular" com o mesmo desempenho por chance.
+  - `minutosEsperadosPorStatus(status, random?)`: não é mais um valor
+    fixo por status — cada status tem uma **faixa** (`promessa`: 5-30,
+    `reserva`: 15-70, `titular`: 60-90, `idolo`: 70-90) e o minuto real é
+    sorteado dentro dela, **partida a partida** (não uma vez por
+    temporada) em `career/career-loop.ts` `jogarTemporada` — pedido
+    explícito de mais variação (um "promessa" às vezes entra 5 min, às
+    vezes 30; um "reserva" pode até superar o mínimo de um "titular" num
+    jogo específico) em vez do jogador sempre jogar exatamente os mesmos
+    minutos toda partida. Impacta diretamente o desempenho:
+    `progression/xp.ts` já escala XP e nota por `minutosJogados/90`.
+  - `statusMinimoPorIdade(idade)`: acima de 22 anos, o piso sobe de
+    `"promessa"` pra `"reserva"` — pedido explícito ("um jogador
+    promessa não pode ter mais de 22 anos, ele pode ser reserva").
+    Aplicado via `aplicarPisoPorIdade` em **três** pontos, pra garantir
+    que a regra vale onde quer que um status seja atribuído: dentro de
+    `evoluirStatus` (evolução por desempenho), dentro de
+    `statusOferecido` (proposta de mercado) e em `career/Player.ts`
+    `criarEstadoInicial` (status inicial, pro caso de uma carreira
+    customizada já começar com `idadeInicial` acima de 22).
   - `multiplicadorDeValorizacaoPorStatus`: 0.7/0.85/1/1.25 — aplicado
     em `market/valuation.ts` `PerfilDeMercado.multiplicadorStatus`
     (campo opcional, número puro — `valuation.ts` não depende do tipo
     `StatusNoClube`, só recebe o multiplicador já calculado, pra não
     criar uma dependência de `career/` desnecessária ali).
-  - `evoluirStatus(statusAtual, notaMedia)`: promove com nota média
-    ≥7, rebaixa com nota <5 — chamado uma vez por temporada em
-    `career/career-loop.ts` `jogarTemporada`, logo depois do resumo de
-    partidas (`onStatusAtualizado`), só quando o jogador jogou alguma
-    partida na temporada. **Ressalva de calibração importante**: a nota
-    usada aqui é calculada com 90 minutos fixos, não com os minutos
-    "reais" do status atual — senão um "promessa" (15 min) quase nunca
-    cruzaria o limiar de promoção só porque a nota vem descontada pela
-    escassez de minutos (a mesma variável que o status deveria
-    destravar estaria travando a própria evolução dele). O que decide o
-    status é a qualidade de quando jogou, não a oportunidade que já
-    tinha.
-  - `statusOferecido(statusAtual, ratingClubeAtual, ratingClubeOfertante)`:
-    clube bem mais forte (diferença de rating > ~1 nível) oferece
-    status 1 degrau abaixo do atual; clube bem mais fraco oferece 1
-    degrau acima; clube parecido mantém o mesmo — é isso que resolve o
-    caso "reserva do Flamengo pode ser titular numa Série B" sem
-    precisar de nenhum caminho especial: só a diferença de rating entre
-    quem oferece e o clube atual já produz esse efeito. `ratingClubeAtual
-    = 0` (início de carreira, sem clube ainda) sempre cai no caso "clube
-    bem mais forte", mantendo `"promessa"` — de novo, sem caminho
-    especial.
+  - `evoluirStatus(statusAtual, notaMedia, idadeJogador)`: promove com
+    nota média ≥7, rebaixa com nota <5, depois passa pelo piso por
+    idade — chamado uma vez por temporada em `career/career-loop.ts`
+    `jogarTemporada`, logo depois do resumo de partidas
+    (`onStatusAtualizado`), só quando o jogador jogou alguma partida na
+    temporada. **Ressalva de calibração importante**: a nota usada aqui
+    é calculada com 90 minutos fixos (`MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO`),
+    não com os minutos "reais" sorteados pra aquela partida — senão um
+    "promessa" (5-30 min) quase nunca cruzaria o limiar de promoção só
+    porque a nota vem descontada pela escassez de minutos (a mesma
+    variável que o status deveria destravar estaria travando a própria
+    evolução dele). O que decide o status é a qualidade de quando jogou,
+    não a oportunidade que já tinha — os minutos sorteados continuam
+    sendo os usados pra aplicar XP normalmente, só a nota de avaliação
+    de status usa a base fixa de 90.
+  - `statusOferecido(statusAtual, fatores: FatoresDeOferta)`: agora é um
+    **score contínuo** com 3 fatores em vez de só a diferença de rating —
+    pedido explícito ("a oferta de status deve considerar concorrência e
+    fase atual da equipe"):
+    - `scoreRating`: diferença de rating entre clube ofertante e clube
+      atual (mesmo efeito de antes: clube bem mais forte empurra pra
+      baixo, bem mais fraco empurra pra cima — resolve o caso "reserva
+      do Flamengo pode ser titular numa Série B" sem caminho especial).
+    - `scoreConcorrencia`: proxy de concorrência interna via
+      `Club.forca_financeira` do ofertante (`muito_alta`/`alta` = mais
+      concorrência por posição, empurra a oferta pra baixo;
+      `baixa`/`muito_baixa` empurra pra cima) — clube rico tende a ter
+      elenco mais cheio na mesma posição.
+      Cada fator sozinho consegue cruzar o limiar de troca de degrau
+      (`LIMIAR_DE_DEGRAU = 1`); em combinação, podem se reforçar ou se
+      cancelar (ver testes de "fatores se contrabalançam" em
+      `tests/career/status.test.ts`).
+    - `scoreFase`: fase atual do clube ofertante, de -1 (crise) a +1
+      (auge) — **sorteada por quem chama** (`market/transfers.ts`
+      `gerarProposta`, via `random() * 2 - 1`), não é uma simulação de
+      forma de equipe de verdade. Não existe hoje nenhum tracking real
+      de forma/resultado recente por clube ao longo de uma carreira —
+      `simulation/rating.ts` `atualizarElo` está implementado mas nunca
+      é chamado em lugar nenhum do motor. Ver pendência na seção 6.
+    `ratingClubeAtual = 0` (início de carreira, sem clube ainda) sempre
+    pesa como "clube bem mais forte" nesse cálculo, então cai
+    naturalmente pro piso permitido pra idade sem precisar de um
+    caminho especial pra isso.
 - **`market/transfers.ts`**: `PropostaTransferencia` ganha
   `statusOferecido` (calculado dentro de `gerarProposta`, não é
   negociável — a negociação só mexe em salário/luvas/anos). Nova
@@ -1097,14 +1133,21 @@ prestígio das propostas de mercado — inclusive o caso concreto pedido:
   antigo de digitar o id do clube manualmente. Status aparece no resumo
   de cada temporada e em cada negociação de transferência (`status
   oferecido: X`).
-- **Validado com dado real**: rodando 12 temporadas seguidas com um
-  atacante no Corinthians (`carreira-loop`), o status ficou em
-  `"promessa"` por ~9 temporadas (nota média subindo de 5.7 pra 6.9
-  conforme o overall cresce de 39 pra 63) até finalmente promover —
-  daí evoluiu rápido: `reserva` (temporada seguinte) → `titular` →
-  `idolo` em mais 3 temporadas, com a nota média já surfando acima de
-  7 com folga. Ritmo condizente com "craque emergente demora anos pra
-  se firmar num clube grande", não instantâneo nem travado pra sempre.
+- **Validado com dado real**: rodando 8 temporadas seguidas com um
+  atacante no Corinthians (`carreira-loop`), o jogador seguiu
+  `"promessa"` até os 22 anos (permitido pelo piso) e, ao virar 23,
+  a próxima avaliação de status já rebaixou o piso pra `"reserva"`
+  mesmo sem uma queda de desempenho — exatamente a regra pedida. Uma
+  transferência pro Argentinos Juniors nessa janela ofereceu
+  `"reserva"` (não `"promessa"`, ainda que o rating do clube fosse
+  parecido), e evoluções seguintes (`reserva` → `titular`) vieram por
+  nota média alta em partidas normais. Numa negociação subsequente com
+  Palmeiras/Flamengo/Boca Juniors no mesmo momento de carreira, os 3
+  clubes concorrentes ofereceram status diferentes apesar de rating
+  parecido entre eles — efeito da concorrência (`forca_financeira`) e
+  da fase sorteada de cada um, confirmando que os 3 fatores realmente
+  produzem ofertas distintas em vez de sempre convergirem pro mesmo
+  resultado só pela diferença de rating.
 
 ## 6. Pendências / próximos passos
 
@@ -1233,16 +1276,22 @@ prestígio das propostas de mercado — inclusive o caso concreto pedido:
   envolvido) em vez do evento.
 - **Status no elenco — limitações desta versão** (ver seção 5.6): só
   sobe/desce 1 degrau por temporada, sem meio-termo (ex: "quase
-  titular"); os minutos por status (`MINUTOS_POR_STATUS`) e o limiar de
-  promoção/rebaixamento (nota 7/5) são constantes fixas, iguais pra
-  qualquer posição/arquétipo/competição — na prática, atacante contra
-  defesas fortes de Série A demora mais pra cruzar o limiar que outras
-  combinações (validado: ~9 temporadas pra sair de "promessa" com um
-  atacante no Corinthians), o que não foi calibrado deliberadamente por
-  posição, só é uma consequência do jeito que a nota é calculada
-  (`progression/xp.ts` `calcularNotaPartida`); um clube só pode oferecer
-  um dos 4 status fixos, não intermediários; `statusOferecido` não leva
-  em conta nada além da diferença de rating entre os 2 clubes (não
-  considera, por exemplo, se o clube ofertante já tem outro jogador
-  forte na mesma posição, que na vida real reduziria a chance de
-  oferecer titularidade).
+  titular"); o limiar de promoção/rebaixamento (nota 7/5) é constante
+  fixa, igual pra qualquer posição/arquétipo/competição — na prática,
+  atacante contra defesas fortes de Série A demora mais pra cruzar o
+  limiar que outras combinações, o que não foi calibrado
+  deliberadamente por posição, só é uma consequência do jeito que a
+  nota é calculada (`progression/xp.ts` `calcularNotaPartida`); um
+  clube só pode oferecer um dos 4 status fixos, não intermediários.
+  ~~`statusOferecido` não leva em conta nada além da diferença de
+  rating~~ **parcialmente resolvida**: agora também considera
+  concorrência interna (proxy `Club.forca_financeira`, não o elenco
+  real do clube — não existe hoje um modelo de "outro jogador forte na
+  mesma posição") e fase da equipe — mas essa fase é **sorteada**, não
+  simulada de verdade: não existe tracking real de forma/resultado
+  recente por clube ao longo de uma carreira (`simulation/rating.ts`
+  `atualizarElo` está implementado mas nunca é chamado em lugar nenhum
+  do motor — se/quando isso for ligado, `scoreFase` em
+  `career/status.ts` `statusOferecido` deveria passar a vir de um
+  histórico real de Elo recente do clube em vez do sorteio atual em
+  `market/transfers.ts` `gerarProposta`).
