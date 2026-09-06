@@ -1483,6 +1483,41 @@ competição.
   — **11 das 11 competições ativas agora simulam**, contra 4 no início
   desta série de mudanças (seção 5.8).
 
+### 5.11. Receita pra Colômbia, com pesquisa de regulamento real (implementado)
+
+Continuação das seções 5.9/5.10 — mesma pesquisa em sequência (não mais
+em paralelo, depois de duas tentativas em lote travarem num limite de
+sessão da API). Confirmado (Wikipedia/ESPN): em 2026 o Torneo Apertura
+colombiano excepcionalmente usa eliminação direta em vez de cuadrangulares
+(por causa da Copa do Mundo), mas isso é uma **exceção pontual** — 2025 e
+a maioria dos anos usam cuadrangulares nos 2 torneios (Apertura e
+Finalización) igual. Como uma carreira roda várias temporadas simuladas
+(não uma réplica literal de 2026), a receita foi implementada pro formato
+**típico** (cuadrangulares nos 2), não pra exceção de um ano específico.
+
+- **`receitaTurnoRetornoComQuadrangularEFinal`** (genérica, combo
+  `fase_quadrangular,final_estadual,returno,turno`) — Colômbia 1ª e 2ª
+  divisão: mesmo padrão de `receitaTurnoRetornoComGrupoEMataMataEFinal`
+  (Venezuela, seção 5.9), só que o "classificatório interno" de cada
+  torneio é uma `fase_quadrangular` (2 grupos de 4) em vez de `fase_grupos`+
+  `mata_mata` — os 2 líderes de grupo disputam uma final (ida e volta,
+  resolvida direto via `resolverConfronto`, já que não há um bloco de
+  formato próprio pra "final dentro do torneio") que decide o "campeão
+  daquele torneio"; só depois os 2 campeões de torneio se enfrentam no
+  `final_estadual` da temporada (mesmo clube campeão dos dois = campeão
+  automático).
+- **Colômbia 2ª divisão** usa a MESMA combinação de blocos (já que seu
+  único bloco extra, `tabela_acumulada`, não entra na chave de despacho)
+  — a receita resolve o campeão dos 2 semestres corretamente, mas não
+  modela a 2ª vaga de acesso condicional à Primera A (repechaje entre o
+  vice do ano e o "time mais regular" que não venceu nenhum semestre —
+  contagem exata de participantes não confirmada por fonte, ver
+  `docs/dados-a-verificar.md`).
+- **Validado com dado real**: rodando a receita direto com os dados reais
+  de `colombia_primera_a`/`colombia_segunda` (nenhuma das duas está no
+  calendário padrão hoje), produz campeões plausíveis (Atlético Nacional,
+  Internacional de Bogotá) sem erro, em várias rodadas com RNG real.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1645,14 +1680,14 @@ competição.
   jogo ao vivo não tem "escalação"/lesão real durante a partida — só a
   chance do jogador e eventos de contexto pausam, o resto do time
   segue sendo Camada 1 (duelo agregado), igual antes.
-- **Receitas de simulação ainda faltando** (ver seções 5.8/5.9): Peru,
-  Colômbia (1ª e 2ª divisão), Argentina 2ª divisão, Copa Verde
-  (`dupla_chave_regional`), Copa do Nordeste — só entram no calendário de
-  uma carreira brasileira se algum dia `data/loaders/calendario.ts`
-  passar a incluir competições internacionais além das continentais
-  atuais. Venezuela 2ª divisão tem receita (mesma função da 1ª) mas erra
-  sempre — os números não reconciliam (`turno` classifica só 4,
-  `fase_grupos` pede 16), ver `docs/dados-a-verificar.md`. Libertadores e
-  Sul-Americana (que dependiam uma da outra pro repechaje) foram
+- **Receitas de simulação ainda faltando** (ver seções 5.8/5.9/5.11):
+  Peru, Argentina 2ª divisão, Copa Verde (`dupla_chave_regional`), Copa
+  do Nordeste — só entram no calendário de uma carreira brasileira se
+  algum dia `data/loaders/calendario.ts` passar a incluir competições
+  internacionais além das continentais atuais. Venezuela 2ª divisão tem
+  receita (mesma função da 1ª) mas erra sempre — os números não
+  reconciliam (`turno` classifica só 4, `fase_grupos` pede 16), ver
+  `docs/dados-a-verificar.md`. Libertadores e Sul-Americana (que
+  dependiam uma da outra pro repechaje) foram
   resolvidas juntas na seção 5.10 — as 11 competições ativas do calendário
   padrão simulam com sucesso hoje.

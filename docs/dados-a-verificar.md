@@ -156,14 +156,24 @@ resultado final bate mas o mecanismo intermediário não é representado:
   regular, sem essa condicional (não afeta quem é campeão, só o detalhe
   de quem disputa a vaga extra). Fonte: [Campeonato Uruguayo de Segunda
   División 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Campeonato_Uruguayo_de_Segunda_Divisi%C3%B3n_2025).
-- **Colômbia 1ª divisão**: em 2026 o Apertura usa playoff direto e o
-  Finalización usa cuadrangulares — modelados de forma uniforme
-  (`fase_quadrangular`), perdendo a diferença. (Pendente confirmar com
-  fonte oficial — pesquisa anterior travou num limite de sessão antes de
-  concluir.)
+- ~~Colômbia 1ª divisão: Apertura usa playoff direto e Finalización usa
+  cuadrangulares — modelados de forma uniforme, perdendo a diferença~~
+  **confirmada e mantida como estimativa deliberada**: pesquisa (Wikipedia/
+  ESPN) confirma que isso é real, mas **só em 2026, exceção pontual por
+  causa da Copa do Mundo** — em anos "típicos" (2025 confirmado) os 2
+  torneios usam cuadrangulares igual. Como uma carreira roda várias
+  temporadas simuladas (não uma réplica literal de 2026), mantido
+  cuadrangulares nos 2 torneios de propósito — ver
+  `simulation/engine.ts` `receitaTurnoRetornoComQuadrangularEFinal`.
+  Fontes: [Torneo Apertura 2026 (Wikipedia)](https://es.wikipedia.org/wiki/Torneo_Apertura_2026_(Colombia)),
+  [8 clasificados a cuadrangulares Finalización 2026 (ESPN)](https://www.espn.com.ar/futbol/colombia/nota/_/id/16591952/torneo-betplay-dimayor-2026-asi-quedaron-8-clasificados-cuadrangulares).
 - **Colômbia 2ª divisão**: acesso condicional (2 campeões semestrais sobem
   direto só se estiverem nas 2 primeiras posições da tabela anual, senão
-  repechaje) não representado.
+  repechaje) não representado — a receita (mesma de Colômbia 1ª) resolve
+  o campeão dos 2 semestres corretamente, mas não modela essa 2ª vaga de
+  acesso condicional (contagem exata de participantes do repechaje não
+  confirmada por fonte). Rebaixamento da própria 2ª divisão também não
+  confirmado.
 - **Chile 2ª divisão**: bye do 2º colocado na liguilla de acesso (só
   3º-8º jogam quartas) não representável.
 - ~~Equador 1ª e 2ª divisão: sem bloco pra "grupos de tamanhos/propósitos

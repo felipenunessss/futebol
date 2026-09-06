@@ -891,6 +891,8 @@ function despacharReceitaGenerica(formato: FormatoEstadual): Receita {
       return receitaTurnoRetornoComGrupoEMataMataEFinal;
     case "fase_final_por_classificacao,pontos_corridos":
       return receitaPontosCorridosComFaseFinalPorClassificacao;
+    case "fase_quadrangular,final_estadual,returno,turno":
+      return receitaTurnoRetornoComQuadrangularEFinal;
     default:
       throw new Error(`sem receita de simulação genérica pra combinação de blocos [${blocos}]`);
   }
@@ -969,6 +971,58 @@ export async function receitaTurnoRetornoSomado(
   const partidasDoJogador = [...(turno.partidasDoJogador ?? []), ...(returno.partidasDoJogador ?? [])].map((p) => p.resultado);
 
   return { campeao: tabelaSomada[0].clubeId, partidasDoJogador };
+}
+
+/**
+ * `turno` + `returno` + `fase_quadrangular` + `final_estadual` (Colômbia
+ * 1ª e 2ª divisão): CADA torneio (Apertura/Finalización) tem sua própria
+ * mini-competição interna — os classificados do turno/returno entram
+ * numa `fase_quadrangular` própria daquele torneio (2 grupos de 4), os 2
+ * líderes de grupo disputam uma final (ida e volta) que decide o "campeão
+ * daquele torneio" — só DEPOIS os 2 campeões de torneio se enfrentam no
+ * `final_estadual` da temporada (mesmo clube campeão dos dois = campeão
+ * automático). **Estimativa de design pra um ano "típico"**: confirmado
+ * via pesquisa (Wikipedia/ESPN, ver `docs/dados-a-verificar.md`) que em
+ * 2026 o Apertura excepcionalmente usa eliminação direta em vez de
+ * cuadrangulares (por causa da Copa do Mundo) — uma exceção pontual, não
+ * a regra normal (2025 e a maioria dos anos usam cuadrangulares nos 2
+ * torneios). Modelado pro ano típico (os 2 torneios com o mesmo formato),
+ * já que uma carreira roda várias temporadas simuladas, não uma réplica
+ * literal de 2026.
+ */
+export async function receitaTurnoRetornoComQuadrangularEFinal(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const { turno, returno } = await simularTurnoRetorno(campeonato, ratings, participacaoJogador, random, eventos, resolverPartida);
+
+  async function campeaoDoTorneio(faseUnica: ResultadoFaseUnica): Promise<{ campeao: string; partidas: ResultadoPartida[] }> {
+    const quadrangular = await simularFaseQuadrangularDoFormato(campeonato.formato.fase_quadrangular!, faseUnica.classificados, ratings, random, true, participacaoJogador, resolverPartida);
+    const [liderA, liderB] = quadrangular.grupos.map((g) => g.classificados[0]);
+    const finalDoTorneio = await resolverConfronto(liderA, liderB, ratings, true, random, participacaoJogador, resolverPartida);
+    const partidasDoQuadrangular = quadrangular.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+    return { campeao: finalDoTorneio.vencedor, partidas: [...partidasDoQuadrangular, ...(finalDoTorneio.partidasDoJogador ?? [])] };
+  }
+
+  const { campeao: campeaoApertura, partidas: partidasApertura } = await campeaoDoTorneio(turno);
+  const { campeao: campeaoClausura, partidas: partidasClausura } = await campeaoDoTorneio(returno);
+
+  const participantesDaFinal = campeaoApertura === campeaoClausura ? [campeaoApertura] : [campeaoApertura, campeaoClausura];
+  const final = await simularFinalEstadualDoFormato(campeonato.formato.final_estadual!, participantesDaFinal, ratings, random, participacaoJogador, resolverPartida);
+
+  const partidasDoJogador = [
+    ...(turno.partidasDoJogador ?? []).map((p) => p.resultado),
+    ...(returno.partidasDoJogador ?? []).map((p) => p.resultado),
+    ...partidasApertura,
+    ...partidasClausura,
+    ...(final.confronto?.partidasDoJogador ?? []),
+  ];
+
+  return { campeao: final.campeao, partidasDoJogador };
 }
 
 /**

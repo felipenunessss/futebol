@@ -11,6 +11,7 @@ import {
   receitaPontosCorridosComLiguilla,
   receitaTurnoEMataMata,
   receitaTurnoRetornoComGrupoEMataMataEFinal,
+  receitaTurnoRetornoComQuadrangularEFinal,
   receitaTurnoRetornoSomado,
   receitaUruguaiPrimeira,
   receitaUruguaiSegunda,
@@ -383,6 +384,39 @@ describe("receitaTurnoRetornoSomado (Paraguai 1ª divisão)", () => {
 
     const resultado = await receitaTurnoRetornoSomado(campeonato, ratingsFavorecendoA, participacao, () => 0.05);
     expect(resultado.campeao).toBe("a");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+});
+
+describe("receitaTurnoRetornoComQuadrangularEFinal (Colômbia 1ª e 2ª divisão)", () => {
+  // 8 times: turno/returno classificam todos os 8 (degenerado, só pra fechar com a fase_quadrangular de
+  // 2 grupos de 4) -> quadrangular próprio de cada torneio -> final entre os 2 líderes de grupo decide o
+  // "campeão do torneio" -> final_estadual entre os 2 campeões de torneio.
+  const times = ["a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "colombia_primera_a",
+    formato: {
+      turno: { ida_e_volta: false, classificam_proxima_fase: 8 },
+      returno: { ida_e_volta: false, classificam_proxima_fase: 8 },
+      fase_quadrangular: { ativa: true, num_grupos: 2, times_por_grupo: 4, classificam_por_grupo: 1 },
+      final_estadual: { criterio: "final_ida_e_volta_entre_os_2_classificados_da_fase_final_de_cada_torneio", ida_e_volta: true },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("produz um campeão válido, passando por turno/returno -> quadrangular próprio -> final do torneio -> final da temporada", async () => {
+    const resultado = await receitaTurnoRetornoComQuadrangularEFinal(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("time muito mais forte domina os 2 torneios e vira campeão automático (sem final da temporada)", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA1 = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaTurnoRetornoComQuadrangularEFinal(campeonato, ratingsFavorecendoA1, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a1");
     expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
   });
 });
