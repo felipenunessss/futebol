@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { EtapaMataMata, FinalEstadual, MataMata } from "../../src/schemas/championship.js";
 import {
   resolverConfronto,
+  simularEtapasMataMataParcial,
   simularFinalEstadualDoFormato,
   simularMataMataComEtapas,
   simularMataMataDoFormato,
@@ -193,5 +194,36 @@ describe("simularMataMataComEtapas com participação do jogador", () => {
 
     const confrontoSemifinalDoA = resultado.etapas[0].confrontos.find((c) => c.timeA === "a" || c.timeB === "a")!;
     expect(confrontoSemifinalDoA.partidasDoJogador).toHaveLength(1);
+  });
+});
+
+describe("simularEtapasMataMataParcial", () => {
+  it("não lança erro terminando com mais de 1 sobrevivente (ao contrário de simularMataMataComEtapas)", async () => {
+    // 1 etapa só ("semifinal"), 4 entrantes -> termina com 2 vencedores, não 1 — usado quando um
+    // final_estadual de verdade resolve os últimos 2 (ver simulation/engine.ts receitaFaseSuicaMataMataEFinal).
+    const etapas: EtapaMataMata[] = [{ nome: "semifinal", ida_e_volta: false, entrantes: ["a", "b", "c", "d"] }];
+    const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+
+    const resultado = await simularEtapasMataMataParcial(etapas, ratings, () => Math.random());
+    expect(resultado.etapas).toHaveLength(1);
+    expect(resultado.etapas[0].vencedores).toHaveLength(2);
+  });
+
+  it("a mesma entrada faria simularMataMataComEtapas lançar erro", async () => {
+    const etapas: EtapaMataMata[] = [{ nome: "semifinal", ida_e_volta: false, entrantes: ["a", "b", "c", "d"] }];
+    const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+
+    await expect(simularMataMataComEtapas(etapas, ratings, () => Math.random())).rejects.toThrow(/terminou com 2 times ainda vivos/);
+  });
+
+  it("propaga partidasDoJogador normalmente", async () => {
+    const etapas: EtapaMataMata[] = [{ nome: "semifinal", ida_e_volta: false, entrantes: ["a", "b", "c", "d"] }];
+    const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await simularEtapasMataMataParcial(etapas, ratings, () => Math.random(), participacao);
+    const confrontoDoA = resultado.etapas[0].confrontos.find((c) => c.timeA === "a" || c.timeB === "a")!;
+    expect(confrontoDoA.partidasDoJogador).toHaveLength(1);
   });
 });

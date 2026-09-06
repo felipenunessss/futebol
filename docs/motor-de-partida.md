@@ -1265,6 +1265,94 @@ limitação como pendência conhecida — esta seção é ela sendo resolvida.
   gol (não é sempre um ou sempre outro) e partidas seguintes (modo
   `"rapida"`) sem narração nenhuma, como esperado.
 
+### 5.8. Receitas de simulação pra mais formatos de competição (implementado)
+
+Pedido explícito: "implemente a receita pra todos os campeonatos
+registrados" — motivado por uma carreira nova ter caído num clube cuja
+única competição (estadual) não tinha receita de simulação, resultando
+numa temporada inteira sem nenhuma partida real. Levantamento (62
+campeonatos registrados, 11 ativos no calendário padrão — Brasil +
+continentais) mostrou que só 4 tinham receita: `pontos_corridos`/
+`mata_mata` isolados e `fase_grupos`+`mata_mata` simples (genéricas) +
+Argentina por id. Implementadas 8 receitas novas em
+`simulation/engine.ts`, todas exportadas e testadas diretamente (mesmo
+padrão de `receitaArgentina`):
+
+- `receitaFaseSuicaEMataMata` (`fase_suica`+`mata_mata`) — Paulistão A1,
+  Gauchão, Catarinense, Goiano, Paraense, Paranaense, Copa Sul-Sudeste.
+- `receitaFaseSuicaMataMataEFinal` (`fase_suica`+`mata_mata`+`final_estadual`)
+  — Mineiro Módulo I: o `mata_mata` aqui é só a semifinal (1 etapa,
+  termina com 2 sobreviventes, não 1 campeão) — precisou de
+  `simulation/knockout.ts` `simularEtapasMataMataParcial`, variante nova
+  de `simularMataMataComEtapas` que **não exige terminar com 1 campeão
+  só** (extraído o loop comum pra `resolverEtapasMataMata`, reaproveitado
+  pelas duas). Os 2 semifinalistas vão pro `final_estadual` de verdade.
+- `receitaFaseGruposFaseQuadrangularEFinal` (`fase_grupos`+`fase_quadrangular`+
+  `final_estadual`) — Série C, Paulistão A2: só o **líder** (1º colocado)
+  de cada quadrangular disputa a final, não todo `classificam_por_grupo`
+  (o `criterio` diz "líderes... disputam o título", singular por grupo).
+- `receitaTurnoEMataMata` (`mata_mata`+`turno`) — Carioca A2.
+- `receitaTurnoRetornoSomado` (`returno`+`turno`, sem `final_estadual`) —
+  Paraguai 1ª divisão: mesma soma de tabelas de `receitaArgentina` (agora
+  extraída num helper comum, `simularTurnoRetorno`), mas sem reconciliação
+  nenhuma depois — campeão é direto o topo da tabela somada.
+- `receitaPontosCorridosComLiguilla` (`mata_mata`+`pontos_corridos`) —
+  Chile 2ª divisão: temporada inteira decide a tabela, os
+  `2^(nº de fases do mata_mata)` melhores colocados disputam a liguilla
+  de acesso. **Aproximação documentada** (já existia em
+  `docs/dados-a-verificar.md`): a liguilla real dá bye pro 2º colocado
+  (só 3º-8º jogam quartas), não representável com o bloco `MataMata`
+  atual — aqui todos os classificados entram direto, sem bye.
+- `receitaCarioca` (por id, mesma combinação `final_estadual`+`returno`+
+  `turno` de `receitaArgentina` com significado diferente): Taça
+  Guanabara/Taça Rio decididas pelo topo da própria tabela (não usa
+  `classificam_proxima_fase` — não há mais nenhuma fase entre elas e a
+  final), `final_estadual` é uma final de verdade entre os 2 — mesmo
+  clube campeão dos dois vira campeão automático, sem final
+  (`simularFinalEstadualDoFormato` já cobre 1 participante só).
+- `receitaFaseGruposComPreClassificatorioEMataMata` (`fase_grupos`+
+  `mata_mata` com `mata_mata.etapas` detalhado) — Libertadores/
+  Sul-Americana: ao contrário do caso simples (classificados do grupo
+  alimentam o mata-mata direto), aqui uma PARTE das etapas do mata-mata
+  acontece **antes** da fase de grupos (pré-classificatório — só alguns
+  times entram direto, o resto disputa vaga) e o resto **depois** (mata-
+  mata final entre os classificados da fase de grupos). O corte entre
+  "antes" e "depois" é **derivado da contagem de times, não hardcoded**:
+  times que nunca aparecem em nenhum `entrantes` são "diretos"; percorre
+  as etapas resolvendo o pré-classificatório até sobreviventes+diretos
+  bater exatamente com o tamanho esperado da fase de grupos
+  (`num_grupos × times_por_grupo`). Pra Libertadores fecha exatamente (28
+  diretos + 4 sobreviventes = 32) — pra Sul-Americana **não fecha em
+  nenhum ponto** (achado documentado em `docs/dados-a-verificar.md`,
+  possível mecanismo cross-competição com a fase preliminar da
+  Libertadores, não modelável só com o `times[]` de uma competição), erro
+  claro em vez de simulação errada.
+- `despacharReceitaGenerica` passou a **ignorar `tabela_acumulada`** na
+  chave de despacho (o bloco só tem `{criterio: string}`, nenhum dado
+  próprio — é uma anotação de "some as tabelas dos outros blocos", não um
+  mecanismo independente). Resolveu de graça o Paraguai 2ª divisão
+  (`pontos_corridos`+`tabela_acumulada` → cai no `receitaPontosCorridos`
+  já existente, já que o `tabela_acumulada` ali é só sobre rebaixamento
+  por média de temporadas, sem efeito nesta temporada).
+- `simulation/swiss.ts` (`simularFaseSuica`) convertido pra `async` +
+  `ResolverPartida`, mesmo padrão de `season.ts`/`knockout.ts`/`groups.ts`
+  — necessário porque a fase suíça agora está em competições ativas de
+  verdade (antes só era exercitada em teste).
+- **Deferido, documentado como pendência** (`docs/dados-a-verificar.md`):
+  Uruguai, Venezuela, Peru, Colômbia, Equador (ambas as divisões de cada),
+  Argentina 2ª divisão, Copa Verde (`dupla_chave_regional`), Copa do
+  Nordeste — a maioria já tinha mecanismo real não totalmente confirmado
+  por fonte, ou (Argentina 2ª) o próprio torneio real ainda em andamento
+  sem chaveamento fechado. Implementar receita pra esses arriscaria
+  inventar regra sem confirmação — contra a convenção do projeto.
+- **Validado com dado real**: rodando `simularTemporada` com o calendário
+  padrão de 2027 e todos os clubes reais carregados, 10 das 11
+  competições ativas simulam com sucesso (campeões plausíveis: Flamengo/
+  Palmeiras no Brasileirão, Cruzeiro/Atlético-MG no Mineiro, Grêmio/
+  Internacional no Gauchão, clubes CONMEBOL reais na Libertadores) — só a
+  Sul-Americana continua com erro (documentado acima). Antes desta seção,
+  só 4 das 11 simulavam.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1427,3 +1515,13 @@ limitação como pendência conhecida — esta seção é ela sendo resolvida.
   jogo ao vivo não tem "escalação"/lesão real durante a partida — só a
   chance do jogador e eventos de contexto pausam, o resto do time
   segue sendo Camada 1 (duelo agregado), igual antes.
+- **Receitas de simulação ainda faltando** (ver seção 5.8): Uruguai,
+  Venezuela, Peru, Colômbia, Equador (1ª e 2ª divisão de cada), Argentina
+  2ª divisão, Copa Verde (`dupla_chave_regional`), Copa do Nordeste — só
+  entram no calendário de uma carreira brasileira se algum dia
+  `data/loaders/calendario.ts` passar a incluir competições
+  internacionais além das continentais atuais. Sul-Americana tem receita
+  (mesma função de Libertadores) mas erra sempre — mecanismo real das
+  etapas "repescagem"/"oitavas"/"quartas" não fecha com o tamanho da fase
+  de grupos, possível dependência cross-competição com a Libertadores
+  (ver `docs/dados-a-verificar.md`).

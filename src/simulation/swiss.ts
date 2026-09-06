@@ -1,5 +1,5 @@
 import type { FaseSuica } from "../schemas/championship.js";
-import { gerarPerfilTime, participacaoNoConfronto, simularPartida, type ParticipacaoJogadorClube } from "./match.js";
+import { resolverPartidaPadrao, participacaoNoConfronto, gerarPerfilTime, type ParticipacaoJogadorClube, type ResolverPartida } from "./match.js";
 import { atualizarLinha, linhaVazia, type Confronto, type LinhaTabela, type PartidaDoJogador } from "./season.js";
 
 /**
@@ -118,13 +118,14 @@ export interface ResultadoFaseSuica {
   partidasDoJogador?: PartidaDoJogador[];
 }
 
-export function simularFaseSuica(
+export async function simularFaseSuica(
   times: string[],
   formato: FaseSuica,
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
-): ResultadoFaseSuica {
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoFaseSuica> {
   const confrontos = gerarConfrontosFaseSuica(times, formato, random);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
   const partidasDoJogador: PartidaDoJogador[] = [];
@@ -133,7 +134,7 @@ export function simularFaseSuica(
     const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
     const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
     const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
-    const resultado = simularPartida(perfilMandante, perfilVisitante, random, participacao);
+    const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante });
 
     atualizarLinha(tabela.get(confronto.mandante)!, resultado.golsCasa, resultado.golsFora);
     atualizarLinha(tabela.get(confronto.visitante)!, resultado.golsFora, resultado.golsCasa);

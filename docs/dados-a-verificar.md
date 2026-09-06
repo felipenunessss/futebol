@@ -163,7 +163,23 @@ resultado final bate mas o mecanismo intermediário não é representado:
   grupos de 9) + mata-mata genérico como placeholder.
 - **Copa Sul-Americana**: só o 1º colocado de cada grupo avança direto às
   oitavas, o 2º vai pra repescagem — modelado como `classificam_por_grupo: 2`
-  uniforme, perdendo a distinção das duas rotas.
+  uniforme, perdendo a distinção das duas rotas. **Achado adicional ao
+  tentar implementar a receita de simulação** (`simulation/engine.ts`
+  `receitaFaseGruposComPreClassificatorioEMataMata`): a contagem de times
+  do `mata_mata.etapas` ("primeira_fase" 32 entrantes + "repescagem" 8
+  entrantes) somada aos 16 diretos (times que não aparecem em nenhum
+  `entrantes`) não fecha em NENHUM ponto com o tamanho esperado da fase de
+  grupos (32, = 8 grupos × 4) — testado em todo corte possível entre as
+  etapas, incluindo antes/depois da repescagem se juntar aos classificados
+  da fase de grupos. A Libertadores (mesmo formato de blocos, `etapas`
+  igualmente detalhado) fecha exatamente (28 diretos + 4 sobreviventes do
+  pré-classificatório = 32) — então o problema não é o motor, é a
+  contagem/nomeação das etapas da Sul-Americana especificamente: possível
+  que "repescagem" dependa de um mecanismo cross-competição (times
+  eliminados da fase preliminar da Libertadores caindo pra Sul-Americana,
+  não modelado — o motor só enxerga o `times[]` de uma competição por
+  vez) que os dados atuais não capturam. Por ora a Sul-Americana continua
+  sem simulação automática (erro claro, não crash da temporada).
 
 ## Clássicos não pesquisados (baixa prioridade — só imersão)
 

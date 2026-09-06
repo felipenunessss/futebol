@@ -120,22 +120,32 @@ export async function resolverConfronto(
   return { ...base, vencedor, decididoNosPenaltis: true };
 }
 
+export interface ResultadoEtapasMataMata {
+  etapas: ResultadoEtapaMataMata[];
+}
+
 /**
- * Simula um mata-mata com entrada escalonada por etapa (`EtapaMataMata[]`,
- * ver `schemas/championship.ts`) — cada etapa soma seus `entrantes` (se
- * houver) aos vencedores que já vinham da etapa anterior, empareiam por
- * força, resolve os confrontos e passa os vencedores adiante. Termina
- * quando sobra 1 só time. Se o clube do jogador for eliminado no meio do
- * caminho, as etapas seguintes simplesmente não têm `partidasDoJogador`.
+ * Resolve as etapas de um mata-mata escalonado (`EtapaMataMata[]`, ver
+ * `schemas/championship.ts`) — cada etapa soma seus `entrantes` (se
+ * houver) aos vencedores que já vinham da etapa anterior, emparelha por
+ * força, resolve os confrontos e passa os vencedores adiante. **Não exige
+ * terminar com 1 campeão só** — quem terminar com mais de 1 sobrevivente
+ * na última etapa (ex: uma "semifinal" isolada, de propósito, pra um
+ * `final_estadual` de verdade decidir os últimos dois — ver
+ * `simulation/engine.ts` `receitaFaseSuicaMataMataEFinal`/
+ * `receitaFaseGruposComPreClassificatorioEMataMata`) lê
+ * `etapas[etapas.length-1].vencedores` direto. `simularMataMataComEtapas`
+ * (abaixo) é a variante que EXIGE 1 campeão — usada quando o mata-mata
+ * decide o título sozinho.
  */
-export async function simularMataMataComEtapas(
+async function resolverEtapasMataMata(
   etapas: EtapaMataMata[],
   ratings: Record<string, number>,
-  random: () => number = Math.random,
-  participacaoJogador?: ParticipacaoJogadorClube,
-  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
-  resolverPartida: ResolverPartida = resolverPartidaPadrao,
-): Promise<ResultadoMataMata> {
+  random: () => number,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  aoResolverConfronto: ((evento: EventoConfrontoMataMata) => void) | undefined,
+  resolverPartida: ResolverPartida,
+): Promise<ResultadoEtapasMataMata> {
   let vivos: string[] = [];
   const resultadoEtapas: ResultadoEtapaMataMata[] = [];
 
@@ -159,6 +169,38 @@ export async function simularMataMataComEtapas(
     resultadoEtapas.push({ nome: etapa.nome, confrontos, vencedores });
     vivos = vencedores;
   }
+
+  return { etapas: resultadoEtapas };
+}
+
+/** Ver `resolverEtapasMataMata` — variante que NÃO exige terminar com 1 campeão só, pra mata-matas que são só uma etapa de um formato maior. */
+export async function simularEtapasMataMataParcial(
+  etapas: EtapaMataMata[],
+  ratings: Record<string, number>,
+  random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
+  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoEtapasMataMata> {
+  return resolverEtapasMataMata(etapas, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+}
+
+/**
+ * Simula um mata-mata com entrada escalonada por etapa até sobrar 1 só
+ * time (ver `resolverEtapasMataMata` pra semântica de cada etapa). Se o
+ * clube do jogador for eliminado no meio do caminho, as etapas seguintes
+ * simplesmente não têm `partidasDoJogador`.
+ */
+export async function simularMataMataComEtapas(
+  etapas: EtapaMataMata[],
+  ratings: Record<string, number>,
+  random: () => number = Math.random,
+  participacaoJogador?: ParticipacaoJogadorClube,
+  aoResolverConfronto?: (evento: EventoConfrontoMataMata) => void,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoMataMata> {
+  const { etapas: resultadoEtapas } = await resolverEtapasMataMata(etapas, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+  const vivos = resultadoEtapas[resultadoEtapas.length - 1]?.vencedores ?? [];
 
   if (vivos.length !== 1) {
     throw new Error(`simularMataMataComEtapas: terminou com ${vivos.length} times ainda vivos, esperava 1 campeão`);

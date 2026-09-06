@@ -53,27 +53,27 @@ describe("gerarConfrontosFaseSuica", () => {
 describe("simularFaseSuica", () => {
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
 
-  it("gera tabela com uma linha por time e classifica classificam_mata_mata", () => {
-    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random());
+  it("gera tabela com uma linha por time e classifica classificam_mata_mata", async () => {
+    const resultado = await simularFaseSuica(times, formato, ratings, () => Math.random());
     expect(resultado.tabela).toHaveLength(8);
     expect(resultado.classificados).toHaveLength(4);
   });
 
-  it("classificados vêm do topo da tabela", () => {
-    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random());
+  it("classificados vêm do topo da tabela", async () => {
+    const resultado = await simularFaseSuica(times, formato, ratings, () => Math.random());
     expect(resultado.classificados).toEqual(resultado.tabela.slice(0, 4).map((l) => l.clubeId));
   });
 
-  it("sem participacaoJogador, partidasDoJogador fica ausente", () => {
-    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random());
+  it("sem participacaoJogador, partidasDoJogador fica ausente", async () => {
+    const resultado = await simularFaseSuica(times, formato, ratings, () => Math.random());
     expect(resultado.partidasDoJogador).toBeUndefined();
   });
 
-  it("com participacaoJogador, retorna uma entrada por partida do clube dele", () => {
+  it("com participacaoJogador, retorna uma entrada por partida do clube dele", async () => {
     const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
     const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
 
-    const resultado = simularFaseSuica(times, formato, ratings, () => Math.random(), participacao);
+    const resultado = await simularFaseSuica(times, formato, ratings, () => Math.random(), participacao);
     const jogosDeA1 = resultado.confrontos.filter((c) => c.mandante === "a1" || c.visitante === "a1").length;
 
     expect(resultado.partidasDoJogador).toHaveLength(jogosDeA1);
