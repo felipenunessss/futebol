@@ -118,7 +118,8 @@ export function atualizarLinha(linha: LinhaTabela, golsFeitos: number, golsSofri
   }
 }
 
-function ordenarTabela(tabela: LinhaTabela[]): LinhaTabela[] {
+/** Exportado pra `simulation/incremental.ts` reaproveitar o mesmo critério de ordenação rodada a rodada. */
+export function ordenarTabela(tabela: LinhaTabela[]): LinhaTabela[] {
   return [...tabela].sort((a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro);
 }
 

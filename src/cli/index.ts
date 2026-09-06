@@ -25,8 +25,10 @@ import type { SubtipoChance } from "../simulation/tactics.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, assinarContrato, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
 import {
   jogarTemporada,
+  jogarTemporadaSemanal,
   type CenarioResolvidoNaTemporada,
   type ContextoPartidaDoJogador,
+  type ContextoPartidaDoJogadorSemanal,
   type ModoDePartida,
   type NegociacaoResolvidaNaTemporada,
   type PartidaDoJogadorMataMata,
@@ -547,43 +549,44 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   };
 
   /**
-   * Quantas partidas o modo "simular até a metade da temporada" fica sem
-   * perguntar de novo depois de escolhido — no ponto em que
-   * `escolherModoDePartida` é chamado (`career/career-loop.ts`) não dá pra
-   * saber de antemão quantas partidas o clube do jogador vai ter na
-   * temporada inteira (múltiplas competições, cada uma só sabendo seu
-   * próprio calendário, ver `simulation/engine.ts`), então isso é uma
-   * estimativa fixa de design (não uma conta exata de "metade"), calibrada
-   * pra cobrir uma janela razoavelmente longa sem perguntar. Depois dela,
-   * volta a perguntar normalmente.
+   * A temporada semanal (`jogarTemporadaSemanal`) roda de semana 1 a 52
+   * (estimativa de design, ver `data/loaders/calendario.ts`) — "pular até a
+   * metade"/"pular pro final" agora suspendem o menu por SEMANA (não por
+   * contagem de partidas): a opção 2 para de perguntar até a semana 26, a
+   * opção 3 para de perguntar pelo resto da temporada inteira.
    */
-  const PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA = 25;
-  let modoAutoAtePartida: number | undefined;
-  let ultimoContextoDePartida: ContextoPartidaDoJogador | undefined;
+  const ULTIMA_SEMANA_DA_TEMPORADA = 52;
+  let modoAutoAteSemana: number | undefined;
+  let ultimoContextoDePartida: ContextoPartidaDoJogadorSemanal | undefined;
 
-  const escolherModoDePartidaInterativo = async (contexto: ContextoPartidaDoJogador): Promise<ModoDePartida> => {
+  const escolherModoDePartidaInterativo = async (contexto: ContextoPartidaDoJogadorSemanal): Promise<ModoDePartida> => {
     ultimoContextoDePartida = contexto;
 
-    if (modoAutoAtePartida !== undefined) {
-      if (contexto.numeroDaPartida <= modoAutoAtePartida) return "rapida";
-      modoAutoAtePartida = undefined; // passou da janela automática, volta a perguntar
+    if (modoAutoAteSemana !== undefined) {
+      if (contexto.semana <= modoAutoAteSemana) return "rapida";
+      modoAutoAteSemana = undefined; // passou da janela automática, volta a perguntar
     }
 
     console.log(
-      `\n--- Partida ${contexto.numeroDaPartida}: ${nomeDoClube(contexto.mandanteId)} x ${nomeDoClube(contexto.visitanteId)} (você joga ${contexto.lado === "casa" ? "em casa" : "fora"}) ---`,
+      `\n--- Semana ${contexto.semana} — ${nomeDoClube(contexto.mandanteId)} x ${nomeDoClube(contexto.visitanteId)} (você joga ${contexto.lado === "casa" ? "em casa" : "fora"}) ---`,
     );
     console.log("  1. Simulação rápida (direto pro resultado)");
-    console.log("  2. Simular até a metade da temporada (não pergunta de novo por um tempo)");
-    console.log("  3. Simular o jogo (ao vivo — pausa em lances importantes)");
+    console.log("  2. Simular até a metade da temporada (não pergunta de novo até lá)");
+    console.log("  3. Simular até o final da temporada direto (não pergunta mais nada este ano)");
+    console.log("  4. Simular o jogo (ao vivo — pausa em lances importantes)");
 
     while (true) {
       const escolha = (await perguntar("Escolha (número): ")).trim();
       if (escolha === "1") return "rapida";
       if (escolha === "2") {
-        modoAutoAtePartida = contexto.numeroDaPartida + PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA;
+        modoAutoAteSemana = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
         return "rapida";
       }
-      if (escolha === "3") return "ao_vivo";
+      if (escolha === "3") {
+        modoAutoAteSemana = ULTIMA_SEMANA_DA_TEMPORADA;
+        return "rapida";
+      }
+      if (escolha === "4") return "ao_vivo";
       console.log("Opção inválida, tente de novo.");
     }
   };
@@ -678,12 +681,39 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     console.log(`  -> ${resolvido.escolha.resultado.impacto.narrativa} (${formatarImpacto(resolvido.escolha.resultado.impacto)})`);
   };
 
-  const onPartidaPontosCorridos = (info: PartidaDoJogadorPontosCorridos): void => {
+  // A pausa pós-jogo só faz sentido fora de uma janela de auto-skip ("até a metade"/"até o final")
+  // — senão a opção de pular perderia o sentido (o jogador teria que apertar Enter em toda partida
+  // mesmo tendo pedido pra não ser mais perguntado). `modoAutoAteSemana` já reflete isso (ver
+  // `escolherModoDePartidaInterativo`, chamado antes deste hook pra essa mesma partida).
+  const onPartidaPontosCorridos = async (info: PartidaDoJogadorPontosCorridos): Promise<void> => {
     exibirPartidaPontosCorridos(info, estado.clubeAtualId);
+    if (modoAutoAteSemana === undefined) await perguntar("\nEnter pra continuar: ");
   };
 
-  const onPartidaMataMata = (info: PartidaDoJogadorMataMata): void => {
+  const onPartidaMataMata = async (info: PartidaDoJogadorMataMata): Promise<void> => {
     exibirPartidaMataMata(info, estado.clubeAtualId);
+    if (modoAutoAteSemana === undefined) await perguntar("\nEnter pra continuar: ");
+  };
+
+  /** Perguntado 1x no início da temporada — quais OUTRAS competições ativas (que não a do próprio clube) o jogador quer acompanhar com resumo de tabela a cada período (ver `onResumoDePeriodoCampeonatoSeguido`). */
+  const escolherCampeonatosParaSeguirInterativo = async (idsAtivos: string[]): Promise<string[]> => {
+    if (idsAtivos.length === 0) return [];
+
+    console.log("\n=== Outras competições ativas nesta temporada ===");
+    idsAtivos.forEach((id, i) => console.log(`  ${i + 1}. ${id}`));
+    const resposta = (await perguntar("Quais você quer acompanhar (números separados por vírgula, ou Enter pra nenhuma): ")).trim();
+    if (!resposta) return [];
+
+    return resposta
+      .split(",")
+      .map((parte) => Number(parte.trim()) - 1)
+      .filter((indice) => indice >= 0 && indice < idsAtivos.length)
+      .map((indice) => idsAtivos[indice]);
+  };
+
+  const onResumoDePeriodoCampeonatoSeguido = (campeonatoId: string, periodo: string, tabela: LinhaTabela[]): void => {
+    console.log(`\n=== ${campeonatoId} — resumo do período ${periodo} ===`);
+    imprimirTabela(tabela);
   };
 
   const onPartidasResumidas = (resumo: ResumoPartidasDaTemporada): void => {
@@ -702,7 +732,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
 
   let continuar = true;
   while (continuar) {
-    const resultado: ResultadoTemporadaDeCarreira = await jogarTemporada(estado, campeonatos, clubes, {
+    const resultado: ResultadoTemporadaDeCarreira = await jogarTemporadaSemanal(estado, campeonatos, clubes, {
       escolherOpcao: escolherOpcaoInterativa,
       escolherFocoDeTreino: escolherFocoDeTreinoInterativo,
       onNegociacaoResolvida,
@@ -716,6 +746,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       decidirChanceAoVivo: decidirChanceAoVivoInterativo,
       decidirEventoDePartida: escolherOpcaoInterativa,
       onEventoAoVivo: onEventoAoVivoInterativo,
+      escolherCampeonatosParaSeguir: escolherCampeonatosParaSeguirInterativo,
+      onResumoDePeriodoCampeonatoSeguido,
     });
     estado = resultado.estado;
 

@@ -1,13 +1,21 @@
 import type { Club } from "../schemas/club.js";
 import { buscarArquetipo } from "../schemas/player.js";
+import type { PeriodoCalendario } from "../schemas/calendar.js";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularTemporada, type CampeonatoSimulavel, type EventosSimulacaoTemporada, type ResultadoTemporada } from "../simulation/engine.js";
 import type { EventoConfrontoMataMata } from "../simulation/knockout.js";
-import type { EventoConfrontoPontosCorridos } from "../simulation/season.js";
-import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida } from "../simulation/match.js";
+import type { EventoConfrontoPontosCorridos, LinhaTabela } from "../simulation/season.js";
+import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "../simulation/match.js";
 import { jogarPartidaAoVivo, type ContextoDecisaoChance, type EventoAoVivo, type ResultadoDecisaoChance } from "../simulation/live-match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
 import { obterRating } from "../simulation/rating.js";
+import {
+  avancarSemana,
+  avancarSemanaConjunta,
+  criarCompeticoesIncrementaisDaTemporada,
+  tabelaAtualDaCompeticao,
+  type HooksDeFase,
+} from "../simulation/incremental.js";
 import { aplicarTreino, calcularNotaPartida, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
 import {
   CENARIOS,
@@ -274,6 +282,156 @@ async function resolverNegociacaoDeTransferencia(
   return { estado: estadoAtual, aceita: false };
 }
 
+interface ContextoResolucaoDePeriodo {
+  clubes: Club[];
+  clubePorId: Map<string, Club>;
+  regiaoAtualPadrao?: string;
+  escolherFocoDeTreino: (estado: EstadoDeCarreira) => FocoDeTreino | Promise<FocoDeTreino>;
+  onTreinoResolvido?: (treino: TreinoResolvidoNaTemporada) => void | Promise<void>;
+  escolherOpcao: (cenario: Cenario) => Opcao | Promise<Opcao>;
+  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
+  onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
+  onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
+  random: () => number;
+}
+
+/**
+ * Resolve o treino + o cenário (com eventual negociação real de transferência)
+ * de UM período do calendário — extraído do corpo do loop de períodos que
+ * `jogarTemporada` já tinha, pra ser reaproveitado também por
+ * `jogarTemporadaSemanal` (que chama isso a cada início de período dentro do
+ * loop semanal, em vez de rodar todos os períodos de uma vez só no final).
+ * Mesmo comportamento exato de antes, só extraído — nenhuma mudança de regra.
+ */
+async function resolverPeriodoDaCarreira(
+  periodo: PeriodoCalendario,
+  estadoInicial: EstadoDeCarreira,
+  ctx: ContextoResolucaoDePeriodo,
+  negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
+): Promise<{ estado: EstadoDeCarreira; treino: TreinoResolvidoNaTemporada; cenario: CenarioResolvidoNaTemporada }> {
+  const { clubes, clubePorId, regiaoAtualPadrao, escolherFocoDeTreino, onTreinoResolvido, escolherOpcao, responderProposta, onNegociacaoResolvida, onCenarioResolvido, random } = ctx;
+  let estadoAtual = estadoInicial;
+  const momento = momentoDoPeriodo(periodo.periodo);
+
+  const foco = await escolherFocoDeTreino(estadoAtual);
+  const overallAntesTreino = overallAtual(estadoAtual);
+  const moralAntesTreino = estadoAtual.moral;
+
+  if (foco === "descanso") {
+    const regiaoParaDescanso = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+    estadoAtual = aplicarImpactoDeCenario(estadoAtual, { moral: MORAL_RECUPERADA_NO_DESCANSO, narrativa: "" }, regiaoParaDescanso);
+  } else {
+    const arquetipo = buscarArquetipo(estadoAtual.jogador.arquetipo_id);
+    const atributosTreinados = aplicarTreino(estadoAtual.jogador, arquetipo, foco);
+    estadoAtual = { ...estadoAtual, jogador: { ...estadoAtual.jogador, atributos: atributosTreinados } };
+  }
+
+  const treinoResolvido: TreinoResolvidoNaTemporada = {
+    periodo: periodo.periodo,
+    foco,
+    overallAntes: overallAntesTreino,
+    overallDepois: overallAtual(estadoAtual),
+    moralAntes: moralAntesTreino,
+    moralDepois: estadoAtual.moral,
+  };
+  await onTreinoResolvido?.(treinoResolvido);
+
+  const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+
+  let interessadosCompra: Club[] = [];
+  let interessadosVenda: Club[] = [];
+  let valorDeMercado = 0;
+  let ratingClubeAtual = 0;
+
+  if (estaNaJanelaDeTransferencia(momento)) {
+    const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
+    ratingClubeAtual = clubeAtualObj ? obterRating(clubeAtualObj) : 0;
+
+    const perfil: PerfilDeMercado = {
+      overall: overallAtual(estadoAtual),
+      idade: estadoAtual.jogador.idade,
+      reputacaoNacional: estadoAtual.reputacao.nacional,
+      multiplicadorStatus: multiplicadorDeValorizacaoPorStatus(estadoAtual.statusNoClube),
+    };
+    valorDeMercado = calcularValorDeMercado(perfil);
+    interessadosCompra = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random });
+
+    if (clubeAtualObj && precisaVender(clubeAtualObj, random)) {
+      interessadosVenda = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random, exigirUpgrade: false });
+    }
+  }
+
+  const contexto: ContextoSorteio = {
+    idadeJogador: estadoAtual.jogador.idade,
+    reputacaoNacional: estadoAtual.reputacao.nacional,
+    reputacaoRegional: regiaoAtual !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtual] ?? 0) : 0,
+    moral: estadoAtual.moral,
+    relacoesInternas: estadoAtual.relacoesInternas,
+    momento,
+  };
+
+  // Cenários "de transferência" (compra ou venda forçada) só entram no sorteio quando há o
+  // interesse real correspondente nesse período — evita prometer proposta que não existe
+  // mecanicamente. Havendo interesse real E ao menos um cenário elegível, o sorteio fica restrito
+  // a eles (não competem contra o resto do catálogo) — garante que a negociação real sempre venha
+  // acompanhada da moldura narrativa certa, em vez de só "coexistir" sem se referenciar. Venda
+  // forçada tem prioridade sobre interesse de compra quando os dois calham no mesmo período.
+  const elegiveis = filtrarCenariosElegiveis(CENARIOS, contexto);
+  const elegiveisDeVenda = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaVendaForcada));
+  const elegiveisDeCompra = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaNegociacaoReal));
+  const elegiveisGerais = elegiveis.filter((c) => !c.opcoes.some((o) => o.disparaVendaForcada || o.disparaNegociacaoReal));
+
+  let poolDeSorteio: Cenario[];
+  if (interessadosVenda.length > 0 && elegiveisDeVenda.length > 0) {
+    poolDeSorteio = elegiveisDeVenda;
+  } else if (interessadosCompra.length > 0 && elegiveisDeCompra.length > 0) {
+    poolDeSorteio = elegiveisDeCompra;
+  } else {
+    poolDeSorteio = elegiveisGerais;
+  }
+
+  const cenario = sortearCenario(poolDeSorteio, random);
+  const opcaoEscolhida = await escolherOpcao(cenario);
+
+  const negociacaoAplicavel =
+    opcaoEscolhida.disparaVendaForcada && interessadosVenda.length > 0
+      ? { interessados: interessadosVenda, tipo: "venda_forcada" as const }
+      : opcaoEscolhida.disparaNegociacaoReal && interessadosCompra.length > 0
+        ? { interessados: interessadosCompra, tipo: "compra" as const }
+        : undefined;
+
+  let escolha: EscolhaResolvida;
+  if (negociacaoAplicavel) {
+    const { estado: novoEstado, aceita } = await resolverNegociacaoDeTransferencia(
+      estadoAtual,
+      negociacaoAplicavel.interessados,
+      valorDeMercado,
+      ratingClubeAtual,
+      negociacaoAplicavel.tipo,
+      periodo.periodo,
+      responderProposta,
+      random,
+      negociacoesResolvidas,
+      onNegociacaoResolvida,
+    );
+    estadoAtual = novoEstado;
+
+    // resultados[0] é o molde de narrativa/impacto pro desfecho favorável (negociação aceita),
+    // resultados[último] pro desfecho desfavorável (recusada) — ver Opcao.disparaNegociacaoReal/disparaVendaForcada.
+    escolha = { opcao: opcaoEscolhida, resultado: aceita ? opcaoEscolhida.resultados[0] : opcaoEscolhida.resultados[opcaoEscolhida.resultados.length - 1] };
+  } else {
+    escolha = resolverEscolha(opcaoEscolhida, random);
+  }
+
+  const regiaoParaImpacto = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoParaImpacto);
+
+  const resolvido: CenarioResolvidoNaTemporada = { periodo: periodo.periodo, momento, cenario, escolha };
+  await onCenarioResolvido?.(resolvido);
+
+  return { estado: estadoAtual, treino: treinoResolvido, cenario: resolvido };
+}
+
 /**
  * Joga uma temporada inteira da carreira: simula todas as competições
  * ativas do calendário padrão (`simulation/engine.ts` `simularTemporada`),
@@ -462,126 +620,295 @@ export async function jogarTemporada(
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
   const treinosResolvidos: TreinoResolvidoNaTemporada[] = [];
 
+  const contextoDePeriodo: ContextoResolucaoDePeriodo = {
+    clubes,
+    clubePorId,
+    regiaoAtualPadrao,
+    escolherFocoDeTreino,
+    onTreinoResolvido,
+    escolherOpcao,
+    responderProposta,
+    onNegociacaoResolvida,
+    onCenarioResolvido,
+    random,
+  };
+
   for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario) {
-    const momento = momentoDoPeriodo(periodo.periodo);
+    const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodo, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
+    estadoAtual = estadoAposPeriodo;
+    treinosResolvidos.push(treino);
+    cenariosResolvidos.push(cenario);
+  }
 
-    const foco = await escolherFocoDeTreino(estadoAtual);
-    const overallAntesTreino = overallAtual(estadoAtual);
-    const moralAntesTreino = estadoAtual.moral;
+  const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
 
-    if (foco === "descanso") {
-      const regiaoParaDescanso = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-      estadoAtual = aplicarImpactoDeCenario(estadoAtual, { moral: MORAL_RECUPERADA_NO_DESCANSO, narrativa: "" }, regiaoParaDescanso);
-    } else {
-      const arquetipo = buscarArquetipo(estadoAtual.jogador.arquetipo_id);
-      const atributosTreinados = aplicarTreino(estadoAtual.jogador, arquetipo, foco);
-      estadoAtual = { ...estadoAtual, jogador: { ...estadoAtual.jogador, atributos: atributosTreinados } };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
+}
+
+export interface ContextoPartidaDoJogadorSemanal extends ContextoPartidaDoJogador {
+  /** Semana do calendário (1-52, estimativa de design) em que essa partida está acontecendo — dá pra `escolherModoDePartida` decidir "pular até a metade"/"pular pro final" por SEMANA, não por contagem de partidas (ver `jogarTemporadaSemanal`). */
+  semana: number;
+}
+
+export interface OpcoesJogarTemporadaSemanal extends Omit<OpcoesJogarTemporada, "escolherModoDePartida" | "onPartidaPontosCorridos" | "onPartidaMataMata"> {
+  escolherModoDePartida?: (contexto: ContextoPartidaDoJogadorSemanal) => ModoDePartida | Promise<ModoDePartida>;
+  /**
+   * Chamado a cada confronto de pontos corridos do clube do jogador — igual
+   * `OpcoesJogarTemporada.onPartidaPontosCorridos`, mas aqui pode ser
+   * assíncrono: como cada confronto é `await`ado antes do próximo ser
+   * resolvido (`simulation/incremental.ts`), um hook que espera um "Enter
+   * pra continuar" do jogador (ex: `src/cli/index.ts`) pausa de verdade a
+   * simulação nesse ponto, mostrando a tabela atualizada antes de seguir.
+   */
+  onPartidaPontosCorridos?: (info: PartidaDoJogadorPontosCorridos) => void | Promise<void>;
+  /** Equivalente a `onPartidaPontosCorridos`, mas pra confrontos de mata-mata. */
+  onPartidaMataMata?: (info: PartidaDoJogadorMataMata) => void | Promise<void>;
+  /**
+   * Chamado uma vez no início da temporada — quais OUTRAS competições ativas
+   * (que não a(s) do próprio clube do jogador, essas já têm a UI completa
+   * de sempre) ele quer acompanhar com resumo de tabela a cada período
+   * (`onResumoDePeriodoCampeonatoSeguido`). Sem esse callback, nenhuma é
+   * seguida.
+   */
+  escolherCampeonatosParaSeguir?: (idsAtivos: string[], clubeAtualId: string) => string[] | Promise<string[]>;
+  /**
+   * Chamado no fim de cada período do calendário, uma vez por competição
+   * seguida (ver `escolherCampeonatosParaSeguir`) — a tabela reflete só o
+   * que já foi resolvido até aquele ponto da temporada, nunca resultado
+   * futuro (`simulation/incremental.ts` `tabelaAtualDaCompeticao`).
+   * **Cobertura parcial**: ausente se a competição estiver numa fase sem
+   * "uma" tabela só no momento (mata-mata, ou fase de grupos com vários
+   * grupos) — pendência de UI, não um erro.
+   */
+  onResumoDePeriodoCampeonatoSeguido?: (campeonatoId: string, periodo: string, tabela: LinhaTabela[]) => void | Promise<void>;
+}
+
+/**
+ * Variante semana-a-semana de `jogarTemporada` — em vez de resolver TODAS as
+ * partidas da temporada de uma vez (`simulation/engine.ts` `simularTemporada`)
+ * e só DEPOIS rodar os períodos de treino/cenário, avança a temporada
+ * semana por semana (`simulation/incremental.ts`), intercalando de verdade
+ * partida do jogador e evento de carreira na ordem cronológica: a cada
+ * semana, resolve o treino/cenário do período que começa ali (se houver) e
+ * avança toda competição ativa em uma rodada/etapa (se o cronograma dela
+ * tiver algo pra essa semana). Usada só pela carreira interativa (`jogar`)
+ * — `jogarTemporada` continua servindo `carreira-loop`/`temporada`/`carreira`
+ * sem nenhuma mudança.
+ *
+ * Diferente de `jogarTemporada`, aqui o XP/nota de cada partida do jogador é
+ * aplicado NA HORA (não em lote no fim) — é o que torna "semana a semana"
+ * de verdade: o treino do período 3 já reflete o desempenho das partidas
+ * disputadas antes dele, não só o estado do fim da temporada anterior.
+ */
+export async function jogarTemporadaSemanal(
+  estado: EstadoDeCarreira,
+  campeonatos: CampeonatoSimulavel[],
+  clubes: Club[],
+  opcoes: OpcoesJogarTemporadaSemanal = {},
+): Promise<ResultadoTemporadaDeCarreira> {
+  const {
+    estiloTecnico = "equilibrado",
+    regiaoAtual: regiaoAtualPadrao,
+    escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
+    responderProposta = contrapropostaPadrao,
+    escolherFocoDeTreino = () => "tecnico" as const,
+    onNegociacaoResolvida,
+    onCenarioResolvido,
+    onPartidasResumidas,
+    onStatusAtualizado,
+    onTreinoResolvido,
+    onPartidaPontosCorridos,
+    onPartidaMataMata,
+    escolherModoDePartida,
+    decidirChanceAoVivo,
+    decidirEventoDePartida,
+    onEventoAoVivo,
+    msPorMinutoAoVivo,
+    maxEventosDeContextoAoVivo,
+    escolherCampeonatosParaSeguir,
+    onResumoDePeriodoCampeonatoSeguido,
+    random = Math.random,
+  } = opcoes;
+
+  const clubePorId = new Map(clubes.map((c) => [c.id, c]));
+  const clubeNoInicioDaTemporada = estado.clubeAtualId;
+  const participacaoJogador: ParticipacaoJogadorClube = { clubeId: estado.clubeAtualId, jogador: estado.jogador, estiloTecnico };
+
+  let estadoAtual = estado;
+  const overallAntes = overallAtual(estado);
+  const impactosDePartidaAoVivo: ImpactoCarreira[] = [];
+  let numeroDaPartidaDoJogador = 0;
+  let semanaAtualParaContexto = 0;
+  let somaDeNotas = 0;
+  let partidasComNota = 0;
+  const golsPorCompeticao = new Map<string, number>();
+  const assistenciasPorCompeticao = new Map<string, number>();
+  const partidasPorCompeticao = new Map<string, number>();
+
+  function registrarPartidaDoJogador(campeonatoId: string, resultado: ResultadoPartida): void {
+    const minutosDaPartida = minutosEsperadosPorStatus(estadoAtual.statusNoClube, random);
+    const desempenho = converterChancesEmDesempenho(resultado.chancesJogador, minutosDaPartida, IMPORTANCIA_PADRAO);
+    estadoAtual = aplicarDesempenhoPartida(estadoAtual, resultado.chancesJogador, desempenho);
+    golsPorCompeticao.set(campeonatoId, (golsPorCompeticao.get(campeonatoId) ?? 0) + desempenho.gols);
+    assistenciasPorCompeticao.set(campeonatoId, (assistenciasPorCompeticao.get(campeonatoId) ?? 0) + desempenho.assistencias);
+    partidasPorCompeticao.set(campeonatoId, (partidasPorCompeticao.get(campeonatoId) ?? 0) + 1);
+    // nota de avaliação usa 90 minutos fixos — mesma razão documentada em `jogarTemporada`.
+    somaDeNotas += calcularNotaPartida({ ...desempenho, minutosJogados: MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO });
+    partidasComNota++;
+  }
+
+  const resolverPartida: ResolverPartida = async (perfilCasa, perfilFora, randomDaPartida, participacao, contexto) => {
+    if (!participacao || !escolherModoDePartida) {
+      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
     }
 
-    const treinoResolvido: TreinoResolvidoNaTemporada = {
-      periodo: periodo.periodo,
-      foco,
-      overallAntes: overallAntesTreino,
-      overallDepois: overallAtual(estadoAtual),
-      moralAntes: moralAntesTreino,
-      moralDepois: estadoAtual.moral,
+    numeroDaPartidaDoJogador++;
+    const modo = await escolherModoDePartida({
+      numeroDaPartida: numeroDaPartidaDoJogador,
+      lado: participacao.lado,
+      mandanteId: contexto?.mandanteId ?? "",
+      visitanteId: contexto?.visitanteId ?? "",
+      semana: semanaAtualParaContexto,
+    });
+
+    if (modo !== "ao_vivo") {
+      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
+    }
+
+    const { resultado, impactosDeContexto } = await jogarPartidaAoVivo(perfilCasa, perfilFora, randomDaPartida, participacao, {
+      decidirChance: decidirChanceAoVivo,
+      decidirEventoDeContexto: decidirEventoDePartida,
+      onEvento: onEventoAoVivo,
+      msPorMinuto: msPorMinutoAoVivo,
+      maxEventosDeContexto: maxEventosDeContextoAoVivo,
+    });
+    impactosDePartidaAoVivo.push(...impactosDeContexto);
+    return resultado;
+  };
+
+  const competicoes = criarCompeticoesIncrementaisDaTemporada(estadoAtual.temporada, campeonatos, clubes, participacaoJogador, random);
+
+  function encontrarCompeticao(campeonatoId: string) {
+    return (
+      competicoes.avulsas.get(campeonatoId) ??
+      competicoes.conjuntas.find((c) => c.lib.campeonatoId === campeonatoId)?.lib ??
+      competicoes.conjuntas.find((c) => c.sula.campeonatoId === campeonatoId)?.sula
+    );
+  }
+
+  const idsDoJogador = new Set<string>();
+  for (const [id, est] of competicoes.avulsas) if (est.participacaoJogador) idsDoJogador.add(id);
+  for (const conjunta of competicoes.conjuntas) {
+    if (conjunta.lib.participacaoJogador) idsDoJogador.add(conjunta.lib.campeonatoId);
+    if (conjunta.sula.participacaoJogador) idsDoJogador.add(conjunta.sula.campeonatoId);
+  }
+
+  const idsAtivos = [...competicoes.avulsas.keys(), ...competicoes.conjuntas.flatMap((c) => [c.lib.campeonatoId, c.sula.campeonatoId])];
+  const idsOutros = idsAtivos.filter((id) => !idsDoJogador.has(id));
+  const idsSeguidos = new Set(escolherCampeonatosParaSeguir ? await escolherCampeonatosParaSeguir(idsOutros, estadoAtual.clubeAtualId) : []);
+
+  function hooksSeForDoJogador(campeonatoId: string): HooksDeFase | undefined {
+    if (!idsDoJogador.has(campeonatoId)) return undefined;
+    return {
+      aoSimularConfrontoPontosCorridos: async (_grupoNome, evento) => {
+        if (evento.confronto.mandante === clubeNoInicioDaTemporada || evento.confronto.visitante === clubeNoInicioDaTemporada) {
+          registrarPartidaDoJogador(campeonatoId, evento.resultado);
+          await onPartidaPontosCorridos?.({ campeonatoId, evento });
+        }
+      },
+      aoResolverConfrontoMataMata: async (evento) => {
+        if (evento.confronto.timeA === clubeNoInicioDaTemporada || evento.confronto.timeB === clubeNoInicioDaTemporada) {
+          for (const partida of evento.confronto.partidasDoJogador ?? []) registrarPartidaDoJogador(campeonatoId, partida);
+          await onPartidaMataMata?.({ campeonatoId, evento });
+        }
+      },
     };
-    treinosResolvidos.push(treinoResolvido);
-    await onTreinoResolvido?.(treinoResolvido);
+  }
 
-    const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  const periodos = construirCalendarioPadrao(estadoAtual.temporada).calendario;
+  const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
+  const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
+  const treinosResolvidos: TreinoResolvidoNaTemporada[] = [];
 
-    let interessadosCompra: Club[] = [];
-    let interessadosVenda: Club[] = [];
-    let valorDeMercado = 0;
-    let ratingClubeAtual = 0;
+  const contextoDePeriodo: ContextoResolucaoDePeriodo = {
+    clubes,
+    clubePorId,
+    regiaoAtualPadrao,
+    escolherFocoDeTreino,
+    onTreinoResolvido,
+    escolherOpcao,
+    responderProposta,
+    onNegociacaoResolvida,
+    onCenarioResolvido,
+    random,
+  };
 
-    if (estaNaJanelaDeTransferencia(momento)) {
-      const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
-      ratingClubeAtual = clubeAtualObj ? obterRating(clubeAtualObj) : 0;
+  const ultimaSemana = Math.max(52, ...periodos.map((p) => p.semanaFim));
+  for (let semana = 1; semana <= ultimaSemana; semana++) {
+    semanaAtualParaContexto = semana;
 
-      const perfil: PerfilDeMercado = {
-        overall: overallAtual(estadoAtual),
-        idade: estadoAtual.jogador.idade,
-        reputacaoNacional: estadoAtual.reputacao.nacional,
-        multiplicadorStatus: multiplicadorDeValorizacaoPorStatus(estadoAtual.statusNoClube),
-      };
-      valorDeMercado = calcularValorDeMercado(perfil);
-      interessadosCompra = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random });
+    const periodoQueComeca = periodos.find((p) => p.semanaInicio === semana);
+    if (periodoQueComeca) {
+      const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodoQueComeca, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
+      estadoAtual = estadoAposPeriodo;
+      treinosResolvidos.push(treino);
+      cenariosResolvidos.push(cenario);
+    }
 
-      if (clubeAtualObj && precisaVender(clubeAtualObj, random)) {
-        interessadosVenda = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random, exigirUpgrade: false });
+    for (const [campeonatoId, competicaoEstado] of competicoes.avulsas) {
+      await avancarSemana(competicaoEstado, semana, random, resolverPartida, hooksSeForDoJogador(campeonatoId));
+    }
+    for (const conjunta of competicoes.conjuntas) {
+      await avancarSemanaConjunta(conjunta, semana, random, resolverPartida, hooksSeForDoJogador(conjunta.lib.campeonatoId), hooksSeForDoJogador(conjunta.sula.campeonatoId));
+    }
+
+    const periodoQueTermina = periodos.find((p) => p.semanaFim === semana);
+    if (periodoQueTermina && onResumoDePeriodoCampeonatoSeguido) {
+      for (const campeonatoId of idsSeguidos) {
+        const competicaoSeguida = encontrarCompeticao(campeonatoId);
+        const tabela = competicaoSeguida ? tabelaAtualDaCompeticao(competicaoSeguida) : undefined;
+        if (tabela) await onResumoDePeriodoCampeonatoSeguido(campeonatoId, periodoQueTermina.periodo, tabela);
       }
     }
+  }
 
-    const contexto: ContextoSorteio = {
-      idadeJogador: estadoAtual.jogador.idade,
-      reputacaoNacional: estadoAtual.reputacao.nacional,
-      reputacaoRegional: regiaoAtual !== undefined ? (estadoAtual.reputacao.porRegiao[regiaoAtual] ?? 0) : 0,
-      moral: estadoAtual.moral,
-      relacoesInternas: estadoAtual.relacoesInternas,
-      momento,
-    };
+  const regiaoParaEventosAoVivo = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  for (const impacto of impactosDePartidaAoVivo) {
+    estadoAtual = aplicarImpactoDeCenario(estadoAtual, impacto, regiaoParaEventosAoVivo);
+  }
 
-    // Cenários "de transferência" (compra ou venda forçada) só entram no sorteio quando há o
-    // interesse real correspondente nesse período — evita prometer proposta que não existe
-    // mecanicamente. Havendo interesse real E ao menos um cenário elegível, o sorteio fica restrito
-    // a eles (não competem contra o resto do catálogo) — garante que a negociação real sempre venha
-    // acompanhada da moldura narrativa certa, em vez de só "coexistir" sem se referenciar. Venda
-    // forçada tem prioridade sobre interesse de compra quando os dois calham no mesmo período.
-    const elegiveis = filtrarCenariosElegiveis(CENARIOS, contexto);
-    const elegiveisDeVenda = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaVendaForcada));
-    const elegiveisDeCompra = elegiveis.filter((c) => c.opcoes.some((o) => o.disparaNegociacaoReal));
-    const elegiveisGerais = elegiveis.filter((c) => !c.opcoes.some((o) => o.disparaVendaForcada || o.disparaNegociacaoReal));
+  const resultadoCompeticoes: ResultadoTemporada["competicoes"] = [];
+  const resumoCompeticoes: ResumoPartidasDaTemporada["competicoes"] = [];
 
-    let poolDeSorteio: Cenario[];
-    if (interessadosVenda.length > 0 && elegiveisDeVenda.length > 0) {
-      poolDeSorteio = elegiveisDeVenda;
-    } else if (interessadosCompra.length > 0 && elegiveisDeCompra.length > 0) {
-      poolDeSorteio = elegiveisDeCompra;
-    } else {
-      poolDeSorteio = elegiveisGerais;
-    }
+  for (const campeonatoId of idsAtivos) {
+    const est = encontrarCompeticao(campeonatoId)!;
+    resultadoCompeticoes.push({ campeonatoId, resultado: { campeao: est.campeao ?? "", partidasDoJogador: est.partidasDoJogador } });
+    resumoCompeticoes.push({
+      campeonatoId,
+      campeao: est.campeao,
+      partidasDoJogador: partidasPorCompeticao.get(campeonatoId) ?? 0,
+      golsDoJogador: golsPorCompeticao.get(campeonatoId) ?? 0,
+      assistenciasDoJogador: assistenciasPorCompeticao.get(campeonatoId) ?? 0,
+    });
+  }
+  for (const { campeonatoId, erro } of competicoes.erros) {
+    resultadoCompeticoes.push({ campeonatoId, erro });
+    resumoCompeticoes.push({ campeonatoId, erro, partidasDoJogador: 0, golsDoJogador: 0, assistenciasDoJogador: 0 });
+  }
 
-    const cenario = sortearCenario(poolDeSorteio, random);
-    const opcaoEscolhida = await escolherOpcao(cenario);
+  const resultadoTemporada: ResultadoTemporada = { temporada: estadoAtual.temporada, competicoes: resultadoCompeticoes };
+  const resumoPartidas: ResumoPartidasDaTemporada = { overallAntes, overallDepois: overallAtual(estadoAtual), competicoes: resumoCompeticoes };
+  await onPartidasResumidas?.(resumoPartidas);
 
-    const negociacaoAplicavel =
-      opcaoEscolhida.disparaVendaForcada && interessadosVenda.length > 0
-        ? { interessados: interessadosVenda, tipo: "venda_forcada" as const }
-        : opcaoEscolhida.disparaNegociacaoReal && interessadosCompra.length > 0
-          ? { interessados: interessadosCompra, tipo: "compra" as const }
-          : undefined;
-
-    let escolha: EscolhaResolvida;
-    if (negociacaoAplicavel) {
-      const { estado: novoEstado, aceita } = await resolverNegociacaoDeTransferencia(
-        estadoAtual,
-        negociacaoAplicavel.interessados,
-        valorDeMercado,
-        ratingClubeAtual,
-        negociacaoAplicavel.tipo,
-        periodo.periodo,
-        responderProposta,
-        random,
-        negociacoesResolvidas,
-        onNegociacaoResolvida,
-      );
-      estadoAtual = novoEstado;
-
-      // resultados[0] é o molde de narrativa/impacto pro desfecho favorável (negociação aceita),
-      // resultados[último] pro desfecho desfavorável (recusada) — ver Opcao.disparaNegociacaoReal/disparaVendaForcada.
-      escolha = { opcao: opcaoEscolhida, resultado: aceita ? opcaoEscolhida.resultados[0] : opcaoEscolhida.resultados[opcaoEscolhida.resultados.length - 1] };
-    } else {
-      escolha = resolverEscolha(opcaoEscolhida, random);
-    }
-
-    const regiaoParaImpacto = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-    estadoAtual = aplicarImpactoDeCenario(estadoAtual, escolha.resultado.impacto, regiaoParaImpacto);
-
-    const resolvido: CenarioResolvidoNaTemporada = { periodo: periodo.periodo, momento, cenario, escolha };
-    cenariosResolvidos.push(resolvido);
-    await onCenarioResolvido?.(resolvido);
+  let statusAtualizado: StatusAtualizadoNaTemporada | undefined;
+  if (partidasComNota > 0) {
+    const notaMedia = somaDeNotas / partidasComNota;
+    const statusAnterior = estadoAtual.statusNoClube;
+    const statusNovo = evoluirStatus(statusAnterior, notaMedia, estadoAtual.jogador.idade);
+    estadoAtual = mudarStatusNoClube(estadoAtual, statusNovo);
+    statusAtualizado = { statusAnterior, statusNovo, notaMedia, partidasJogadas: partidasComNota };
+    await onStatusAtualizado?.(statusAtualizado);
   }
 
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;

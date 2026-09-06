@@ -45,7 +45,8 @@ export interface EventoConfrontoMataMata {
   confronto: ResultadoConfrontoMataMata;
 }
 
-function emparelharPorForca(participantes: string[], ratings: Record<string, number>): [string, string][] {
+/** Exportado pra `simulation/incremental.ts` reaproveitar o mesmo emparelhamento etapa a etapa. */
+export function emparelharPorForca(participantes: string[], ratings: Record<string, number>): [string, string][] {
   if (participantes.length % 2 !== 0) {
     throw new Error(`emparelharPorForca: número ímpar de participantes (${participantes.length})`);
   }

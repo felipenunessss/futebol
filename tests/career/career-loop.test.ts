@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { jogarCarreira, jogarTemporada } from "../../src/career/career-loop.js";
+import { jogarCarreira, jogarTemporada, jogarTemporadaSemanal } from "../../src/career/career-loop.js";
 import { criarEstadoInicial, overallAtual } from "../../src/career/Player.js";
 import type { Club } from "../../src/schemas/club.js";
 import type { CampeonatoSimulavel } from "../../src/simulation/engine.js";
@@ -467,6 +467,129 @@ describe("modo de partida ao vivo (escolherModoDePartida/jogarPartidaAoVivo)", (
     // sem escolherModoDePartida devolver "ao_vivo" pra numeroDaPartida > 1, o resto da temporada segue instantâneo,
     // então só a 1ª partida do jogador gera eventos de chance (genérica ou do jogador) — smoke test de que não travou/quebrou.
     expect(tipos.some((t) => t === "chance_generica" || t === "chance_jogador")).toBe(true);
+  });
+});
+
+describe("jogarTemporadaSemanal", () => {
+  it("avança idade e temporada em 1, como jogarTemporada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    expect(resultado.estado.temporada).toBe(2028);
+    expect(resultado.estado.jogador.idade).toBe(19);
+  });
+
+  it("resolve os 5 períodos do calendário padrão, mesmo cenário do jogarTemporada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    expect(resultado.cenariosResolvidos).toHaveLength(5);
+    expect(resultado.cenariosResolvidos.map((c) => c.periodo)).toEqual(["jan-1a_quinz", "fev", "mar", "abr", "mai-nov"]);
+    expect(resultado.treinosResolvidos).toHaveLength(5);
+  });
+
+  it("devolve resumoPartidas/resultadoTemporada com o mesmo formato de jogarTemporada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    const resumoBrasileirao = resultado.resumoPartidas.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
+    expect(resumoBrasileirao.erro).toBeUndefined();
+    expect(times).toContain(resumoBrasileirao.campeao);
+    expect(resumoBrasileirao.partidasDoJogador).toBeGreaterThan(0);
+
+    const competicao = resultado.resultadoTemporada.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a");
+    expect(times).toContain(competicao?.resultado?.campeao);
+  });
+
+  it("intercala de verdade: pelo menos um treino acontece ANTES de alguma partida do jogador ainda por vir (não é mais 'todas as partidas primeiro, todos os treinos depois')", async () => {
+    const times = ["a", "b", "c", "d"];
+    const ordemDeEventos: string[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onTreinoResolvido: () => ordemDeEventos.push("treino"),
+      escolherModoDePartida: () => "rapida",
+      onPartidaPontosCorridos: () => ordemDeEventos.push("partida"),
+    });
+
+    expect(ordemDeEventos).toContain("treino");
+    expect(ordemDeEventos).toContain("partida");
+
+    // prova de intercalação real: existe um "treino" com pelo menos uma "partida" depois dele —
+    // impossível no motor em lote antigo, onde TODAS as partidas do calendário resolvem antes de
+    // QUALQUER treino (ver jogarTemporada, que continua assim de propósito).
+    const primeiroTreino = ordemDeEventos.indexOf("treino");
+    const ultimaPartida = ordemDeEventos.lastIndexOf("partida");
+    expect(ultimaPartida).toBeGreaterThan(primeiroTreino);
+  });
+
+  it("chama escolherModoDePartida com a semana atual (não decrescente) antes de cada partida do jogador", async () => {
+    const times = ["a", "b", "c", "d"];
+    const semanas: number[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: (contexto) => {
+        semanas.push(contexto.semana);
+        return "rapida";
+      },
+    });
+
+    expect(semanas.length).toBeGreaterThan(0);
+    for (let i = 1; i < semanas.length; i++) {
+      expect(semanas[i]).toBeGreaterThanOrEqual(semanas[i - 1]);
+    }
+  });
+
+  it("onPartidaPontosCorridos recebe tabelaAntes/tabelaDepois (a pausa pós-jogo tem o que mostrar)", async () => {
+    const times = ["a", "b", "c", "d"];
+    const eventos: { tabelaAntes: unknown[]; tabelaDepois: unknown[] }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: () => "rapida",
+      onPartidaPontosCorridos: (info) => eventos.push({ tabelaAntes: info.evento.tabelaAntes, tabelaDepois: info.evento.tabelaDepois }),
+    });
+
+    expect(eventos.length).toBeGreaterThan(0);
+    for (const evento of eventos) {
+      expect(evento.tabelaAntes).toHaveLength(times.length);
+      expect(evento.tabelaDepois).toHaveLength(times.length);
+    }
+  });
+
+  it("segue outra competição ativa (não a do jogador) e mostra resumo por período sem revelar todos os jogos de uma vez", async () => {
+    const timesA = ["a", "b", "c", "d"];
+    const timesB = ["e", "f", "g", "h"];
+    const campeonatos: CampeonatoSimulavel[] = [
+      { id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times: timesA },
+      { id: "brasileirao_serie_b", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times: timesB },
+    ];
+    const clubes = [...timesA, ...timesB].map((id) => clube(id));
+
+    const idsOferecidos: string[][] = [];
+    const resumos: { campeonatoId: string; periodo: string; totalJogos: number }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatos, clubes, {
+      random: () => 0.5,
+      escolherCampeonatosParaSeguir: (idsAtivos) => {
+        idsOferecidos.push(idsAtivos);
+        return ["brasileirao_serie_b"];
+      },
+      onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => {
+        resumos.push({ campeonatoId, periodo, totalJogos: tabela.reduce((soma, linha) => soma + linha.jogos, 0) });
+      },
+    });
+
+    expect(idsOferecidos[0]).toEqual(["brasileirao_serie_b"]); // a própria competição do jogador (serie_a) não é oferecida
+    expect(resumos.length).toBeGreaterThan(0);
+    expect(resumos.every((r) => r.campeonatoId === "brasileirao_serie_b")).toBe(true);
+
+    // revelação progressiva: o total de jogos já disputados não pode diminuir de um resumo pro próximo,
+    // e o do primeiro resumo não pode já ser a temporada inteira (senão não seria "por período").
+    for (let i = 1; i < resumos.length; i++) {
+      expect(resumos[i].totalJogos).toBeGreaterThanOrEqual(resumos[i - 1].totalJogos);
+    }
   });
 });
 

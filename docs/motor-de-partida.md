@@ -1565,6 +1565,105 @@ a convenção do projeto.
   (nenhuma das duas está no calendário padrão hoje), produzem campeões
   plausíveis sem erro, em várias rodadas com RNG real.
 
+### 5.13. Temporada semana a semana — motor incremental, intercalando partida e evento de carreira (implementado)
+
+Até aqui, `career/career-loop.ts` `jogarTemporada` resolvia a temporada em
+duas rajadas separadas: primeiro `simulation/engine.ts` `simularTemporada`
+resolvia **todas** as partidas de **todas** as competições ativas da
+temporada inteira de uma vez, e só depois disso o código percorria os 5
+períodos largos do calendário (`data/loaders/calendario.ts`, ex:
+`"mai-nov"` cobre 7 meses) fazendo treino e sorteando um cenário por
+período. Na prática, jogando `jogar`, isso aparecia como "primeiro todas
+as decisões de partida do ano inteiro, depois todas as decisões de
+treino/cenário do ano inteiro" — não intercalado por tempo real nenhum,
+e sem pausa nenhuma depois de cada partida.
+
+**Não foi uma modificação do motor em lote existente.** `simulation/
+engine.ts` `simularTemporada` e todas as receitas continuam exatamente
+como estavam, usadas por `carreira-loop`/`temporada`/`carreira` e por toda
+a suíte de testes anterior a esta seção — zero risco de regressão ali.
+Em vez disso, um motor **incremental** novo foi construído em paralelo
+(`simulation/incremental.ts`), usado só pela carreira interativa (`jogar`,
+`career/career-loop.ts` `jogarTemporadaSemanal`).
+
+- **`schemas/calendar.ts`/`data/loaders/calendario.ts`**: `PeriodoCalendario`
+  ganhou `semanaInicio`/`semanaFim` (1-52) — estimativa de design
+  documentada, o jogo não tem datas de partida reais pra nenhuma
+  competição. Nova `janelaDeSemanasPorCompeticao(campeonatoId, calendario)`
+  devolve a união das faixas de semana de todo período em que uma
+  competição aparece ativa — a "janela de tempo" que o motor incremental
+  usa pra espalhar as rodadas/etapas dela.
+- **`simulation/incremental.ts`** (módulo novo): `CompeticaoIncremental` —
+  resolve uma competição UMA rodada (pontos corridos/fase suíça/fase de
+  grupos) ou UMA etapa (mata-mata) por vez, guardando estado entre
+  chamadas, em vez de resolver tudo numa chamada só. Cada rodada/etapa
+  tem uma "unidade" de tempo; o total de unidades de uma competição é
+  conhecido de antemão (só depende de números estáticos do formato —
+  quantos times, quantas etapas — nunca de quem classifica), o que permite
+  espalhar as unidades uniformemente dentro da janela de semanas da
+  competição sem precisar simular nada primeiro. Cobre as 8 formas de
+  receita alcançáveis pelo calendário padrão hoje: `pontos_corridos`;
+  `fase_suica`+`mata_mata` (com/sem `final_estadual`); `turno`+`returno`+
+  `final_estadual` (Carioca, por id); `fase_grupos`+`fase_quadrangular`+
+  `final_estadual`; `fase_grupos`+`mata_mata` simples; `mata_mata` isolado
+  com `etapas` (Copa do Brasil); e o par conjunto Libertadores+
+  Sul-Americana (o repechaje da Sul-Americana espera a fase de grupos da
+  Libertadores concluir via um mecanismo de "passo não pronto ainda", que
+  só atrasa aquele passo por algumas semanas em vez de travar ou quebrar).
+  As dezenas de receitas internacionais (Uruguai, Colômbia, Peru, etc. —
+  seções 5.9-5.12) nunca aparecem no calendário hoje, não precisam de
+  versão incremental.
+- **`career/career-loop.ts`**: `jogarTemporada` (função antiga) fica
+  intacta — só ganhou um refactor de extração (`resolverPeriodoDaCarreira`,
+  o corpo do treino+cenário+negociação de um período, reaproveitado pelos
+  dois loops) sem mudar nenhum comportamento. Nova `jogarTemporadaSemanal`
+  percorre semana 1 a 52: se a semana cruza o início de um período,
+  resolve treino/cenário desse período (usando o estado JÁ atualizado
+  pelas partidas anteriores — XP é aplicado partida a partida, não em
+  lote no fim, é isso que torna a intercalação real: o treino do período
+  3 já reflete o desempenho de quem jogou antes dele); depois avança toda
+  competição ativa em uma unidade, se o cronograma dela tiver algo pra
+  essa semana. Toda competição ativa (do jogador, seguida, ou nenhuma das
+  duas) é avançada pelo mesmo mecanismo — a diferença é só de UI: as que
+  contêm o clube do jogador disparam os hooks reais (menu de modo,
+  pausa pós-jogo); as demais só acumulam, e se estiverem na lista de
+  seguidas (`escolherCampeonatosParaSeguir`, perguntado 1x no início da
+  temporada), disparam um resumo de tabela no fim de cada período
+  (`onResumoDePeriodoCampeonatoSeguido`) — a tabela reflete só o que já
+  foi resolvido até aquele ponto, nunca resultado futuro. **Cobertura
+  parcial documentada**: o resumo por período só existe quando a
+  competição está numa fase de "uma tabela só" no momento (liga, fase
+  suíça, turno/returno) — numa fase de mata-mata ou de múltiplos grupos
+  não tem uma tabela única pra mostrar, o resumo simplesmente não dispara
+  nesse período (não é erro).
+- **`src/cli/index.ts`**: `jogarCarreiraInterativaCli` passou a chamar
+  `jogarTemporadaSemanal`. Novo prompt no início da temporada pra escolher
+  quais competições seguir. `onPartidaPontosCorridos`/`onPartidaMataMata`
+  ganharam a pausa real (`Enter pra continuar`) depois de mostrar o
+  placar+tabela — condicionada a NÃO estar numa janela de auto-skip
+  (ver abaixo), senão a opção de pular perderia o sentido. O menu de modo
+  de partida ganhou uma 3ª opção nova, "simular até o final da temporada
+  direto" (antes só existia "até a metade") — as duas agora suspendem o
+  menu (e a pausa pós-jogo) por SEMANA, não mais por contagem de
+  partidas (não dava pra saber de antemão quantas partidas o clube do
+  jogador teria na temporada inteira; semana é uma unidade que o motor já
+  conhece de antemão pra qualquer competição).
+- **Validado**: 393+ testes (incluindo `tests/simulation/incremental.test.ts`
+  e o novo describe de `jogarTemporadaSemanal` em
+  `tests/career/career-loop.test.ts` — cobrindo intercalação real
+  comprovada por ordem de eventos, tabela pós-jogo, semana não-decrescente
+  passada pro menu de modo, e revelação progressiva de uma competição
+  seguida) e `npx tsc --noEmit` limpos. Rodado também via driver
+  script-a-CLI (não interativo, respostas automáticas) simulando uma
+  temporada inteira com dado real completo (678 clubes, 11 competições
+  ativas do calendário, incluindo o par conjunto Libertadores+
+  Sul-Americana) do início ao fim sem erro — confirma que a fiação nova
+  não quebra com o volume real de dados do jogo, embora landar o clube
+  inicial numa competição ativa dependa da sorte das propostas iniciais
+  (`market/transfers.ts`), então nem toda rodada manual desse driver
+  exercitou o menu de partida/pausa pós-jogo de verdade — os testes
+  automatizados acima é que garantem isso deterministicamente.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
