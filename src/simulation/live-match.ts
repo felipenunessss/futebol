@@ -20,11 +20,15 @@ import {
  * `simularPartida` (chances totais/fatia casa-fora a partir do duelo de
  * meio, chance do jogador via `PESO_ENVOLVIMENTO_ATAQUE`/`resolverChanceJogador`),
  * só que resolvida **evento a evento, em ordem de minuto**, com uma pausa
- * de verdade (`decidirChance`) na chance do jogador — a decisão muda a
- * força de verdade antes do duelo ser resolvido (não é só narrativa, ver
- * `docs/motor-de-partida.md` seção 5.7) — e eventos de contexto sorteados
- * do catálogo `progression/match-events.ts` (cartão, disputa dura,
- * provocação, etc), cada um também pausável (`decidirEventoDeContexto`).
+ * de verdade (`decidirChance`) numa **fração** das chances do jogador
+ * (`PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR` — nem toda chance sua para
+ * o jogo, de propósito: frequência fixa/sempre igual foi pedido explícito
+ * pra evitar) — quando pausa, a decisão muda a força de verdade antes do
+ * duelo ser resolvido (não é só narrativa, ver `docs/motor-de-partida.md`
+ * seção 5.7) — e eventos de contexto sorteados do catálogo
+ * `progression/match-events.ts` (cartão, disputa dura, provocação, etc),
+ * com quantidade por partida também variável (não um número fixo por
+ * jogo), cada um também pausável (`decidirEventoDeContexto`).
  *
  * Não duplica a lógica de agendamento de rodada/chaveamento — é chamado
  * como um `simulation/match.ts` `ResolverPartida` alternativo, injetado
@@ -59,7 +63,15 @@ export type EventoAoVivo =
   | { tipo: "apito_final"; golsCasa: number; golsFora: number };
 
 export interface OpcoesPartidaAoVivo {
-  /** Pausa numa chance do próprio jogador — o ajuste devolvido entra direto no duelo (ver `ContextoDecisaoChance`). Sem callback, resolve sem ajuste nenhum (equivalente a "jogar sem pensar duas vezes"). */
+  /**
+   * Pausa numa chance do próprio jogador — o ajuste devolvido entra
+   * direto no duelo (ver `ContextoDecisaoChance`). **Nem toda chance sua
+   * pausa**: só uma fração delas, sorteada por `probabilidadeDePausarChance`
+   * (pedido explícito — a frequência de interrupção não pode ser sempre a
+   * mesma/fixa). Nas chances que não pausam (ou sem callback nenhum),
+   * resolve sem ajuste nenhum (equivalente a "jogar sem pensar duas
+   * vezes"), mas continua narrada normalmente (`onEvento`).
+   */
   decidirChance?: (contexto: ContextoDecisaoChance) => ResultadoDecisaoChance | Promise<ResultadoDecisaoChance>;
   /** Pausa num evento de contexto sorteado (`progression/match-events.ts`). Sem callback, sempre escolhe a 1ª opção (mesmo padrão de `career/career-loop.ts` `escolherOpcao`). */
   decidirEventoDeContexto?: (cenario: Cenario) => Opcao | Promise<Opcao>;
@@ -67,8 +79,17 @@ export interface OpcoesPartidaAoVivo {
   onEvento?: (evento: EventoAoVivo) => void | Promise<void>;
   /** ms de espera real por minuto de jogo decorrido — 0 pula a espera (sem isso os testes ficariam lentos de verdade). Padrão `MS_POR_MINUTO_PADRAO`. */
   msPorMinuto?: number;
-  /** Quantos eventos de contexto, no máximo, podem ser sorteados nesta partida (cada um com `PROBABILIDADE_DE_EVENTO_DE_CONTEXTO` de realmente acontecer) — 0 desliga totalmente. Padrão `MAX_EVENTOS_DE_CONTEXTO_PADRAO`. */
+  /**
+   * Teto de quantos eventos de contexto **podem** ser sorteados nesta
+   * partida — o número real que acontece varia partida a partida (cada
+   * candidato até esse teto só vira evento de verdade com
+   * `PROBABILIDADE_DE_EVENTO_DE_CONTEXTO`, então o resultado típico é 0-1,
+   * raramente o teto inteiro). 0 desliga totalmente. Padrão
+   * `MAX_EVENTOS_DE_CONTEXTO_PADRAO`.
+   */
   maxEventosDeContexto?: number;
+  /** Probabilidade de uma chance do jogador realmente pausar pra decisão (as demais resolvem automaticamente, sem ajuste). Padrão `PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR`. */
+  probabilidadeDePausarChance?: number;
 }
 
 export interface ResultadoPartidaAoVivo {
@@ -93,9 +114,12 @@ interface SlotDeEvento {
 }
 type Slot = SlotDeChance | SlotDeEvento;
 
-const MAX_EVENTOS_DE_CONTEXTO_PADRAO = 2;
-/** Chance de CADA slot candidato (até `maxEventosDeContexto`) virar um evento de contexto de verdade — estimativa de design, calibrada pra "acontece de vez em quando, não toda partida". */
-const PROBABILIDADE_DE_EVENTO_DE_CONTEXTO = 0.35;
+/** Teto de eventos de contexto candidatos por partida (não é a quantidade real — ver `PROBABILIDADE_DE_EVENTO_DE_CONTEXTO`). Um pouco mais alto que "quantidade típica" de propósito, pra deixar espaço pra partidas raras e mais eventadas. */
+const MAX_EVENTOS_DE_CONTEXTO_PADRAO = 3;
+/** Chance de CADA slot candidato (até `maxEventosDeContexto`) virar um evento de contexto de verdade — estimativa de design, calibrada pra "acontece de vez em quando, não toda partida, e não sempre a mesma quantidade". */
+const PROBABILIDADE_DE_EVENTO_DE_CONTEXTO = 0.25;
+/** Fração das chances do próprio jogador que realmente pausam pra decisão — o resto flui automático (sem ajuste), só narrado. Estimativa de design: interrupção frequente demais cansa, rara demais não parece dar controle nenhum. */
+const PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR = 0.6;
 
 export async function jogarPartidaAoVivo(
   perfilCasa: PerfilTime,
@@ -104,7 +128,14 @@ export async function jogarPartidaAoVivo(
   participacaoJogador?: ParticipacaoJogador,
   opcoes: OpcoesPartidaAoVivo = {},
 ): Promise<ResultadoPartidaAoVivo> {
-  const { decidirChance, decidirEventoDeContexto, onEvento, msPorMinuto = MS_POR_MINUTO_PADRAO, maxEventosDeContexto = MAX_EVENTOS_DE_CONTEXTO_PADRAO } = opcoes;
+  const {
+    decidirChance,
+    decidirEventoDeContexto,
+    onEvento,
+    msPorMinuto = MS_POR_MINUTO_PADRAO,
+    maxEventosDeContexto = MAX_EVENTOS_DE_CONTEXTO_PADRAO,
+    probabilidadeDePausarChance = PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR,
+  } = opcoes;
 
   const probabilidadeMeioCasa = probabilidadeDeVencer(perfilCasa.meio, perfilFora.meio);
   const margemMeio = Math.abs(probabilidadeMeioCasa - 0.5) * 2;
@@ -158,7 +189,8 @@ export async function jogarPartidaAoVivo(
       const forcaJogadorBase = forcaDoAtributo(valorAtributo);
       const forcaDefensivaBase = perfilDefensor.defesa;
 
-      const decisao = decidirChance ? await decidirChance({ minuto: slot.minuto, subtipo, atributoUsado }) : DECISAO_PADRAO;
+      const pausaParaDecisao = decidirChance !== undefined && random() < probabilidadeDePausarChance;
+      const decisao = pausaParaDecisao ? await decidirChance!({ minuto: slot.minuto, subtipo, atributoUsado }) : DECISAO_PADRAO;
       const sucesso = resolverDuelo(forcaJogadorBase + decisao.ajusteForcaJogador, forcaDefensivaBase + decisao.ajusteForcaDefensiva, random) === "A";
 
       const chance: ChanceJogador = { subtipo, sucesso, atributoUsado };

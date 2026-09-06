@@ -88,6 +88,45 @@ describe("jogarPartidaAoVivo", () => {
     expect(contextosRecebidos.map((c) => c.atributoUsado)).toEqual(resultado.chancesJogador.map((c) => c.atributoUsado));
   });
 
+  it("nem toda chance do jogador pausa pra decisão — probabilidadeDePausarChance controla a fração", async () => {
+    const jogador: Jogador = {
+      id: "j1",
+      nome: "Teste",
+      posicao: "atacante",
+      arquetipo_id: buscarArquetipo("finalizador").id,
+      idade: 22,
+      atributos: { finalizacao: 50, cabeceio: 50, drible: 50, visao_de_jogo: 50, desarme: 50 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador, estiloTecnico: "equilibrado" };
+
+    // random baixo e fixo (0.1) garante que toda chance da casa seja do jogador (pesoJogador do
+    // atacante é 0.4, 0.1 < 0.4) — determinístico, sem depender de sorte pra ter chances pra testar.
+    let chamadasComProbabilidadeZero = 0;
+    const { resultado: comProbabilidadeZero } = await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, () => 0.1, participacao, {
+      msPorMinuto: 0,
+      maxEventosDeContexto: 0,
+      probabilidadeDePausarChance: 0,
+      decidirChance: () => {
+        chamadasComProbabilidadeZero++;
+        return { ajusteForcaJogador: 0, ajusteForcaDefensiva: 0 };
+      },
+    });
+    expect(comProbabilidadeZero.chancesJogador.length).toBeGreaterThan(0);
+    expect(chamadasComProbabilidadeZero).toBe(0); // nenhuma pausou
+
+    let chamadasComProbabilidadeUm = 0;
+    const { resultado: comProbabilidadeUm } = await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, () => 0.1, participacao, {
+      msPorMinuto: 0,
+      maxEventosDeContexto: 0,
+      probabilidadeDePausarChance: 1,
+      decidirChance: () => {
+        chamadasComProbabilidadeUm++;
+        return { ajusteForcaJogador: 0, ajusteForcaDefensiva: 0 };
+      },
+    });
+    expect(chamadasComProbabilidadeUm).toBe(comProbabilidadeUm.chancesJogador.length); // todas pausaram
+  });
+
   it("eventos de contexto: sorteiam do catálogo, pausam pra decisão e o impacto resolvido volta em impactosDeContexto", async () => {
     let chamadas = 0;
     const decidirEventoDeContexto = (cenario: { opcoes: Opcao[] }): Opcao => {

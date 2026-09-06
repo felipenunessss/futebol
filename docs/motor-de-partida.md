@@ -1186,13 +1186,20 @@ limitação como pendência conhecida — esta seção é ela sendo resolvida.
   tudo de uma vez. Três tipos de parada:
   - **Chance genérica** (não é do jogador): resolvida na hora, só narrada
     (`onEvento`), sem pausa.
-  - **Chance do jogador**: pausa de verdade (`decidirChance`) — o
-    `ContextoDecisaoChance` (minuto/subtipo/atributo) vai pra quem chama, e
-    o `ResultadoDecisaoChance` (ajuste de força pro jogador e/ou pro
+  - **Chance do jogador**: pausa **numa fração** delas, não em todas
+    — pedido explícito ("não quero que as interrupções e eventos ocorram
+    na mesma frequência sempre, quero que seja randômico/provável, mas não
+    fixo"). Cada chance sua sorteia se pausa
+    (`PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR = 0.6`, configurável via
+    `probabilidadeDePausarChance`); quando pausa, o `decidirChance`
+    recebe o `ContextoDecisaoChance` (minuto/subtipo/atributo), e o
+    `ResultadoDecisaoChance` (ajuste de força pro jogador e/ou pro
     adversário) volta e **entra direto no duelo antes dele ser resolvido**
     — a decisão muda a probabilidade de verdade, não é só narrativa (era a
     exigência explícita: "muda a probabilidade de verdade, depois retoma
-    o jogo de onde parou"). Sem `decidirChance`, resolve sem ajuste nenhum.
+    o jogo de onde parou"). Quando não pausa (incluindo sem `decidirChance`
+    nenhum), resolve sem ajuste — mas continua narrada normalmente
+    (`onEvento` "chance_jogador" dispara do mesmo jeito).
   - **Evento de contexto**: sorteado do novo catálogo
     `progression/match-events.ts` `EVENTOS_DE_PARTIDA` (cartão duvidoso,
     disputa dura de bola, provocação da torcida, cãibra no fim do jogo,
@@ -1200,17 +1207,22 @@ limitação como pendência conhecida — esta seção é ela sendo resolvida.
     `progression/scenarios.ts` `Cenario`/`Opcao`, só que **catálogo
     separado e sem `gatilho`**: o motor de partida não tem acesso a
     contexto de carreira, e a maior parte do catálogo principal é sobre
-    decisões fora de campo, sem sentido como pausa em pleno jogo). Pausa
-    via `decidirEventoDeContexto`; o impacto (moral/relações internas — só
-    isso, nunca atributo, porque o motor de partida não sabe a posição do
-    jogador pra saber qual atributo seria seguro mexer) sai no retorno
-    (`impactosDeContexto`) pra quem orquestra aplicar depois — `live-match.ts`
-    não conhece `EstadoDeCarreira` (`simulation/*` não depende de
-    `career/*`).
-  - `msPorMinuto` (padrão ~220ms, ~90 min em ~20s) e `maxEventosDeContexto`
-    (padrão 2, cada um com 35% de chance de acontecer de verdade) são
-    configuráveis — em teste, sempre 0/desligado, pra não esperar de
-    verdade.
+    decisões fora de campo, sem sentido como pausa em pleno jogo). A
+    **quantidade por partida também varia**, não é um teto fixo sempre
+    atingido: até `maxEventosDeContexto` candidatos são sorteados (padrão
+    3), cada um só virando evento de verdade com
+    `PROBABILIDADE_DE_EVENTO_DE_CONTEXTO = 0.25` — na prática a maioria
+    das partidas tem 0-1 evento, raramente 2-3, nunca sempre o mesmo
+    número. Pausa via `decidirEventoDeContexto`; o impacto
+    (moral/relações internas — só isso, nunca atributo, porque o motor de
+    partida não sabe a posição do jogador pra saber qual atributo seria
+    seguro mexer) sai no retorno (`impactosDeContexto`) pra quem orquestra
+    aplicar depois — `live-match.ts` não conhece `EstadoDeCarreira`
+    (`simulation/*` não depende de `career/*`).
+  - `msPorMinuto` (padrão ~220ms, ~90 min em ~20s), `maxEventosDeContexto`
+    e `probabilidadeDePausarChance` são configuráveis — em teste, sempre
+    0/desligado ou forçado pra 0/1, pra não esperar de verdade nem
+    depender de sorte pra exercitar o caminho certo.
 - **`career/career-loop.ts`**: `OpcoesJogarTemporada` ganha
   `escolherModoDePartida` (`ContextoPartidaDoJogador`: número sequencial
   da partida do jogador na temporada, lado, mandante/visitante ->
