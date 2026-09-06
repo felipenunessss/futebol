@@ -6,7 +6,8 @@ import type { EventoConfrontoMataMata } from "../simulation/knockout.js";
 import type { EventoConfrontoPontosCorridos } from "../simulation/season.js";
 import type { ParticipacaoJogadorClube } from "../simulation/match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
-import { aplicarTreino, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
+import { obterRating } from "../simulation/rating.js";
+import { aplicarTreino, calcularNotaPartida, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
 import {
   CENARIOS,
   filtrarCenariosElegiveis,
@@ -22,7 +23,8 @@ import { calcularValorDeMercado, type PerfilDeMercado } from "../market/valuatio
 import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressados, type PropostaTransferencia, type TermosDeContrato } from "../market/transfers.js";
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
-import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, overallAtual, type EstadoDeCarreira } from "./Player.js";
+import { evoluirStatus, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
+import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
@@ -33,10 +35,10 @@ import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, ava
  * negociação na mão como a demo de `src/cli/index.ts` fazia.
  */
 
-/** Minutos jogados assumidos em toda partida do jogador — não existe sistema de minutagem/banco ainda (pendência, docs/motor-de-partida.md). */
-const MINUTOS_POR_PARTIDA_PADRAO = 90;
 /** Importância uniforme pra toda partida — o motor ainda não distingue fase (final de mata-mata vs. fase de grupos) dentro de `partidasDoJogador` (pendência). */
 const IMPORTANCIA_PADRAO = 1;
+/** Minutos usados só pra calcular a nota de avaliação de status (`career/status.ts` `evoluirStatus`) — sempre 90, independente do status atual, pra não penalizar duplamente quem já joga pouco (ver comentário no loop de partidas). */
+const MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO = 90;
 
 export interface PartidaDoJogadorPontosCorridos {
   campeonatoId: string;
@@ -83,6 +85,14 @@ export interface ResumoPartidasDaTemporada {
   competicoes: ResumoCompeticaoNaTemporada[];
 }
 
+export interface StatusAtualizadoNaTemporada {
+  statusAnterior: StatusNoClube;
+  statusNovo: StatusNoClube;
+  /** Nota média (0-10) do jogador nas partidas que jogou na temporada — base da evolução de status (`career/status.ts` `evoluirStatus`). */
+  notaMedia: number;
+  partidasJogadas: number;
+}
+
 export interface TreinoResolvidoNaTemporada {
   periodo: string;
   foco: FocoDeTreino;
@@ -99,6 +109,8 @@ export interface ResultadoTemporadaDeCarreira {
   resultadoTemporada: ResultadoTemporada;
   /** Resumo das partidas do jogador na temporada (gols/assistências/campeão por competição, overall antes/depois) — visão agregada, não partida a partida (ver `onPartidasResumidas` pra saber por quê). */
   resumoPartidas: ResumoPartidasDaTemporada;
+  /** Ausente quando o jogador não jogou nenhuma partida na temporada (status não muda sem desempenho real em campo pra avaliar). */
+  statusAtualizado?: StatusAtualizadoNaTemporada;
   /** Uma sessão de treino resolvida por período do calendário, na ordem em que aconteceram (ver `progression/xp.ts` `aplicarTreino`). */
   treinosResolvidos: TreinoResolvidoNaTemporada[];
   /** Um cenário resolvido por período do calendário, na ordem em que aconteceram. */
@@ -169,6 +181,13 @@ export interface OpcoesJogarTemporada {
    * o meio-termo prático (ver `ResumoPartidasDaTemporada`).
    */
   onPartidasResumidas?: (resumo: ResumoPartidasDaTemporada) => void | Promise<void>;
+  /**
+   * Chamado uma vez por temporada (junto com `onPartidasResumidas`,
+   * mesmo momento), só quando o jogador jogou ao menos uma partida —
+   * reporta a evolução (ou não) do status no elenco a partir da nota
+   * média da temporada (`career/status.ts` `evoluirStatus`).
+   */
+  onStatusAtualizado?: (info: StatusAtualizadoNaTemporada) => void | Promise<void>;
   /** Chamado assim que cada cenário do período é resolvido — útil pra mostrar o desfecho em tempo real numa interface interativa. */
   onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
   random?: () => number;
@@ -185,6 +204,7 @@ async function resolverNegociacaoDeTransferencia(
   estado: EstadoDeCarreira,
   interessados: Club[],
   valorDeMercado: number,
+  ratingClubeAtual: number,
   tipo: NegociacaoResolvidaNaTemporada["tipo"],
   periodo: string,
   responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>,
@@ -195,7 +215,7 @@ async function resolverNegociacaoDeTransferencia(
   let estadoAtual = estado;
 
   for (const clube of interessados) {
-    const proposta = gerarProposta(clube, valorDeMercado, random);
+    const proposta = gerarProposta(clube, valorDeMercado, estadoAtual.statusNoClube, ratingClubeAtual, random);
     const contraproposta = await responderProposta(proposta);
     const fatoresConfianca: FatoresConfianca = {
       overall: overallAtual(estadoAtual),
@@ -209,7 +229,7 @@ async function resolverNegociacaoDeTransferencia(
     await onNegociacaoResolvida?.(negociacao);
 
     if (resultado.aceito && resultado.contrato) {
-      return { estado: assinarContrato(estadoAtual, resultado.contrato), aceita: true };
+      return { estado: assinarContrato(estadoAtual, resultado.contrato, proposta.statusOferecido), aceita: true };
     }
   }
 
@@ -250,8 +270,10 @@ async function resolverNegociacaoDeTransferencia(
  * declínio por idade, renda de patrocínio). Não muta o `estado` recebido.
  *
  * **Simplificações documentadas** (não são bugs escondidos, ver pendências
- * em `docs/motor-de-partida.md`): toda partida é tratada como 90 minutos
- * jogados e importância 1 — não existe sistema de minutagem/banco nem
+ * em `docs/motor-de-partida.md`): toda partida da temporada usa o mesmo
+ * número de minutos, vindo do status no elenco no início da temporada
+ * (`career/status.ts` `minutosEsperadosPorStatus` — não varia partida a
+ * partida por escalação/lesão/tática) e importância 1 — não existe
  * diferenciação de fase (final vs. fase de grupos) dentro de
  * `partidasDoJogador` ainda. Uma negociação aceita por temporada, no
  * máximo (para no primeiro clube que aceitar a contraproposta).
@@ -271,6 +293,7 @@ export async function jogarTemporada(
     onNegociacaoResolvida,
     onCenarioResolvido,
     onPartidasResumidas,
+    onStatusAtualizado,
     onTreinoResolvido,
     onPartidaPontosCorridos,
     onPartidaMataMata,
@@ -302,6 +325,9 @@ export async function jogarTemporada(
   const overallAntes = overallAtual(estado);
   let estadoAtual = estado;
   const resumoCompeticoes: ResumoCompeticaoNaTemporada[] = [];
+  const minutosDaTemporada = minutosEsperadosPorStatus(estadoAtual.statusNoClube);
+  let somaDeNotas = 0;
+  let partidasComNota = 0;
 
   for (const competicao of resultadoTemporada.competicoes) {
     if (!competicao.resultado) {
@@ -312,10 +338,16 @@ export async function jogarTemporada(
     let golsDoJogador = 0;
     let assistenciasDoJogador = 0;
     for (const partida of competicao.resultado.partidasDoJogador) {
-      const desempenho = converterChancesEmDesempenho(partida.chancesJogador, MINUTOS_POR_PARTIDA_PADRAO, IMPORTANCIA_PADRAO);
+      const desempenho = converterChancesEmDesempenho(partida.chancesJogador, minutosDaTemporada, IMPORTANCIA_PADRAO);
       estadoAtual = aplicarDesempenhoPartida(estadoAtual, partida.chancesJogador, desempenho);
       golsDoJogador += desempenho.gols;
       assistenciasDoJogador += desempenho.assistencias;
+      // nota de avaliação usa 90 minutos fixos, não os minutos "reais" do status — senão um
+      // promessa (15 min) quase nunca cruzaria o limiar de promoção só pela nota vir descontada
+      // pela escassez de minutos: o que decide o status é a qualidade de quando jogou, não a
+      // oportunidade que já tinha (essa é justamente a variável que o status deve destravar).
+      somaDeNotas += calcularNotaPartida({ ...desempenho, minutosJogados: MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO });
+      partidasComNota++;
     }
 
     resumoCompeticoes.push({
@@ -329,6 +361,16 @@ export async function jogarTemporada(
 
   const resumoPartidas: ResumoPartidasDaTemporada = { overallAntes, overallDepois: overallAtual(estadoAtual), competicoes: resumoCompeticoes };
   await onPartidasResumidas?.(resumoPartidas);
+
+  let statusAtualizado: StatusAtualizadoNaTemporada | undefined;
+  if (partidasComNota > 0) {
+    const notaMedia = somaDeNotas / partidasComNota;
+    const statusAnterior = estadoAtual.statusNoClube;
+    const statusNovo = evoluirStatus(statusAnterior, notaMedia);
+    estadoAtual = mudarStatusNoClube(estadoAtual, statusNovo);
+    statusAtualizado = { statusAnterior, statusNovo, notaMedia, partidasJogadas: partidasComNota };
+    await onStatusAtualizado?.(statusAtualizado);
+  }
 
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
@@ -366,17 +408,21 @@ export async function jogarTemporada(
     let interessadosCompra: Club[] = [];
     let interessadosVenda: Club[] = [];
     let valorDeMercado = 0;
+    let ratingClubeAtual = 0;
 
     if (estaNaJanelaDeTransferencia(momento)) {
+      const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
+      ratingClubeAtual = clubeAtualObj ? obterRating(clubeAtualObj) : 0;
+
       const perfil: PerfilDeMercado = {
         overall: overallAtual(estadoAtual),
         idade: estadoAtual.jogador.idade,
         reputacaoNacional: estadoAtual.reputacao.nacional,
+        multiplicadorStatus: multiplicadorDeValorizacaoPorStatus(estadoAtual.statusNoClube),
       };
       valorDeMercado = calcularValorDeMercado(perfil);
       interessadosCompra = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random });
 
-      const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
       if (clubeAtualObj && precisaVender(clubeAtualObj, random)) {
         interessadosVenda = selecionarClubesInteressados(clubes, estadoAtual.clubeAtualId, perfil, { random, exigirUpgrade: false });
       }
@@ -427,6 +473,7 @@ export async function jogarTemporada(
         estadoAtual,
         negociacaoAplicavel.interessados,
         valorDeMercado,
+        ratingClubeAtual,
         negociacaoAplicavel.tipo,
         periodo.periodo,
         responderProposta,
@@ -454,7 +501,7 @@ export async function jogarTemporada(
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
   estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
 
-  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ResultadoCarreiraDeVariasTemporadas {

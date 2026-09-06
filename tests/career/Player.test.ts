@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import {
   aplicarDesempenhoPartida,
   aplicarImpactoDeCenario,
+  assinarContrato,
   avancarTemporada,
   criarEstadoInicial,
+  mudarStatusNoClube,
   overallAtual,
   transferirParaClube,
   type EstadoDeCarreira,
 } from "../../src/career/Player.js";
+import type { Contrato } from "../../src/schemas/contract.js";
 import type { ChanceJogador } from "../../src/simulation/match.js";
 import type { DesempenhoPartida } from "../../src/progression/xp.js";
 
@@ -33,6 +36,7 @@ describe("criarEstadoInicial", () => {
     expect(estado.reputacao.porRegiao).toEqual({});
     expect(estado.relacoesInternas).toBe(50);
     expect(estado.patrimonio).toBe(0);
+    expect(estado.statusNoClube).toBe("promessa");
   });
 
   it("atributos prioritários do arquétipo começam mais altos que os demais", () => {
@@ -165,5 +169,36 @@ describe("avancarTemporada", () => {
     const depois = avancarTemporada(estado, "SP");
     // nacional 50 libera marca_esportiva_nacional (min 40, 80_000); regional SP 40 libera loja_do_bairro (min 15, 5_000) e emissora_local (min 35, 20_000)
     expect(depois.patrimonio).toBe(80_000 + 5_000 + 20_000);
+  });
+});
+
+describe("assinarContrato", () => {
+  it("troca o clube, registra o contrato e atualiza o status no elenco", () => {
+    const estado = estadoBase();
+    const contrato: Contrato = { clubeId: "flamengo", salarioMensal: 10_000, luvas: 30_000, clausulaRescisao: 500_000, anos: 3, temporadaAssinatura: 2027 };
+
+    const depois = assinarContrato(estado, contrato, "titular");
+
+    expect(depois.clubeAtualId).toBe("flamengo");
+    expect(depois.contratoAtual).toEqual(contrato);
+    expect(depois.statusNoClube).toBe("titular");
+  });
+
+  it("não muta o estado original", () => {
+    const estado = estadoBase();
+    const contrato: Contrato = { clubeId: "flamengo", salarioMensal: 10_000, luvas: 30_000, clausulaRescisao: 500_000, anos: 3, temporadaAssinatura: 2027 };
+    assinarContrato(estado, contrato, "titular");
+    expect(estado.clubeAtualId).toBe("corinthians");
+    expect(estado.statusNoClube).toBe("promessa");
+  });
+});
+
+describe("mudarStatusNoClube", () => {
+  it("atualiza só o status, sem mexer em clube/contrato", () => {
+    const estado = estadoBase();
+    const depois = mudarStatusNoClube(estado, "titular");
+    expect(depois.statusNoClube).toBe("titular");
+    expect(depois.clubeAtualId).toBe(estado.clubeAtualId);
+    expect(depois.contratoAtual).toBe(estado.contratoAtual);
   });
 });

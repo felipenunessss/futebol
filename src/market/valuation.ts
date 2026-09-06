@@ -15,6 +15,8 @@ export interface PerfilDeMercado {
   overall: number;
   idade: number;
   reputacaoNacional: number;
+  /** Multiplicador de valorização por status no elenco (`career/status.ts` `multiplicadorDeValorizacaoPorStatus`) — passado como número puro, não como `StatusNoClube`, pra este módulo não precisar depender de `career/`. Padrão 1 (nem bônus nem penalidade) quando omitido, pra não quebrar quem ainda não tem status pra informar. */
+  multiplicadorStatus?: number;
 }
 
 const OVERALL_MINIMO_COM_VALOR = 40;
@@ -46,13 +48,14 @@ function multiplicadorPorIdade(idade: number): number {
 
 const BONUS_MAXIMO_POR_REPUTACAO = 0.5;
 
-/** Valor de mercado estimado em reais fictícios — mesma escala usada em `career/patrocinios.ts` e no exemplo de `docs/game-design.md` seção 4. */
+/** Valor de mercado estimado em reais fictícios — mesma escala usada em `career/patrocinios.ts` e no exemplo de `docs/game-design.md` seção 4. `perfil.multiplicadorStatus` (padrão 1) reflete que um titular vale mais que um reserva/promessa com o mesmo overall — mais minutagem comprovada, menos risco pro clube comprador. */
 export function calcularValorDeMercado(perfil: PerfilDeMercado): number {
   const base = valorBasePorOverall(perfil.overall);
   const multiplicadorIdade = multiplicadorPorIdade(perfil.idade);
   const multiplicadorReputacao = 1 + (perfil.reputacaoNacional / 100) * BONUS_MAXIMO_POR_REPUTACAO;
+  const multiplicadorStatus = perfil.multiplicadorStatus ?? 1;
 
-  return Math.round(base * multiplicadorIdade * multiplicadorReputacao);
+  return Math.round(base * multiplicadorIdade * multiplicadorReputacao * multiplicadorStatus);
 }
 
 const RATING_BASE = 1000;
@@ -76,5 +79,8 @@ const PONTOS_DE_RATING_POR_REPUTACAO = 2;
  * ~2075 (patamar de clube de elite).
  */
 export function calcularRatingDeInteresse(perfil: PerfilDeMercado): number {
-  return RATING_BASE + perfil.overall * PONTOS_DE_RATING_POR_OVERALL + perfil.reputacaoNacional * PONTOS_DE_RATING_POR_REPUTACAO;
+  const contribuicao = perfil.overall * PONTOS_DE_RATING_POR_OVERALL + perfil.reputacaoNacional * PONTOS_DE_RATING_POR_REPUTACAO;
+  const multiplicadorStatus = perfil.multiplicadorStatus ?? 1;
+
+  return Math.round(RATING_BASE + contribuicao * multiplicadorStatus);
 }

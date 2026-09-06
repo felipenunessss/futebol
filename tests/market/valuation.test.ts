@@ -31,6 +31,18 @@ describe("calcularValorDeMercado", () => {
   it("nunca devolve valor negativo", () => {
     expect(calcularValorDeMercado({ overall: 1, idade: 45, reputacaoNacional: 0 })).toBeGreaterThanOrEqual(0);
   });
+
+  it("multiplicadorStatus escala o valor (titular vale mais que reserva com o mesmo overall)", () => {
+    const perfilBase = { overall: 75, idade: 27, reputacaoNacional: 30 };
+    const comoReserva = calcularValorDeMercado({ ...perfilBase, multiplicadorStatus: 0.85 });
+    const comoTitular = calcularValorDeMercado({ ...perfilBase, multiplicadorStatus: 1 });
+    expect(comoTitular).toBeGreaterThan(comoReserva);
+  });
+
+  it("sem multiplicadorStatus informado, se comporta como multiplicador 1 (retrocompatível)", () => {
+    const perfilBase = { overall: 75, idade: 27, reputacaoNacional: 30 };
+    expect(calcularValorDeMercado(perfilBase)).toBe(calcularValorDeMercado({ ...perfilBase, multiplicadorStatus: 1 }));
+  });
 });
 
 describe("calcularRatingDeInteresse", () => {
@@ -52,5 +64,14 @@ describe("calcularRatingDeInteresse", () => {
     expect(rookie).toBeGreaterThan(1000);
     expect(rookie).toBeLessThan(1600);
     expect(estrela).toBeGreaterThan(1900);
+  });
+
+  it("multiplicadorStatus reduz o rating de interesse sem derrubar abaixo do piso base", () => {
+    const perfilBase = { overall: 75, idade: 27, reputacaoNacional: 30 };
+    const comoTitular = calcularRatingDeInteresse({ ...perfilBase, multiplicadorStatus: 1 });
+    const comoPromessa = calcularRatingDeInteresse({ ...perfilBase, multiplicadorStatus: 0.7 });
+
+    expect(comoPromessa).toBeLessThan(comoTitular);
+    expect(comoPromessa).toBeGreaterThanOrEqual(1000);
   });
 });

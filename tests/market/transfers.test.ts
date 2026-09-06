@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressados, tetoSalarialMensal } from "../../src/market/transfers.js";
+import { estaNaJanelaDeTransferencia, gerarProposta, gerarPropostasIniciais, selecionarClubesInteressados, tetoSalarialMensal } from "../../src/market/transfers.js";
 import type { Club } from "../../src/schemas/club.js";
 
 function clube(id: string, extra: Partial<Club> = {}): Club {
@@ -31,12 +31,12 @@ describe("tetoSalarialMensal", () => {
 describe("gerarProposta", () => {
   it("nunca ultrapassa o teto salarial do clube", () => {
     const club = clube("a", { forca_financeira: "baixa" });
-    const proposta = gerarProposta(club, 10_000_000, () => 0.99);
+    const proposta = gerarProposta(club, 10_000_000, "titular", 1600, () => 0.99);
     expect(proposta.propostaInicial.salarioMensal).toBeLessThanOrEqual(tetoSalarialMensal(club));
   });
 
   it("com valor de mercado zero, ainda gera termos válidos (sem negativos)", () => {
-    const proposta = gerarProposta(clube("a", { forca_financeira: "alta" }), 0, () => 0.5);
+    const proposta = gerarProposta(clube("a", { forca_financeira: "alta" }), 0, "titular", 1600, () => 0.5);
     expect(proposta.propostaInicial.salarioMensal).toBeGreaterThanOrEqual(1);
     expect(proposta.propostaInicial.luvas).toBeGreaterThanOrEqual(0);
     expect(proposta.propostaInicial.anos).toBeGreaterThanOrEqual(2);
@@ -44,9 +44,46 @@ describe("gerarProposta", () => {
 
   it("respeita o random injetado (determinístico)", () => {
     const club = clube("a", { forca_financeira: "media" });
-    const a = gerarProposta(club, 1_000_000, () => 0.5);
-    const b = gerarProposta(club, 1_000_000, () => 0.5);
+    const a = gerarProposta(club, 1_000_000, "titular", 1600, () => 0.5);
+    const b = gerarProposta(club, 1_000_000, "titular", 1600, () => 0.5);
     expect(a).toEqual(b);
+  });
+
+  it("clube bem mais forte que o clube atual oferece status um degrau abaixo do atual", () => {
+    const clubeGigante = clube("gigante", { forca_financeira: "muito_alta", rating_inicial: 2000 });
+    const proposta = gerarProposta(clubeGigante, 1_000_000, "titular", 1500, () => 0.5);
+    expect(proposta.statusOferecido).toBe("reserva");
+  });
+
+  it("clube bem mais fraco que o clube atual oferece status um degrau acima do atual", () => {
+    const clubePequeno = clube("pequeno", { forca_financeira: "media", rating_inicial: 1200 });
+    const proposta = gerarProposta(clubePequeno, 1_000_000, "reserva", 1600, () => 0.5);
+    expect(proposta.statusOferecido).toBe("titular");
+  });
+
+  it("ratingClubeAtual 0 (início de carreira) sempre mantém status promessa", () => {
+    const clubePequeno = clube("pequeno", { forca_financeira: "baixa", rating_inicial: 1200 });
+    const proposta = gerarProposta(clubePequeno, 0, "promessa", 0, () => 0.5);
+    expect(proposta.statusOferecido).toBe("promessa");
+  });
+});
+
+describe("gerarPropostasIniciais", () => {
+  const perfilNovato = { overall: 39, idade: 18, reputacaoNacional: 10 };
+
+  it("gera até a quantidade pedida de propostas, todas com status promessa", () => {
+    const clubes = ["a", "b", "c", "d", "e"].map((id) => clube(id, { forca_financeira: "media", rating_inicial: 1400 }));
+    const propostas = gerarPropostasIniciais(clubes, perfilNovato, 3, () => 0.5);
+
+    expect(propostas.length).toBeLessThanOrEqual(3);
+    expect(propostas.length).toBeGreaterThan(0);
+    expect(propostas.every((p) => p.statusOferecido === "promessa")).toBe(true);
+  });
+
+  it("não inclui clube fora do alcance de um jogador novato (rating muito acima do que o overall sustenta)", () => {
+    const clubeGigante = clube("gigante", { forca_financeira: "muito_alta", rating_inicial: 2000 });
+    const propostas = gerarPropostasIniciais([clubeGigante], perfilNovato, 3, () => 0.5);
+    expect(propostas.map((p) => p.clubeOfertanteId)).not.toContain("gigante");
   });
 });
 

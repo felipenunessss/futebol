@@ -20,7 +20,7 @@ import {
 import { converterChancesEmDesempenho, type FocoDeTreino } from "../progression/xp.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
-import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
+import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, assinarContrato, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
 import {
   jogarTemporada,
   type CenarioResolvidoNaTemporada,
@@ -29,8 +29,12 @@ import {
   type PartidaDoJogadorPontosCorridos,
   type ResultadoTemporadaDeCarreira,
   type ResumoPartidasDaTemporada,
+  type StatusAtualizadoNaTemporada,
   type TreinoResolvidoNaTemporada,
 } from "../career/career-loop.js";
+import { multiplicadorDeValorizacaoPorStatus } from "../career/status.js";
+import { gerarPropostasIniciais } from "../market/transfers.js";
+import type { Contrato } from "../schemas/contract.js";
 
 const clubes = loadClubes();
 const clubePorId = new Map(clubes.map((c) => [c.id, c]));
@@ -363,7 +367,7 @@ async function simularCarreiraLoopCli(): Promise<void> {
   });
 
   console.log(`\n=== Carreira de ${estado.jogador.nome} (${quantidadeDeTemporadas} temporadas, clube inicial: ${nomeDoClube(clubeInicialId)}) ===`);
-  console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)}\n`);
+  console.log(`Início: temporada ${estado.temporada} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)} | status ${estado.statusNoClube}\n`);
 
   const mostrarJogoAJogo = process.argv.includes("--jogo-a-jogo");
 
@@ -375,18 +379,24 @@ async function simularCarreiraLoopCli(): Promise<void> {
 
     const competicoesOk = temporada.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(
-      `\n--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | clube ${nomeDoClube(temporada.estado.clubeAtualId)} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} ---`,
+      `\n--- Temporada ${temporada.resultadoTemporada.temporada} → ${temporada.estado.temporada} | clube ${nomeDoClube(temporada.estado.clubeAtualId)} | idade ${temporada.estado.jogador.idade} | overall ${overallAtual(temporada.estado)} | status ${temporada.estado.statusNoClube} ---`,
     );
     console.log(
       `  ${competicoesOk.length}/${temporada.resultadoTemporada.competicoes.length} competições simuladas | ${temporada.cenariosResolvidos.length} cenários resolvidos`,
     );
+
+    if (temporada.statusAtualizado && temporada.statusAtualizado.statusAnterior !== temporada.statusAtualizado.statusNovo) {
+      console.log(
+        `  Status: ${temporada.statusAtualizado.statusAnterior} -> ${temporada.statusAtualizado.statusNovo} (nota média ${temporada.statusAtualizado.notaMedia.toFixed(1)} em ${temporada.statusAtualizado.partidasJogadas} partida(s))`,
+      );
+    }
 
     for (const negociacao of temporada.negociacoesResolvidas) {
       const termos = negociacao.contrapropostaJogador;
       const desfecho = negociacao.resultado.aceito ? "ACEITA" : "recusada";
       const rotulo = negociacao.tipo === "venda_forcada" ? "venda forçada" : "transferência";
       console.log(
-        `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)}: contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
+        `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)}: status oferecido ${negociacao.proposta.statusOferecido} | contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
       );
     }
 
@@ -397,7 +407,9 @@ async function simularCarreiraLoopCli(): Promise<void> {
     estado = temporada.estado;
   }
 
-  console.log(`\n=== Fim: temporada ${estado.temporada} | clube ${nomeDoClube(estado.clubeAtualId)} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)} ===`);
+  console.log(
+    `\n=== Fim: temporada ${estado.temporada} | clube ${nomeDoClube(estado.clubeAtualId)} | idade ${estado.jogador.idade} | overall ${overallAtual(estado)} | status ${estado.statusNoClube} ===`,
+  );
 }
 
 /**
@@ -446,31 +458,78 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     console.log("Opção inválida, tente de novo.");
   }
 
-  let clubeInicialId: string | undefined;
-  while (!clubeInicialId) {
-    const resposta = (await perguntar("\nClube inicial (digite o id, ex: corinthians — ou 'listar BR' pra ver ids de um país): ")).trim();
-    if (resposta.toLowerCase().startsWith("listar")) {
-      const filtroPais = resposta.split(/\s+/)[1];
-      const listados = filtroPais ? clubes.filter((c) => c.pais.toLowerCase() === filtroPais.toLowerCase()) : clubes;
-      console.log(`\n${listados.length} clube(s)${filtroPais ? ` (país: ${filtroPais})` : ""}:`);
-      for (const c of [...listados].sort((a, b) => a.id.localeCompare(b.id)).slice(0, 60)) {
-        console.log(`  ${c.id} — ${c.nome_popular ?? c.nome}`);
+  const TEMPORADA_INICIAL = 2027;
+  // clubeInicialId provisório só pra poder calcular overall/perfil antes de existir um clube de verdade —
+  // nunca é mostrado nem usado além disso: `assinarContrato`, logo abaixo, substitui pelo clube escolhido.
+  let estado = criarEstadoInicial({ id: "jogador_interativo", nome, posicao, arquetipoId, clubeInicialId: "", temporadaInicial: TEMPORADA_INICIAL });
+
+  const perfilDeNovato = {
+    overall: overallAtual(estado),
+    idade: estado.jogador.idade,
+    reputacaoNacional: estado.reputacao.nacional,
+    multiplicadorStatus: multiplicadorDeValorizacaoPorStatus(estado.statusNoClube),
+  };
+  const propostasIniciais = gerarPropostasIniciais(clubes, perfilDeNovato, 3);
+
+  let clubeInicialId: string;
+  if (propostasIniciais.length === 0) {
+    // fallback raro (nenhum clube demonstrou interesse) — escolha manual, mesmo fluxo de antes.
+    console.log("\nNenhuma proposta chegou pra você ainda — escolha um clube pra tentar a sorte.");
+    let escolhaManual: string | undefined;
+    while (!escolhaManual) {
+      const resposta = (await perguntar("Clube inicial (digite o id, ex: corinthians — ou 'listar BR' pra ver ids de um país): ")).trim();
+      if (resposta.toLowerCase().startsWith("listar")) {
+        const filtroPais = resposta.split(/\s+/)[1];
+        const listados = filtroPais ? clubes.filter((c) => c.pais.toLowerCase() === filtroPais.toLowerCase()) : clubes;
+        console.log(`\n${listados.length} clube(s)${filtroPais ? ` (país: ${filtroPais})` : ""}:`);
+        for (const c of [...listados].sort((a, b) => a.id.localeCompare(b.id)).slice(0, 60)) {
+          console.log(`  ${c.id} — ${c.nome_popular ?? c.nome}`);
+        }
+        if (listados.length > 60) console.log(`  ... e mais ${listados.length - 60} (filtre por país pra uma lista menor)`);
+        continue;
       }
-      if (listados.length > 60) console.log(`  ... e mais ${listados.length - 60} (filtre por país pra uma lista menor)`);
-      continue;
+      if (clubePorId.has(resposta)) {
+        escolhaManual = resposta;
+      } else {
+        console.log(`Clube "${resposta}" não encontrado.`);
+      }
     }
-    if (clubePorId.has(resposta)) {
-      clubeInicialId = resposta;
-    } else {
-      console.log(`Clube "${resposta}" não encontrado.`);
+    clubeInicialId = escolhaManual;
+    estado = { ...estado, clubeAtualId: clubeInicialId };
+  } else {
+    console.log("\n=== Propostas iniciais ===");
+    propostasIniciais.forEach((p, i) => {
+      const termos = p.propostaInicial;
+      console.log(
+        `  ${i + 1}. ${nomeDoClube(p.clubeOfertanteId)} — status: ${p.statusOferecido} | R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos`,
+      );
+    });
+
+    let escolhaIndice: number | undefined;
+    while (escolhaIndice === undefined) {
+      const resposta = Number((await perguntar("Escolha uma proposta (número): ")).trim());
+      if (resposta >= 1 && resposta <= propostasIniciais.length) escolhaIndice = resposta - 1;
+      else console.log("Opção inválida, tente de novo.");
     }
+
+    const propostaEscolhida = propostasIniciais[escolhaIndice];
+    const termos = propostaEscolhida.propostaInicial;
+    const contratoInicial: Contrato = {
+      clubeId: propostaEscolhida.clubeOfertanteId,
+      salarioMensal: termos.salarioMensal,
+      luvas: termos.luvas,
+      clausulaRescisao: termos.salarioMensal * 12 * (termos.anos + 1), // mesma estimativa simples de market/negotiation.ts
+      anos: termos.anos,
+      temporadaAssinatura: TEMPORADA_INICIAL,
+    };
+    estado = assinarContrato(estado, contratoInicial, propostaEscolhida.statusOferecido);
+    clubeInicialId = propostaEscolhida.clubeOfertanteId;
   }
 
-  let estado = criarEstadoInicial({ id: "jogador_interativo", nome, posicao, arquetipoId, clubeInicialId, temporadaInicial: 2027 });
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
 
   console.log(`\n=== ${estado.jogador.nome} (${posicao}) — ${nomeDoClube(clubeInicialId)}, temporada ${estado.temporada} ===`);
-  console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)}\n`);
+  console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)} | Status: ${estado.statusNoClube}\n`);
 
   const escolherOpcaoInterativa = async (cenario: Cenario): Promise<Opcao> => {
     console.log(`\n--- ${cenario.titulo} ---`);
@@ -513,8 +572,14 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     const desfecho = negociacao.resultado.aceito ? "ACEITA!" : "recusada.";
     const rotulo = negociacao.tipo === "venda_forcada" ? "Venda forçada" : "Proposta de transferência";
     console.log(
-      `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)} — contraproposta automática: R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos -> ${desfecho}`,
+      `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)} — status oferecido: ${negociacao.proposta.statusOferecido} | contraproposta automática: R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos -> ${desfecho}`,
     );
+  };
+
+  const onStatusAtualizado = (info: StatusAtualizadoNaTemporada): void => {
+    const seta = info.statusAnterior === info.statusNovo ? "mantido" : `${info.statusAnterior} -> ${info.statusNovo}`;
+    console.log(`\n--- Avaliação de status (${info.partidasJogadas} partida(s), nota média ${info.notaMedia.toFixed(1)}) ---`);
+    console.log(`  Status no elenco: ${seta}`);
   };
 
   const onCenarioResolvido = (resolvido: CenarioResolvidoNaTemporada): void => {
@@ -551,6 +616,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       onNegociacaoResolvida,
       onCenarioResolvido,
       onPartidasResumidas,
+      onStatusAtualizado,
       onTreinoResolvido,
       onPartidaPontosCorridos,
       onPartidaMataMata,
@@ -559,7 +625,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
 
     const competicoesOk = resultado.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(`\n=== Fim da temporada ${resultado.resultadoTemporada.temporada} — agora ${estado.temporada} ===`);
-    console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Idade: ${estado.jogador.idade} | Overall: ${overallAtual(estado)}`);
+    console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Idade: ${estado.jogador.idade} | Overall: ${overallAtual(estado)} | Status: ${estado.statusNoClube}`);
     console.log(`${competicoesOk.length}/${resultado.resultadoTemporada.competicoes.length} competições simuladas`);
     console.log(
       `Moral ${estado.moral} | Reputação nacional ${estado.reputacao.nacional} | Relações internas ${estado.relacoesInternas} | Patrimônio R$${estado.patrimonio}`,
@@ -569,7 +635,9 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     if (resposta === "sair" || resposta === "s" || resposta === "parar") continuar = false;
   }
 
-  console.log(`\n=== Carreira encerrada em ${estado.temporada}, aos ${estado.jogador.idade} anos, overall ${overallAtual(estado)} ===`);
+  console.log(
+    `\n=== Carreira encerrada em ${estado.temporada}, aos ${estado.jogador.idade} anos, overall ${overallAtual(estado)}, status ${estado.statusNoClube} no ${nomeDoClube(estado.clubeAtualId)} ===`,
+  );
   rl.close();
 }
 

@@ -1034,6 +1034,78 @@ carreira — qualquer chamador (não só o game loop) pode se inscrever.
   mesmo fluxo funcionou dentro da carreira interativa (`jogar`), jogo a
   jogo intercalado com as sessões de treino e os cenários da temporada.
 
+### 5.6. Status no elenco + propostas iniciais (implementado)
+
+Pedido explícito: (1) início de carreira com 3 propostas de clube em vez
+de escolher o clube direto; (2) status do jogador no elenco
+("promessa", "titular", etc) impactando desempenho/stats; (3) status
+evoluindo/regredindo conforme o jogador melhora/piora, puxando junto o
+prestígio das propostas de mercado — inclusive o caso concreto pedido:
+"um jogador que é reserva no Flamengo pode ser importante numa Série B".
+
+- **`career/status.ts`** (novo módulo) — `StatusNoClube`: `"promessa" |
+  "reserva" | "titular" | "idolo"`, só sobe/desce 1 degrau por vez.
+  - `minutosEsperadosPorStatus`: 15/45/90/90 minutos — impacta
+    diretamente o desempenho: `progression/xp.ts` já escala XP e nota
+    por `minutosJogados/90`, então um "promessa" cresce mais devagar
+    que um "titular" com o mesmo desempenho por chance.
+  - `multiplicadorDeValorizacaoPorStatus`: 0.7/0.85/1/1.25 — aplicado
+    em `market/valuation.ts` `PerfilDeMercado.multiplicadorStatus`
+    (campo opcional, número puro — `valuation.ts` não depende do tipo
+    `StatusNoClube`, só recebe o multiplicador já calculado, pra não
+    criar uma dependência de `career/` desnecessária ali).
+  - `evoluirStatus(statusAtual, notaMedia)`: promove com nota média
+    ≥7, rebaixa com nota <5 — chamado uma vez por temporada em
+    `career/career-loop.ts` `jogarTemporada`, logo depois do resumo de
+    partidas (`onStatusAtualizado`), só quando o jogador jogou alguma
+    partida na temporada. **Ressalva de calibração importante**: a nota
+    usada aqui é calculada com 90 minutos fixos, não com os minutos
+    "reais" do status atual — senão um "promessa" (15 min) quase nunca
+    cruzaria o limiar de promoção só porque a nota vem descontada pela
+    escassez de minutos (a mesma variável que o status deveria
+    destravar estaria travando a própria evolução dele). O que decide o
+    status é a qualidade de quando jogou, não a oportunidade que já
+    tinha.
+  - `statusOferecido(statusAtual, ratingClubeAtual, ratingClubeOfertante)`:
+    clube bem mais forte (diferença de rating > ~1 nível) oferece
+    status 1 degrau abaixo do atual; clube bem mais fraco oferece 1
+    degrau acima; clube parecido mantém o mesmo — é isso que resolve o
+    caso "reserva do Flamengo pode ser titular numa Série B" sem
+    precisar de nenhum caminho especial: só a diferença de rating entre
+    quem oferece e o clube atual já produz esse efeito. `ratingClubeAtual
+    = 0` (início de carreira, sem clube ainda) sempre cai no caso "clube
+    bem mais forte", mantendo `"promessa"` — de novo, sem caminho
+    especial.
+- **`market/transfers.ts`**: `PropostaTransferencia` ganha
+  `statusOferecido` (calculado dentro de `gerarProposta`, não é
+  negociável — a negociação só mexe em salário/luvas/anos). Nova
+  `gerarPropostasIniciais(clubes, perfil, quantidade=3, random?)` —
+  reaproveita `selecionarClubesInteressados` com um `clubeAtualId`
+  vazio (não bate com nenhum clube real, então nada é excluído nem
+  usado como referência de upgrade) e `ratingClubeAtual: 0` em
+  `gerarProposta` pra cada clube selecionado.
+- **`career/Player.ts`**: `EstadoDeCarreira.statusNoClube` (`"promessa"`
+  por padrão em `criarEstadoInicial`). `assinarContrato` agora recebe
+  o status junto (contrato e papel no elenco mudam juntos numa
+  transferência real); `mudarStatusNoClube` só pra revisão de status
+  sem trocar de clube.
+- **CLI interativa (`jogar`)**: depois de nome/posição/arquétipo, gera
+  3 propostas iniciais (`gerarPropostasIniciais`) — mostra clube,
+  status oferecido (sempre `"promessa"`, por construção) e termos; você
+  escolhe uma, e ela vira o contrato/status inicial de verdade via
+  `assinarContrato`. Sem proposta nenhuma (raro), cai de volta no fluxo
+  antigo de digitar o id do clube manualmente. Status aparece no resumo
+  de cada temporada e em cada negociação de transferência (`status
+  oferecido: X`).
+- **Validado com dado real**: rodando 12 temporadas seguidas com um
+  atacante no Corinthians (`carreira-loop`), o status ficou em
+  `"promessa"` por ~9 temporadas (nota média subindo de 5.7 pra 6.9
+  conforme o overall cresce de 39 pra 63) até finalmente promover —
+  daí evoluiu rápido: `reserva` (temporada seguinte) → `titular` →
+  `idolo` em mais 3 temporadas, com a nota média já surfando acima de
+  7 com folga. Ritmo condizente com "craque emergente demora anos pra
+  se firmar num clube grande", não instantâneo nem travado pra sempre.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1123,12 +1195,17 @@ carreira — qualquer chamador (não só o game loop) pode se inscrever.
   simulação de fluxo de caixa (clube não fica "mais endividado" com o
   tempo, a chance por temporada é sempre a mesma); não existe renovação
   de contrato (jogador pode ficar anos além de `temporadaDeVencimento`
-  sem nada acontecer); não existe sistema de minutagem que reduza o
-  interesse de mercado de um jogador que não joga; `clubeAtualId` inicial
-  (`criarEstadoInicial`) continua vindo de quem chama, sem nenhuma lista
-  curada/filtrada de "clubes pra começar carreira" — `npx tsx
-  src/cli/index.ts clubes [pais]` lista tudo, sem filtrar por tamanho/
-  divisão.
+  sem nada acontecer); ~~não existe sistema de minutagem que reduza o
+  interesse de mercado de um jogador que não joga~~ **resolvida**: status
+  no elenco (seção 5.6) cumpre esse papel — `multiplicadorDeValorizacaoPorStatus`
+  reduz valor de mercado/teto de rating alcançável pra quem não é
+  titular. ~~`clubeAtualId` inicial continua vindo de quem chama, sem
+  lista curada~~ **resolvida na CLI interativa** (`jogar` gera 3
+  propostas iniciais em vez de pedir o id direto, seção 5.6) — a API
+  (`criarEstadoInicial`) continua exigindo `clubeInicialId` explícito
+  pra quem chama programaticamente (`npx tsx src/cli/index.ts clubes
+  [pais]` ainda lista tudo sem filtrar por tamanho/divisão, útil pro
+  fallback manual da CLI quando nenhuma proposta chega).
 - **Carreira interativa — limitações desta primeira versão** (ver seção
   5.3): contraproposta de negociação continua automática
   (`contrapropostaPadrao`), o jogador não escolhe os termos; não há
@@ -1154,3 +1231,18 @@ carreira — qualquer chamador (não só o game loop) pode se inscrever.
   quem quiser o placar perna a perna precisa olhar
   `resultado.partidasDoJogador` (quando o clube do jogador estava
   envolvido) em vez do evento.
+- **Status no elenco — limitações desta versão** (ver seção 5.6): só
+  sobe/desce 1 degrau por temporada, sem meio-termo (ex: "quase
+  titular"); os minutos por status (`MINUTOS_POR_STATUS`) e o limiar de
+  promoção/rebaixamento (nota 7/5) são constantes fixas, iguais pra
+  qualquer posição/arquétipo/competição — na prática, atacante contra
+  defesas fortes de Série A demora mais pra cruzar o limiar que outras
+  combinações (validado: ~9 temporadas pra sair de "promessa" com um
+  atacante no Corinthians), o que não foi calibrado deliberadamente por
+  posição, só é uma consequência do jeito que a nota é calculada
+  (`progression/xp.ts` `calcularNotaPartida`); um clube só pode oferecer
+  um dos 4 status fixos, não intermediários; `statusOferecido` não leva
+  em conta nada além da diferença de rating entre os 2 clubes (não
+  considera, por exemplo, se o clube ofertante já tem outro jogador
+  forte na mesma posição, que na vida real reduziria a chance de
+  oferecer titularidade).

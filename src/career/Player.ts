@@ -7,6 +7,7 @@ import { patrociniosDisponiveis } from "./patrocinios.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
 import type { Contrato } from "../schemas/contract.js";
+import type { StatusNoClube } from "./status.js";
 
 /**
  * Estado de carreira do jogador — o "save" da carreira. Junta o `Jogador`
@@ -33,6 +34,8 @@ export interface EstadoDeCarreira {
   patrimonio: number;
   /** Contrato com o clube atual (`market/negotiation.ts`) — ausente quando o jogador ainda não passou por uma negociação de mercado (ex: acabou de criar a carreira, ou foi movido por `transferirParaClube` sem negociação). */
   contratoAtual?: Contrato;
+  /** Status no elenco do clube atual (`career/status.ts`) — decide minutos esperados por partida e pesa no valor de mercado/status oferecido em propostas. */
+  statusNoClube: StatusNoClube;
 }
 
 export interface OpcoesEstadoInicial {
@@ -87,6 +90,7 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
     reputacao: criarReputacaoInicial(),
     relacoesInternas: RELACOES_INTERNAS_INICIAL,
     patrimonio: PATRIMONIO_INICIAL,
+    statusNoClube: "promessa",
   };
 }
 
@@ -148,9 +152,14 @@ export function transferirParaClube(estado: EstadoDeCarreira, novoClubeId: strin
   return { ...estado, clubeAtualId: novoClubeId };
 }
 
-/** Move o jogador pro clube do `Contrato` e registra o contrato como `contratoAtual` — resultado de uma negociação de mercado bem-sucedida (`market/negotiation.ts` `negociarTransferencia`). */
-export function assinarContrato(estado: EstadoDeCarreira, contrato: Contrato): EstadoDeCarreira {
-  return { ...estado, clubeAtualId: contrato.clubeId, contratoAtual: contrato };
+/** Move o jogador pro clube do `Contrato`, registra o contrato como `contratoAtual` e atualiza o status no elenco — resultado de uma negociação de mercado bem-sucedida (`market/negotiation.ts` `negociarTransferencia`, `career/status.ts` `statusOferecido`). */
+export function assinarContrato(estado: EstadoDeCarreira, contrato: Contrato, statusNoClube: StatusNoClube): EstadoDeCarreira {
+  return { ...estado, clubeAtualId: contrato.clubeId, contratoAtual: contrato, statusNoClube };
+}
+
+/** Atualiza só o status no elenco do clube atual (ex: revisão de fim de temporada, `career/status.ts` `evoluirStatus`) — não mexe em clube/contrato. */
+export function mudarStatusNoClube(estado: EstadoDeCarreira, statusNoClube: StatusNoClube): EstadoDeCarreira {
+  return { ...estado, statusNoClube };
 }
 
 /**

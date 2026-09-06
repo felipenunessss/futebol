@@ -1,6 +1,7 @@
 import type { Club, ForcaFinanceira } from "../schemas/club.js";
 import { obterRating } from "../simulation/rating.js";
 import type { MomentoDeCarreira } from "../progression/scenarios.js";
+import { statusOferecido, type StatusNoClube } from "../career/status.js";
 import { calcularRatingDeInteresse, calcularValorDeMercado, type PerfilDeMercado } from "./valuation.js";
 
 /**
@@ -49,6 +50,8 @@ export interface TermosDeContrato {
 export interface PropostaTransferencia {
   clubeOfertanteId: string;
   propostaInicial: TermosDeContrato;
+  /** Status que o clube ofertante propõe pro jogador no elenco dele (`career/status.ts` `statusOferecido`) — não é negociável (a negociação só mexe em salário/luvas/anos, ver `market/negotiation.ts`). */
+  statusOferecido: StatusNoClube;
 }
 
 const MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL = 24;
@@ -63,17 +66,29 @@ const ANOS_VARIACAO = 3;
  * Gera a proposta inicial de um clube — parte de uma referência salarial
  * simples (valor de mercado ~ 2 anos de salário), respeita o teto salarial
  * do clube, e abre abaixo do próprio teto/referência (70-90%) pra deixar
- * espaço de negociação (`market/negotiation.ts`). Estimativa de design.
+ * espaço de negociação (`market/negotiation.ts`). O status oferecido
+ * (`career/status.ts` `statusOferecido`) vem da diferença de rating entre
+ * o clube ofertante e o clube atual do jogador — `ratingClubeAtual: 0`
+ * (sem clube ainda, início de carreira) sempre cai no caso "clube bem mais
+ * forte", mantendo `statusAtual` (tipicamente `"promessa"`) sem precisar
+ * de um caminho especial pra isso. Estimativa de design.
  */
-export function gerarProposta(clube: Club, valorDeMercado: number, random: () => number = Math.random): PropostaTransferencia {
+export function gerarProposta(
+  clube: Club,
+  valorDeMercado: number,
+  statusAtual: StatusNoClube,
+  ratingClubeAtual: number,
+  random: () => number = Math.random,
+): PropostaTransferencia {
   const tetoMensal = tetoSalarialMensal(clube);
   const salarioReferencia = Math.min(tetoMensal, Math.round(valorDeMercado / MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL));
   const fatorDeAbertura = FATOR_DE_ABERTURA_MINIMO + random() * FATOR_DE_ABERTURA_VARIACAO;
   const salarioMensal = Math.max(1, Math.round(salarioReferencia * fatorDeAbertura));
   const luvas = Math.round(salarioMensal * (LUVAS_MINIMO_EM_SALARIOS + random() * LUVAS_VARIACAO_EM_SALARIOS));
   const anos = ANOS_MINIMO + Math.floor(random() * ANOS_VARIACAO);
+  const status = statusOferecido(statusAtual, ratingClubeAtual, obterRating(clube));
 
-  return { clubeOfertanteId: clube.id, propostaInicial: { salarioMensal, luvas, anos } };
+  return { clubeOfertanteId: clube.id, propostaInicial: { salarioMensal, luvas, anos }, statusOferecido: status };
 }
 
 export interface OpcoesSelecaoDeInteressados {
@@ -140,4 +155,28 @@ export function selecionarClubesInteressados(clubes: Club[], clubeAtualId: strin
   }
 
   return embaralhados.slice(0, quantidadeMaxima);
+}
+
+const QUANTIDADE_PADRAO_DE_PROPOSTAS_INICIAIS = 3;
+
+/**
+ * Gera propostas de clube pra começar a carreira — pedido explícito de
+ * receber 3 propostas em vez de escolher o clube inicial direto.
+ * Reaproveita `selecionarClubesInteressados` sem clube atual (`""` nunca
+ * bate com nenhum id real, então nada é excluído nem usado como
+ * referência de upgrade) e `ratingClubeAtual: 0` em `gerarProposta` —
+ * isso já garante `statusOferecido` = `"promessa"` pra toda proposta
+ * (ver `career/status.ts` `statusOferecido`), sem precisar de um caminho
+ * especial só pro início de carreira.
+ */
+export function gerarPropostasIniciais(
+  clubes: Club[],
+  perfil: PerfilDeMercado,
+  quantidade: number = QUANTIDADE_PADRAO_DE_PROPOSTAS_INICIAIS,
+  random: () => number = Math.random,
+): PropostaTransferencia[] {
+  const valorDeMercado = calcularValorDeMercado(perfil);
+  const interessados = selecionarClubesInteressados(clubes, "", perfil, { random, quantidadeMaxima: quantidade, exigirUpgrade: false });
+
+  return interessados.map((clube) => gerarProposta(clube, valorDeMercado, "promessa", 0, random));
 }

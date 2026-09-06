@@ -224,7 +224,9 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0 });
+    // status "titular" (em vez do "promessa" padrão) evita que o multiplicador de status por si só
+    // derrube o teto de interesse abaixo do clube "b" — o foco do teste é o fluxo de negociação, não status.
+    const resultado = await jogarTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, campeonatos, clubes, { random: () => 0 });
 
     expect(resultado.negociacoesResolvidas.length).toBeGreaterThan(0);
     const negociacaoAceita = resultado.negociacoesResolvidas.find((n) => n.resultado.aceito);
@@ -259,7 +261,7 @@ describe("jogarTemporada — negociação de transferência", () => {
     ];
     const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
 
-    const resultado = await jogarTemporada(estadoDeTeste(), campeonatos, clubes, { random: () => 0.5 });
+    const resultado = await jogarTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, campeonatos, clubes, { random: () => 0.5 });
 
     const cenarioDePreTemporada = resultado.cenariosResolvidos.find((c) => c.momento === "pre_temporada")!;
     expect(cenarioDePreTemporada.cenario.opcoes.some((o) => o.disparaNegociacaoReal)).toBe(true);
@@ -333,6 +335,65 @@ describe("jogarTemporada — jogo a jogo (onPartidaPontosCorridos/onPartidaMataM
     expect(eventos.length).toBeLessThanOrEqual(2);
     expect(eventos.every((e) => e.campeonatoId === "copa_do_brasil")).toBe(true);
     expect(eventos.every((e) => e.timeA === "a" || e.timeB === "a")).toBe(true);
+  });
+});
+
+describe("jogarTemporada — status no clube", () => {
+  it("jogador começa 'promessa' e evolui quando joga bem (nota média alta)", async () => {
+    const times = ["a", "b", "c", "d"];
+    const estadoInicial = estadoDeTeste();
+    expect(estadoInicial.statusNoClube).toBe("promessa");
+
+    // random baixo tende a gerar chances bem-sucedidas (ver resolverChanceJogador em match.ts) — nota média alta
+    const resultado = await jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.05 });
+
+    expect(resultado.statusAtualizado).toBeDefined();
+    expect(resultado.statusAtualizado!.statusAnterior).toBe("promessa");
+    expect(resultado.estado.statusNoClube).toBe(resultado.statusAtualizado!.statusNovo);
+  });
+
+  it("sem nenhuma partida jogada na temporada, statusAtualizado fica indefinido e status não muda", async () => {
+    const times = ["a", "b", "c", "d"];
+    // clube "outro" não está em nenhum campeonato — o jogador não joga nenhuma partida
+    const estadoSemClubeAtivo = { ...estadoDeTeste(), clubeAtualId: "outro" };
+    const clubesComOutro = [...times.map((id) => clube(id)), clube("outro")];
+
+    const resultado = await jogarTemporada(estadoSemClubeAtivo, campeonatoDeTeste(times), clubesComOutro, { random: () => 0.5 });
+
+    expect(resultado.statusAtualizado).toBeUndefined();
+    expect(resultado.estado.statusNoClube).toBe("promessa");
+  });
+
+  it("chama onStatusAtualizado quando o jogador jogou partidas", async () => {
+    const times = ["a", "b", "c", "d"];
+    let chamado: unknown;
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      onStatusAtualizado: (info) => {
+        chamado = info;
+      },
+    });
+
+    expect(chamado).toBeDefined();
+  });
+
+  it("status melhor (titular) libera clubes de rating mais alto que status promessa, tudo mais igual", async () => {
+    const clubesFortes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", rating_inicial: 1400 },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", rating_inicial: 1700, forca_financeira: "muito_alta" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", rating_inicial: 1400 },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", rating_inicial: 1400 },
+    ];
+    const campeonatos = campeonatoDeTeste(clubesFortes.map((c) => c.id));
+
+    const comoPromessa = await jogarTemporada({ ...estadoDeTeste(), statusNoClube: "promessa" }, campeonatos, clubesFortes, { random: () => 0.5 });
+    const comoTitular = await jogarTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, campeonatos, clubesFortes, { random: () => 0.5 });
+
+    const negociouComoPromessa = comoPromessa.negociacoesResolvidas.some((n) => n.clubeOfertanteId === "b");
+    const negociouComoTitular = comoTitular.negociacoesResolvidas.some((n) => n.clubeOfertanteId === "b");
+
+    expect(negociouComoTitular || !negociouComoPromessa).toBe(true);
   });
 });
 
