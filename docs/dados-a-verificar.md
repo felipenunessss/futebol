@@ -134,29 +134,75 @@ resultado final bate mas o mecanismo intermediário não é representado:
   (`classificam_proxima_fase: 16` é estimativa).
 - **Argentina 2ª divisão**: chaveamento exato dos 15 times do "Reduzido"
   não fechado (torneio real ainda em andamento).
-- **Uruguai 1ª divisão**: schema não amarra explicitamente qual fase
-  (Apertura/Clausura/Intermedio) alimenta qual etapa do mata-mata final.
-- **Uruguai 2ª divisão**: não representa como o resultado do "Torneo
-  Competencia" se soma à fase regular, nem a condicional "vaga garantida
-  só se não estiver já em zona de acesso".
+- ~~Uruguai 1ª divisão: schema não amarra explicitamente qual fase
+  alimenta qual etapa do mata-mata final~~ **resolvida** (confirmado via
+  Wikipedia/AUF): "Torneo Intermedio" é uma competição À PARTE, só de vaga
+  internacional, sem relação com o título — removido do formato (não
+  modelado, ver `simulation/engine.ts` `receitaUruguaiPrimeira`). O título
+  ("Campeón Uruguayo") é: campeão automático se o mesmo clube vencer
+  Apertura e Clausura; senão, semifinal entre os 2 campeões de torneio; se
+  o líder da Tabla Anual (soma Apertura+Clausura) for um dos 2
+  semifinalistas, quem vencer a semifinal já é campeão; senão, o vencedor
+  ainda enfrenta o líder numa final. Fonte: [Campeonato Uruguayo de
+  Primera División 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Campeonato_Uruguayo_de_Primera_Divisi%C3%B3n_2025).
+- ~~Uruguai 2ª divisão: não representa como o Torneo Competencia se soma
+  à fase regular, nem a condicional "vaga garantida"~~ **parcialmente
+  resolvida**: confirmado que o campeão da divisão é sempre o líder da
+  fase regular (`pontos_corridos`), não do Torneo Competencia — este roda
+  à parte (`receitaUruguaiSegunda`). A condicional exata do playoff pelo
+  3º acesso (só inclui o campeão do Torneo Competencia se ele não estiver
+  já em zona de acesso direto nem de descenso) continua **não
+  representada** — a receita usa sempre as posições 3ª-6ª da tabela
+  regular, sem essa condicional (não afeta quem é campeão, só o detalhe
+  de quem disputa a vaga extra). Fonte: [Campeonato Uruguayo de Segunda
+  División 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Campeonato_Uruguayo_de_Segunda_Divisi%C3%B3n_2025).
 - **Colômbia 1ª divisão**: em 2026 o Apertura usa playoff direto e o
   Finalización usa cuadrangulares — modelados de forma uniforme
-  (`fase_quadrangular`), perdendo a diferença.
+  (`fase_quadrangular`), perdendo a diferença. (Pendente confirmar com
+  fonte oficial — pesquisa anterior travou num limite de sessão antes de
+  concluir.)
 - **Colômbia 2ª divisão**: acesso condicional (2 campeões semestrais sobem
   direto só se estiverem nas 2 primeiras posições da tabela anual, senão
   repechaje) não representado.
 - **Chile 2ª divisão**: bye do 2º colocado na liguilla de acesso (só
   3º-8º jogam quartas) não representável.
-- **Equador 1ª divisão**: pós-fase-inicial os 16 times viram 3 grupos de
-  tamanhos e propósitos diferentes (hexagonal do título, quadrangular
-  internacional, hexagonal de rebaixamento) — sem bloco pra isso, tudo em
-  texto livre.
-- **Equador 2ª divisão**: Grupo Ascenso e Grupo Descenso usam o mesmo campo
-  `classificam_por_grupo`, sem representar que um decide acesso e outro
-  descenso, nem o carregamento de pontos entre fases.
-- **Venezuela 2ª divisão**: grupos reais são assimétricos (8 Oriental + 9
-  Occidental) — schema só representa `times_por_grupo` uniforme, modelado
-  como 2×8 por aproximação.
+- ~~Equador 1ª e 2ª divisão: sem bloco pra "grupos de tamanhos/propósitos
+  diferentes por classificação"~~ **resolvida**: novo bloco de schema
+  `FaseFinalPorClassificacao` (`schemas/championship.ts`) — grupos em
+  ordem (do melhor colocado ao pior), com `pontos_carregados` opcional
+  (soma os pontos da fase anterior em vez de zerar). **Achado
+  adicional**: o dado antigo de `equador_segunda` (2 grupos de 6 desde o
+  início) não batia com o formato real 2025 — corrigido pra
+  `pontos_corridos` único de 12 times (22 rodadas) seguido de 2
+  hexagonais (ascenso 1º-6º, descenso 7º-12º) por classificação, pontos
+  carregados. `equador_primera`: 3 grupos por classificação (hexagonal do
+  título 1º-6º, quadrangular internacional 7º-10º, hexagonal de
+  rebaixamento 11º-16º), pontos carregados. Fontes: [¿Cómo se jugará la
+  LigaPro 2025?](https://www.primicias.ec/deportes/nuevo-formato-sistema-campeonato-ligapro2025-85954/),
+  [2025 LigaPro Serie A (Wikipedia)](https://en.wikipedia.org/wiki/2025_LigaPro_Serie_A),
+  [¿Cómo será la Serie B de Ecuador de 2025?](https://www.primicias.ec/deportes/serie-b-ecuador-equipos-formato-ascenso-descenso-clubes-calendario-partidos-91404/),
+  [2025 Ecuadorian Serie B (Wikipedia)](https://en.wikipedia.org/wiki/2025_Ecuadorian_Serie_B).
+- ~~Venezuela 1ª/2ª divisão: estrutura em 2 níveis não confirmada~~
+  **resolvida**: confirmado (Wikipedia/El Universal) que cada torneio
+  (Apertura/Clausura) tem sua própria mini-competição interna — os
+  classificados do turno/returno entram numa `fase_grupos` própria
+  daquele torneio (cuadrangulares), que alimenta um `mata_mata` que
+  decide o "campeão daquele torneio"; só depois os 2 campeões de torneio
+  se enfrentam no `final_estadual` da temporada (mesmo clube campeão dos
+  dois = campeão automático). Ver `simulation/engine.ts`
+  `receitaTurnoRetornoComGrupoEMataMataEFinal`. **Bug de dado corrigido**:
+  `venezuela_primera.json` tinha `final_estadual.ida_e_volta: false`,
+  deveria ser `true` (final 2025 foi ida e volta, UCV 3-1 sobre Carabobo
+  no agregado). Pra Venezuela 2ª divisão especificamente, os grupos reais
+  continuam assimétricos (8 Oriental + 9 Occidental, aqui modelado como
+  2×8 por aproximação) e não foi possível confirmar se a Final Absoluta é
+  jogo único ou ida e volta (mantido ida e volta, plausível mas não
+  confirmado) — a última fase do `mata_mata` (`quartas`/`semifinal`/
+  jogo único na final) também precisaria de `etapas` com `ida_e_volta`
+  por etapa em vez do campo único atual, não fizemos essa correção ainda.
+  Fontes: [Primera División de Venezuela 2025](https://es.wikipedia.org/wiki/Primera_Divisi%C3%B3n_de_Venezuela_2025),
+  [UCV FC campeón Liga FUTVE 2025 (El Universal)](https://www.eluniversal.com/deportes/221884/ucv-fc-se-consagra-como-campeon-la-liga-futve-2025),
+  [Segunda División de Venezuela 2025](https://es.wikipedia.org/wiki/Segunda_Divisi%C3%B3n_de_Venezuela_2025).
 - **Peru 2ª divisão (Liga 2)**: a mais elaborada de todas — 2 grupos
   regionais de 9 → 3 "Grupos Campeonato" de 4 com pontos de bônus
   carregados → playoffs de 3 etapas. Modelado só o corpo principal (2

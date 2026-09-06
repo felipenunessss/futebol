@@ -6,7 +6,14 @@
   "ano_referencia": 2026,
   "formato": {
     "pontos_corridos": { "ida_e_volta": true, "rodadas": 22 },
-    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 6, "ida_e_volta": true, "classificam_por_grupo": 2 }
+    "fase_final_por_classificacao": {
+      "grupos": [
+        { "nome": "hexagonal_ascenso", "tamanho": 6 },
+        { "nome": "hexagonal_descenso", "tamanho": 6 }
+      ],
+      "ida_e_volta": true,
+      "pontos_carregados": true
+    }
   },
   "premiacao": {
     "acesso_proxima_divisao": 2,

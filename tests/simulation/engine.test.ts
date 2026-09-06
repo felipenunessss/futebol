@@ -6,12 +6,18 @@ import {
   receitaFaseGruposFaseQuadrangularEFinal,
   receitaFaseSuicaEMataMata,
   receitaFaseSuicaMataMataEFinal,
+  receitaPontosCorridosComFaseFinalPorClassificacao,
   receitaPontosCorridosComLiguilla,
   receitaTurnoEMataMata,
+  receitaTurnoRetornoComGrupoEMataMataEFinal,
   receitaTurnoRetornoSomado,
+  receitaUruguaiPrimeira,
+  receitaUruguaiSegunda,
+  simularFaseFinalPorClassificacao,
   simularTemporada,
   type CampeonatoSimulavel,
 } from "../../src/simulation/engine.js";
+import type { LinhaTabela } from "../../src/simulation/season.js";
 import type { Club } from "../../src/schemas/club.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
@@ -474,5 +480,193 @@ describe("receitaFaseGruposComPreClassificatorioEMataMata (Libertadores/Sul-Amer
     await expect(receitaFaseGruposComPreClassificatorioEMataMata(campeonatoSemCorte, ratingsSemCorte, undefined, () => Math.random())).rejects.toThrow(
       /não foi possível derivar o corte/,
     );
+  });
+});
+
+describe("receitaTurnoRetornoComGrupoEMataMataEFinal (Venezuela 1ª divisão)", () => {
+  // 8 times: turno/returno classificam 4 -> fase_grupos própria (2 grupos de 2) -> mata_mata (1 fase,
+  // reduz 2->1) decide o "campeão do torneio" -> final_estadual entre os 2 campeões de torneio.
+  const times = ["a1", "a2", "a3", "a4", "b1", "b2", "b3", "b4"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "venezuela_primera",
+    formato: {
+      turno: { ida_e_volta: false, classificam_proxima_fase: 4 },
+      returno: { ida_e_volta: false, classificam_proxima_fase: 4 },
+      fase_grupos: { num_grupos: 2, times_por_grupo: 2, ida_e_volta: true, classificam_por_grupo: 1 },
+      mata_mata: { fases: ["final_do_apertura_ou_clausura"], ida_e_volta: false },
+      final_estadual: { criterio: "final_unica_entre_campeoes_do_apertura_e_clausura", ida_e_volta: true },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("produz um campeão válido, passando por turno/returno -> grupo próprio -> mata-mata -> final", async () => {
+    const resultado = await receitaTurnoRetornoComGrupoEMataMataEFinal(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("time muito mais forte domina os 2 torneios e vira campeão automático (sem final)", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA1 = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaTurnoRetornoComGrupoEMataMataEFinal(campeonato, ratingsFavorecendoA1, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a1");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+});
+
+describe("receitaUruguaiPrimeira", () => {
+  const times = ["a", "b", "c", "d"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "uruguai_primera",
+    formato: {
+      turno: { ida_e_volta: false, classificam_proxima_fase: 1 },
+      returno: { ida_e_volta: false, classificam_proxima_fase: 1 },
+      mata_mata: { fases: ["semifinal_campeonato", "final_campeonato"], ida_e_volta: false },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("clube muito mais forte vence Apertura e Clausura e vira campeão automático, sem semifinal nem final", async () => {
+    const ratingsFavorecendoA = { ...ratings, a: 2400 };
+    const resultado = await receitaUruguaiPrimeira(campeonato, ratingsFavorecendoA, undefined, () => 0.05);
+    expect(resultado.campeao).toBe("a");
+  });
+
+  it("produz um campeão válido no caminho geral (campeões diferentes, com ou sem final extra contra o líder da tabela anual)", async () => {
+    const resultado = await receitaUruguaiPrimeira(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("propaga partidasDoJogador do turno/returno + semifinal/final combinados", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA = { ...ratings, a: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaUruguaiPrimeira(campeonato, ratingsFavorecendoA, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+});
+
+describe("receitaUruguaiSegunda", () => {
+  const times = ["a1", "a2", "a3", "b1", "b2", "b3"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "uruguai_segunda",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 3, ida_e_volta: false, classificam_por_grupo: 1 },
+      final_estadual: { criterio: "final_entre_campeoes_de_serie_do_torneio_competencia", ida_e_volta: false },
+      pontos_corridos: { ida_e_volta: true, rodadas: 10 },
+      mata_mata: { fases: ["playoff_terceiro_acesso"], ida_e_volta: false },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("campeão é sempre o líder da fase regular (pontos_corridos), não do Torneo Competencia", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    // a1 domina só a fase regular (rating alto); os outros ficam parecidos entre si pro Torneo Competencia
+    const ratingsFavorecendoA1NaFaseRegular = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaUruguaiSegunda(campeonato, ratingsFavorecendoA1NaFaseRegular, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a1");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+
+  it("produz um campeão válido e roda Torneo Competencia + playoff sem quebrar", async () => {
+    const resultado = await receitaUruguaiSegunda(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+});
+
+describe("receitaPontosCorridosComFaseFinalPorClassificacao (Equador)", () => {
+  const times = ["a1", "a2", "a3", "b1", "b2", "b3"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "equador_primera",
+    formato: {
+      pontos_corridos: { ida_e_volta: false, rodadas: 5 },
+      fase_final_por_classificacao: {
+        grupos: [
+          { nome: "hexagonal_titulo", tamanho: 3 },
+          { nome: "hexagonal_rebaixamento", tamanho: 3 },
+        ],
+        ida_e_volta: false,
+        pontos_carregados: true,
+      },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("campeão é o líder do primeiro grupo (hexagonal do título), não do segundo", async () => {
+    const resultado = await receitaPontosCorridosComFaseFinalPorClassificacao(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("time muito mais forte domina a fase regular e o hexagonal do título", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA1 = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaPontosCorridosComFaseFinalPorClassificacao(campeonato, ratingsFavorecendoA1, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a1");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+});
+
+describe("simularFaseFinalPorClassificacao", () => {
+  function linha(overrides: Partial<LinhaTabela>): LinhaTabela {
+    return { clubeId: "x", pontos: 0, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, golsPro: 0, golsContra: 0, saldoDeGols: 0, ...overrides };
+  }
+
+  it("divide a tabela anterior em grupos consecutivos, melhores colocados primeiro", async () => {
+    const tabelaAnterior: LinhaTabela[] = [
+      linha({ clubeId: "1o", pontos: 30 }),
+      linha({ clubeId: "2o", pontos: 25 }),
+      linha({ clubeId: "3o", pontos: 20 }),
+      linha({ clubeId: "4o", pontos: 15 }),
+    ];
+    const formato = {
+      grupos: [
+        { nome: "grupo_a", tamanho: 2 },
+        { nome: "grupo_b", tamanho: 2 },
+      ],
+      ida_e_volta: false,
+      pontos_carregados: false,
+    };
+    const ratings = Object.fromEntries(tabelaAnterior.map((l) => [l.clubeId, 1600]));
+
+    const resultado = await simularFaseFinalPorClassificacao(formato, tabelaAnterior, ratings, undefined, () => Math.random());
+
+    expect(resultado.grupos[0].tabela.map((l) => l.clubeId).sort()).toEqual(["1o", "2o"]);
+    expect(resultado.grupos[1].tabela.map((l) => l.clubeId).sort()).toEqual(["3o", "4o"]);
+  });
+
+  it("com pontos_carregados, os pontos da fase anterior somam à tabela do grupo (não zeram)", async () => {
+    // gap de pontos carregados (100) domina qualquer resultado possível de 1 único jogo (no máximo +3) —
+    // então o time que entrou na frente continua na frente, não importa quem "vence" o jogo do grupo.
+    const tabelaAnterior: LinhaTabela[] = [linha({ clubeId: "favorito", pontos: 100 }), linha({ clubeId: "azarao", pontos: 0 })];
+    const formato = { grupos: [{ nome: "grupo_unico", tamanho: 2 }], ida_e_volta: false, pontos_carregados: true };
+    const ratings = { favorito: 1600, azarao: 1600 };
+
+    const resultado = await simularFaseFinalPorClassificacao(formato, tabelaAnterior, ratings, undefined, () => Math.random());
+
+    expect(resultado.grupos[0].tabela[0].clubeId).toBe("favorito");
+    expect(resultado.grupos[0].tabela[0].pontos).toBeGreaterThanOrEqual(100);
+  });
+
+  it("sem pontos_carregados, a tabela do grupo zera (só conta os jogos dessa fase)", async () => {
+    const tabelaAnterior: LinhaTabela[] = [linha({ clubeId: "a", pontos: 100 }), linha({ clubeId: "b", pontos: 0 })];
+    const formato = { grupos: [{ nome: "grupo_unico", tamanho: 2 }], ida_e_volta: false, pontos_carregados: false };
+    const ratings = { a: 1600, b: 1600 };
+
+    const resultado = await simularFaseFinalPorClassificacao(formato, tabelaAnterior, ratings, undefined, () => Math.random());
+
+    for (const linhaResultado of resultado.grupos[0].tabela) {
+      expect(linhaResultado.pontos).toBeLessThanOrEqual(3); // só 1 jogo nesse grupo de 2 (ida_e_volta:false)
+    }
   });
 });

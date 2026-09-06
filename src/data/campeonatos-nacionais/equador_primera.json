@@ -6,9 +6,14 @@
   "ano_referencia": 2026,
   "formato": {
     "pontos_corridos": { "ida_e_volta": true, "rodadas": 30 },
-    "final_estadual": {
-      "criterio": "apos_a_fase_inicial_os_16_times_dividem_se_por_faixa_de_classificacao_em_3_grupos_que_jogam_turno_unico_entre_si_hexagonal_do_titulo_1o_a_6o_hexagonal_do_titulo_define_campeao_e_vagas_conmebol_quadrangular_internacional_7o_a_10o_disputa_vaga_extra_de_sulamericana_hexagonal_de_rebaixamento_11o_a_16o_define_os_2_rebaixados",
-      "ida_e_volta": true
+    "fase_final_por_classificacao": {
+      "grupos": [
+        { "nome": "hexagonal_titulo", "tamanho": 6 },
+        { "nome": "quadrangular_internacional", "tamanho": 4 },
+        { "nome": "hexagonal_rebaixamento", "tamanho": 6 }
+      ],
+      "ida_e_volta": true,
+      "pontos_carregados": true
     }
   },
   "premiacao": {

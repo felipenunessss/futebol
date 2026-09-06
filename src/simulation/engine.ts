@@ -1,11 +1,26 @@
-import type { EtapaMataMata, FormatoEstadual } from "../schemas/championship.js";
+import type { EtapaMataMata, FaseFinalPorClassificacao, FormatoEstadual } from "../schemas/championship.js";
 import type { Club } from "../schemas/club.js";
 import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularFaseDeGruposDoFormato, simularFaseQuadrangularDoFormato } from "./groups.js";
-import { simularEtapasMataMataParcial, simularFinalEstadualDoFormato, simularMataMataComEtapas, simularMataMataDoFormato, simularMataMataSimples, type EventoConfrontoMataMata } from "./knockout.js";
+import {
+  resolverConfronto,
+  simularEtapasMataMataParcial,
+  simularFinalEstadualDoFormato,
+  simularMataMataComEtapas,
+  simularMataMataDoFormato,
+  simularMataMataSimples,
+  type EventoConfrontoMataMata,
+} from "./knockout.js";
 import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "./match.js";
 import { obterRating } from "./rating.js";
-import { simularFaseUnicaDoFormato, simularTemporadaPontosCorridos, somarTabelas, type EventoConfrontoPontosCorridos, type ResultadoFaseUnica } from "./season.js";
+import {
+  simularFaseUnicaDoFormato,
+  simularTemporadaPontosCorridos,
+  somarTabelas,
+  type EventoConfrontoPontosCorridos,
+  type LinhaTabela,
+  type ResultadoFaseUnica,
+} from "./season.js";
 import { simularFaseSuica } from "./swiss.js";
 
 /**
@@ -420,6 +435,256 @@ export async function receitaFaseGruposComPreClassificatorioEMataMata(
   };
 }
 
+/**
+ * `turno` + `returno` + `fase_grupos` + `mata_mata` + `final_estadual`
+ * (Venezuela 1ª divisão): CADA torneio (Apertura/Clausura) tem sua
+ * própria mini-competição interna — os classificados do turno/returno
+ * entram numa `fase_grupos` (cuadrangulares) própria daquele torneio, que
+ * alimenta um `mata_mata` (final em jogo único) que decide o "campeão
+ * daquele torneio" — só DEPOIS os 2 campeões de torneio se enfrentam no
+ * `final_estadual` da temporada (mesmo clube campeão dos dois = campeão
+ * automático, `simularFinalEstadualDoFormato` já cobre 1 participante
+ * só). Confirmado via pesquisa (ver docs/dados-a-verificar.md).
+ */
+export async function receitaTurnoRetornoComGrupoEMataMataEFinal(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+  const mataMata = campeonato.formato.mata_mata!;
+
+  async function campeaoDoTorneio(faseUnica: ResultadoFaseUnica): Promise<{ campeao: string; partidas: ResultadoPartida[] }> {
+    const grupo = await simularFaseDeGruposDoFormato(campeonato.formato.fase_grupos!, faseUnica.classificados, ratings, random, participacaoJogador, resolverPartida);
+    const resultadoMataMata = await simularMataMataSimples(grupo.classificados, mataMata.fases, mataMata.ida_e_volta, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+    const partidasDoGrupo = grupo.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+    const partidasDoMataMata = resultadoMataMata.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+    return { campeao: resultadoMataMata.campeao, partidas: [...partidasDoGrupo, ...partidasDoMataMata] };
+  }
+
+  const apertura = await simularFaseUnicaDoFormato(campeonato.formato.turno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto, resolverPartida);
+  const clausura = await simularFaseUnicaDoFormato(campeonato.formato.returno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto, resolverPartida);
+  const { campeao: campeaoApertura, partidas: partidasApertura } = await campeaoDoTorneio(apertura);
+  const { campeao: campeaoClausura, partidas: partidasClausura } = await campeaoDoTorneio(clausura);
+
+  const participantesDaFinal = campeaoApertura === campeaoClausura ? [campeaoApertura] : [campeaoApertura, campeaoClausura];
+  const final = await simularFinalEstadualDoFormato(campeonato.formato.final_estadual!, participantesDaFinal, ratings, random, participacaoJogador, resolverPartida);
+
+  const partidasDoJogador = [
+    ...(apertura.partidasDoJogador ?? []).map((p) => p.resultado),
+    ...(clausura.partidasDoJogador ?? []).map((p) => p.resultado),
+    ...partidasApertura,
+    ...partidasClausura,
+    ...(final.confronto?.partidasDoJogador ?? []),
+  ];
+
+  return { campeao: final.campeao, partidasDoJogador };
+}
+
+/**
+ * Uruguai 1ª divisão (por id — mecanismo bem específico, não generalizável):
+ * Apertura e Clausura decididos pelo topo da própria tabela (não usam
+ * `classificam_proxima_fase` — o "Torneo Intermedio" real que usaria isso
+ * é uma competição à parte, só de vaga internacional, não modelada aqui,
+ * ver docs/dados-a-verificar.md). Mesmo clube campeão dos dois = campeão
+ * automático. Senão: semifinal entre os 2 campeões de torneio; se o líder
+ * da Tabla Anual (soma Apertura+Clausura) for um dos 2 semifinalistas,
+ * quem vencer a semifinal já é campeão; senão, o vencedor da semifinal
+ * ainda precisa vencer uma final contra o líder da Tabla Anual.
+ */
+export async function receitaUruguaiPrimeira(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const apertura = await simularFaseUnicaDoFormato(campeonato.formato.turno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto, resolverPartida);
+  const clausura = await simularFaseUnicaDoFormato(campeonato.formato.returno!, campeonato.times, ratings, random, participacaoJogador, aoSimularConfronto, resolverPartida);
+  const campeaoApertura = apertura.tabela[0].clubeId;
+  const campeaoClausura = clausura.tabela[0].clubeId;
+
+  const partidasDoTurnoEReturno = [...(apertura.partidasDoJogador ?? []), ...(clausura.partidasDoJogador ?? [])].map((p) => p.resultado);
+
+  if (campeaoApertura === campeaoClausura) {
+    return { campeao: campeaoApertura, partidasDoJogador: partidasDoTurnoEReturno };
+  }
+
+  const tabelaAnual = somarTabelas([apertura.tabela, clausura.tabela]);
+  const lider = tabelaAnual[0].clubeId;
+  const idaEVolta = campeonato.formato.mata_mata!.ida_e_volta;
+
+  const semifinal = await resolverConfronto(campeaoApertura, campeaoClausura, ratings, idaEVolta, random, participacaoJogador, resolverPartida);
+
+  let campeao: string;
+  let partidasDaFinal: ResultadoPartida[] = [];
+  if (lider === campeaoApertura || lider === campeaoClausura) {
+    campeao = semifinal.vencedor;
+  } else {
+    const final = await resolverConfronto(semifinal.vencedor, lider, ratings, idaEVolta, random, participacaoJogador, resolverPartida);
+    campeao = final.vencedor;
+    partidasDaFinal = final.partidasDoJogador ?? [];
+  }
+
+  return {
+    campeao,
+    partidasDoJogador: [...partidasDoTurnoEReturno, ...(semifinal.partidasDoJogador ?? []), ...partidasDaFinal],
+  };
+}
+
+/**
+ * Uruguai 2ª divisão (por id): Torneo Competencia (2 séries de 7, turno
+ * único cada, via `fase_grupos`, + final entre os 2 campeões de série via
+ * `final_estadual`) rodado à parte; o campeão da divisão (quem sobe
+ * direto) é sempre o líder da fase regular (`pontos_corridos`) — critério
+ * real confirmado. **Aproximação documentada**: o playoff pelo 3º acesso
+ * (`mata_mata`, fases: `["playoff_terceiro_acesso"]`) na vida real inclui
+ * condicionalmente o campeão do Torneo Competencia (só se ele não estiver
+ * já classificado direto nem em zona de descenso) — aqui usamos sempre as
+ * posições 3ª-6ª da tabela regular, sem essa condicional (não afeta quem é
+ * o campeão da divisão, só o detalhe de quem disputa a vaga extra).
+ */
+export async function receitaUruguaiSegunda(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+
+  const series = await simularFaseDeGruposDoFormato(campeonato.formato.fase_grupos!, campeonato.times, ratings, random, participacaoJogador, resolverPartida);
+  const campeoesDeSerie = series.grupos.map((g) => g.classificados[0]);
+  const finalTorneioCompetencia = await simularFinalEstadualDoFormato(campeonato.formato.final_estadual!, campeoesDeSerie, ratings, random, participacaoJogador, resolverPartida);
+
+  const regular = await simularTemporadaPontosCorridos(
+    campeonato.times,
+    ratings,
+    campeonato.formato.pontos_corridos!.ida_e_volta,
+    random,
+    participacaoJogador,
+    aoSimularConfronto,
+    resolverPartida,
+  );
+
+  const mataMata = campeonato.formato.mata_mata!;
+  const participantesDoPlayoff = regular.tabela.slice(2, 2 + Math.pow(2, mataMata.fases.length)).map((l) => l.clubeId);
+  const resultadoPlayoff = await simularMataMataSimples(participantesDoPlayoff, mataMata.fases, mataMata.ida_e_volta, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+
+  const partidasDoJogador = [
+    ...series.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado)),
+    ...(finalTorneioCompetencia.confronto?.partidasDoJogador ?? []),
+    ...(regular.partidasDoJogador ?? []).map((p) => p.resultado),
+    ...resultadoPlayoff.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? [])),
+  ];
+
+  return { campeao: regular.tabela[0].clubeId, partidasDoJogador };
+}
+
+/**
+ * Resolve uma `FaseFinalPorClassificacao` (ver `schemas/championship.ts`)
+ * a partir da tabela final de uma fase anterior — divide os times em
+ * grupos consecutivos (melhores colocados primeiro) do tamanho pedido por
+ * cada `grupos[].tamanho`, roda cada grupo como uma mini pontos-corridos
+ * independente e, se `pontos_carregados`, soma de volta os pontos que o
+ * time já tinha antes de entrar nessa fase (a tabela de cada grupo não
+ * "zera").
+ */
+export async function simularFaseFinalPorClassificacao(
+  formato: FaseFinalPorClassificacao,
+  tabelaAnterior: LinhaTabela[],
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number = Math.random,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<{ grupos: { nome: string; tabela: LinhaTabela[] }[]; partidasDoJogador: ResultadoPartida[] }> {
+  const grupos: { nome: string; tabela: LinhaTabela[] }[] = [];
+  const partidasDoJogador: ResultadoPartida[] = [];
+  const pontosAntes = new Map(tabelaAnterior.map((linha) => [linha.clubeId, linha.pontos]));
+
+  let indice = 0;
+  for (const grupoConfig of formato.grupos) {
+    const timesDoGrupo = tabelaAnterior.slice(indice, indice + grupoConfig.tamanho).map((linha) => linha.clubeId);
+    indice += grupoConfig.tamanho;
+
+    const participacaoDoGrupo = participacaoJogador && timesDoGrupo.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
+    const resultado = await simularTemporadaPontosCorridos(timesDoGrupo, ratings, formato.ida_e_volta, random, participacaoDoGrupo, undefined, resolverPartida);
+
+    let tabela = resultado.tabela;
+    if (formato.pontos_carregados) {
+      tabela = [...tabela]
+        .map((linha) => ({ ...linha, pontos: linha.pontos + (pontosAntes.get(linha.clubeId) ?? 0) }))
+        .sort((a, b) => b.pontos - a.pontos || b.saldoDeGols - a.saldoDeGols || b.golsPro - a.golsPro);
+    }
+
+    grupos.push({ nome: grupoConfig.nome, tabela });
+    partidasDoJogador.push(...(resultado.partidasDoJogador ?? []).map((p) => p.resultado));
+  }
+
+  return { grupos, partidasDoJogador };
+}
+
+/**
+ * `pontos_corridos` + `fase_final_por_classificacao` (Equador 1ª e 2ª
+ * divisão): fase regular decide a tabela, que é dividida em grupos
+ * consecutivos por classificação (não por sorteio/força) pra fase final —
+ * o campeão é o líder do PRIMEIRO grupo (o que reúne os melhores
+ * colocados: hexagonal do título no Equador, ver
+ * `schemas/championship.ts` `FaseFinalPorClassificacao`).
+ */
+export async function receitaPontosCorridosComFaseFinalPorClassificacao(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const aoSimularConfronto = eventos?.aoSimularConfrontoPontosCorridos
+    ? (evento: EventoConfrontoPontosCorridos) => eventos.aoSimularConfrontoPontosCorridos!(campeonato.id, evento)
+    : undefined;
+  const regular = await simularTemporadaPontosCorridos(
+    campeonato.times,
+    ratings,
+    campeonato.formato.pontos_corridos!.ida_e_volta,
+    random,
+    participacaoJogador,
+    aoSimularConfronto,
+    resolverPartida,
+  );
+
+  const faseFinal = await simularFaseFinalPorClassificacao(
+    campeonato.formato.fase_final_por_classificacao!,
+    regular.tabela,
+    ratings,
+    participacaoJogador,
+    random,
+    resolverPartida,
+  );
+
+  const partidasDoJogador = [...(regular.partidasDoJogador ?? []).map((p) => p.resultado), ...faseFinal.partidasDoJogador];
+
+  return { campeao: faseFinal.grupos[0].tabela[0].clubeId, partidasDoJogador };
+}
+
 type Receita = (
   campeonato: CampeonatoSimulavel,
   ratings: Record<string, number>,
@@ -470,6 +735,10 @@ function despacharReceitaGenerica(formato: FormatoEstadual): Receita {
       return receitaPontosCorridosComLiguilla;
     case "returno,turno":
       return receitaTurnoRetornoSomado;
+    case "fase_grupos,final_estadual,mata_mata,returno,turno":
+      return receitaTurnoRetornoComGrupoEMataMataEFinal;
+    case "fase_final_por_classificacao,pontos_corridos":
+      return receitaPontosCorridosComFaseFinalPorClassificacao;
     default:
       throw new Error(`sem receita de simulação genérica pra combinação de blocos [${blocos}]`);
   }
@@ -594,6 +863,8 @@ export async function receitaCarioca(
 const RECEITAS_POR_ID: Record<string, Receita> = {
   argentina_primera: receitaArgentina,
   carioca_a: receitaCarioca,
+  uruguai_primera: receitaUruguaiPrimeira,
+  uruguai_segunda: receitaUruguaiSegunda,
 };
 
 function escolherReceita(campeonato: CampeonatoSimulavel): Receita {

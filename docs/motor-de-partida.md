@@ -1338,13 +1338,13 @@ padrão de `receitaArgentina`):
   `ResolverPartida`, mesmo padrão de `season.ts`/`knockout.ts`/`groups.ts`
   — necessário porque a fase suíça agora está em competições ativas de
   verdade (antes só era exercitada em teste).
-- **Deferido, documentado como pendência** (`docs/dados-a-verificar.md`):
-  Uruguai, Venezuela, Peru, Colômbia, Equador (ambas as divisões de cada),
-  Argentina 2ª divisão, Copa Verde (`dupla_chave_regional`), Copa do
-  Nordeste — a maioria já tinha mecanismo real não totalmente confirmado
-  por fonte, ou (Argentina 2ª) o próprio torneio real ainda em andamento
-  sem chaveamento fechado. Implementar receita pra esses arriscaria
-  inventar regra sem confirmação — contra a convenção do projeto.
+- **Deferido nesta rodada, documentado como pendência**
+  (`docs/dados-a-verificar.md`): Peru, Colômbia, Argentina 2ª divisão,
+  Copa Verde (`dupla_chave_regional`), Copa do Nordeste — mecanismo real
+  ainda não totalmente confirmado por fonte (ou, no caso da Argentina 2ª,
+  o próprio torneio real ainda em andamento sem chaveamento fechado).
+  Uruguai/Venezuela/Equador, inicialmente também deferidos aqui, foram
+  pesquisados e implementados na seção 5.9 logo abaixo.
 - **Validado com dado real**: rodando `simularTemporada` com o calendário
   padrão de 2027 e todos os clubes reais carregados, 10 das 11
   competições ativas simulam com sucesso (campeões plausíveis: Flamengo/
@@ -1352,6 +1352,71 @@ padrão de `receitaArgentina`):
   Internacional no Gauchão, clubes CONMEBOL reais na Libertadores) — só a
   Sul-Americana continua com erro (documentado acima). Antes desta seção,
   só 4 das 11 simulavam.
+
+### 5.9. Receitas pra Uruguai, Venezuela e Equador, com pesquisa de regulamento real (implementado)
+
+Continuação da seção 5.8 — pedido explícito de confirmar regulamento nos
+sites oficiais (CONMEBOL/federações) antes de implementar as receitas
+deferidas. Uruguai, Venezuela e Equador foram pesquisados e implementados
+nesta rodada (fontes citadas em `docs/dados-a-verificar.md`); Colômbia,
+Peru, Argentina 2ª divisão e as copas regionais brasileiras continuam
+pendentes (uma pesquisa em lote travou num limite de sessão da API antes
+de completar essas 3 — refazer em sequência, não em paralelo).
+
+- **`schemas/championship.ts`**: novo bloco `FaseFinalPorClassificacao` —
+  depois de uma fase anterior (normalmente `pontos_corridos`), os times
+  são divididos em grupos de **tamanhos e propósitos diferentes**, na
+  ordem da tabela final dessa fase (não por sorteio nem grupos fixos,
+  diferente de `FaseGrupos`/`FaseQuadrangular`). `pontos_carregados`
+  opcional soma os pontos já conquistados em vez de zerar a tabela do
+  grupo. Cobre o Equador (única pendência de arquitetura de schema
+  identificada até agora, ver seção 6 antiga).
+- **`receitaPontosCorridosComFaseFinalPorClassificacao`** (genérica,
+  combo `fase_final_por_classificacao,pontos_corridos`) — Equador 1ª e 2ª
+  divisão: campeão é o líder do PRIMEIRO grupo (o que reúne os melhores
+  colocados). **Achado ao pesquisar**: o dado antigo de
+  `equador_segunda.json` (2 grupos de 6 desde o início) não batia com o
+  formato real 2025 — corrigido pra `pontos_corridos` único de 12 times
+  seguido de 2 hexagonais por classificação.
+- **`receitaTurnoRetornoComGrupoEMataMataEFinal`** (genérica, combo
+  `fase_grupos,final_estadual,mata_mata,returno,turno`) — Venezuela 1ª
+  divisão: cada torneio (Apertura/Clausura) tem sua própria mini-
+  competição interna (classificados do turno/returno → `fase_grupos`
+  própria → `mata_mata` próprio → "campeão do torneio"), só depois os 2
+  campeões de torneio se enfrentam no `final_estadual` da temporada
+  (mesmo clube campeão dos dois = campeão automático). **Bug de dado
+  corrigido**: `venezuela_primera.json` tinha `final_estadual.ida_e_volta:
+  false`, deveria ser `true` (confirmado por fonte). Venezuela 2ª divisão
+  usa a MESMA combinação de blocos (então cai na mesma receita
+  genérica), mas os números não reconciliam (`turno` classifica só 4,
+  `fase_grupos` pede 16) — erro claro ao rodar, documentado como
+  pendência em vez de forçar algo errado.
+- **`receitaUruguaiPrimeira`** (por id — mecanismo específico demais pra
+  generalizar): Apertura/Clausura decididos pelo topo da própria tabela;
+  mesmo clube campeão dos dois = campeão automático; senão, semifinal
+  entre os 2 campeões de torneio, e só precisa de uma final adicional
+  contra o líder da Tabela Anual se esse líder **não** for um dos 2
+  semifinalistas. **Achado ao pesquisar**: o dado tinha um `fase_grupos`
+  representando o "Torneo Intermedio" misturado com o mata-mata do
+  título (`mata_mata.fases` incluía `"final_torneo_intermedio"` junto de
+  `"semifinal_campeonato"/"final_campeonato"`) — confirmado que o Torneo
+  Intermedio é uma competição À PARTE (só vaga internacional, sem relação
+  com o título) — removido do dado (não modelado) em vez de simulado
+  errado.
+- **`receitaUruguaiSegunda`** (por id): Torneo Competencia (2 séries +
+  final, rodado à parte) não decide o campeão — confirmado que o campeão
+  da divisão é sempre o líder da fase regular (`pontos_corridos`).
+  **Aproximação documentada**: o playoff pelo 3º acesso na vida real
+  inclui condicionalmente o campeão do Torneo Competencia (só se ele não
+  estiver em zona de acesso direto nem de descenso) — aqui sempre usa as
+  posições 3ª-6ª da tabela regular, sem essa condicional (não afeta quem
+  é campeão, só o detalhe de quem disputa a vaga extra).
+- **Validado com dado real**: rodando as 5 receitas novas direto com os
+  campeonatos/clubes reais carregados (nenhuma delas está no calendário
+  padrão hoje — calendário só cobre Brasil + continentais), todas
+  produzem campeões plausíveis (Deportivo Táchira na Venezuela, Peñarol
+  no Uruguai, Independiente del Valle no Equador) sem erro, em várias
+  rodadas com RNG real (`Math.random()`).
 
 ## 6. Pendências / próximos passos
 
@@ -1515,13 +1580,15 @@ padrão de `receitaArgentina`):
   jogo ao vivo não tem "escalação"/lesão real durante a partida — só a
   chance do jogador e eventos de contexto pausam, o resto do time
   segue sendo Camada 1 (duelo agregado), igual antes.
-- **Receitas de simulação ainda faltando** (ver seção 5.8): Uruguai,
-  Venezuela, Peru, Colômbia, Equador (1ª e 2ª divisão de cada), Argentina
-  2ª divisão, Copa Verde (`dupla_chave_regional`), Copa do Nordeste — só
-  entram no calendário de uma carreira brasileira se algum dia
-  `data/loaders/calendario.ts` passar a incluir competições
-  internacionais além das continentais atuais. Sul-Americana tem receita
-  (mesma função de Libertadores) mas erra sempre — mecanismo real das
-  etapas "repescagem"/"oitavas"/"quartas" não fecha com o tamanho da fase
-  de grupos, possível dependência cross-competição com a Libertadores
-  (ver `docs/dados-a-verificar.md`).
+- **Receitas de simulação ainda faltando** (ver seções 5.8/5.9): Peru,
+  Colômbia (1ª e 2ª divisão), Argentina 2ª divisão, Copa Verde
+  (`dupla_chave_regional`), Copa do Nordeste — só entram no calendário de
+  uma carreira brasileira se algum dia `data/loaders/calendario.ts`
+  passar a incluir competições internacionais além das continentais
+  atuais. Venezuela 2ª divisão tem receita (mesma função da 1ª) mas erra
+  sempre — os números não reconciliam (`turno` classifica só 4,
+  `fase_grupos` pede 16), ver `docs/dados-a-verificar.md`.
+  Sul-Americana tem receita (mesma função de Libertadores) mas erra
+  sempre — mecanismo real das etapas "repescagem"/"oitavas"/"quartas" não
+  fecha com o tamanho da fase de grupos, possível dependência
+  cross-competição com a Libertadores (ver `docs/dados-a-verificar.md`).

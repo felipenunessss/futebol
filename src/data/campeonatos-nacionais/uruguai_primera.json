@@ -7,9 +7,8 @@
   "formato": {
     "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
     "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
-    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 8, "ida_e_volta": false, "classificam_por_grupo": 1 },
     "mata_mata": {
-      "fases": ["final_torneo_intermedio", "semifinal_campeonato", "final_campeonato"],
+      "fases": ["semifinal_campeonato", "final_campeonato"],
       "ida_e_volta": false
     }
   },

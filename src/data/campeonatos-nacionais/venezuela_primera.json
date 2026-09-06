@@ -10,7 +10,7 @@
     "fase_grupos": { "num_grupos": 2, "times_por_grupo": 4, "ida_e_volta": true, "classificam_por_grupo": 1 },
     "mata_mata": { "fases": ["final_do_apertura_ou_clausura"], "ida_e_volta": false },
     "tabela_acumulada": { "criterio": "soma_das_fases_regulares_define_vagas_internacionais_e_rebaixamento" },
-    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura_ou_campeao_absoluto_automatico_se_o_mesmo_time_vencer_os_dois_torneios", "ida_e_volta": false }
+    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura_ou_campeao_absoluto_automatico_se_o_mesmo_time_vencer_os_dois_torneios", "ida_e_volta": true }
   },
   "premiacao": {
     "vaga_libertadores": 4,

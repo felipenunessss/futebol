@@ -91,6 +91,24 @@ export interface DuplaChaveRegional {
 }
 
 /**
+ * Fase final formada por CLASSIFICAÇÃO (não sorteio nem grupos fixos) —
+ * depois de uma fase anterior (normalmente `pontos_corridos`), os times
+ * são divididos em grupos de tamanhos possivelmente diferentes, cada um
+ * com um propósito diferente (título, vaga internacional, rebaixamento),
+ * na ordem da tabela final dessa fase anterior. Ex: Equador 1ª divisão
+ * (hexagonal do título 1º-6º, quadrangular internacional 7º-10º,
+ * hexagonal de rebaixamento 11º-16º) e 2ª divisão (hexagonal de acesso
+ * 1º-6º, hexagonal de descenso 7º-12º) — ver docs/dados-a-verificar.md.
+ */
+export interface FaseFinalPorClassificacao {
+  /** Em ordem, do grupo que reúne os melhores colocados da fase anterior ao que reúne os piores — a soma dos `tamanho` deve fechar com o total de times da competição. */
+  grupos: { nome: string; tamanho: number }[];
+  ida_e_volta: boolean;
+  /** Se `true`, os pontos da fase anterior são mantidos (somados), não zerados, ao entrar nesta fase. */
+  pontos_carregados: boolean;
+}
+
+/**
  * Blocos de formato opcionais — cada estado ativa só os que usa de verdade,
  * conforme doc seção 2.2.
  */
@@ -105,6 +123,7 @@ export interface FormatoEstadual {
   dupla_chave_regional?: DuplaChaveRegional;
   mata_mata?: MataMata;
   final_estadual?: FinalEstadual;
+  fase_final_por_classificacao?: FaseFinalPorClassificacao;
 }
 
 export interface Premiacao {
