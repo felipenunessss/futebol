@@ -397,6 +397,79 @@ describe("jogarTemporada — status no clube", () => {
   });
 });
 
+describe("modo de partida ao vivo (escolherModoDePartida/jogarPartidaAoVivo)", () => {
+  it("escolherModoDePartida é chamado uma vez por partida do jogador, com numeroDaPartida/lado/mandanteId/visitanteId", async () => {
+    const times = ["a", "b", "c", "d"];
+    const contextos: { numeroDaPartida: number; lado: string; mandanteId: string; visitanteId: string }[] = [];
+
+    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: (contexto) => {
+        contextos.push(contexto);
+        return "rapida";
+      },
+    });
+
+    const totalPartidasDoJogador = resultado.resultadoTemporada.competicoes.reduce((soma, c) => soma + (c.resultado?.partidasDoJogador.length ?? 0), 0);
+    expect(contextos).toHaveLength(totalPartidasDoJogador);
+    expect(contextos.map((c) => c.numeroDaPartida)).toEqual(Array.from({ length: totalPartidasDoJogador }, (_, i) => i + 1));
+    for (const contexto of contextos) {
+      expect(["casa", "fora"]).toContain(contexto.lado);
+      expect([contexto.mandanteId, contexto.visitanteId]).toContain("a"); // clube do jogador nos testes é sempre "a"
+    }
+  });
+
+  it("sem escolherModoDePartida, nunca chama decidirChanceAoVivo/onEventoAoVivo (continua tudo instantâneo)", async () => {
+    const times = ["a", "b", "c", "d"];
+    let chamouDecisao = false;
+    let chamouEvento = false;
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      decidirChanceAoVivo: () => {
+        chamouDecisao = true;
+        return { ajusteForcaJogador: 0, ajusteForcaDefensiva: 0 };
+      },
+      onEventoAoVivo: () => {
+        chamouEvento = true;
+      },
+    });
+
+    expect(chamouDecisao).toBe(false);
+    expect(chamouEvento).toBe(false);
+  });
+
+  it("modo 'ao_vivo': narra eventos (chance genérica/do jogador/contexto/apito final) e devolve o impacto do evento de contexto resolvido", async () => {
+    const times = ["a", "b", "c", "d"];
+    const eventos: import("../../src/simulation/live-match.js").EventoAoVivo[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.1, // baixo o bastante pra sempre sortear evento de contexto (ver simulation/live-match.ts)
+      msPorMinutoAoVivo: 0,
+      maxEventosDeContextoAoVivo: 1,
+      escolherModoDePartida: (contexto) => (contexto.numeroDaPartida === 1 ? "ao_vivo" : "rapida"),
+      decidirEventoDePartida: (cenario) => cenario.opcoes[cenario.opcoes.length - 1], // opção "segura", garantida (probabilidade 1)
+      onEventoAoVivo: (evento) => {
+        eventos.push(evento);
+      },
+    });
+
+    const tipos = eventos.map((e) => e.tipo);
+    expect(tipos[tipos.length - 1]).toBe("apito_final"); // último evento é sempre o apito final
+    expect(tipos).toContain("evento_de_contexto");
+
+    const eventoDeContexto = eventos.find((e) => e.tipo === "evento_de_contexto");
+    if (eventoDeContexto?.tipo === "evento_de_contexto") {
+      expect(eventoDeContexto.escolha.resultado.probabilidade).toBe(1); // opção "segura" escolhida acima é sempre garantida
+      expect(eventoDeContexto.escolha.resultado.impacto.narrativa).toBeTruthy();
+    }
+
+    // sem escolherModoDePartida devolver "ao_vivo" pra numeroDaPartida > 1, o resto da temporada segue instantâneo,
+    // então só a 1ª partida do jogador gera eventos de chance (genérica ou do jogador) — smoke test de que não travou/quebrou.
+    expect(tipos.some((t) => t === "chance_generica" || t === "chance_jogador")).toBe(true);
+  });
+});
+
 describe("jogarCarreira", () => {
   it("encadeia N temporadas, uma alimentando a próxima", async () => {
     const times = ["a", "b", "c", "d"];

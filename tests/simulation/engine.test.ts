@@ -9,31 +9,31 @@ function clube(id: string, rating = 1600): Club {
 }
 
 describe("simularTemporada", () => {
-  it("simula pontos_corridos genérico (ex: brasileirao_serie_a) e devolve um campeão", () => {
+  it("simula pontos_corridos genérico (ex: brasileirao_serie_a) e devolve um campeão", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times }];
     const clubes = times.map((id) => clube(id));
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
 
     expect(competicao.erro).toBeUndefined();
     expect(times).toContain(competicao.resultado!.campeao);
   });
 
-  it("simula mata_mata genérico (ex: copa_do_brasil) e devolve um campeão", () => {
+  it("simula mata_mata genérico (ex: copa_do_brasil) e devolve um campeão", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "copa_do_brasil", formato: { mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } }, times }];
     const clubes = times.map((id) => clube(id));
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "copa_do_brasil")!;
 
     expect(competicao.erro).toBeUndefined();
     expect(times).toContain(competicao.resultado!.campeao);
   });
 
-  it("simula fase_grupos + mata_mata genérico (a maioria dos estaduais) e devolve um campeão", () => {
+  it("simula fase_grupos + mata_mata genérico (a maioria dos estaduais) e devolve um campeão", async () => {
     const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
     const campeonatos = [
       {
@@ -47,14 +47,14 @@ describe("simularTemporada", () => {
     ];
     const clubes = times.map((id) => clube(id));
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "paulistao_a1")!;
 
     expect(competicao.erro).toBeUndefined();
     expect(times).toContain(competicao.resultado!.campeao);
   });
 
-  it("competição com combinação de blocos sem receita vem com erro, sem derrubar as outras", () => {
+  it("competição com combinação de blocos sem receita vem com erro, sem derrubar as outras", async () => {
     // "carioca_a" tem a MESMA combinação de blocos que "argentina_primera" (final_estadual+returno+turno),
     // mas não tem receita por id registrada — confirma que a receita da Argentina é por id, não por formato.
     // "carioca_a" e "brasileirao_serie_a" são ids referenciados pelo calendário padrão de verdade (calendario.ts)
@@ -64,7 +64,7 @@ describe("simularTemporada", () => {
     ];
     const clubes = [clube("a"), clube("b")];
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
     const carioca = resultado.competicoes.find((c) => c.campeonatoId === "carioca_a")!;
     const serieA = resultado.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
 
@@ -74,26 +74,26 @@ describe("simularTemporada", () => {
     expect(serieA.resultado).toBeDefined();
   });
 
-  it("competição referenciada no calendário mas ausente da lista de campeonatos vem com erro", () => {
-    const resultado = simularTemporada(2027, [], [], undefined, () => Math.random());
+  it("competição referenciada no calendário mas ausente da lista de campeonatos vem com erro", async () => {
+    const resultado = await simularTemporada(2027, [], [], undefined, () => Math.random());
     const qualquer = resultado.competicoes[0];
     expect(qualquer.erro).toMatch(/não encontrada/);
   });
 
-  it("com participacaoJogador, a competição do clube dele acumula partidasDoJogador", () => {
+  it("com participacaoJogador, a competição do clube dele acumula partidasDoJogador", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times }];
     const clubes = times.map((id) => clube(id));
     const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
     const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, participacao, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, participacao, () => Math.random());
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
 
     expect(competicao.resultado!.partidasDoJogador.length).toBeGreaterThan(0);
   });
 
-  it("receitaArgentina simula como Tabla Anual (soma turno+returno), não como final de jogo isolada", () => {
+  it("receitaArgentina simula como Tabla Anual (soma turno+returno), não como final de jogo isolada", async () => {
     // "argentina_primera" ainda não é referenciada pelo calendário padrão (ver comentário da receita
     // em engine.ts), então testamos a função diretamente em vez de passar por simularTemporada.
     const times = ["a", "b", "c", "d"];
@@ -108,13 +108,13 @@ describe("simularTemporada", () => {
     };
     const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
 
-    const resultado = receitaArgentina(campeonato, ratings, undefined, () => Math.random());
+    const resultado = await receitaArgentina(campeonato, ratings, undefined, () => Math.random());
 
     expect(times).toContain(resultado.campeao);
     expect(resultado.partidasDoJogador).toEqual([]);
   });
 
-  it("receitaArgentina propaga partidasDoJogador do Apertura e do Clausura combinados", () => {
+  it("receitaArgentina propaga partidasDoJogador do Apertura e do Clausura combinados", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonato: CampeonatoSimulavel = {
       id: "argentina_primera",
@@ -129,33 +129,33 @@ describe("simularTemporada", () => {
     const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
     const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
 
-    const resultado = receitaArgentina(campeonato, ratings, participacao, () => Math.random());
+    const resultado = await receitaArgentina(campeonato, ratings, participacao, () => Math.random());
 
     // "a" joga contra os outros 3, uma vez no turno e uma no returno = 6 partidas
     expect(resultado.partidasDoJogador).toHaveLength(2 * (times.length - 1));
   });
 
-  it("clube do jogador fora da competição: partidasDoJogador fica vazio", () => {
+  it("clube do jogador fora da competição: partidasDoJogador fica vazio", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times }];
     const clubes = times.map((id) => clube(id));
     const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
     const participacao: ParticipacaoJogadorClube = { clubeId: "outro_clube", jogador, estiloTecnico: "equilibrado" };
 
-    const resultado = simularTemporada(2027, campeonatos, clubes, participacao, () => Math.random());
+    const resultado = await simularTemporada(2027, campeonatos, clubes, participacao, () => Math.random());
     const competicao = resultado.competicoes.find((c) => c.campeonatoId === "brasileirao_serie_a")!;
 
     expect(competicao.resultado!.partidasDoJogador).toEqual([]);
   });
 
-  it("aoSimularConfrontoPontosCorridos é chamado com o campeonatoId certo, uma vez por confronto", () => {
+  it("aoSimularConfrontoPontosCorridos é chamado com o campeonatoId certo, uma vez por confronto", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "brasileirao_serie_a", formato: { pontos_corridos: { ida_e_volta: true, rodadas: 6 } }, times }];
     const clubes = times.map((id) => clube(id));
     const campeonatoIds = new Set<string>();
     let contagem = 0;
 
-    simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
+    await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
       aoSimularConfrontoPontosCorridos: (campeonatoId) => {
         campeonatoIds.add(campeonatoId);
         contagem++;
@@ -166,14 +166,14 @@ describe("simularTemporada", () => {
     expect(contagem).toBe((times.length - 1) * times.length); // ida e volta, 4 times: 12 confrontos
   });
 
-  it("aoResolverConfrontoMataMata é chamado com o campeonatoId certo, uma vez por confronto", () => {
+  it("aoResolverConfrontoMataMata é chamado com o campeonatoId certo, uma vez por confronto", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonatos = [{ id: "copa_do_brasil", formato: { mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } }, times }];
     const clubes = times.map((id) => clube(id));
     const campeonatoIds = new Set<string>();
     let contagem = 0;
 
-    simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
+    await simularTemporada(2027, campeonatos, clubes, undefined, () => Math.random(), {
       aoResolverConfrontoMataMata: (campeonatoId) => {
         campeonatoIds.add(campeonatoId);
         contagem++;

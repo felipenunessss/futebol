@@ -1,7 +1,7 @@
 import type { FaseGrupos, FaseQuadrangular } from "../schemas/championship.js";
 import type { Confronto, LinhaTabela, PartidaDoJogador } from "./season.js";
 import { simularTemporadaPontosCorridos } from "./season.js";
-import type { ParticipacaoJogadorClube } from "./match.js";
+import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida } from "./match.js";
 
 /**
  * Gerador/simulador de fase de grupos (`formato.fase_grupos`, ver
@@ -64,20 +64,22 @@ export interface ResultadoFaseDeGrupos {
 }
 
 /** Simula todos os grupos (cada um como uma mini temporada de pontos corridos) e extrai os classificados de cada um. */
-export function simularFaseDeGrupos(
+export async function simularFaseDeGrupos(
   grupos: Grupo[],
   ratings: Record<string, number>,
   idaEVolta: boolean,
   classificamPorGrupo: number,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
-): ResultadoFaseDeGrupos {
-  const resultados: ResultadoGrupo[] = grupos.map((grupo) => {
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoFaseDeGrupos> {
+  const resultados: ResultadoGrupo[] = [];
+  for (const grupo of grupos) {
     const participacaoDoGrupo = participacaoJogador && grupo.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
-    const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(grupo.times, ratings, idaEVolta, random, participacaoDoGrupo);
+    const { confrontos, tabela, partidasDoJogador } = await simularTemporadaPontosCorridos(grupo.times, ratings, idaEVolta, random, participacaoDoGrupo, undefined, resolverPartida);
     const classificados = tabela.slice(0, classificamPorGrupo).map((linha) => linha.clubeId);
-    return { nome: grupo.nome, confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) };
-  });
+    resultados.push({ nome: grupo.nome, confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) });
+  }
 
   return {
     grupos: resultados,
@@ -93,13 +95,14 @@ export function simularFaseDeGrupos(
  * de grupos, sem os times de fase preliminar (ver `formato.mata_mata.etapas`
  * quando a competição tem entrada escalonada, como Libertadores/Sul-Americana).
  */
-export function simularFaseDeGruposDoFormato(
+export async function simularFaseDeGruposDoFormato(
   formato: FaseGrupos,
   times: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
-): ResultadoFaseDeGrupos {
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoFaseDeGrupos> {
   const esperado = formato.num_grupos * formato.times_por_grupo;
   if (times.length !== esperado) {
     throw new Error(
@@ -108,7 +111,7 @@ export function simularFaseDeGruposDoFormato(
   }
 
   const grupos = dividirEmGruposPorForca(times, formato.num_grupos, ratings);
-  return simularFaseDeGrupos(grupos, ratings, formato.ida_e_volta, formato.classificam_por_grupo, random, participacaoJogador);
+  return simularFaseDeGrupos(grupos, ratings, formato.ida_e_volta, formato.classificam_por_grupo, random, participacaoJogador, resolverPartida);
 }
 
 /**
@@ -121,14 +124,15 @@ export function simularFaseDeGruposDoFormato(
  * `true` reflete isso; passe `false` se a fonte específica disser turno
  * único) e com um flag `ativa` que precisa estar ligado.
  */
-export function simularFaseQuadrangularDoFormato(
+export async function simularFaseQuadrangularDoFormato(
   formato: FaseQuadrangular,
   times: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
   idaEVolta = true,
   participacaoJogador?: ParticipacaoJogadorClube,
-): ResultadoFaseDeGrupos {
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoFaseDeGrupos> {
   if (!formato.ativa) {
     throw new Error("simularFaseQuadrangularDoFormato: formato.ativa é false — essa fase não deveria estar rodando");
   }
@@ -139,5 +143,6 @@ export function simularFaseQuadrangularDoFormato(
     ratings,
     random,
     participacaoJogador,
+    resolverPartida,
   );
 }

@@ -51,15 +51,15 @@ describe("simularFaseDeGrupos", () => {
   ];
   const ratings = Object.fromEntries(grupos.flatMap((g) => g.times).map((t) => [t, 1600]));
 
-  it("classifica exatamente classificamPorGrupo times de cada grupo", () => {
-    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
+  it("classifica exatamente classificamPorGrupo times de cada grupo", async () => {
+    const resultado = await simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
     expect(resultado.grupos).toHaveLength(2);
     for (const grupo of resultado.grupos) expect(grupo.classificados).toHaveLength(2);
     expect(resultado.classificados).toHaveLength(4);
   });
 
-  it("só classifica times que realmente jogaram naquele grupo", () => {
-    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
+  it("só classifica times que realmente jogaram naquele grupo", async () => {
+    const resultado = await simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
     const classificadosGrupoA = resultado.grupos[0].classificados;
     for (const time of classificadosGrupoA) expect(grupos[0].times).toContain(time);
   });
@@ -70,15 +70,15 @@ describe("simularFaseDeGruposDoFormato", () => {
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
   const formato: FaseGrupos = { num_grupos: 2, times_por_grupo: 4, ida_e_volta: true, classificam_por_grupo: 2 };
 
-  it("lê num_grupos/times_por_grupo/classificam_por_grupo do bloco de formato", () => {
-    const resultado = simularFaseDeGruposDoFormato(formato, times, ratings, () => Math.random());
+  it("lê num_grupos/times_por_grupo/classificam_por_grupo do bloco de formato", async () => {
+    const resultado = await simularFaseDeGruposDoFormato(formato, times, ratings, () => Math.random());
     expect(resultado.grupos).toHaveLength(2);
     expect(resultado.classificados).toHaveLength(4);
   });
 
-  it("lança erro se o número de times não bater com num_grupos × times_por_grupo", () => {
-    expect(() => simularFaseDeGruposDoFormato(formato, times.slice(0, 7), ratings)).toThrow();
-    expect(() => simularFaseDeGruposDoFormato(formato, [...times, "i"], ratings)).toThrow();
+  it("lança erro se o número de times não bater com num_grupos × times_por_grupo", async () => {
+    await expect(simularFaseDeGruposDoFormato(formato, times.slice(0, 7), ratings)).rejects.toThrow();
+    await expect(simularFaseDeGruposDoFormato(formato, [...times, "i"], ratings)).rejects.toThrow();
   });
 });
 
@@ -87,15 +87,15 @@ describe("simularFaseQuadrangularDoFormato", () => {
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
   const formato: FaseQuadrangular = { ativa: true, num_grupos: 2, times_por_grupo: 4, classificam_por_grupo: 2 };
 
-  it("funciona igual a simularFaseDeGruposDoFormato (mesma estrutura, sem campo ida_e_volta próprio)", () => {
-    const resultado = simularFaseQuadrangularDoFormato(formato, times, ratings, () => Math.random());
+  it("funciona igual a simularFaseDeGruposDoFormato (mesma estrutura, sem campo ida_e_volta próprio)", async () => {
+    const resultado = await simularFaseQuadrangularDoFormato(formato, times, ratings, () => Math.random());
     expect(resultado.grupos).toHaveLength(2);
     expect(resultado.classificados).toHaveLength(4);
   });
 
-  it("lança erro se formato.ativa for false", () => {
+  it("lança erro se formato.ativa for false", async () => {
     const inativo: FaseQuadrangular = { ...formato, ativa: false };
-    expect(() => simularFaseQuadrangularDoFormato(inativo, times, ratings)).toThrow(/ativa/);
+    await expect(simularFaseQuadrangularDoFormato(inativo, times, ratings)).rejects.toThrow(/ativa/);
   });
 });
 
@@ -107,9 +107,9 @@ describe("simularFaseDeGrupos com participação do jogador", () => {
   const ratings = Object.fromEntries(grupos.flatMap((g) => g.times).map((t) => [t, 1600]));
   const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
 
-  it("só o grupo que contém o clube do jogador ganha partidasDoJogador", () => {
+  it("só o grupo que contém o clube do jogador ganha partidasDoJogador", async () => {
     const participacao: ParticipacaoJogadorClube = { clubeId: "e", jogador, estiloTecnico: "equilibrado" }; // está no Grupo B
-    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random(), participacao);
+    const resultado = await simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random(), participacao);
 
     const grupoA = resultado.grupos.find((g) => g.nome === "Grupo A")!;
     const grupoB = resultado.grupos.find((g) => g.nome === "Grupo B")!;
@@ -119,8 +119,8 @@ describe("simularFaseDeGrupos com participação do jogador", () => {
     expect(grupoB.partidasDoJogador!.length).toBeGreaterThan(0);
   });
 
-  it("sem participacaoJogador, nenhum grupo tem partidasDoJogador", () => {
-    const resultado = simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
+  it("sem participacaoJogador, nenhum grupo tem partidasDoJogador", async () => {
+    const resultado = await simularFaseDeGrupos(grupos, ratings, true, 2, () => Math.random());
     for (const grupo of resultado.grupos) expect(grupo.partidasDoJogador).toBeUndefined();
   });
 });

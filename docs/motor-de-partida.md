@@ -1149,6 +1149,110 @@ prestígio das propostas de mercado — inclusive o caso concreto pedido:
   produzem ofertas distintas em vez de sempre convergirem pro mesmo
   resultado só pela diferença de rating.
 
+### 5.7. Simulação de partida ao vivo + menu de modo (implementado)
+
+Pedido explícito: "quero ver os jogos passarem" — um menu, antes de cada
+partida do clube do jogador, com 3 opções: (1) simulação rápida, direto
+pro resultado; (2) simular até a metade da temporada, sem perguntar de
+novo; (3) simular o jogo ao vivo, com os 90 minutos passando de forma
+corrida e pausando de verdade quando aparece um evento importante.
+
+**Descoberta central**: antes disso, `simulation/season.ts`/`knockout.ts`/
+`groups.ts`/`engine.ts` eram 100% síncronos — `simularTemporada` resolvia
+a temporada inteira (todas as competições, todas as rodadas) numa rajada
+só, e os hooks existentes (`aoSimularConfronto`/`aoResolverConfronto`) só
+avisavam **depois** de cada confronto já resolvido — dava pra **mostrar**
+jogo a jogo (`carreira-loop --jogo-a-jogo`), mas não pra **pausar** no meio
+de uma partida específica esperando uma decisão real. O comentário antigo
+em `career/career-loop.ts` (`onPartidaPontosCorridos`) já registrava essa
+limitação como pendência conhecida — esta seção é ela sendo resolvida.
+
+- **`simulation/match.ts`**: novo tipo `ResolverPartida` — o ponto de
+  injeção que `season.ts`/`knockout.ts`/`groups.ts` agora chamam em vez de
+  invocar `simularPartida` direto. Assinatura aceita `Promise` (por isso
+  todo mundo na cadeia virou `async function`), mas o resolvedor padrão
+  (`resolverPartidaPadrao`) só chama `simularPartida` normalmente — **nenhum
+  comportamento muda pra quem não injeta nada**, só a assinatura ganha
+  `await` a mais. `ContextoConfronto` (mandante/visitante) é passado junto,
+  meramente informativo, pra quem for perguntar "contra quem é esse jogo"
+  antes de decidir o modo. `CHANCES_BASE_POR_PARTIDA`/
+  `VANTAGEM_MAXIMA_DE_MEIO`/`PESO_ENVOLVIMENTO_ATAQUE`/`forcaDoAtributo`/
+  `resolverDuelo` viraram exports (eram privados) pra `live-match.ts`
+  reaproveitar a mesma matemática sem duplicar.
+- **`simulation/live-match.ts`** (novo módulo) — `jogarPartidaAoVivo`:
+  reimplementa a mesma conta de `simularPartida` (chances totais/fatia
+  casa-fora do duelo de meio), mas monta uma **linha do tempo ordenada por
+  minuto** (cada chance sorteia seu próprio minuto 1-90) em vez de resolver
+  tudo de uma vez. Três tipos de parada:
+  - **Chance genérica** (não é do jogador): resolvida na hora, só narrada
+    (`onEvento`), sem pausa.
+  - **Chance do jogador**: pausa de verdade (`decidirChance`) — o
+    `ContextoDecisaoChance` (minuto/subtipo/atributo) vai pra quem chama, e
+    o `ResultadoDecisaoChance` (ajuste de força pro jogador e/ou pro
+    adversário) volta e **entra direto no duelo antes dele ser resolvido**
+    — a decisão muda a probabilidade de verdade, não é só narrativa (era a
+    exigência explícita: "muda a probabilidade de verdade, depois retoma
+    o jogo de onde parou"). Sem `decidirChance`, resolve sem ajuste nenhum.
+  - **Evento de contexto**: sorteado do novo catálogo
+    `progression/match-events.ts` `EVENTOS_DE_PARTIDA` (cartão duvidoso,
+    disputa dura de bola, provocação da torcida, cãibra no fim do jogo,
+    cobrança de companheiro — 5 eventos, mesmo formato de
+    `progression/scenarios.ts` `Cenario`/`Opcao`, só que **catálogo
+    separado e sem `gatilho`**: o motor de partida não tem acesso a
+    contexto de carreira, e a maior parte do catálogo principal é sobre
+    decisões fora de campo, sem sentido como pausa em pleno jogo). Pausa
+    via `decidirEventoDeContexto`; o impacto (moral/relações internas — só
+    isso, nunca atributo, porque o motor de partida não sabe a posição do
+    jogador pra saber qual atributo seria seguro mexer) sai no retorno
+    (`impactosDeContexto`) pra quem orquestra aplicar depois — `live-match.ts`
+    não conhece `EstadoDeCarreira` (`simulation/*` não depende de
+    `career/*`).
+  - `msPorMinuto` (padrão ~220ms, ~90 min em ~20s) e `maxEventosDeContexto`
+    (padrão 2, cada um com 35% de chance de acontecer de verdade) são
+    configuráveis — em teste, sempre 0/desligado, pra não esperar de
+    verdade.
+- **`career/career-loop.ts`**: `OpcoesJogarTemporada` ganha
+  `escolherModoDePartida` (`ContextoPartidaDoJogador`: número sequencial
+  da partida do jogador na temporada, lado, mandante/visitante ->
+  `ModoDePartida`: `"rapida"` ou `"ao_vivo"`), `decidirChanceAoVivo`,
+  `decidirEventoDePartida`, `onEventoAoVivo`. `jogarTemporada` monta seu
+  próprio `ResolverPartida` internamente: sem `participacaoJogador` (não é
+  o clube do jogador) ou sem `escolherModoDePartida` injetado, cai direto
+  no `resolverPartidaPadrao`; senão, pergunta o modo, e se for `"ao_vivo"`
+  chama `jogarPartidaAoVivo`, acumulando os `impactosDeContexto` numa lista
+  (`impactosDePartidaAoVivo`) aplicada ao `estadoAtual` (via
+  `aplicarImpactoDeCenario`) logo depois que `simularTemporada` termina —
+  **não existe um 3º modo "simular até a metade" no motor**: essa lógica
+  ("parar de perguntar por um tempo") é inteiramente de quem implementa
+  `escolherModoDePartida` (ver CLI abaixo); `jogarTemporada` só chama de
+  novo a cada partida e usa o que vier.
+- **CLI interativa (`jogar`)**: `escolherModoDePartidaInterativo` mostra o
+  menu de 3 opções antes de cada partida do clube do jogador — a opção 2
+  guarda `numeroDaPartida + PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA`
+  (constante fixa, hoje 25) e para de perguntar até passar desse número,
+  **estimativa de design**: não dá pra saber de antemão quantas partidas o
+  clube do jogador vai ter na temporada inteira nesse ponto do motor (cada
+  competição só conhece o próprio calendário, ver `simulation/engine.ts`),
+  então "metade da temporada" não é uma conta exata. `decidirChanceAoVivoInterativo`
+  oferece 2 opções (arriscar vs. ajeitar com mais categoria, ajustes de
+  força diferentes); `decidirEventoDePartida` reaproveita
+  `escolherOpcaoInterativa` (mesmo formato de `Cenario`/`Opcao` dos
+  cenários de carreira, então o mesmo renderizador serve pros dois sem
+  duplicar); `onEventoAoVivoInterativo` narra cada evento em tempo real.
+- **Validado**: suíte de testes (`tests/simulation/live-match.test.ts`,
+  `tests/progression/match-events.test.ts`, describe
+  `"modo de partida ao vivo"` em `tests/career/career-loop.test.ts`) cobre
+  o mecanismo isoladamente (decisão muda o resultado do duelo de verdade,
+  contexto recebido bate com a chance resolvida, eventos saem em ordem
+  crescente de minuto terminando em apito final) e integrado
+  (`escolherModoDePartida` chamado uma vez por partida do jogador com o
+  contexto certo, impacto de evento de contexto realmente aplicado ao
+  estado). Rodado também via script avulso chamando `jogarTemporada`
+  direto (fora da suíte de testes, só pra inspeção visual da narração) —
+  confirma minutos crescentes, decisão "arriscar" variando entre gol/sem
+  gol (não é sempre um ou sempre outro) e partidas seguintes (modo
+  `"rapida"`) sem narração nenhuma, como esperado.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1295,3 +1399,19 @@ prestígio das propostas de mercado — inclusive o caso concreto pedido:
   `career/status.ts` `statusOferecido` deveria passar a vir de um
   histórico real de Elo recente do clube em vez do sorteio atual em
   `market/transfers.ts` `gerarProposta`).
+- **Simulação ao vivo — limitações desta versão** (ver seção 5.7): o
+  menu de modo (rápida/até metade da temporada/ao vivo) só está ligado
+  na CLI interativa (`jogar`) — `carreira-loop`/`temporada`/`carreira`
+  continuam 100% instantâneas, sem o menu; "simular até a metade da
+  temporada" é uma janela de partidas de tamanho fixo
+  (`PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA = 25`), não uma conta
+  real de "metade" (o motor não sabe de antemão quantas partidas o
+  clube do jogador vai ter na temporada, cada competição só conhece o
+  próprio calendário); eventos de contexto ao vivo
+  (`progression/match-events.ts`) só afetam moral/relações internas,
+  nunca atributo (o motor de partida não tem a posição do jogador
+  disponível ali pra saber qual atributo seria seguro mexer sem criar
+  um campo "órfão" fora da lista de atributos da posição); e o próprio
+  jogo ao vivo não tem "escalação"/lesão real durante a partida — só a
+  chance do jogador e eventos de contexto pausam, o resto do time
+  segue sendo Camada 1 (duelo agregado), igual antes.

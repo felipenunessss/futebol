@@ -60,28 +60,28 @@ describe("simularTemporadaPontosCorridos", () => {
   const times = ["a", "b", "c", "d"];
   const ratingsIguais = Object.fromEntries(times.map((t) => [t, 1600]));
 
-  it("tabela tem uma linha por time, todas com o mesmo número de jogos", () => {
-    const { tabela } = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5);
+  it("tabela tem uma linha por time, todas com o mesmo número de jogos", async () => {
+    const { tabela } = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5);
     expect(tabela).toHaveLength(4);
     const jogosPorTime = new Set(tabela.map((l) => l.jogos));
     expect(jogosPorTime.size).toBe(1); // todo mundo jogou o mesmo número de partidas
   });
 
-  it("tabela vem ordenada por pontos (decrescente)", () => {
-    const { tabela } = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => Math.random());
+  it("tabela vem ordenada por pontos (decrescente)", async () => {
+    const { tabela } = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => Math.random());
     for (let i = 1; i < tabela.length; i++) {
       expect(tabela[i - 1].pontos).toBeGreaterThanOrEqual(tabela[i].pontos);
     }
   });
 
-  it("time com rating muito mais alto tende a terminar em 1º", () => {
+  it("time com rating muito mais alto tende a terminar em 1º", async () => {
     const ratings = { ...ratingsIguais, a: 2200 };
-    const { tabela } = simularTemporadaPontosCorridos(times, ratings, true, () => 0.4);
+    const { tabela } = await simularTemporadaPontosCorridos(times, ratings, true, () => 0.4);
     expect(tabela[0].clubeId).toBe("a");
   });
 
-  it("pontos = 3×vitórias + 1×empates, consistente com jogos = vitórias+empates+derrotas", () => {
-    const { tabela } = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => Math.random());
+  it("pontos = 3×vitórias + 1×empates, consistente com jogos = vitórias+empates+derrotas", async () => {
+    const { tabela } = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => Math.random());
     for (const linha of tabela) {
       expect(linha.pontos).toBe(linha.vitorias * 3 + linha.empates);
       expect(linha.jogos).toBe(linha.vitorias + linha.empates + linha.derrotas);
@@ -90,9 +90,9 @@ describe("simularTemporadaPontosCorridos", () => {
   });
 
   describe("aoSimularConfronto", () => {
-    it("é chamado uma vez por confronto, na mesma ordem de confrontos", () => {
+    it("é chamado uma vez por confronto, na mesma ordem de confrontos", async () => {
       const eventos: EventoConfrontoPontosCorridos[] = [];
-      const { confrontos } = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => {
+      const { confrontos } = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => {
         eventos.push(evento);
       });
 
@@ -100,9 +100,9 @@ describe("simularTemporadaPontosCorridos", () => {
       expect(eventos.map((e) => e.confronto)).toEqual(confrontos);
     });
 
-    it("tabelaDepois reflete o resultado desse confronto (jogos +1 pros dois times envolvidos)", () => {
+    it("tabelaDepois reflete o resultado desse confronto (jogos +1 pros dois times envolvidos)", async () => {
       const eventos: EventoConfrontoPontosCorridos[] = [];
-      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+      await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
 
       const primeiro = eventos[0];
       const linhaMandanteDepois = primeiro.tabelaDepois.find((l) => l.clubeId === primeiro.confronto.mandante)!;
@@ -110,18 +110,18 @@ describe("simularTemporadaPontosCorridos", () => {
       expect(linhaMandanteDepois.jogos).toBe(linhaMandanteAntes.jogos + 1);
     });
 
-    it("tabelaAntes do primeiro confronto começa zerada (ninguém jogou ainda)", () => {
+    it("tabelaAntes do primeiro confronto começa zerada (ninguém jogou ainda)", async () => {
       const eventos: EventoConfrontoPontosCorridos[] = [];
-      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+      await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
 
       for (const linha of eventos[0].tabelaAntes) {
         expect(linha.jogos).toBe(0);
       }
     });
 
-    it("tabelaAntes/tabelaDepois de eventos passados não mudam depois de confrontos futuros (são cópias, não a mesma referência mutável)", () => {
+    it("tabelaAntes/tabelaDepois de eventos passados não mudam depois de confrontos futuros (são cópias, não a mesma referência mutável)", async () => {
       const eventos: EventoConfrontoPontosCorridos[] = [];
-      simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
+      await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, (evento) => eventos.push(evento));
 
       const jogosDoPrimeiroEventoNaHora = eventos[0].tabelaDepois.find((l) => l.clubeId === eventos[0].confronto.mandante)!.jogos;
       // confere de novo depois que TODOS os confrontos já rodaram — não deveria ter mudado
@@ -129,9 +129,9 @@ describe("simularTemporadaPontosCorridos", () => {
       expect(mesmaLinha.jogos).toBe(jogosDoPrimeiroEventoNaHora);
     });
 
-    it("sem o callback, o resultado final não muda (mesmo comportamento de antes)", () => {
-      const semCallback = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5);
-      const comCallback = simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, () => {});
+    it("sem o callback, o resultado final não muda (mesmo comportamento de antes)", async () => {
+      const semCallback = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5);
+      const comCallback = await simularTemporadaPontosCorridos(times, ratingsIguais, true, () => 0.5, undefined, () => {});
       expect(comCallback.tabela).toEqual(semCallback.tabela);
     });
   });
@@ -141,17 +141,17 @@ describe("simularFaseUnicaDoFormato", () => {
   const times = ["a", "b", "c", "d"];
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
 
-  it("classifica exatamente classificam_proxima_fase times, na ordem da tabela desse torneio", () => {
+  it("classifica exatamente classificam_proxima_fase times, na ordem da tabela desse torneio", async () => {
     const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 2 };
-    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
+    const resultado = await simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
 
     expect(resultado.classificados).toHaveLength(2);
     expect(resultado.classificados).toEqual([resultado.tabela[0].clubeId, resultado.tabela[1].clubeId]);
   });
 
-  it("classificam_proxima_fase: 0 não classifica ninguém, mas ainda gera tabela completa", () => {
+  it("classificam_proxima_fase: 0 não classifica ninguém, mas ainda gera tabela completa", async () => {
     const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 0 };
-    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
+    const resultado = await simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random());
 
     expect(resultado.classificados).toEqual([]);
     expect(resultado.tabela).toHaveLength(4);
@@ -204,25 +204,25 @@ describe("simularTemporadaPontosCorridos com participação do jogador", () => {
   };
   const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
 
-  it("sem participacaoJogador, partidasDoJogador fica ausente", () => {
-    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random());
+  it("sem participacaoJogador, partidasDoJogador fica ausente", async () => {
+    const resultado = await simularTemporadaPontosCorridos(times, ratings, true, () => Math.random());
     expect(resultado.partidasDoJogador).toBeUndefined();
   });
 
-  it("com participacaoJogador, retorna uma entrada por partida do clube dele (ida e volta = joga contra todos 2x)", () => {
-    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+  it("com participacaoJogador, retorna uma entrada por partida do clube dele (ida e volta = joga contra todos 2x)", async () => {
+    const resultado = await simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
     expect(resultado.partidasDoJogador).toHaveLength(2 * (times.length - 1));
   });
 
-  it("toda partida listada em partidasDoJogador realmente envolve o clube do jogador", () => {
-    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+  it("toda partida listada em partidasDoJogador realmente envolve o clube do jogador", async () => {
+    const resultado = await simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
     for (const { confronto } of resultado.partidasDoJogador!) {
       expect(confronto.mandante === "a" || confronto.visitante === "a").toBe(true);
     }
   });
 
-  it("existem confrontos entre outros times que não entram em partidasDoJogador", () => {
-    const resultado = simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
+  it("existem confrontos entre outros times que não entram em partidasDoJogador", async () => {
+    const resultado = await simularTemporadaPontosCorridos(times, ratings, true, () => Math.random(), participacao);
     const outroConfrontoQualquer = resultado.confrontos.find((c) => c.mandante !== "a" && c.visitante !== "a");
     expect(outroConfrontoQualquer).toBeDefined();
     expect(resultado.partidasDoJogador!.some((p) => p.confronto === outroConfrontoQualquer)).toBe(false);
@@ -230,14 +230,14 @@ describe("simularTemporadaPontosCorridos com participação do jogador", () => {
 });
 
 describe("simularFaseUnicaDoFormato com participação do jogador", () => {
-  it("propaga partidasDoJogador quando participacaoJogador é passado", () => {
+  it("propaga partidasDoJogador quando participacaoJogador é passado", async () => {
     const times = ["a", "b", "c", "d"];
     const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
     const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: {} };
     const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
     const formato: FaseUnica = { ida_e_volta: false, classificam_proxima_fase: 1 };
 
-    const resultado = simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random(), participacao);
+    const resultado = await simularFaseUnicaDoFormato(formato, times, ratings, () => Math.random(), participacao);
     expect(resultado.partidasDoJogador).toHaveLength(times.length - 1);
   });
 });

@@ -4,7 +4,8 @@ import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularTemporada, type CampeonatoSimulavel, type EventosSimulacaoTemporada, type ResultadoTemporada } from "../simulation/engine.js";
 import type { EventoConfrontoMataMata } from "../simulation/knockout.js";
 import type { EventoConfrontoPontosCorridos } from "../simulation/season.js";
-import type { ParticipacaoJogadorClube } from "../simulation/match.js";
+import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida } from "../simulation/match.js";
+import { jogarPartidaAoVivo, type ContextoDecisaoChance, type EventoAoVivo, type ResultadoDecisaoChance } from "../simulation/live-match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
 import { obterRating } from "../simulation/rating.js";
 import { aplicarTreino, calcularNotaPartida, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, type FocoDeTreino } from "../progression/xp.js";
@@ -17,6 +18,7 @@ import {
   type Cenario,
   type ContextoSorteio,
   type EscolhaResolvida,
+  type ImpactoCarreira,
   type Opcao,
 } from "../progression/scenarios.js";
 import { calcularValorDeMercado, type PerfilDeMercado } from "../market/valuation.js";
@@ -102,6 +104,18 @@ export interface TreinoResolvidoNaTemporada {
   moralDepois: number;
 }
 
+/** "rapida" = instantânea, sem narração (comportamento de sempre). "ao_vivo" = `simulation/live-match.ts` `jogarPartidaAoVivo`, narrada e pausável. Um eventual modo "simular vário sem perguntar de novo" não é um 3º valor aqui — é uma decisão de quem implementa `escolherModoDePartida`, que simplesmente devolve "rapida" sem perguntar de novo por um tempo. */
+export type ModoDePartida = "rapida" | "ao_vivo";
+
+/** Contexto passado pra `OpcoesJogarTemporada.escolherModoDePartida` a cada partida do clube do jogador. */
+export interface ContextoPartidaDoJogador {
+  /** 1, 2, 3... — conta só as partidas do jogador nesta temporada, na ordem em que o motor as resolve (não necessariamente a ordem cronológica real do calendário, ver `simulation/engine.ts`). */
+  numeroDaPartida: number;
+  lado: "casa" | "fora";
+  mandanteId: string;
+  visitanteId: string;
+}
+
 export interface ResultadoTemporadaDeCarreira {
   /** Estado do jogador ao final da temporada — já com a idade/temporada avançadas (ver `avancarTemporada`). */
   estado: EstadoDeCarreira;
@@ -156,18 +170,42 @@ export interface OpcoesJogarTemporada {
    * Chamado a cada confronto de pontos corridos que o clube atual do
    * jogador disputa (`simulation/season.ts` `EventoConfrontoPontosCorridos`
    * — inclui a tabela antes/depois desse confronto específico), na ordem
-   * em que os confrontos acontecem dentro da competição. **Síncrono, não
-   * assíncrono** (ao contrário dos outros hooks) — a temporada inteira é
-   * simulada de uma vez só (`simulation/engine.ts` `simularTemporada` não
-   * é assíncrono), então não dá pra pausar/esperar entrada de usuário
-   * entre partidas sem reescrever todo o motor de simulação como
-   * assíncrono; o hook serve pra **mostrar** o jogo a jogo em tempo real
-   * conforme a temporada é processada, não pra interagir partida a
-   * partida.
+   * em que os confrontos acontecem dentro da competição. Continua síncrono
+   * (só pra **mostrar** o resumo pós-jogo) — quem quiser pausar/interagir
+   * *durante* a partida do jogador (menu de modo, jogo ao vivo com decisão
+   * real) usa `resolverPartida`, abaixo, que já rodou e resolveu aquele
+   * confronto específico antes deste hook disparar.
    */
   onPartidaPontosCorridos?: (info: PartidaDoJogadorPontosCorridos) => void;
-  /** Equivalente a `onPartidaPontosCorridos`, mas pra confrontos de mata-mata (`simulation/knockout.ts` `EventoConfrontoMataMata`) — também síncrono, mesma ressalva. */
+  /** Equivalente a `onPartidaPontosCorridos`, mas pra confrontos de mata-mata (`simulation/knockout.ts` `EventoConfrontoMataMata`) — mesma ressalva. */
   onPartidaMataMata?: (info: PartidaDoJogadorMataMata) => void;
+  /**
+   * Como decidir o modo de simulação de cada partida do clube do jogador
+   * — padrão sempre `"rapida"` (instantâneo, mesmo comportamento de
+   * antes). Chamado uma vez por partida do jogador na temporada, na
+   * ordem em que o motor as resolve (`numeroDaPartida` conta só as
+   * partidas dele, 1, 2, 3...) — é o ponto de injeção do menu "simulação
+   * rápida / simular até metade da temporada / jogo ao vivo": a lógica de
+   * "parar de perguntar por um tempo" (modo 2) é inteiramente de quem
+   * implementa esse callback (ex: `src/cli/index.ts`), `jogarTemporada`
+   * só chama de novo a cada partida e usa o que vier. Retornar
+   * `"ao_vivo"` liga `simulation/live-match.ts` `jogarPartidaAoVivo`
+   * (pausa real nas chances do jogador e em eventos de contexto, ver
+   * `decidirChanceAoVivo`/`decidirEventoDePartida` abaixo) — é isso que
+   * torna `simulation/engine.ts` `simularTemporada` (chamado abaixo)
+   * `async` mesmo continuando 100% síncrono no caminho padrão.
+   */
+  escolherModoDePartida?: (contexto: ContextoPartidaDoJogador) => ModoDePartida | Promise<ModoDePartida>;
+  /** Pausa numa chance do próprio jogador durante uma partida "ao vivo" — ver `simulation/live-match.ts` `ContextoDecisaoChance`/`ResultadoDecisaoChance`. Sem callback, resolve sem ajuste nenhum. */
+  decidirChanceAoVivo?: (contexto: ContextoDecisaoChance) => ResultadoDecisaoChance | Promise<ResultadoDecisaoChance>;
+  /** Pausa num evento de contexto sorteado durante uma partida "ao vivo" (`progression/match-events.ts`) — o impacto resolvido é aplicado ao estado de carreira logo depois que `simularTemporada` terminar (ver `impactosDePartidaAoVivo` dentro de `jogarTemporada`). Sem callback, sempre escolhe a 1ª opção. */
+  decidirEventoDePartida?: (cenario: Cenario) => Opcao | Promise<Opcao>;
+  /** Chamado a cada evento de uma partida "ao vivo" (chance genérica, chance do jogador, evento de contexto, apito final) — pra narrar em tempo real. */
+  onEventoAoVivo?: (evento: EventoAoVivo) => void | Promise<void>;
+  /** Repassado direto pra `simulation/live-match.ts` `jogarPartidaAoVivo` (`OpcoesPartidaAoVivo.msPorMinuto`) — 0 em teste, pra não esperar de verdade. */
+  msPorMinutoAoVivo?: number;
+  /** Repassado direto pra `simulation/live-match.ts` `jogarPartidaAoVivo` (`OpcoesPartidaAoVivo.maxEventosDeContexto`). */
+  maxEventosDeContextoAoVivo?: number;
   /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
   /**
@@ -270,11 +308,11 @@ async function resolverNegociacaoDeTransferencia(
  * declínio por idade, renda de patrocínio). Não muta o `estado` recebido.
  *
  * **Simplificações documentadas** (não são bugs escondidos, ver pendências
- * em `docs/motor-de-partida.md`): toda partida da temporada usa o mesmo
- * número de minutos, vindo do status no elenco no início da temporada
- * (`career/status.ts` `minutosEsperadosPorStatus` — não varia partida a
- * partida por escalação/lesão/tática) e importância 1 — não existe
- * diferenciação de fase (final vs. fase de grupos) dentro de
+ * em `docs/motor-de-partida.md`): os minutos de cada partida são sorteados
+ * dentro da faixa do status no elenco (`career/status.ts`
+ * `minutosEsperadosPorStatus`, partida a partida — não varia por
+ * escalação/lesão/tática específica) e toda partida usa importância 1 —
+ * não existe diferenciação de fase (final vs. fase de grupos) dentro de
  * `partidasDoJogador` ainda. Uma negociação aceita por temporada, no
  * máximo (para no primeiro clube que aceitar a contraproposta).
  */
@@ -297,6 +335,12 @@ export async function jogarTemporada(
     onTreinoResolvido,
     onPartidaPontosCorridos,
     onPartidaMataMata,
+    escolherModoDePartida,
+    decidirChanceAoVivo,
+    decidirEventoDePartida,
+    onEventoAoVivo,
+    msPorMinutoAoVivo,
+    maxEventosDeContextoAoVivo,
     random = Math.random,
   } = opcoes;
 
@@ -320,10 +364,51 @@ export async function jogarTemporada(
         }
       : undefined,
   };
-  const resultadoTemporada = simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random, eventosDeSimulacao);
+  const impactosDePartidaAoVivo: ImpactoCarreira[] = [];
+  let numeroDaPartidaDoJogador = 0;
+
+  const resolverPartida: ResolverPartida = async (perfilCasa, perfilFora, randomDaPartida, participacao, contexto) => {
+    if (!participacao || !escolherModoDePartida) {
+      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
+    }
+
+    numeroDaPartidaDoJogador++;
+    const modo = await escolherModoDePartida({
+      numeroDaPartida: numeroDaPartidaDoJogador,
+      lado: participacao.lado,
+      mandanteId: contexto?.mandanteId ?? "",
+      visitanteId: contexto?.visitanteId ?? "",
+    });
+
+    if (modo !== "ao_vivo") {
+      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
+    }
+
+    const { resultado, impactosDeContexto } = await jogarPartidaAoVivo(perfilCasa, perfilFora, randomDaPartida, participacao, {
+      decidirChance: decidirChanceAoVivo,
+      decidirEventoDeContexto: decidirEventoDePartida,
+      onEvento: onEventoAoVivo,
+      msPorMinuto: msPorMinutoAoVivo,
+      maxEventosDeContexto: maxEventosDeContextoAoVivo,
+    });
+    impactosDePartidaAoVivo.push(...impactosDeContexto);
+    return resultado;
+  };
+
+  const resultadoTemporada = await simularTemporada(estado.temporada, campeonatos, clubes, participacaoJogador, random, eventosDeSimulacao, resolverPartida);
 
   const overallAntes = overallAtual(estado);
   let estadoAtual = estado;
+
+  // Impactos de eventos de contexto ocorridos em partidas "ao vivo" (cartão, disputa, provocação, etc,
+  // ver `simulation/live-match.ts`/`progression/match-events.ts`) — aplicados aqui, na ordem em que
+  // aconteceram, porque o motor de partida não tem acesso ao estado de carreira (`simulation/*` não
+  // depende de `career/*`), só devolve o impacto puro pra quem orquestra aplicar.
+  const regiaoParaEventosAoVivo = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  for (const impacto of impactosDePartidaAoVivo) {
+    estadoAtual = aplicarImpactoDeCenario(estadoAtual, impacto, regiaoParaEventosAoVivo);
+  }
+
   const resumoCompeticoes: ResumoCompeticaoNaTemporada[] = [];
   let somaDeNotas = 0;
   let partidasComNota = 0;

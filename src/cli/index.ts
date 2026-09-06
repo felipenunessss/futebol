@@ -20,10 +20,14 @@ import {
 import { converterChancesEmDesempenho, type FocoDeTreino } from "../progression/xp.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
+import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "../simulation/live-match.js";
+import type { SubtipoChance } from "../simulation/tactics.js";
 import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, assinarContrato, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
 import {
   jogarTemporada,
   type CenarioResolvidoNaTemporada,
+  type ContextoPartidaDoJogador,
+  type ModoDePartida,
   type NegociacaoResolvidaNaTemporada,
   type PartidaDoJogadorMataMata,
   type PartidaDoJogadorPontosCorridos,
@@ -109,11 +113,11 @@ function exibirPartidaMataMata(info: PartidaDoJogadorMataMata, clubeId: string):
   console.log(`\n  [${campeonatoId}] ${etapa}: ${nomeDoClube(confronto.timeA)} ${confronto.golsA} x ${confronto.golsB} ${nomeDoClube(confronto.timeB)}${decisao} — ${desfecho}`);
 }
 
-function simularCopaDoBrasil(): void {
+async function simularCopaDoBrasil(): Promise<void> {
   const copaDoBrasil = buscarCampeonato("copa_do_brasil");
   const ratings = Object.fromEntries(copaDoBrasil.times.map((id) => [id, obterRating(clubePorId.get(id)!)]));
 
-  const resultado: ResultadoMataMata = simularMataMataDoFormato(copaDoBrasil.formato.mata_mata!, ratings, copaDoBrasil.times);
+  const resultado: ResultadoMataMata = await simularMataMataDoFormato(copaDoBrasil.formato.mata_mata!, ratings, copaDoBrasil.times);
 
   console.log(`\n=== ${copaDoBrasil.nome} ${copaDoBrasil.ano_referencia} — simulação ===`);
   console.log(`${copaDoBrasil.times.length} clubes reais na disputa\n`);
@@ -142,12 +146,12 @@ function simularCopaDoBrasil(): void {
  * uma final de jogo real. Por isso aqui simulamos os dois torneios como
  * `FaseUnica` e somamos as tabelas em vez de chamar `simularFinalEstadualDoFormato`.
  */
-function simularArgentina(): void {
+async function simularArgentina(): Promise<void> {
   const liga = buscarCampeonato("argentina_primera");
   const ratings = Object.fromEntries(liga.times.map((id) => [id, obterRating(clubePorId.get(id)!)]));
 
-  const apertura = simularFaseUnicaDoFormato(liga.formato.turno!, liga.times, ratings);
-  const clausura = simularFaseUnicaDoFormato(liga.formato.returno!, liga.times, ratings);
+  const apertura = await simularFaseUnicaDoFormato(liga.formato.turno!, liga.times, ratings);
+  const clausura = await simularFaseUnicaDoFormato(liga.formato.returno!, liga.times, ratings);
   const tabelaAnual = somarTabelas([apertura.tabela, clausura.tabela]);
 
   console.log(`\n=== ${liga.nome} ${liga.ano_referencia} — simulação ===`);
@@ -312,7 +316,7 @@ function simularCarreira(): void {
  * clube informado, mostrando quais competições rodaram automaticamente e
  * quais ainda não têm receita (combinação de blocos de formato bespoke).
  */
-function simularTemporadaCli(): void {
+async function simularTemporadaCli(): Promise<void> {
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
   const jogador = {
     id: "jogador_temporada",
@@ -323,7 +327,7 @@ function simularTemporadaCli(): void {
     atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 60])),
   };
 
-  const resultado = simularTemporada(2027, campeonatos, clubes, { clubeId: "corinthians", jogador, estiloTecnico: "equilibrado" });
+  const resultado = await simularTemporada(2027, campeonatos, clubes, { clubeId: "corinthians", jogador, estiloTecnico: "equilibrado" });
 
   console.log(`\n=== Temporada ${resultado.temporada} — ${resultado.competicoes.length} competições ativas no calendário ===\n`);
   for (const c of resultado.competicoes) {
@@ -542,6 +546,94 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     }
   };
 
+  /**
+   * Quantas partidas o modo "simular até a metade da temporada" fica sem
+   * perguntar de novo depois de escolhido — no ponto em que
+   * `escolherModoDePartida` é chamado (`career/career-loop.ts`) não dá pra
+   * saber de antemão quantas partidas o clube do jogador vai ter na
+   * temporada inteira (múltiplas competições, cada uma só sabendo seu
+   * próprio calendário, ver `simulation/engine.ts`), então isso é uma
+   * estimativa fixa de design (não uma conta exata de "metade"), calibrada
+   * pra cobrir uma janela razoavelmente longa sem perguntar. Depois dela,
+   * volta a perguntar normalmente.
+   */
+  const PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA = 25;
+  let modoAutoAtePartida: number | undefined;
+  let ultimoContextoDePartida: ContextoPartidaDoJogador | undefined;
+
+  const escolherModoDePartidaInterativo = async (contexto: ContextoPartidaDoJogador): Promise<ModoDePartida> => {
+    ultimoContextoDePartida = contexto;
+
+    if (modoAutoAtePartida !== undefined) {
+      if (contexto.numeroDaPartida <= modoAutoAtePartida) return "rapida";
+      modoAutoAtePartida = undefined; // passou da janela automática, volta a perguntar
+    }
+
+    console.log(
+      `\n--- Partida ${contexto.numeroDaPartida}: ${nomeDoClube(contexto.mandanteId)} x ${nomeDoClube(contexto.visitanteId)} (você joga ${contexto.lado === "casa" ? "em casa" : "fora"}) ---`,
+    );
+    console.log("  1. Simulação rápida (direto pro resultado)");
+    console.log("  2. Simular até a metade da temporada (não pergunta de novo por um tempo)");
+    console.log("  3. Simular o jogo (ao vivo — pausa em lances importantes)");
+
+    while (true) {
+      const escolha = (await perguntar("Escolha (número): ")).trim();
+      if (escolha === "1") return "rapida";
+      if (escolha === "2") {
+        modoAutoAtePartida = contexto.numeroDaPartida + PARTIDAS_ATE_METADE_DA_TEMPORADA_HEURISTICA;
+        return "rapida";
+      }
+      if (escolha === "3") return "ao_vivo";
+      console.log("Opção inválida, tente de novo.");
+    }
+  };
+
+  const LABEL_SUBTIPO: Record<SubtipoChance, string> = {
+    voleio: "voleio",
+    cabeceio: "cabeceio",
+    chute_de_fora: "chute de fora da área",
+    jogada_individual: "jogada individual",
+    passe_decisivo: "passe decisivo",
+    desarme_decisivo: "desarme decisivo",
+  };
+
+  const decidirChanceAoVivoInterativo = async (contexto: ContextoDecisaoChance): Promise<ResultadoDecisaoChance> => {
+    console.log(`\n  ${contexto.minuto}' — chance sua! (${LABEL_SUBTIPO[contexto.subtipo]})`);
+    console.log("    1. Arriscar, ir com tudo");
+    console.log("    2. Ajeitar antes de bater, com mais categoria");
+    while (true) {
+      const escolha = (await perguntar("  Sua decisão (número): ")).trim();
+      if (escolha === "1") return { ajusteForcaJogador: 150, ajusteForcaDefensiva: 0 };
+      if (escolha === "2") return { ajusteForcaJogador: 60, ajusteForcaDefensiva: -60 };
+      console.log("  Opção inválida, tente de novo.");
+    }
+  };
+
+  const onEventoAoVivoInterativo = (evento: EventoAoVivo): void => {
+    const mandanteNome = ultimoContextoDePartida ? nomeDoClube(ultimoContextoDePartida.mandanteId) : "Mandante";
+    const visitanteNome = ultimoContextoDePartida ? nomeDoClube(ultimoContextoDePartida.visitanteId) : "Visitante";
+
+    switch (evento.tipo) {
+      case "chance_generica": {
+        const time = evento.lado === "casa" ? mandanteNome : visitanteNome;
+        console.log(`  ${evento.minuto}' ${evento.gol ? `GOL do ${time}!` : `Chance perdida do ${time}.`}`);
+        break;
+      }
+      case "chance_jogador": {
+        console.log(`  ${evento.minuto}' ${evento.chance.sucesso ? "GOL SEU!" : "Você não conseguiu marcar dessa vez."}`);
+        break;
+      }
+      case "evento_de_contexto": {
+        console.log(`  ${evento.minuto}' ${evento.escolha.resultado.impacto.narrativa}`);
+        break;
+      }
+      case "apito_final": {
+        console.log(`  Apito final: ${mandanteNome} ${evento.golsCasa} x ${evento.golsFora} ${visitanteNome}`);
+        break;
+      }
+    }
+  };
+
   const FOCOS_DE_TREINO: { foco: FocoDeTreino; rotulo: string }[] = [
     { foco: "fisico", rotulo: "Físico (velocidade, força, resistência, jogo aéreo, reflexos)" },
     { foco: "tecnico", rotulo: "Técnico (finalização, drible, passe, marcação, etc — depende da posição)" },
@@ -620,6 +712,10 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       onTreinoResolvido,
       onPartidaPontosCorridos,
       onPartidaMataMata,
+      escolherModoDePartida: escolherModoDePartidaInterativo,
+      decidirChanceAoVivo: decidirChanceAoVivoInterativo,
+      decidirEventoDePartida: escolherOpcaoInterativa,
+      onEventoAoVivo: onEventoAoVivoInterativo,
     });
     estado = resultado.estado;
 
@@ -657,10 +753,10 @@ const comando = process.argv[2] ?? "copa-do-brasil";
 
 switch (comando) {
   case "copa-do-brasil":
-    simularCopaDoBrasil();
+    await simularCopaDoBrasil();
     break;
   case "argentina":
-    simularArgentina();
+    await simularArgentina();
     break;
   case "cenario":
     simularCenario();
@@ -669,7 +765,7 @@ switch (comando) {
     simularCarreira();
     break;
   case "temporada":
-    simularTemporadaCli();
+    await simularTemporadaCli();
     break;
   case "carreira-loop":
     await simularCarreiraLoopCli();

@@ -1,5 +1,5 @@
 import type { FaseUnica } from "../schemas/championship.js";
-import { gerarPerfilTime, participacaoNoConfronto, simularPartida, type ParticipacaoJogadorClube, type ResultadoPartida } from "./match.js";
+import { gerarPerfilTime, participacaoNoConfronto, resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "./match.js";
 
 /**
  * Confrontos e tabela de uma temporada de pontos corridos — o formato mais
@@ -134,15 +134,23 @@ function ordenarTabela(tabela: LinhaTabela[]): LinhaTabela[] {
  * com a tabela antes/depois desse confronto específico — dá pra mostrar o
  * jogo a jogo em tempo real. As cópias só são feitas quando esse callback
  * é passado (sem custo extra quando ninguém precisa disso).
+ *
+ * `resolverPartida` (padrão `resolverPartidaPadrao`, síncrono) decide como
+ * cada confronto é resolvido — quem passa um resolvedor assíncrono (ex:
+ * `simulation/live-match.ts`, via `career/career-loop.ts`) consegue pausar
+ * a simulação de uma partida específica pra decisão real do jogador sem
+ * essa função (ou quem chama ela) precisar saber disso: é por isso que ela
+ * é `async` agora, mesmo continuando 100% síncrona no caminho padrão.
  */
-export function simularTemporadaPontosCorridos(
+export async function simularTemporadaPontosCorridos(
   times: string[],
   ratings: Record<string, number>,
   idaEVolta: boolean,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
   aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void,
-): ResultadoTemporadaPontosCorridos {
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoTemporadaPontosCorridos> {
   const confrontos = gerarConfrontosPontosCorridos(times, idaEVolta);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
   const partidasDoJogador: PartidaDoJogador[] = [];
@@ -151,7 +159,7 @@ export function simularTemporadaPontosCorridos(
     const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
     const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
     const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
-    const resultado = simularPartida(perfilMandante, perfilVisitante, random, participacao);
+    const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante });
 
     const tabelaAntes = aoSimularConfronto ? ordenarTabela([...tabela.values()].map((linha) => ({ ...linha }))) : undefined;
 
@@ -185,15 +193,16 @@ export interface ResultadoFaseUnica extends ResultadoTemporadaPontosCorridos {
  * a partir dessa fase específica (`classificam_proxima_fase`), não pra
  * decidir campeão sozinho.
  */
-export function simularFaseUnicaDoFormato(
+export async function simularFaseUnicaDoFormato(
   formato: FaseUnica,
   times: string[],
   ratings: Record<string, number>,
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
   aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void,
-): ResultadoFaseUnica {
-  const { confrontos, tabela, partidasDoJogador } = simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random, participacaoJogador, aoSimularConfronto);
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoFaseUnica> {
+  const { confrontos, tabela, partidasDoJogador } = await simularTemporadaPontosCorridos(times, ratings, formato.ida_e_volta, random, participacaoJogador, aoSimularConfronto, resolverPartida);
   const classificados = tabela.slice(0, formato.classificam_proxima_fase).map((linha) => linha.clubeId);
 
   return { confrontos, tabela, classificados, ...(partidasDoJogador ? { partidasDoJogador } : {}) };

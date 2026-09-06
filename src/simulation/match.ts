@@ -31,7 +31,8 @@ export function probabilidadeDeVencer(forcaA: number, forcaB: number): number {
   return 1 / (1 + Math.pow(10, (forcaB - forcaA) / 400));
 }
 
-function resolverDuelo(forcaA: number, forcaB: number, random: () => number): "A" | "B" {
+/** Exportado pra `simulation/live-match.ts` reaproveitar o mesmo duelo sem duplicar a fórmula. */
+export function resolverDuelo(forcaA: number, forcaB: number, random: () => number): "A" | "B" {
   return random() < probabilidadeDeVencer(forcaA, forcaB) ? "A" : "B";
 }
 
@@ -41,8 +42,8 @@ export interface ChanceJogador {
   atributoUsado: Atributo;
 }
 
-/** Converte um atributo (0-99) numa força comparável à escala de rating dos times (~1000-2000). */
-function forcaDoAtributo(valor: number): number {
+/** Converte um atributo (0-99) numa força comparável à escala de rating dos times (~1000-2000). Exportado pra `simulation/live-match.ts` reaproveitar. */
+export function forcaDoAtributo(valor: number): number {
   return 1000 + valor * 10;
 }
 
@@ -112,9 +113,10 @@ export function participacaoNoConfronto(
   return undefined;
 }
 
-const CHANCES_BASE_POR_PARTIDA = 10;
-/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.3 = até 80%/20% num duelo muito dominante). */
-const VANTAGEM_MAXIMA_DE_MEIO = 0.3;
+/** Exportado pra `simulation/live-match.ts` calcular o mesmo total de chances de uma partida sem duplicar a conta. */
+export const CHANCES_BASE_POR_PARTIDA = 10;
+/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.3 = até 80%/20% num duelo muito dominante). Exportado pelo mesmo motivo que `CHANCES_BASE_POR_PARTIDA`. */
+export const VANTAGEM_MAXIMA_DE_MEIO = 0.3;
 
 export interface ResultadoPartida {
   golsCasa: number;
@@ -176,3 +178,38 @@ export function simularPartida(
 
   return { golsCasa, golsFora, chancesCasa, chancesFora, chancesJogador };
 }
+
+/**
+ * Resolve uma partida específica dado o perfil dos dois times — ponto de
+ * injeção usado por `season.ts`/`knockout.ts`/`groups.ts` em vez de chamar
+ * `simularPartida` direto, pra permitir um resolvedor alternativo (ex:
+ * `simulation/live-match.ts` `jogarPartidaAoVivo`, que narra a partida em
+ * tempo real e pausa em chances do jogador pra decisão real) sem duplicar
+ * nem reescrever a lógica de agendamento de rodadas/chaveamento em cada
+ * módulo. Pode ser assíncrono (por isso o retorno aceita `Promise`) —
+ * `resolverPartidaPadrao` (o default usado quando ninguém injeta nada) é
+ * síncrono, então nenhum consumidor existente muda de comportamento, só de
+ * assinatura (`async`/`await` a mais, ver `docs/motor-de-partida.md`).
+ */
+export type ResolverPartida = (
+  perfilCasa: PerfilTime,
+  perfilFora: PerfilTime,
+  random: () => number,
+  participacaoJogador?: ParticipacaoJogador,
+  contexto?: ContextoConfronto,
+) => Promise<ResultadoPartida> | ResultadoPartida;
+
+/**
+ * Quem manda/visita nesse confronto específico — meramente informativo
+ * (não influencia a simulação em si, que já usa `perfilCasa`/`perfilFora`);
+ * serve pra um resolvedor interativo saber contra quem é o jogo antes de
+ * perguntar o modo de simulação pro jogador (`career/career-loop.ts`).
+ */
+export interface ContextoConfronto {
+  mandanteId: string;
+  visitanteId: string;
+}
+
+/** Resolvedor padrão — só chama `simularPartida` normalmente, sem narração/pausa nenhuma. */
+export const resolverPartidaPadrao: ResolverPartida = (perfilCasa, perfilFora, random, participacaoJogador) =>
+  simularPartida(perfilCasa, perfilFora, random, participacaoJogador);
