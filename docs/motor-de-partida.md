@@ -1518,6 +1518,53 @@ Finalización) igual. Como uma carreira roda várias temporadas simuladas
   calendário padrão hoje), produz campeões plausíveis (Atlético Nacional,
   Internacional de Bogotá) sem erro, em várias rodadas com RNG real.
 
+### 5.12. Receitas pra Peru e Argentina 2ª divisão; Copa Verde/Nordeste deferidas por incerteza de dado (implementado)
+
+Última rodada da pesquisa em sequência (seções 5.9/5.10/5.11) — Peru e
+Argentina 2ª divisão tinham mecanismo bem confirmável e foram
+implementados; Copa Verde e Copa do Nordeste ficaram de fora porque a
+pesquisa encontrou indício de que os **dados atuais podem estar
+desatualizados** (times/formato mudaram), não só a receita de simulação
+— arriscar implementar em cima de dado possivelmente errado contrariaria
+a convenção do projeto.
+
+- **`receitaPeruPrimeira`** (por id): mesmo clube campeão de Apertura e
+  Clausura = campeão automático; senão, liguilla de 4 (os 2 campeões de
+  torneio + os 2 melhores do acumulado geral, excluindo quem já é
+  campeão de torneio) — semifinal e final ida e volta, confirmadas por
+  fonte (antes era pendência em aberto). Corrigido também o
+  `final_estadual.criterio` do dado (removida uma condição extra —
+  "campeões precisam estar entre os 7 primeiros do acumulado" — que uma
+  fonte mais recente não confirma).
+- **`receitaArgentinaSegunda`** (por id): 2 zonas de 18, líder de cada
+  uma disputa uma final direta pelo 1º ascenso; os 2º-8º de cada zona (14
+  no total) entram no "Reduzido" (jogo único, 14→7) — o PERDEDOR da
+  final direta se soma aos 7 vencedores (8 times) pras quartas/semifinal/
+  final do Reduzido, todas ida e volta, decidindo o 2º ascenso. A
+  pendência antiga registrava isso como "torneio real ainda em
+  andamento, chaveamento não fechado" — a pesquisa confirmou que 2025 já
+  foi disputado com esse formato fechado, deixou de ser indefinido.
+  Implementado como uma dependência DENTRO da mesma competição (o
+  perdedor da final alimenta uma etapa do próprio mata-mata) — diferente
+  de Libertadores/Sul-Americana (seção 5.10), que precisam de dados de
+  DUAS competições.
+- **Deferidas por incerteza de DADO, não só de receita** (ver
+  `docs/dados-a-verificar.md`): Copa do Nordeste — a pesquisa (2025)
+  descreve 16 times em 2 grupos de 8, mas o dado atual do projeto modela
+  `fase_suica` com 4 potes de 5 (20 times) — não dá pra saber se o
+  formato mudou entre a edição modelada e 2025 sem reconfirmar contra a
+  fonte original usada na hora de montar o dado. Copa Verde muda de
+  formato a partir de 2026 (vira uma "supercopa" de 2 blocos de 12,
+  estruturalmente parecida com `dupla_chave_regional` já modelado), mas o
+  formato exato de cada bloco não foi confirmado. Implementar a receita
+  em cima de uma contagem de times possivelmente errada arriscaria
+  simular algo que não corresponde a nenhuma edição real — preferível
+  esperar reconfirmação antes de mexer no dado ou na receita.
+- **Validado com dado real**: `receitaPeruPrimeira`/`receitaArgentinaSegunda`
+  rodadas direto com os dados reais de `peru_primera`/`argentina_segunda`
+  (nenhuma das duas está no calendário padrão hoje), produzem campeões
+  plausíveis sem erro, em várias rodadas com RNG real.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
@@ -1680,13 +1727,17 @@ Finalización) igual. Como uma carreira roda várias temporadas simuladas
   jogo ao vivo não tem "escalação"/lesão real durante a partida — só a
   chance do jogador e eventos de contexto pausam, o resto do time
   segue sendo Camada 1 (duelo agregado), igual antes.
-- **Receitas de simulação ainda faltando** (ver seções 5.8/5.9/5.11):
-  Peru, Argentina 2ª divisão, Copa Verde (`dupla_chave_regional`), Copa
-  do Nordeste — só entram no calendário de uma carreira brasileira se
-  algum dia `data/loaders/calendario.ts` passar a incluir competições
-  internacionais além das continentais atuais. Venezuela 2ª divisão tem
-  receita (mesma função da 1ª) mas erra sempre — os números não
-  reconciliam (`turno` classifica só 4, `fase_grupos` pede 16), ver
+- **Receitas de simulação ainda faltando** (ver seção 5.12): Copa Verde
+  (`dupla_chave_regional`) e Copa do Nordeste — deferidas por incerteza
+  no próprio DADO (times/formato podem ter mudado), não só na receita;
+  qualquer uma das duas só entraria no calendário de uma carreira
+  brasileira se algum dia `data/loaders/calendario.ts` passar a incluir
+  copas regionais (hoje só cobre Brasileirão/Copa do Brasil +
+  continentais). Peru e Argentina 2ª divisão foram implementados na
+  seção 5.12 (Peru/Argentina não entram no calendário hoje de qualquer
+  forma — calendário só cobre Brasil + continentais). Venezuela 2ª
+  divisão tem receita (mesma função da 1ª) mas erra sempre — os números
+  não reconciliam (`turno` classifica só 4, `fase_grupos` pede 16), ver
   `docs/dados-a-verificar.md`. Libertadores e Sul-Americana (que
   dependiam uma da outra pro repechaje) foram
   resolvidas juntas na seção 5.10 — as 11 competições ativas do calendário

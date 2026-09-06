@@ -91,19 +91,48 @@ dado, se precisar recuperar o raciocínio).
   vaga, melhor colocado sem competição nacional) em vez de critério
   pesquisado — vale revisar, especialmente São Paulo, que provavelmente tem
   mais de 1 vaga por ser estado grande.
-- **Peru (1ª divisão)**: se a semifinal/final da Liguilla de acesso são jogo
-  único ou ida e volta não foi especificado em nenhuma fonte encontrada —
-  mantido `ida_e_volta: true` sem confirmação real.
+- ~~Peru (1ª divisão): se a semifinal/final da Liguilla são jogo único ou
+  ida e volta não foi especificado~~ **resolvida**: confirmado (ESPN/
+  América TV/RPP) que semifinal e final são **ida e volta**. Também
+  corrigido o `final_estadual.criterio`: a condição extra que o dado
+  tinha ("campeões precisam estar entre os 7 primeiros do acumulado")
+  não se confirmou numa fonte mais recente — a regra real é só "os 2
+  campeões de torneio + os 2 melhores do acumulado geral, excluindo quem
+  já é campeão de torneio". Receita implementada em
+  `simulation/engine.ts` `receitaPeruPrimeira`. Fontes: [Liga 1 anunció
+  formato (ESPN)](https://www.espn.com.pe/futbol/peru/nota/_/id/16206894/formato-para-definir-al-campeon-de-la-liga-1-de-peru-2026),
+  [Liga1 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Liga1_2025_(Per%C3%BA)).
 - **Paraguai (2ª divisão, División Intermedia)**: a tabela anota "Ascienden
   a Primera División" no plural ao lado do 1º colocado, sugerindo mais de um
   acesso, mas não achamos confirmação explícita de que o 2º sobe direto ou
   se há repechaje — modelado como aproximação (`acesso_proxima_divisao: 2`).
 - **Copas regionais (Nordeste, Verde, Sul-Sudeste)**: campeão vs. vice não
   distinguido na maioria das vagas (exceto MG/PR/SC na Copa Sul-Sudeste);
-  formato da Copa do Nordeste após a fase de grupos pareados (mata-mata?
-  outra fase de grupos?) não confirmado; se as 3 copas dão vaga direta de
-  Sul-Americana/Libertadores ao campeão (além da vaga já confirmada na Copa
-  do Brasil) não é 100% certo.
+  se as 3 copas dão vaga direta de Sul-Americana/Libertadores ao campeão
+  (além da vaga já confirmada na Copa do Brasil) não é 100% certo.
+  **Achado ao pesquisar formato pós-fase-de-grupos** (ainda pendente de
+  implementar receita): a Copa do Nordeste 2025 (confirmado via
+  Olympics.com/CBF) usa 16 times em 2 grupos de 8 (com jogos DENTRO do
+  próprio grupo, não só cruzados como antes de 2025), top 4 de cada grupo
+  em cruzamento olímpico pras quartas (jogo único), semifinal (jogo
+  único), final (ida e volta) — **mas o dado atual do projeto modela
+  `fase_suica` (4 potes de 5 = 20 times)**, uma contagem/estrutura
+  DIFERENTE da confirmada aqui. Não sabemos se o formato mudou entre a
+  edição modelada e 2025, ou se o dado atual já era uma aproximação —
+  não implementamos a receita nem corrigimos o dado até reconfirmar a
+  contagem exata de times/grupos da edição que o projeto pretende
+  modelar. A estrutura pós-grupos (quartas/semi jogo único, final ida e
+  volta) está bem confirmada e reaproveitável assim que a contagem for
+  resolvida. A Copa Verde também muda de formato a partir de **2026**
+  (vira uma "supercopa": 24 clubes em 2 blocos de 12 — Copa Norte e Copa
+  Centro-Oeste —, cada bloco decidindo seu próprio campeão antes da final
+  entre os 2, o que bate estruturalmente com `dupla_chave_regional` já
+  modelado), mas o formato EXATO de cada bloco (quantas fases dentro dos
+  12 times) não foi confirmado. Fontes: [Olympics.com — Copa do Nordeste
+  2025 formato](https://www.olympics.com/pt/noticias/copa-do-nordeste-2025-formato-classificados-datas),
+  [ecbahia — formato Nordestão 2025](https://www.ecbahia.com/nordestao/formato-da-copa-do-nordeste-2025),
+  [CBF — Copa Verde em novo formato 2026](https://www.cbf.com.br/futebol-brasileiro/noticias/supercopa/sub20/copa-verde-em-novo-formato-tem-inicio-nesta-terca-24),
+  [Band — Copa Verde/Supercopa](https://www.band.com.br/esportes/futebol/noticias/copa-verde-supercopa-copa-norte-copa-centro-oeste-202510011247).
 - **Libertadores/Sul-Americana — premiação entre competições irmãs**: nenhum
   campo do schema cobre vaga direta na Copa Intercontinental FIFA/Recopa/
   Mundial de Clubes (campeão da Libertadores) nem a vaga do campeão da
@@ -132,8 +161,18 @@ resultado final bate mas o mecanismo intermediário não é representado:
 - **Argentina 1ª divisão**: zonas internas de cada torneio (Apertura/
   Clausura) e tamanho exato do chaveamento de playoff não modelados
   (`classificam_proxima_fase: 16` é estimativa).
-- **Argentina 2ª divisão**: chaveamento exato dos 15 times do "Reduzido"
-  não fechado (torneio real ainda em andamento).
+- ~~Argentina 2ª divisão: chaveamento exato dos 15 times do "Reduzido" não
+  fechado (torneio real ainda em andamento)~~ **resolvida**: o Reduzido
+  2025 já foi disputado com formato fechado (LA NACION/ESPN/todojujuy) —
+  não é mais indefinido. 1º de cada zona disputa uma final direta pelo 1º
+  ascenso; os 2º-8º de cada zona (14 times) entram no Reduzido (jogo
+  único, 14→7); o PERDEDOR da final direta se soma aos 7 vencedores
+  (8 times) pras quartas/semifinal/final, todas ida e volta, decidindo o
+  2º ascenso. Receita implementada em `simulation/engine.ts`
+  `receitaArgentinaSegunda`. Fontes: [LA NACION — Reduzido 2025
+  fechado](https://www.lanacion.com.ar/deportes/futbol/asi-quedo-el-reducido-de-la-primera-nacional-2025-nid05102025/),
+  [ESPN — como se joga o Reduzido](https://www.espn.com.ar/futbol/argentina/nota/_/id/15780960/asi-se-juega-el-torneo-reducido-de-la-primera-nacional),
+  [todojujuy — cruzamentos das quartas](https://www.todojujuy.com/deportes/cuartos-final-del-reducido-la-primera-nacional-como-seran-los-cruces-n260288).
 - ~~Uruguai 1ª divisão: schema não amarra explicitamente qual fase
   alimenta qual etapa do mata-mata final~~ **resolvida** (confirmado via
   Wikipedia/AUF): "Torneo Intermedio" é uma competição À PARTE, só de vaga

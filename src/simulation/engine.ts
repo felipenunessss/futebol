@@ -1061,6 +1061,106 @@ export async function receitaCarioca(
 }
 
 /**
+ * Peru 1ª divisão (Liga 1) — por id: mesmo clube campeão dos 2 torneios
+ * (Apertura/Clausura) = campeão automático. Senão, uma liguilla de 4
+ * times decide o título: os 2 campeões de torneio + os 2 melhores
+ * colocados da tabela acumulada (excluindo quem já é campeão de torneio,
+ * então sem duplicata por construção) — semifinal e final, ambas ida e
+ * volta. Confirmado via pesquisa (ESPN/América TV/RPP, ver
+ * `docs/dados-a-verificar.md`) — a condição extra que o dado tinha antes
+ * ("campeões precisam estar entre os 7 primeiros do acumulado") não se
+ * confirmou numa fonte mais recente/direta, removida do `criterio`.
+ */
+export async function receitaPeruPrimeira(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const { turno, returno } = await simularTurnoRetorno(campeonato, ratings, participacaoJogador, random, eventos, resolverPartida);
+  const campeaoApertura = turno.tabela[0].clubeId;
+  const campeaoClausura = returno.tabela[0].clubeId;
+  const partidasDoTurnoEReturno = [...(turno.partidasDoJogador ?? []), ...(returno.partidasDoJogador ?? [])].map((p) => p.resultado);
+
+  if (campeaoApertura === campeaoClausura) {
+    return { campeao: campeaoApertura, partidasDoJogador: partidasDoTurnoEReturno };
+  }
+
+  const tabelaAcumulada = somarTabelas([turno.tabela, returno.tabela]);
+  const melhoresDoAcumulado = tabelaAcumulada
+    .filter((linha) => linha.clubeId !== campeaoApertura && linha.clubeId !== campeaoClausura)
+    .slice(0, 2)
+    .map((linha) => linha.clubeId);
+  const participantesDaLiguilla = [campeaoApertura, campeaoClausura, ...melhoresDoAcumulado];
+
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+  const idaEVolta = campeonato.formato.final_estadual!.ida_e_volta;
+  const etapasDaLiguilla: EtapaMataMata[] = [
+    { nome: "semifinal", ida_e_volta: idaEVolta, entrantes: participantesDaLiguilla },
+    { nome: "final", ida_e_volta: idaEVolta },
+  ];
+  const liguilla = await simularMataMataComEtapas(etapasDaLiguilla, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+  const partidasDaLiguilla = liguilla.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+
+  return { campeao: liguilla.campeao, partidasDoJogador: [...partidasDoTurnoEReturno, ...partidasDaLiguilla] };
+}
+
+/**
+ * Argentina 2ª divisão (Primera Nacional) — por id: 2 zonas de 18, top 8
+ * de cada avançam (16 total). O 1º de cada zona disputa uma final direta
+ * pelo 1º ascenso; os 7 times restantes de cada zona (2º-8º, 14 no total)
+ * MAIS o perdedor dessa final entram no "Reduzido" (chaveamento
+ * escalonado: 14 times jogo único → 7 vencedores + o perdedor da final
+ * direta = 8 → quartas/semifinal/final, todas ida e volta) que decide o
+ * 2º ascenso. Confirmado via pesquisa — o Reduzido 2025 já foi disputado
+ * com esse formato fechado (LA NACION/ESPN/todojujuy, ver
+ * `docs/dados-a-verificar.md`), diferente da pendência antiga que
+ * registrava isso como indefinido. O "campeão" retornado é o vencedor da
+ * final direta (1º ascenso, a posição mais alta) — o 2º ascenso (vencedor
+ * do Reduzido) ainda entra em `partidasDoJogador` normalmente.
+ */
+export async function receitaArgentinaSegunda(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<ResultadoCampeonatoSimples> {
+  const grupos = await simularFaseDeGruposDoFormato(campeonato.formato.fase_grupos!, campeonato.times, ratings, random, participacaoJogador, resolverPartida);
+  const lideresDeZona = grupos.grupos.map((g) => g.classificados[0]);
+  const restantesParaOReduzido = grupos.grupos.flatMap((g) => g.classificados.slice(1));
+
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+
+  const finalDireta = await simularFinalEstadualDoFormato(campeonato.formato.final_estadual!, lideresDeZona, ratings, random, participacaoJogador, resolverPartida);
+  const perdedorDaFinal = finalDireta.confronto ? [finalDireta.confronto.timeA, finalDireta.confronto.timeB].find((t) => t !== finalDireta.campeao)! : undefined;
+
+  const etapasDoReduzido: EtapaMataMata[] = [
+    { nome: "primeira_fase", ida_e_volta: false, entrantes: restantesParaOReduzido },
+    { nome: "quartas", ida_e_volta: true, entrantes: perdedorDaFinal ? [perdedorDaFinal] : [] },
+    { nome: "semifinal", ida_e_volta: true },
+    { nome: "final", ida_e_volta: true },
+  ];
+  const reduzido = await simularMataMataComEtapas(etapasDoReduzido, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+
+  const partidasDosGrupos = grupos.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+  const partidasDaFinalDireta = finalDireta.confronto?.partidasDoJogador ?? [];
+  const partidasDoReduzido = reduzido.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+
+  return {
+    campeao: finalDireta.campeao,
+    partidasDoJogador: [...partidasDosGrupos, ...partidasDaFinalDireta, ...partidasDoReduzido],
+  };
+}
+
+/**
  * Receitas registradas por id — pra competições cuja combinação de blocos
  * é ambígua (o mesmo formato pode significar coisas diferentes em
  * campeonatos diferentes, ver `receitaArgentina`/`receitaCarioca`).
@@ -1068,9 +1168,11 @@ export async function receitaCarioca(
  */
 const RECEITAS_POR_ID: Record<string, Receita> = {
   argentina_primera: receitaArgentina,
+  argentina_segunda: receitaArgentinaSegunda,
   carioca_a: receitaCarioca,
   uruguai_primera: receitaUruguaiPrimeira,
   uruguai_segunda: receitaUruguaiSegunda,
+  peru_primera: receitaPeruPrimeira,
 };
 
 function escolherReceita(campeonato: CampeonatoSimulavel): Receita {

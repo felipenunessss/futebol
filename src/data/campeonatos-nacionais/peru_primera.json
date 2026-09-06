@@ -8,7 +8,7 @@
     "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
     "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1, "rodadas": 17 },
     "tabela_acumulada": { "criterio": "soma_dos_pontos_de_apertura_e_clausura_define_playoffs_vagas_internacionais_e_rebaixamento" },
-    "final_estadual": { "criterio": "liguilla_de_4_times_campeoes_do_apertura_e_clausura_que_estejam_entre_os_7_primeiros_do_acumulado_mais_os_2_melhores_do_acumulado_geral_se_o_mesmo_time_vence_apertura_e_clausura_e_campeao_direto_sem_playoff", "ida_e_volta": true }
+    "final_estadual": { "criterio": "liguilla_de_4_times_os_2_campeoes_de_torneio_apertura_e_clausura_mais_os_2_melhores_colocados_do_acumulado_geral_excluindo_quem_ja_e_campeao_de_torneio_semifinal_e_final_ida_e_volta_se_o_mesmo_time_vence_apertura_e_clausura_e_campeao_direto_sem_playoff", "ida_e_volta": true }
   },
   "premiacao": {
     "vaga_libertadores": 4,

@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   receitaArgentina,
+  receitaArgentinaSegunda,
   receitaCarioca,
   receitaFaseGruposComPreClassificatorioEMataMata,
   receitaFaseGruposFaseQuadrangularEFinal,
   receitaFaseSuicaEMataMata,
   receitaFaseSuicaMataMataEFinal,
   receitaLibertadoresESulAmericanaConjunta,
+  receitaPeruPrimeira,
   receitaPontosCorridosComFaseFinalPorClassificacao,
   receitaPontosCorridosComLiguilla,
   receitaTurnoEMataMata,
@@ -797,5 +799,84 @@ describe("receitaLibertadoresESulAmericanaConjunta", () => {
     const resultadoSula = resultado.competicoes.find((c) => c.campeonatoId === "sulamericana")!;
     expect(resultadoSula.erro).toBeDefined();
     expect(resultadoSula.resultado).toBeUndefined();
+  });
+});
+
+describe("receitaPeruPrimeira", () => {
+  const times = ["a", "b", "c", "d"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "peru_primera",
+    formato: {
+      turno: { ida_e_volta: false, classificam_proxima_fase: 1 },
+      returno: { ida_e_volta: false, classificam_proxima_fase: 1 },
+      final_estadual: { criterio: "liguilla_de_4_times", ida_e_volta: true },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("clube muito mais forte vence Apertura e Clausura e vira campeão automático, sem liguilla", async () => {
+    const ratingsFavorecendoA = { ...ratings, a: 2400 };
+    const resultado = await receitaPeruPrimeira(campeonato, ratingsFavorecendoA, undefined, () => 0.05);
+    expect(resultado.campeao).toBe("a");
+  });
+
+  it("produz um campeão válido no caminho geral (campeões diferentes -> liguilla de 4 com os 2 melhores do acumulado)", async () => {
+    const resultado = await receitaPeruPrimeira(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("propaga partidasDoJogador do turno/returno + liguilla combinados", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA = { ...ratings, a: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaPeruPrimeira(campeonato, ratingsFavorecendoA, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+});
+
+describe("receitaArgentinaSegunda", () => {
+  // 2 zonas de 8 (classificam todos os 8, degenerado só pra fechar as contas do Reduzido: líder de cada
+  // zona (2) disputa a final direta; os 7 restantes de cada zona (14) entram no Reduzido —
+  // primeira_fase (14->7) + o perdedor da final direta (8) -> quartas -> semifinal -> final.
+  const zonaA = ["a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"];
+  const zonaB = ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"];
+  const times = [...zonaA, ...zonaB];
+  const campeonato: CampeonatoSimulavel = {
+    id: "argentina_segunda",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 8, ida_e_volta: false, classificam_por_grupo: 8 },
+      final_estadual: { criterio: "campeoes_das_2_zonas_disputam_final_pelo_1o_ascenso_direto", ida_e_volta: false },
+      mata_mata: { fases: ["primeira_fase", "quartas", "semifinal", "final"], ida_e_volta: false },
+    },
+    times,
+  };
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+  it("produz um campeão válido (1º ascenso — vencedor da final direta entre líderes de zona)", async () => {
+    const resultado = await receitaArgentinaSegunda(campeonato, ratings, undefined, () => Math.random());
+    expect(times).toContain(resultado.campeao);
+  });
+
+  it("clube muito mais forte domina a própria zona e vence a final direta pelo 1º ascenso", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const ratingsFavorecendoA1 = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a1", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaArgentinaSegunda(campeonato, ratingsFavorecendoA1, participacao, () => 0.05);
+    expect(resultado.campeao).toBe("a1");
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+
+  it("propaga partidas de quem cai no Reduzido (2º-8º de cada zona + perdedor da final direta)", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    // a2 nunca lidera a própria zona (a1 é muito mais forte), mas participa do Reduzido como "restante".
+    const ratingsFavorecendoA1 = { ...ratings, a1: 2400 };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "a2", jogador, estiloTecnico: "equilibrado" };
+
+    const resultado = await receitaArgentinaSegunda(campeonato, ratingsFavorecendoA1, participacao, () => 0.5);
+    expect(resultado.partidasDoJogador.length).toBeGreaterThan(0);
   });
 });

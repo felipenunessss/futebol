@@ -7,7 +7,7 @@
   "formato": {
     "fase_grupos": { "num_grupos": 2, "times_por_grupo": 18, "ida_e_volta": true, "classificam_por_grupo": 8 },
     "final_estadual": { "criterio": "campeoes_das_2_zonas_disputam_final_em_campo_neutro_pelo_1o_ascenso_direto", "ida_e_volta": false },
-    "mata_mata": { "fases": ["reduzido"], "ida_e_volta": false }
+    "mata_mata": { "fases": ["primeira_fase", "quartas", "semifinal", "final"], "ida_e_volta": false }
   },
   "premiacao": {
     "acesso_proxima_divisao": 2,
