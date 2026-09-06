@@ -382,9 +382,57 @@ export async function receitaFaseGruposComPreClassificatorioEMataMata(
   eventos?: EventosSimulacaoTemporada,
   resolverPartida: ResolverPartida = resolverPartidaPadrao,
 ): Promise<ResultadoCampeonatoSimples> {
+  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
+    : undefined;
+
+  const { timesDaFaseDeGrupos, partidasPreClassificatorio, etapasRestantes } = await resolverPreClassificatorioDeFaseDeGrupos(
+    campeonato,
+    ratings,
+    participacaoJogador,
+    random,
+    aoResolverConfronto,
+    resolverPartida,
+  );
+
+  const grupos = await simularFaseDeGruposDoFormato(campeonato.formato.fase_grupos!, timesDaFaseDeGrupos, ratings, random, participacaoJogador, resolverPartida);
+
+  const etapasFinais: EtapaMataMata[] = etapasRestantes.map((etapa, indice) => ({
+    nome: etapa.nome,
+    ida_e_volta: etapa.ida_e_volta,
+    // a 1ª etapa pós-grupos recebe os classificados JUNTO com quem já tinha entrantes próprios ali
+    // (ex: Sul-Americana tem uma "repescagem" com entrantes próprios logo depois do corte) — soma, não substitui.
+    entrantes: indice === 0 ? [...grupos.classificados, ...(etapa.entrantes ?? [])] : etapa.entrantes,
+  }));
+  const resultadoMataMataFinal = await simularMataMataComEtapas(etapasFinais, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+
+  const partidasDosGrupos = grupos.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+  const partidasDoMataMataFinal = resultadoMataMataFinal.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+
+  return {
+    campeao: resultadoMataMataFinal.campeao,
+    partidasDoJogador: [...partidasPreClassificatorio, ...partidasDosGrupos, ...partidasDoMataMataFinal],
+  };
+}
+
+/**
+ * Resolve as etapas PRÉ-classificatórias de um `mata_mata.etapas` (a
+ * parte que acontece antes da fase de grupos — ver
+ * `receitaFaseGruposComPreClassificatorioEMataMata`), derivando o corte
+ * pela contagem de times (não hardcoded). Extraído pra ser reaproveitado
+ * também por `receitaLibertadoresESulAmericanaConjunta`, que precisa do
+ * mesmo cálculo pras DUAS competições antes de cruzá-las no repechaje.
+ */
+async function resolverPreClassificatorioDeFaseDeGrupos(
+  campeonato: CampeonatoSimulavel,
+  ratings: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number,
+  aoResolverConfronto: ((evento: EventoConfrontoMataMata) => void) | undefined,
+  resolverPartida: ResolverPartida,
+): Promise<{ timesDaFaseDeGrupos: string[]; partidasPreClassificatorio: ResultadoPartida[]; etapasRestantes: EtapaMataMata[] }> {
   const faseGrupos = campeonato.formato.fase_grupos!;
-  const mataMata = campeonato.formato.mata_mata!;
-  const etapas = mataMata.etapas!;
+  const etapas = campeonato.formato.mata_mata!.etapas!;
   const tamanhoDaFaseDeGrupos = faseGrupos.num_grupos * faseGrupos.times_por_grupo;
 
   const listadosComoEntrantes = clubesListadosEmEntrantes(etapas);
@@ -405,33 +453,137 @@ export async function receitaFaseGruposComPreClassificatorioEMataMata(
     );
   }
 
-  const aoResolverConfronto = eventos?.aoResolverConfrontoMataMata
-    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(campeonato.id, evento)
-    : undefined;
-
   const etapasPreClassificatorias = etapas.slice(0, indiceDeCorte + 1);
   const preClassificatorio = await simularEtapasMataMataParcial(etapasPreClassificatorias, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
   const qualificados = preClassificatorio.etapas[preClassificatorio.etapas.length - 1].vencedores;
 
-  const timesDaFaseDeGrupos = [...diretos, ...qualificados];
-  const grupos = await simularFaseDeGruposDoFormato(faseGrupos, timesDaFaseDeGrupos, ratings, random, participacaoJogador, resolverPartida);
+  return {
+    timesDaFaseDeGrupos: [...diretos, ...qualificados],
+    partidasPreClassificatorio: preClassificatorio.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? [])),
+    etapasRestantes: etapas.slice(indiceDeCorte + 1),
+  };
+}
 
-  const etapasFinais: EtapaMataMata[] = etapas.slice(indiceDeCorte + 1).map((etapa, indice) => ({
+/** Ordena times por rating, do mais forte ao mais fraco — usado por `receitaLibertadoresESulAmericanaConjunta` pra emparelhar o repechaje respeitando o lado de origem de cada time (2º da Sula sempre contra 3º da Libertadores, nunca 2º-vs-2º ou 3º-vs-3º). */
+function ordenarPorForca(times: string[], ratings: Record<string, number>): string[] {
+  return [...times].sort((a, b) => (ratings[b] ?? 0) - (ratings[a] ?? 0));
+}
+
+/**
+ * Libertadores + Sul-Americana são intimamente ligadas: os 3º colocados
+ * dos grupos da Libertadores caem pra Sul-Americana, disputando o
+ * repechaje (ida e volta) contra os 2º colocados dos grupos da própria
+ * Sul-Americana — confirmado via CONMEBOL/imprensa (LA NACION, Infobae,
+ * Wikipedia — ver `docs/dados-a-verificar.md`). Uma receita isolada por
+ * competição não consegue representar isso (só enxerga o `times[]` da
+ * própria competição), então as duas são resolvidas JUNTAS aqui — caso
+ * especial tratado em `simularTemporada` antes do despacho normal por
+ * competição, não uma `Receita` comum (por isso não está em
+ * `RECEITAS_POR_ID`/`despacharReceitaGenerica`).
+ *
+ * O repechaje empareia por força (2º da Sula mais forte contra 3º da
+ * Libertadores mais forte, e assim por diante) — sem dado de sorteio
+ * real, mesma aproximação já usada no resto do motor (`emparelharPorForca`),
+ * só que respeitando o lado de origem de cada time (nunca 2º-vs-2º nem
+ * 3º-vs-3º, que não é o confronto real).
+ *
+ * **Limitação aceita**: não modela o clube do jogador "migrando" de
+ * competição — se o clube dele terminasse 3º de grupo na Libertadores, na
+ * vida real ele seguiria jogando (agora pela Sul-Americana); aqui ele
+ * simplesmente é eliminado da Libertadores, como o motor já fazia antes
+ * desta função existir. Só a correção estrutural do campeão de cada
+ * competição (e das partidas de quem já tiver o clube do jogador na
+ * própria lista de times daquela competição) é resolvida — participação
+ * dinâmica entre competições ficaria pra uma mudança maior de
+ * arquitetura (ver `docs/dados-a-verificar.md`).
+ */
+export async function receitaLibertadoresESulAmericanaConjunta(
+  libertadores: CampeonatoSimulavel,
+  sulAmericana: CampeonatoSimulavel,
+  ratingsLibertadores: Record<string, number>,
+  ratingsSulAmericana: Record<string, number>,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+  random: () => number = Math.random,
+  eventos?: EventosSimulacaoTemporada,
+  resolverPartida: ResolverPartida = resolverPartidaPadrao,
+): Promise<{ libertadores: ResultadoCampeonatoSimples; sulAmericana: ResultadoCampeonatoSimples }> {
+  const aoResolverConfrontoLib = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(libertadores.id, evento)
+    : undefined;
+  const aoResolverConfrontoSula = eventos?.aoResolverConfrontoMataMata
+    ? (evento: EventoConfrontoMataMata) => eventos.aoResolverConfrontoMataMata!(sulAmericana.id, evento)
+    : undefined;
+
+  const participacaoLib = participacaoJogador && libertadores.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
+  const participacaoSula = participacaoJogador && sulAmericana.times.includes(participacaoJogador.clubeId) ? participacaoJogador : undefined;
+
+  // Libertadores: pré-classificatório igual sempre, mas a fase de grupos aqui classifica 3 por grupo
+  // (não só os 2 que declaradamente avançam) — precisamos saber quem é o 3º pra alimentar a Sula.
+  const preClassificatorioLib = await resolverPreClassificatorioDeFaseDeGrupos(libertadores, ratingsLibertadores, participacaoLib, random, aoResolverConfrontoLib, resolverPartida);
+  const faseGruposLibComTerceiro = { ...libertadores.formato.fase_grupos!, classificam_por_grupo: 3 };
+  const gruposLib = await simularFaseDeGruposDoFormato(faseGruposLibComTerceiro, preClassificatorioLib.timesDaFaseDeGrupos, ratingsLibertadores, random, participacaoLib, resolverPartida);
+
+  const classificadosLibertadores = gruposLib.grupos.flatMap((g) => g.classificados.slice(0, 2));
+  const tercerosLibertadores = gruposLib.grupos.map((g) => g.classificados[2]);
+
+  const etapasFinaisLib: EtapaMataMata[] = preClassificatorioLib.etapasRestantes.map((etapa, indice) => ({
     nome: etapa.nome,
     ida_e_volta: etapa.ida_e_volta,
-    // a 1ª etapa pós-grupos recebe os classificados JUNTO com quem já tinha entrantes próprios ali
-    // (ex: Sul-Americana tem uma "repescagem" com entrantes próprios logo depois do corte) — soma, não substitui.
-    entrantes: indice === 0 ? [...grupos.classificados, ...(etapa.entrantes ?? [])] : etapa.entrantes,
+    entrantes: indice === 0 ? [...classificadosLibertadores, ...(etapa.entrantes ?? [])] : etapa.entrantes,
   }));
-  const resultadoMataMataFinal = await simularMataMataComEtapas(etapasFinais, ratings, random, participacaoJogador, aoResolverConfronto, resolverPartida);
+  const mataMataLib = await simularMataMataComEtapas(etapasFinaisLib, ratingsLibertadores, random, participacaoLib, aoResolverConfrontoLib, resolverPartida);
 
-  const partidasPreClassificatorio = preClassificatorio.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
-  const partidasDosGrupos = grupos.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
-  const partidasDoMataMataFinal = resultadoMataMataFinal.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+  // Sul-Americana: pré-classificatório + fase de grupos própria, líder avança direto, 2º vai pro repechaje.
+  const preClassificatorioSula = await resolverPreClassificatorioDeFaseDeGrupos(sulAmericana, ratingsSulAmericana, participacaoSula, random, aoResolverConfrontoSula, resolverPartida);
+  const gruposSula = await simularFaseDeGruposDoFormato(sulAmericana.formato.fase_grupos!, preClassificatorioSula.timesDaFaseDeGrupos, ratingsSulAmericana, random, participacaoSula, resolverPartida);
+
+  const lideresSula = gruposSula.grupos.map((g) => g.classificados[0]);
+  const segundosSula = gruposSula.grupos.map((g) => g.classificados[1]);
+
+  const segundosSulaOrdenados = ordenarPorForca(segundosSula, ratingsSulAmericana);
+  const tercerosLibertadoresOrdenados = ordenarPorForca(tercerosLibertadores, ratingsLibertadores);
+
+  // A partir daqui, o "lado Sul-Americana" pode incluir times que vieram da Libertadores (3º de grupo
+  // que caiu no repechaje) — um time que vence o repechaje segue jogando (e pode até ser campeão da
+  // Sul-Americana, isso é real), então os ratings dele (só cadastrados em ratingsLibertadores) também
+  // precisam estar disponíveis daqui em diante.
+  const ratingsSulAmericanaComCruzados = { ...ratingsSulAmericana, ...ratingsLibertadores };
+
+  const classificadosDoRepechaje: string[] = [];
+  const partidasDoRepechaje: ResultadoPartida[] = [];
+  for (let i = 0; i < segundosSulaOrdenados.length; i++) {
+    const confronto = await resolverConfronto(segundosSulaOrdenados[i], tercerosLibertadoresOrdenados[i], ratingsSulAmericanaComCruzados, true, random, participacaoJogador, resolverPartida);
+    aoResolverConfrontoSula?.({ etapa: "repescagem", confronto });
+    classificadosDoRepechaje.push(confronto.vencedor);
+    partidasDoRepechaje.push(...(confronto.partidasDoJogador ?? []));
+  }
+
+  // "repescagem" já foi resolvida manualmente acima (empareada por lado de origem, não pelo
+  // emparelhamento automático por força de simularMataMataComEtapas) — não entra de novo aqui,
+  // senão o repechaje seria resolvido duas vezes. As etapas seguintes (oitavas em diante) recebem
+  // os classificados do repechaje como se fossem os entrantes da primeira delas.
+  const etapasPosRepechaje = preClassificatorioSula.etapasRestantes.filter((etapa) => etapa.nome !== "repescagem");
+  const etapasFinaisSula: EtapaMataMata[] = etapasPosRepechaje.map((etapa, indice) => ({
+    nome: etapa.nome,
+    ida_e_volta: etapa.ida_e_volta,
+    entrantes: indice === 0 ? [...lideresSula, ...classificadosDoRepechaje] : etapa.entrantes,
+  }));
+  const mataMataSula = await simularMataMataComEtapas(etapasFinaisSula, ratingsSulAmericanaComCruzados, random, participacaoSula, aoResolverConfrontoSula, resolverPartida);
+
+  const partidasDosGruposLib = gruposLib.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+  const partidasDoMataMataLib = mataMataLib.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
+  const partidasDosGruposSula = gruposSula.grupos.flatMap((g) => (g.partidasDoJogador ?? []).map((p) => p.resultado));
+  const partidasDoMataMataSula = mataMataSula.etapas.flatMap((etapa) => etapa.confrontos.flatMap((c) => c.partidasDoJogador ?? []));
 
   return {
-    campeao: resultadoMataMataFinal.campeao,
-    partidasDoJogador: [...partidasPreClassificatorio, ...partidasDosGrupos, ...partidasDoMataMataFinal],
+    libertadores: {
+      campeao: mataMataLib.campeao,
+      partidasDoJogador: [...preClassificatorioLib.partidasPreClassificatorio, ...partidasDosGruposLib, ...partidasDoMataMataLib],
+    },
+    sulAmericana: {
+      campeao: mataMataSula.campeao,
+      partidasDoJogador: [...preClassificatorioSula.partidasPreClassificatorio, ...partidasDosGruposSula, ...partidasDoRepechaje, ...partidasDoMataMataSula],
+    },
   };
 }
 
@@ -906,7 +1058,40 @@ export async function simularTemporada(
 
   const competicoes: ResultadoCompeticaoNaTemporada[] = [];
 
+  // Libertadores e Sul-Americana são um caso especial: a Sul-Americana depende dos 3º colocados dos
+  // grupos da Libertadores (repechaje), então não dá pra resolver uma sem a outra — ver
+  // receitaLibertadoresESulAmericanaConjunta. Só entra em jogo quando as duas estão ativas E carregadas.
+  const idsJaResolvidos = new Set<string>();
+  const libertadores = campeonatoPorId.get("libertadores");
+  const sulAmericana = campeonatoPorId.get("sulamericana");
+  if (idsAtivos.has("libertadores") && idsAtivos.has("sulamericana") && libertadores && sulAmericana) {
+    try {
+      const ratingsLibertadores = Object.fromEntries(libertadores.times.map((clubeId) => [clubeId, obterRating(clubePorId.get(clubeId)!)]));
+      const ratingsSulAmericana = Object.fromEntries(sulAmericana.times.map((clubeId) => [clubeId, obterRating(clubePorId.get(clubeId)!)]));
+      const resultado = await receitaLibertadoresESulAmericanaConjunta(
+        libertadores,
+        sulAmericana,
+        ratingsLibertadores,
+        ratingsSulAmericana,
+        participacaoJogador,
+        random,
+        eventos,
+        resolverPartida,
+      );
+      competicoes.push({ campeonatoId: "libertadores", resultado: resultado.libertadores });
+      competicoes.push({ campeonatoId: "sulamericana", resultado: resultado.sulAmericana });
+    } catch (erro) {
+      const mensagem = erro instanceof Error ? erro.message : String(erro);
+      competicoes.push({ campeonatoId: "libertadores", erro: mensagem });
+      competicoes.push({ campeonatoId: "sulamericana", erro: mensagem });
+    }
+    idsJaResolvidos.add("libertadores");
+    idsJaResolvidos.add("sulamericana");
+  }
+
   for (const campeonatoId of idsAtivos) {
+    if (idsJaResolvidos.has(campeonatoId)) continue;
+
     const campeonato = campeonatoPorId.get(campeonatoId);
     if (!campeonato) {
       competicoes.push({ campeonatoId, erro: "competição não encontrada nos campeonatos carregados" });

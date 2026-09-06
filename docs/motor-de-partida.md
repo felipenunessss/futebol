@@ -1350,8 +1350,8 @@ padrão de `receitaArgentina`):
   competições ativas simulam com sucesso (campeões plausíveis: Flamengo/
   Palmeiras no Brasileirão, Cruzeiro/Atlético-MG no Mineiro, Grêmio/
   Internacional no Gauchão, clubes CONMEBOL reais na Libertadores) — só a
-  Sul-Americana continua com erro (documentado acima). Antes desta seção,
-  só 4 das 11 simulavam.
+  Sul-Americana continua com erro nesta seção (resolvido na seção 5.10
+  logo abaixo). Antes desta seção, só 4 das 11 simulavam.
 
 ### 5.9. Receitas pra Uruguai, Venezuela e Equador, com pesquisa de regulamento real (implementado)
 
@@ -1417,6 +1417,71 @@ de completar essas 3 — refazer em sequência, não em paralelo).
   produzem campeões plausíveis (Deportivo Táchira na Venezuela, Peñarol
   no Uruguai, Independiente del Valle no Equador) sem erro, em várias
   rodadas com RNG real (`Math.random()`).
+
+### 5.10. Sul-Americana + Libertadores resolvidas juntas (implementado)
+
+Pedido explícito: confirmar no site da CONMEBOL o mecanismo de que "os
+3º colocados de cada grupo da Libertadores entram no primeiro mata-mata
+depois da fase de grupos, na repescagem, contra os 2º colocados dos
+grupos da Sul-Americana" — **confirmado** (LA NACION, Infobae, Wikipedia,
+ver `docs/dados-a-verificar.md`): 1º/2º de cada grupo da Libertadores
+avançam direto às oitavas da própria Libertadores; 3º cai pra Sul-
+Americana; na Sul-Americana, 1º de cada grupo avança direto às oitavas
+dela, 2º disputa o repechaje (ida e volta) contra os 3º da Libertadores.
+
+Isso é exatamente a limitação arquitetural que a seção 5.8 já suspeitava
+ao investigar por que a matemática das etapas da Sul-Americana nunca
+fechava sozinha: **a Sul-Americana depende de dados da Libertadores**, e
+uma `Receita` isolada só enxerga o `times[]`/`formato` da própria
+competição.
+
+- **`receitaLibertadoresESulAmericanaConjunta`** (não é uma `Receita`
+  comum — não entra em `RECEITAS_POR_ID`/`despacharReceitaGenerica`):
+  recebe as DUAS competições e os DOIS mapas de rating de uma vez.
+  Resolve o pré-classificatório e a fase de grupos de cada uma
+  separadamente (reaproveitando `resolverPreClassificatorioDeFaseDeGrupos`,
+  extraído de `receitaFaseGruposComPreClassificatorioEMataMata` pra esse
+  fim) — a fase de grupos da Libertadores roda com `classificam_por_grupo`
+  temporariamente sobrescrito pra 3 (precisamos saber quem é o 3º
+  colocado, não só quem avança). Monta o repechaje manualmente (não via
+  `EtapaMataMata` — o emparelhamento automático por força não respeitaria
+  o lado de origem de cada time): ordena os 2º da Sul-Americana e os 3º
+  da Libertadores por rating e casa por índice (mais forte contra mais
+  forte de cada lado), resolvendo cada confronto com `resolverConfronto`
+  diretamente. Os classificados do repechaje entram na 1ª etapa **depois**
+  de "repescagem" no `mata_mata.etapas` da Sul-Americana (que é ignorada
+  na hora de montar as etapas finais — já foi resolvida manualmente,
+  entrar de novo dobraria a resolução).
+- **Bug pego em teste, não só no dado**: um time que vem da Libertadores
+  pro repechaje da Sul-Americana pode seguir vencendo e **virar campeão da
+  Sul-Americana de verdade** (aconteceu num teste com dado real:
+  Atlético-MG, times que caem da Libertadores realmente disputam e às
+  vezes vencem a Sul-Americana) — só que os ratings desse time só estavam
+  cadastrados no mapa da Libertadores, não no da Sul-Americana, e usar o
+  mapa errado depois do repechaje geraria `NaN` na força do time.
+  Corrigido combinando os dois mapas de rating (`{...ratingsSulAmericana,
+  ...ratingsLibertadores}`) pra qualquer confronto a partir do repechaje.
+- **Wire-up em `simularTemporada`**: antes do loop normal por competição,
+  um caso especial verifica se `"libertadores"` e `"sulamericana"` estão
+  ativas E carregadas — se sim, resolve as duas juntas e marca os 2 ids
+  como já resolvidos (pulados no loop genérico). Se só uma das duas
+  estiver presente, cai no despacho normal por competição (mesmo
+  comportamento de antes — Sul-Americana sozinha continua com erro claro,
+  não inventa um repechaje sem o dado real da Libertadores).
+- **Limitação aceita, documentada**: não modela o clube do jogador
+  "migrando" de competição — se o clube dele terminasse 3º de grupo na
+  Libertadores, na vida real ele seguiria jogando (agora pela Sul-
+  Americana); aqui ele é eliminado da Libertadores normalmente, como o
+  motor já fazia antes desta função existir. Só a correção estrutural do
+  campeão de cada competição (e das partidas de quem já tiver o clube do
+  jogador na própria lista de times daquela competição) foi resolvida —
+  participação dinâmica entre competições ficaria pra uma mudança maior
+  de arquitetura.
+- **Validado com dado real**: rodando `simularTemporada` com o calendário
+  padrão de 2027 e todos os clubes reais carregados, repetidas vezes,
+  Libertadores e Sul-Americana simulam com sucesso junto com as outras 9
+  — **11 das 11 competições ativas agora simulam**, contra 4 no início
+  desta série de mudanças (seção 5.8).
 
 ## 6. Pendências / próximos passos
 
@@ -1587,8 +1652,7 @@ de completar essas 3 — refazer em sequência, não em paralelo).
   passar a incluir competições internacionais além das continentais
   atuais. Venezuela 2ª divisão tem receita (mesma função da 1ª) mas erra
   sempre — os números não reconciliam (`turno` classifica só 4,
-  `fase_grupos` pede 16), ver `docs/dados-a-verificar.md`.
-  Sul-Americana tem receita (mesma função de Libertadores) mas erra
-  sempre — mecanismo real das etapas "repescagem"/"oitavas"/"quartas" não
-  fecha com o tamanho da fase de grupos, possível dependência
-  cross-competição com a Libertadores (ver `docs/dados-a-verificar.md`).
+  `fase_grupos` pede 16), ver `docs/dados-a-verificar.md`. Libertadores e
+  Sul-Americana (que dependiam uma da outra pro repechaje) foram
+  resolvidas juntas na seção 5.10 — as 11 competições ativas do calendário
+  padrão simulam com sucesso hoje.

@@ -207,25 +207,23 @@ resultado final bate mas o mecanismo intermediário não é representado:
   regionais de 9 → 3 "Grupos Campeonato" de 4 com pontos de bônus
   carregados → playoffs de 3 etapas. Modelado só o corpo principal (2
   grupos de 9) + mata-mata genérico como placeholder.
-- **Copa Sul-Americana**: só o 1º colocado de cada grupo avança direto às
-  oitavas, o 2º vai pra repescagem — modelado como `classificam_por_grupo: 2`
-  uniforme, perdendo a distinção das duas rotas. **Achado adicional ao
-  tentar implementar a receita de simulação** (`simulation/engine.ts`
-  `receitaFaseGruposComPreClassificatorioEMataMata`): a contagem de times
-  do `mata_mata.etapas` ("primeira_fase" 32 entrantes + "repescagem" 8
-  entrantes) somada aos 16 diretos (times que não aparecem em nenhum
-  `entrantes`) não fecha em NENHUM ponto com o tamanho esperado da fase de
-  grupos (32, = 8 grupos × 4) — testado em todo corte possível entre as
-  etapas, incluindo antes/depois da repescagem se juntar aos classificados
-  da fase de grupos. A Libertadores (mesmo formato de blocos, `etapas`
-  igualmente detalhado) fecha exatamente (28 diretos + 4 sobreviventes do
-  pré-classificatório = 32) — então o problema não é o motor, é a
-  contagem/nomeação das etapas da Sul-Americana especificamente: possível
-  que "repescagem" dependa de um mecanismo cross-competição (times
-  eliminados da fase preliminar da Libertadores caindo pra Sul-Americana,
-  não modelado — o motor só enxerga o `times[]` de uma competição por
-  vez) que os dados atuais não capturam. Por ora a Sul-Americana continua
-  sem simulação automática (erro claro, não crash da temporada).
+- ~~Copa Sul-Americana: mecanismo cross-competição com a Libertadores não
+  modelado~~ **resolvida**: confirmado via CONMEBOL/imprensa (LA NACION,
+  Infobae, Wikipedia) que 1º/2º de cada grupo da Libertadores avançam
+  direto às oitavas dela, o 3º cai pra Sul-Americana — na Sul-Americana,
+  1º de cada grupo avança direto, o 2º disputa o repechaje (ida e volta)
+  contra os 3º colocados da Libertadores. Implementado em
+  `simulation/engine.ts` `receitaLibertadoresESulAmericanaConjunta` (as
+  duas competições resolvidas juntas, único jeito de representar essa
+  dependência — ver `docs/motor-de-partida.md` seção 5.10). Continua
+  perdida a distinção "só o 1º de cada grupo avança direto às oitavas, o
+  2º vai pra repescagem" dentro da PRÓPRIA Sul-Americana antes do
+  cruzamento — isso já está corretamente representado agora, então essa
+  parte específica da pendência original também foi resolvida. Fontes:
+  [LA NACION — clasificados a octavos Libertadores/repechaje Sudamericana](https://www.lanacion.com.ar/deportes/futbol/clasificados-a-octavos-de-final-de-la-copa-libertadores-2025-los-que-avanzaron-y-los-que-jugaran-nid30052025/),
+  [Infobae — clasificados octavos y playoffs Sudamericana](https://www.infobae.com/peru/deportes/2025/05/27/los-equipos-clasificados-a-octavos-y-play-offs-de-la-copa-sudamericana-2025-tras-culminar-la-fase-de-grupos/),
+  [beIN Sports — playoffs Sudamericana ida/vuelta](https://www.beinsports.com/es-us/football/conmebol-sudamericana/articles/playoffs-de-la-copa-sudamericana-cu%C3%A1ndo-donde-equipos-llaves-fechas-y-horarios-de-los-partidos-de-esta-fase-2025-07-15),
+  [Wikipedia ES — eliminatoria de octavos Sudamericana 2025](https://es.wikipedia.org/wiki/Anexo:Eliminatoria_de_octavos_de_final_de_la_Copa_Sudamericana_2025).
 
 ## Clássicos não pesquisados (baixa prioridade — só imersão)
 

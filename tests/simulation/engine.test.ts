@@ -6,6 +6,7 @@ import {
   receitaFaseGruposFaseQuadrangularEFinal,
   receitaFaseSuicaEMataMata,
   receitaFaseSuicaMataMataEFinal,
+  receitaLibertadoresESulAmericanaConjunta,
   receitaPontosCorridosComFaseFinalPorClassificacao,
   receitaPontosCorridosComLiguilla,
   receitaTurnoEMataMata,
@@ -668,5 +669,99 @@ describe("simularFaseFinalPorClassificacao", () => {
     for (const linhaResultado of resultado.grupos[0].tabela) {
       expect(linhaResultado.pontos).toBeLessThanOrEqual(3); // só 1 jogo nesse grupo de 2 (ida_e_volta:false)
     }
+  });
+});
+
+describe("receitaLibertadoresESulAmericanaConjunta", () => {
+  // Libertadores mini: 5 diretos + 2 pré-classificatórios (lp1/lp2) — pré-classificatório reduz 2->1,
+  // 5 diretos + 1 sobrevivente fecham com 2 grupos de 3 (6) pra fase de grupos. Top 2 de cada grupo (4)
+  // avançam pras "oitavas" da Libertadores; o 3º de cada grupo (2) cai pro repechaje da Sul-Americana.
+  const libertadores: CampeonatoSimulavel = {
+    id: "libertadores",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 3, ida_e_volta: false, classificam_por_grupo: 2 },
+      mata_mata: {
+        fases: ["primeira_fase", "oitavas", "final"],
+        ida_e_volta: false,
+        etapas: [
+          { nome: "primeira_fase", ida_e_volta: false, entrantes: ["lp1", "lp2"] },
+          { nome: "oitavas", ida_e_volta: false },
+          { nome: "final", ida_e_volta: false },
+        ],
+      },
+    },
+    times: ["ld1", "ld2", "ld3", "ld4", "ld5", "lp1", "lp2"],
+  };
+  // Sul-Americana mini: sem pré-classificatório de verdade (1ª etapa sem entrantes, cut imediato) — 2
+  // grupos de 3 (6 diretos). Líder de cada grupo (2) avança direto às "oitavas"; o 2º de cada grupo (2)
+  // disputa o repechaje contra os 2 "3º colocados" da Libertadores.
+  const sulAmericana: CampeonatoSimulavel = {
+    id: "sulamericana",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 3, ida_e_volta: false, classificam_por_grupo: 2 },
+      mata_mata: {
+        fases: ["primeira_fase", "repescagem", "oitavas", "final"],
+        ida_e_volta: false,
+        etapas: [
+          { nome: "primeira_fase", ida_e_volta: false },
+          { nome: "repescagem", ida_e_volta: false },
+          { nome: "oitavas", ida_e_volta: false },
+          { nome: "final", ida_e_volta: false },
+        ],
+      },
+    },
+    times: ["sd1", "sd2", "sd3", "sd4", "sd5", "sd6"],
+  };
+  const ratingsLibertadores = Object.fromEntries(libertadores.times.map((t) => [t, 1600]));
+  const ratingsSulAmericana = Object.fromEntries(sulAmericana.times.map((t) => [t, 1600]));
+
+  it("produz um campeão válido pras 2 competições, sem quebrar (repechaje cruzado: 3º da Libertadores x 2º da Sul-Americana)", async () => {
+    const resultado = await receitaLibertadoresESulAmericanaConjunta(libertadores, sulAmericana, ratingsLibertadores, ratingsSulAmericana, undefined, () => Math.random());
+    expect(libertadores.times).toContain(resultado.libertadores.campeao);
+    // o campeão da Sul-Americana pode legitimamente ser um 3º colocado da Libertadores que caiu no
+    // repechaje e seguiu vencendo — é assim na vida real, não um bug (ver docs/dados-a-verificar.md).
+    expect([...sulAmericana.times, ...libertadores.times]).toContain(resultado.sulAmericana.campeao);
+  });
+
+  it("propaga partidasDoJogador quando o clube do jogador está na Libertadores", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "lp1", jogador, estiloTecnico: "equilibrado" };
+    const ratingsFavorecendoLp1 = { ...ratingsLibertadores, lp1: 2400 };
+
+    const resultado = await receitaLibertadoresESulAmericanaConjunta(libertadores, sulAmericana, ratingsFavorecendoLp1, ratingsSulAmericana, participacao, () => 0.05);
+    expect(resultado.libertadores.campeao).toBe("lp1");
+    expect(resultado.libertadores.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+
+  it("propaga partidasDoJogador quando o clube do jogador está na Sul-Americana", async () => {
+    const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "sd1", jogador, estiloTecnico: "equilibrado" };
+    const ratingsFavorecendoSd1 = { ...ratingsSulAmericana, sd1: 2400 };
+
+    const resultado = await receitaLibertadoresESulAmericanaConjunta(libertadores, sulAmericana, ratingsLibertadores, ratingsFavorecendoSd1, participacao, () => 0.05);
+    expect(resultado.sulAmericana.campeao).toBe("sd1");
+    expect(resultado.sulAmericana.partidasDoJogador.length).toBeGreaterThan(0);
+  });
+
+  it("integrado via simularTemporada: as duas resolvem juntas quando ambas estão ativas e carregadas", async () => {
+    const clubes = [...libertadores.times, ...sulAmericana.times].map((id) => clube(id));
+    const resultado = await simularTemporada(2027, [libertadores, sulAmericana], clubes, undefined, () => Math.random());
+
+    const resultadoLib = resultado.competicoes.find((c) => c.campeonatoId === "libertadores")!;
+    const resultadoSula = resultado.competicoes.find((c) => c.campeonatoId === "sulamericana")!;
+
+    expect(resultadoLib.erro).toBeUndefined();
+    expect(resultadoSula.erro).toBeUndefined();
+    expect(libertadores.times).toContain(resultadoLib.resultado!.campeao);
+    expect([...sulAmericana.times, ...libertadores.times]).toContain(resultadoSula.resultado!.campeao);
+  });
+
+  it("integrado via simularTemporada: Sul-Americana sozinha (sem Libertadores carregada) continua com erro — não inventa um repechaje sem dado real", async () => {
+    const clubes = sulAmericana.times.map((id) => clube(id));
+    const resultado = await simularTemporada(2027, [sulAmericana], clubes, undefined, () => Math.random());
+
+    const resultadoSula = resultado.competicoes.find((c) => c.campeonatoId === "sulamericana")!;
+    expect(resultadoSula.erro).toBeDefined();
+    expect(resultadoSula.resultado).toBeUndefined();
   });
 });
