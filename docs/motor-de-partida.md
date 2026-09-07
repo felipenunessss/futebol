@@ -1664,6 +1664,67 @@ Em vez disso, um motor **incremental** novo foi construído em paralelo
   exercitou o menu de partida/pausa pós-jogo de verdade — os testes
   automatizados acima é que garantem isso deterministicamente.
 
+### 5.14. Todos os países CONMEBOL, jogáveis de verdade (implementado)
+
+O calendário padrão só ativava competições brasileiras + continentais — as
+ligas de Argentina, Uruguai, Chile, Colômbia, Peru, Equador, Paraguai,
+Bolívia e Venezuela já tinham dado e receita de simulação prontos (seções
+5.9-5.12), mas nunca apareciam numa temporada jogada. Isso causava um bug
+real: as propostas iniciais de clube (`market/transfers.ts`
+`gerarPropostasIniciais`) puxam de toda a base global, não só do Brasil,
+então uma carreira podia começar num clube desses países e nunca ter uma
+partida sequer, porque a liga dele nunca estava ativa.
+
+- **`data/loaders/calendario.ts`**: novo período `"temporada-conmebol"`
+  (semana 5-48) ativando 16 das 17 competições dos 9 países (`venezuela_segunda`
+  fica de fora de propósito — dado incompatível conhecido, ver seção 5.9).
+  Como um período a mais faria a carreira ganhar uma 6ª sessão de
+  treino/cenário sem querer (`jogarTemporada`/`jogarTemporadaSemanal`
+  resolvem 1 por período), `schemas/calendar.ts` ganhou
+  `PeriodoCalendario.pontoDeTreino` (`false` pra esse período novo — só dá
+  janela de semana pra competição, não é checkpoint de carreira).
+- **`simulation/incremental.ts`**: dos 17, 4 (Bolívia, Chile 1ª, Paraguai 2ª,
+  Peru 2ª) já batiam com formatos que o motor incremental já cobria —
+  ficaram jogáveis só de entrar no calendário. As outras 12 (Venezuela 2ª
+  fica de fora) ganharam formato incremental novo, cada um espelhando a
+  receita em lote equivalente (seções 5.9-5.12): soma de turno+returno sem
+  final (Paraguai 1ª, Argentina 1ª — mesmo mecanismo, reaproveitado);
+  liguilla de pontos-corridos (Chile 2ª); liguilla condicional com campeão
+  automático quando o mesmo clube vence os 2 torneios (Peru 1ª, Uruguai
+  1ª — os casos condicionais reaproveitam a degradação que `avancarEtapa`
+  já faz pra etapa de 1 entrante só, sem mecanismo novo); 4 partes
+  independentes que só se cruzam no fim (Uruguai 2ª); zonas + final direta
+  + Reduzido com o perdedor injetado (Argentina 2ª); pontos corridos +
+  fase final por classificação com pontos carregados (Equador — única que
+  precisou de uma primitiva nova, `criarFaseRodadasPorClassificacao`,
+  grupos cortados de uma tabela anterior em vez de por força/sorteio);
+  turno/returno alimentando um classificatório (`fase_quadrangular` na
+  Colômbia, `fase_grupos` na Venezuela) que decide o campeão de cada
+  torneio antes da final da temporada (`passosDeUmTorneio`, reaproveitado
+  pelos dois países — só o tipo de classificatório e o formato da mini-final
+  do torneio mudam).
+- **Robustez descoberta nessa validação**: `dividirEmGruposPorForca`
+  (usado por todo formato com `fase_grupos`/`fase_quadrangular`) nunca
+  conferia se a contagem de times batia com `num_grupos × times_por_grupo`
+  — o motor em lote confere isso (`groups.ts`
+  `simularFaseDeGruposDoFormato`), o incremental não conferia. Corrigido
+  com `dividirEmGruposValidado` (mesma mensagem de erro) em todos os 9
+  pontos que formavam grupo. Como esse tipo de fase só é criada
+  *depois* que uma fase anterior já rodou de verdade (ex: só depois do
+  turno concluir é que dá pra saber se o classificatório vai fechar), um
+  erro assim só aparece no meio da temporada, não na montagem inicial —
+  `CompeticaoIncremental` ganhou um campo `erro` e `avancarSemana` passou
+  a isolar essa falha (mesmo princípio de falha isolada do motor em lote:
+  a competição quebrada para de avançar, as demais continuam normais).
+- **Validado com dado real**: todas as 21 competições avulsas ativas do
+  calendário (5 brasileiras + as 16 novas) resolvem sem erro, produzindo
+  campeões plausíveis (Boca Juniors, Peñarol, Cerro Porteño, Independiente
+  del Valle, Atlético Nacional, entre outros) — mais o par conjunto
+  Libertadores+Sul-Americana. `venezuela_segunda` continua fora do
+  calendário de propósito. 409 testes passando (um `describe` novo por
+  formato em `tests/simulation/incremental.test.ts`, seguindo o mesmo
+  padrão dos formatos anteriores), `npx tsc --noEmit` limpo.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

@@ -888,6 +888,14 @@ export async function jogarTemporadaSemanal(
 
   for (const campeonatoId of idsAtivos) {
     const est = encontrarCompeticao(campeonatoId)!;
+    // Falha isolada tardia (ver simulation/incremental.ts CompeticaoIncremental.erro) — um passo
+    // posterior só descobre o problema depois que uma fase anterior já rodou, então não dava pra
+    // pegar isso na montagem inicial (competicoes.erros, tratado no loop de baixo).
+    if (est.erro) {
+      resultadoCompeticoes.push({ campeonatoId, erro: est.erro });
+      resumoCompeticoes.push({ campeonatoId, erro: est.erro, partidasDoJogador: 0, golsDoJogador: 0, assistenciasDoJogador: 0 });
+      continue;
+    }
     resultadoCompeticoes.push({ campeonatoId, resultado: { campeao: est.campeao ?? "", partidasDoJogador: est.partidasDoJogador } });
     resumoCompeticoes.push({
       campeonatoId,

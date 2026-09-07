@@ -1,5 +1,5 @@
 import type { Club } from "../schemas/club.js";
-import type { EtapaMataMata, FaseSuica } from "../schemas/championship.js";
+import type { EtapaMataMata, FaseSuica, FaseUnica } from "../schemas/championship.js";
 import { construirCalendarioPadrao, janelaDeSemanasPorCompeticao, type JanelaDeSemanas } from "../data/loaders/calendario.js";
 import type { CampeonatoSimulavel } from "./engine.js";
 import {
@@ -13,7 +13,7 @@ import {
   type LinhaTabela,
 } from "./season.js";
 import { gerarConfrontosFaseSuica } from "./swiss.js";
-import { dividirEmGruposPorForca } from "./groups.js";
+import { dividirEmGruposPorForca, type Grupo } from "./groups.js";
 import {
   emparelharPorForca,
   resolverConfronto,
@@ -170,6 +170,43 @@ function criarFaseRodadasSuica(nome: string, times: string[], formato: FaseSuica
   };
 }
 
+/**
+ * Variante de fase de rodadas pra grupos formados por CORTE de uma tabela anterior (não por força/
+ * sorteio nem por tamanho igual) — usada só pelo Equador (`FaseFinalPorClassificacao`, ver
+ * `schemas/championship.ts`): o 1º grupo reúne os melhores colocados da fase anterior, o último os
+ * piores, e cada grupo pode ter um tamanho diferente dos outros (`avancarRodada` já lida bem com
+ * isso — cada grupo só tem confrontos até a própria rodada final, rodadas a mais não encontram
+ * nada pra resolver naquele grupo). Se `pontosCarregados`, cada time entra na fase final já com os
+ * pontos que tinha antes (soma, não zera).
+ */
+function criarFaseRodadasPorClassificacao(
+  nome: string,
+  tabelaAnterior: LinhaTabela[],
+  gruposConfig: { nome: string; tamanho: number }[],
+  idaEVolta: boolean,
+  pontosCarregados: boolean,
+): FaseRodadas {
+  const pontosAntes = new Map(tabelaAnterior.map((linha) => [linha.clubeId, linha.pontos]));
+
+  let indice = 0;
+  const grupos: GrupoDeRodadas[] = gruposConfig.map((config) => {
+    const timesDoGrupo = tabelaAnterior.slice(indice, indice + config.tamanho).map((linha) => linha.clubeId);
+    indice += config.tamanho;
+
+    const tabela = new Map(
+      timesDoGrupo.map((id) => {
+        const linha = linhaVazia(id);
+        if (pontosCarregados) linha.pontos = pontosAntes.get(id) ?? 0;
+        return [id, linha] as const;
+      }),
+    );
+    return { nome: config.nome, confrontos: gerarConfrontosPontosCorridos(timesDoGrupo, idaEVolta), tabela };
+  });
+
+  const totalRodadas = Math.max(0, ...grupos.flatMap((g) => g.confrontos.map((c) => c.rodada)));
+  return { tipo: "rodadas", nome, grupos, classificamPorGrupo: 0, rodadaAtual: 1, totalRodadas, partidasDoJogador: [], concluida: totalRodadas === 0 };
+}
+
 function criarFaseMataMata(nome: string, etapas: EtapaMataMata[]): FaseMataMata {
   return { tipo: "mata_mata", nome, etapas, indiceAtual: 0, vivos: [], resultados: [], partidasDoJogador: [], concluida: etapas.length === 0 };
 }
@@ -270,6 +307,21 @@ async function avancarRepechaje(
 
   fase.indiceAtual++;
   if (fase.indiceAtual >= fase.segundosSula.length) fase.concluida = true;
+}
+
+/**
+ * Mesma validação de `groups.ts` `simularFaseDeGruposDoFormato` — confere que a contagem de times
+ * bate com `numGrupos × timesPorGrupo` antes de dividir, pra falhar alto (erro claro só naquela
+ * competição, sem derrubar as demais — mesmo tratamento de `criarCompeticoesIncrementaisDaTemporada`)
+ * em vez de formar grupos quebrados silenciosamente quando o dado não reconcilia (ex:
+ * `venezuela_segunda`, dado incompatível já documentado em `docs/dados-a-verificar.md`).
+ */
+function dividirEmGruposValidado(times: string[], numGrupos: number, timesPorGrupo: number, ratings: Record<string, number>, contexto: string): Grupo[] {
+  const esperado = numGrupos * timesPorGrupo;
+  if (times.length !== esperado) {
+    throw new Error(`${contexto}: esperava ${esperado} times (${numGrupos} grupos de ${timesPorGrupo}), recebeu ${times.length}`);
+  }
+  return dividirEmGruposPorForca(times, numGrupos, ratings);
 }
 
 function classificadosDaFase(fase: FaseRodadas): string[] {
@@ -582,7 +634,7 @@ function passosUruguaiSegunda(campeonato: CampeonatoSimulavel, ratings: Record<s
   return [
     {
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: () => criarFaseRodadas("series", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, 1),
+      criar: () => criarFaseRodadas("series", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, 1),
       aoConcluir: (fase, ctx) => {
         ctx.campeoesDeSerie = tabelasPorGrupo(fase as FaseRodadas).map((g) => g.tabela[0].clubeId);
       },
@@ -632,7 +684,7 @@ function passosArgentinaSegunda(campeonato: CampeonatoSimulavel, ratings: Record
   return [
     {
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: () => criarFaseRodadas("grupos", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
+      criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         const porGrupo = tabelasPorGrupo(fase as FaseRodadas);
         ctx.lideresDeZona = porGrupo.map((g) => g.tabela[0].clubeId);
@@ -665,6 +717,156 @@ function passosArgentinaSegunda(campeonato: CampeonatoSimulavel, ratings: Record
   ];
 }
 
+/**
+ * Um "torneio" (Apertura ou Clausura) dentro de `turno`+`returno`+`final_estadual` — reaproveitado
+ * por `passosColombia` (o classificatório é `fase_quadrangular`) e `passosVenezuela` (o
+ * classificatório é `fase_grupos`), que só diferem em COMO o torneio classifica os times e decide
+ * seu próprio campeão. `criarClassificatorio`/`criarFinalDoTorneio` isolam essa diferença; o resto
+ * (fase única alimentando o classificatório, gravar `campeaoApertura`/`campeaoClausura` no
+ * contexto compartilhado) é idêntico nos dois países.
+ */
+function passosDeUmTorneio(
+  campeonato: CampeonatoSimulavel,
+  nomeTorneio: string,
+  formatoFaseUnica: FaseUnica,
+  chaveDeSaida: "campeaoApertura" | "campeaoClausura",
+  unidadesDoClassificatorio: number,
+  criarClassificatorio: (classificados: string[]) => Fase,
+  aoConcluirClassificatorio: (fase: Fase, ctx: ContextoDePrograma) => void,
+  unidadesDaFinalDoTorneio: number,
+  criarFinalDoTorneio: (ctx: ContextoDePrograma) => Fase,
+): PassoDePrograma[] {
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, formatoFaseUnica.ida_e_volta),
+      criar: () => criarFaseRodadas(nomeTorneio, [campeonato.times], formatoFaseUnica.ida_e_volta, formatoFaseUnica.classificam_proxima_fase),
+      aoConcluir: (fase, ctx) => {
+        ctx[`classificados_${nomeTorneio}`] = classificadosDaFase(fase as FaseRodadas);
+      },
+    },
+    {
+      unidades: unidadesDoClassificatorio,
+      criar: (ctx) => criarClassificatorio(ctx[`classificados_${nomeTorneio}`] as string[]),
+      aoConcluir: aoConcluirClassificatorio,
+    },
+    {
+      unidades: unidadesDaFinalDoTorneio,
+      criar: criarFinalDoTorneio,
+      aoConcluir: (fase, ctx) => {
+        ctx[chaveDeSaida] = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
+/** Passo final comum a Colômbia e Venezuela: os 2 campeões de torneio (Apertura/Clausura) disputam a final da temporada — mesmo campeão dos 2 = automático. */
+function passoFinalDaTemporada(finalEstadual: { ida_e_volta: boolean }): PassoDePrograma {
+  return {
+    unidades: 1,
+    criar: (ctx) => {
+      const a = ctx.campeaoApertura as string;
+      const b = ctx.campeaoClausura as string;
+      return criarFaseMataMata("final_temporada", [{ nome: "final", ida_e_volta: finalEstadual.ida_e_volta, entrantes: a === b ? [a] : [a, b] }]);
+    },
+    aoConcluir: (fase, ctx) => {
+      ctx.campeao = (fase as FaseMataMata).vivos[0];
+    },
+  };
+}
+
+/**
+ * Colômbia 1ª e 2ª divisão — espelha `engine.ts` `receitaTurnoRetornoComQuadrangularEFinal`: cada
+ * torneio (Apertura/Finalización) tem sua própria fase_quadrangular (2 grupos de 4, sempre ida e
+ * volta) cujos líderes disputam uma final (ida e volta) que decide o campeão DAQUELE torneio; só
+ * depois os 2 campeões de torneio se enfrentam na final da temporada.
+ */
+function passosColombia(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const returno = campeonato.formato.returno!;
+  const fq = campeonato.formato.fase_quadrangular!;
+  const finalEstadual = campeonato.formato.final_estadual!;
+
+  function classificatorio(nomeTorneio: string) {
+    return (classificados: string[]) =>
+      criarFaseRodadas(`${nomeTorneio}_quadrangular`, dividirEmGruposValidado(classificados, fq.num_grupos, fq.times_por_grupo, ratings, campeonato.id).map((g) => g.times), true, 1);
+  }
+
+  const passosApertura = passosDeUmTorneio(
+    campeonato,
+    "apertura",
+    turno,
+    "campeaoApertura",
+    totalDeRodadas(fq.times_por_grupo, true),
+    classificatorio("apertura"),
+    (fase, ctx) => {
+      ctx.lideres_apertura = tabelasPorGrupo(fase as FaseRodadas).map((g) => g.tabela[0].clubeId);
+    },
+    1,
+    (ctx) => criarFaseMataMata("apertura_final", [{ nome: "final", ida_e_volta: true, entrantes: ctx.lideres_apertura as string[] }]),
+  );
+  const passosClausura = passosDeUmTorneio(
+    campeonato,
+    "clausura",
+    returno,
+    "campeaoClausura",
+    totalDeRodadas(fq.times_por_grupo, true),
+    classificatorio("clausura"),
+    (fase, ctx) => {
+      ctx.lideres_clausura = tabelasPorGrupo(fase as FaseRodadas).map((g) => g.tabela[0].clubeId);
+    },
+    1,
+    (ctx) => criarFaseMataMata("clausura_final", [{ nome: "final", ida_e_volta: true, entrantes: ctx.lideres_clausura as string[] }]),
+  );
+
+  return [...passosApertura, ...passosClausura, passoFinalDaTemporada(finalEstadual)];
+}
+
+/**
+ * Venezuela 1ª divisão (venezuela_segunda fica de fora — dado incompatível conhecido, ver
+ * `docs/dados-a-verificar.md`) — espelha `engine.ts` `receitaTurnoRetornoComGrupoEMataMataEFinal`:
+ * mesma estrutura de `passosColombia` (torneio → classificatório → mini-final → final da
+ * temporada), só que o classificatório de cada torneio é `fase_grupos` (não `fase_quadrangular`)
+ * e a "final do torneio" é um `mata_mata` de verdade (pode ter mais de 1 fase), não um confronto só.
+ */
+function passosVenezuela(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const returno = campeonato.formato.returno!;
+  const fg = campeonato.formato.fase_grupos!;
+  const mataMata = campeonato.formato.mata_mata!;
+  const finalEstadual = campeonato.formato.final_estadual!;
+
+  function classificatorio(nomeTorneio: string) {
+    return (classificados: string[]) =>
+      criarFaseRodadas(`${nomeTorneio}_grupos`, dividirEmGruposValidado(classificados, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo);
+  }
+
+  function montarTorneio(nomeTorneio: string, formatoFaseUnica: FaseUnica, chaveDeSaida: "campeaoApertura" | "campeaoClausura"): PassoDePrograma[] {
+    return passosDeUmTorneio(
+      campeonato,
+      nomeTorneio,
+      formatoFaseUnica,
+      chaveDeSaida,
+      totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
+      classificatorio(nomeTorneio),
+      (fase, ctx) => {
+        ctx[`classificadosGrupo_${nomeTorneio}`] = classificadosDaFase(fase as FaseRodadas);
+      },
+      mataMata.fases.length,
+      (ctx) =>
+        criarFaseMataMata(
+          `${nomeTorneio}_mata_mata`,
+          mataMata.fases.map((nome, indice) => ({
+            nome,
+            ida_e_volta: mataMata.ida_e_volta,
+            entrantes: indice === 0 ? (ctx[`classificadosGrupo_${nomeTorneio}`] as string[]) : undefined,
+          })),
+        ),
+    );
+  }
+
+  return [...montarTorneio("apertura", turno, "campeaoApertura"), ...montarTorneio("clausura", returno, "campeaoClausura"), passoFinalDaTemporada(finalEstadual)];
+}
+
 function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
   const fg = campeonato.formato.fase_grupos!;
   const fq = campeonato.formato.fase_quadrangular!;
@@ -672,7 +874,7 @@ function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel,
   return [
     {
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: () => criarFaseRodadas("grupos", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
+      criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.classificadosGrupos = classificadosDaFase(fase as FaseRodadas);
       },
@@ -680,7 +882,7 @@ function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel,
     {
       unidades: totalDeRodadas(fq.times_por_grupo, true),
       criar: (ctx) =>
-        criarFaseRodadas("quadrangular", dividirEmGruposPorForca(ctx.classificadosGrupos as string[], fq.num_grupos, ratings).map((g) => g.times), true, fq.classificam_por_grupo),
+        criarFaseRodadas("quadrangular", dividirEmGruposValidado(ctx.classificadosGrupos as string[], fq.num_grupos, fq.times_por_grupo, ratings, campeonato.id).map((g) => g.times), true, fq.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.lideres = tabelasPorGrupo(fase as FaseRodadas).map((g) => g.tabela[0].clubeId);
       },
@@ -698,13 +900,46 @@ function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel,
   ];
 }
 
+/** Soma dos `totalDeRodadas` de cada grupo — o total de rodadas da fase inteira é o do MAIOR grupo (`criarFaseRodadasPorClassificacao` já deixa os grupos menores ociosos nas rodadas finais). */
+function totalDeRodadasPorClassificacao(gruposConfig: { tamanho: number }[], idaEVolta: boolean): number {
+  return Math.max(0, ...gruposConfig.map((config) => totalDeRodadas(config.tamanho, idaEVolta)));
+}
+
+/**
+ * `pontos_corridos` + `fase_final_por_classificacao` (Equador 1ª e 2ª divisão) — espelha
+ * `engine.ts` `receitaPontosCorridosComFaseFinalPorClassificacao`/`simularFaseFinalPorClassificacao`:
+ * fase regular decide a tabela, dividida em grupos consecutivos por CLASSIFICAÇÃO (não força) pra
+ * fase final — o campeão é o líder do PRIMEIRO grupo (o hexagonal do título).
+ */
+function passosPontosCorridosComFaseFinalPorClassificacao(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const pontosCorridos = campeonato.formato.pontos_corridos!;
+  const faseFinal = campeonato.formato.fase_final_por_classificacao!;
+
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, pontosCorridos.ida_e_volta),
+      criar: () => criarFaseRodadas("regular", [campeonato.times], pontosCorridos.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        ctx.tabelaRegular = tabelaDoGrupoUnico(fase as FaseRodadas);
+      },
+    },
+    {
+      unidades: totalDeRodadasPorClassificacao(faseFinal.grupos, faseFinal.ida_e_volta),
+      criar: (ctx) => criarFaseRodadasPorClassificacao("fase_final", ctx.tabelaRegular as LinhaTabela[], faseFinal.grupos, faseFinal.ida_e_volta, faseFinal.pontos_carregados),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeao = tabelasPorGrupo(fase as FaseRodadas)[0].tabela[0].clubeId;
+      },
+    },
+  ];
+}
+
 function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
   const fg = campeonato.formato.fase_grupos!;
   const mataMata = campeonato.formato.mata_mata!;
   return [
     {
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: () => criarFaseRodadas("grupos", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
+      criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.classificados = classificadosDaFase(fase as FaseRodadas);
       },
@@ -803,6 +1038,12 @@ function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string
       return passosTurnoRetornoSomado(campeonato);
     case "mata_mata,pontos_corridos":
       return passosPontosCorridosComLiguilla(campeonato);
+    case "fase_final_por_classificacao,pontos_corridos":
+      return passosPontosCorridosComFaseFinalPorClassificacao(campeonato);
+    case "fase_quadrangular,final_estadual,returno,turno":
+      return passosColombia(campeonato, ratings);
+    case "fase_grupos,final_estadual,mata_mata,returno,turno":
+      return passosVenezuela(campeonato, ratings);
     default:
       throw new Error(`incremental: sem receita incremental pra combinação de blocos [${blocos}] (campeonato ${campeonato.id})`);
   }
@@ -826,6 +1067,8 @@ export interface CompeticaoIncremental {
   contexto: ContextoDePrograma;
   concluida: boolean;
   campeao?: string;
+  /** Presente quando a competição quebrou no meio da temporada (ex: dado incompatível só detectável depois que uma fase anterior já concluiu — `criar` de um passo posterior pode lançar). A partir daí `avancarSemana` não tenta mais avançar essa competição (fica `concluida: true` sem `campeao`) — mesma tolerância a falha isolada de `engine.ts` `ResultadoCompeticaoNaTemporada.erro`, só que detectada mais tarde (aqui) em vez de na montagem inicial (`CompeticoesDaTemporada.erros`). */
+  erro?: string;
   partidasDoJogador: ResultadoPartida[];
 }
 
@@ -885,36 +1128,46 @@ export async function avancarSemana(
   resolverPartida: ResolverPartida = resolverPartidaPadrao,
   hooks?: HooksDeFase,
 ): Promise<void> {
-  while (!estado.concluida && semanaAtual >= semanaDaProximaUnidade(estado)) {
-    const passo = estado.passos[estado.indicePasso];
+  try {
+    while (!estado.concluida && semanaAtual >= semanaDaProximaUnidade(estado)) {
+      const passo = estado.passos[estado.indicePasso];
 
-    if (!estado.faseAtual) {
-      if (passo.estaPronta && !passo.estaPronta(estado.contexto)) break; // aguarda dependência externa (ex: repechaje aguardando Libertadores)
-      estado.faseAtual = passo.criar(estado.contexto);
-    }
-
-    if (!estado.faseAtual.concluida) {
-      if (estado.faseAtual.tipo === "rodadas") {
-        await avancarRodada(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
-      } else if (estado.faseAtual.tipo === "mata_mata") {
-        await avancarEtapa(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
-      } else {
-        await avancarRepechaje(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
+      if (!estado.faseAtual) {
+        if (passo.estaPronta && !passo.estaPronta(estado.contexto)) break; // aguarda dependência externa (ex: repechaje aguardando Libertadores)
+        estado.faseAtual = passo.criar(estado.contexto);
       }
-      estado.unidadesConcluidas++;
-    }
 
-    if (estado.faseAtual.concluida) {
-      passo.aoConcluir(estado.faseAtual, estado.contexto);
-      estado.partidasDoJogador.push(...estado.faseAtual.partidasDoJogador);
-      estado.faseAtual = undefined;
-      estado.indicePasso++;
+      if (!estado.faseAtual.concluida) {
+        if (estado.faseAtual.tipo === "rodadas") {
+          await avancarRodada(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
+        } else if (estado.faseAtual.tipo === "mata_mata") {
+          await avancarEtapa(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
+        } else {
+          await avancarRepechaje(estado.faseAtual, estado.ratings, random, estado.participacaoJogador, resolverPartida, hooks);
+        }
+        estado.unidadesConcluidas++;
+      }
 
-      if (estado.indicePasso >= estado.passos.length) {
-        estado.concluida = true;
-        estado.campeao = estado.contexto.campeao as string;
+      if (estado.faseAtual.concluida) {
+        passo.aoConcluir(estado.faseAtual, estado.contexto);
+        estado.partidasDoJogador.push(...estado.faseAtual.partidasDoJogador);
+        estado.faseAtual = undefined;
+        estado.indicePasso++;
+
+        if (estado.indicePasso >= estado.passos.length) {
+          estado.concluida = true;
+          estado.campeao = estado.contexto.campeao as string;
+        }
       }
     }
+  } catch (erro) {
+    // Falha isolada, não em cascata (mesmo princípio de `engine.ts` `simularTemporada`): um passo
+    // posterior pode só descobrir um problema de dado (ex: contagem de times incompatível, ver
+    // `dividirEmGruposValidado`) depois que uma fase anterior já rodou de verdade — não dava pra
+    // pegar isso na montagem inicial (`criarCompeticoesIncrementaisDaTemporada`). Marca esta
+    // competição como quebrada e para de tentar avançá-la; as demais continuam normalmente.
+    estado.erro = erro instanceof Error ? erro.message : String(erro);
+    estado.concluida = true;
   }
 }
 
@@ -988,7 +1241,7 @@ function passosLibertadores(campeonato: CampeonatoSimulavel, ratings: Record<str
     {
       // classifica 3 por grupo (não só os 2 que declaradamente avançam) — o 3º alimenta o repechaje da Sul-Americana.
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: (ctx) => criarFaseRodadas("grupos", dividirEmGruposPorForca(ctx.timesDaFaseDeGrupos as string[], fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, 3),
+      criar: (ctx) => criarFaseRodadas("grupos", dividirEmGruposValidado(ctx.timesDaFaseDeGrupos as string[], fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, 3),
       aoConcluir: (fase, ctx) => {
         const porGrupo = tabelasPorGrupo(fase as FaseRodadas);
         ctx.classificados = porGrupo.flatMap((g) => g.tabela.slice(0, 2).map((linha) => linha.clubeId));
@@ -1030,7 +1283,8 @@ function passosSulAmericana(campeonato: CampeonatoSimulavel, ratings: Record<str
     },
     {
       unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
-      criar: (ctx) => criarFaseRodadas("grupos", dividirEmGruposPorForca(ctx.timesDaFaseDeGrupos as string[], fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
+      criar: (ctx) =>
+        criarFaseRodadas("grupos", dividirEmGruposValidado(ctx.timesDaFaseDeGrupos as string[], fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         const porGrupo = tabelasPorGrupo(fase as FaseRodadas);
         ctx.lideres = porGrupo.map((g) => g.tabela[0].clubeId);

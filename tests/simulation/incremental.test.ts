@@ -322,6 +322,71 @@ describe("criarCompeticaoIncremental — 2 zonas + final direta + Reduzido (Arge
   }
 });
 
+describe("criarCompeticaoIncremental — pontos_corridos + fase final por classificação (Equador)", () => {
+  const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "equador_teste",
+    formato: {
+      pontos_corridos: { ida_e_volta: true, rodadas: 14 },
+      fase_final_por_classificacao: {
+        grupos: [
+          { nome: "hexagonal_titulo", tamanho: 4 },
+          { nome: "hexagonal_rebaixamento", tamanho: 4 },
+        ],
+        ida_e_volta: true,
+        pontos_carregados: true,
+      },
+    },
+    times,
+  };
+
+  it("o campeão sai do grupo do título (1º da fase regular), nunca do grupo de rebaixamento", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 20 }, () => Math.random());
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+
+  it("com pontos_carregados, quem chega na fase final com mais pontos da fase regular carrega essa vantagem (não zera)", async () => {
+    // rating muito mais alto só pro time "a" — deve dominar a fase regular, entrar na fase final com
+    // vantagem enorme de pontos, e vencer o hexagonal do título mesmo com o resto empatado em força.
+    const ratingsFavorecendoA = { ...ratings, a: 2600 };
+    const estado = criarCompeticaoIncremental(campeonato, ratingsFavorecendoA, undefined, { semanaInicio: 1, semanaFim: 20 }, () => 0.02);
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => 0.02);
+    expect(estado.campeao).toBe("a");
+  });
+});
+
+describe("criarCompeticaoIncremental — turno/returno com quadrangular + final (Colômbia 1ª e 2ª divisão)", () => {
+  const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "colombia_teste",
+    formato: {
+      turno: { nome: "Apertura", ida_e_volta: false, classificam_proxima_fase: 8 },
+      returno: { nome: "Finalización", ida_e_volta: false, classificam_proxima_fase: 8 },
+      fase_quadrangular: { ativa: true, num_grupos: 2, times_por_grupo: 4, classificam_por_grupo: 1 },
+      final_estadual: { criterio: "campeoes_apertura_finalizacion", ida_e_volta: true },
+    },
+    times,
+  };
+
+  it("cada torneio decide o próprio campeão via quadrangular+final, e os 2 campeões disputam a final da temporada", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 20 }, () => Math.random());
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+
+  it("mesmo clube campeão dos 2 torneios vira campeão automático da temporada", async () => {
+    const ratingsDominantes = { ...ratings, a: 2600 };
+    const estado = criarCompeticaoIncremental(campeonato, ratingsDominantes, undefined, { semanaInicio: 1, semanaFim: 20 }, () => 0.02);
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => 0.02);
+    expect(estado.campeao).toBe("a");
+  });
+});
+
 describe("criarCompeticaoIncrementalConjunta (Libertadores + Sul-Americana)", () => {
   // Mesma base sintética de tests/simulation/engine.test.ts (receitaLibertadoresESulAmericanaConjunta).
   const libertadores: CampeonatoSimulavel = {
@@ -438,8 +503,36 @@ describe("criarCompeticoesIncrementaisDaTemporada", () => {
       expect(campeonato.times).toContain(estado.campeao);
     }
 
-    // as competições que ainda precisam de formato incremental novo (Fase 2, em andamento)
-    // continuam falhando de forma esperada — não travam a montagem das demais.
-    expect(resultado.erros.some((e) => e.campeonatoId === "venezuela_primera")).toBe(true);
+    // venezuela_segunda fica de fora do calendário de propósito (dado incompatível conhecido, ver
+    // docs/dados-a-verificar.md e data/loaders/calendario.ts) — nem chega a ser montada.
+    expect(resultado.avulsas.has("venezuela_segunda")).toBe(false);
+  });
+
+  it("uma competição que só quebra numa fase POSTERIOR (depois que uma fase anterior já rodou de verdade) é isolada sem travar as demais — CompeticaoIncremental.erro", async () => {
+    // times[] não reconcilia com fase_grupos (6 ao todo, mas o classificatório pede 2 grupos de 4 = 8)
+    // — só descoberto depois que o turno já concluiu (mesmo formato de venezuela_primera/segunda).
+    const times = ["a", "b", "c", "d", "e", "f"];
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+    const campeonato: CampeonatoSimulavel = {
+      id: "venezuela_teste",
+      formato: {
+        turno: { nome: "Apertura", ida_e_volta: false, classificam_proxima_fase: 6 },
+        returno: { nome: "Clausura", ida_e_volta: false, classificam_proxima_fase: 6 },
+        fase_grupos: { num_grupos: 2, times_por_grupo: 4, ida_e_volta: true, classificam_por_grupo: 2 },
+        mata_mata: { fases: ["final"], ida_e_volta: false },
+        final_estadual: { criterio: "campeoes_apertura_clausura", ida_e_volta: false },
+      },
+      times,
+    };
+
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 20 }, () => Math.random());
+    for (let semana = 1; semana <= 20; semana++) {
+      await avancarSemana(estado, semana, () => Math.random()); // nunca lança — o erro fica isolado no estado
+    }
+
+    expect(estado.concluida).toBe(true);
+    expect(estado.erro).toBeDefined();
+    expect(estado.erro).toContain("esperava 8 times");
+    expect(estado.campeao).toBeUndefined();
   });
 });
