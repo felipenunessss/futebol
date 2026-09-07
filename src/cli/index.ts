@@ -18,6 +18,7 @@ import {
   type Opcao,
 } from "../progression/scenarios.js";
 import { converterChancesEmDesempenho, type FocoDeTreino } from "../progression/xp.js";
+import { ROTULO_POTENCIAL } from "../progression/potencial.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "../simulation/live-match.js";
@@ -535,7 +536,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
 
   console.log(`\n=== ${estado.jogador.nome} (${posicao}) — ${nomeDoClube(clubeInicialId)}, temporada ${estado.temporada} ===`);
-  console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)} | Status: ${estado.statusNoClube}\n`);
+  console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)} | Status: ${estado.statusNoClube}`);
+  console.log(`Avaliação dos olheiros sobre seu potencial de desenvolvimento: ${ROTULO_POTENCIAL[estado.avaliacaoDeOlheiros]} (pode não ser exata ainda)\n`);
 
   const escolherOpcaoInterativa = async (cenario: Cenario): Promise<Opcao> => {
     console.log(`\n--- ${cenario.titulo} ---`);
@@ -754,6 +756,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     const competicoesOk = resultado.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(`\n=== Fim da temporada ${resultado.resultadoTemporada.temporada} — agora ${estado.temporada} ===`);
     console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Idade: ${estado.jogador.idade} | Overall: ${overallAtual(estado)} | Status: ${estado.statusNoClube}`);
+    console.log(`Avaliação dos olheiros sobre seu potencial: ${ROTULO_POTENCIAL[estado.avaliacaoDeOlheiros]}`);
     console.log(`${competicoesOk.length}/${resultado.resultadoTemporada.competicoes.length} competições simuladas`);
     console.log(
       `Moral ${estado.moral} | Reputação nacional ${estado.reputacao.nacional} | Relações internas ${estado.relacoesInternas} | Patrimônio R$${estado.patrimonio}`,

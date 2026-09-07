@@ -15,6 +15,10 @@ import type { ChanceJogador } from "../../src/simulation/match.js";
 import type { DesempenhoPartida } from "../../src/progression/xp.js";
 
 function estadoBase(): EstadoDeCarreira {
+  // random fixo — a maioria dos testes deste arquivo compara "antes vs depois" de alguma operação
+  // a partir do MESMO ponto de partida; com random de verdade, criarEstadoInicial sorteia atributos
+  // (e overall) diferentes a cada chamada (ver career/Player.ts), o que tornaria essas comparações
+  // instáveis.
   return criarEstadoInicial({
     id: "j1",
     nome: "Jogador Teste",
@@ -22,6 +26,7 @@ function estadoBase(): EstadoDeCarreira {
     arquetipoId: "finalizador",
     clubeInicialId: "corinthians",
     temporadaInicial: 2027,
+    random: () => 0.5,
   });
 }
 
@@ -40,9 +45,32 @@ describe("criarEstadoInicial", () => {
   });
 
   it("atributos prioritários do arquétipo começam mais altos que os demais", () => {
-    const estado = estadoBase();
+    // random fixo (0.5 = exatamente o centro da amostra triangular, sem ruído) — evita flakiness,
+    // já que com random de verdade o ruído poderia (raramente) empatar/inverter um par específico.
+    const estado = criarEstadoInicial({ id: "j1", nome: "Jogador Teste", posicao: "atacante", arquetipoId: "finalizador", clubeInicialId: "corinthians", temporadaInicial: 2027, random: () => 0.5 });
     // finalizador: prioritários = finalizacao, posicionamento_ofensivo, frieza
     expect(estado.jogador.atributos.finalizacao!).toBeGreaterThan(estado.jogador.atributos.velocidade!);
+  });
+
+  it("overall inicial tem amplitude real (não é mais um valor fixo) mas fica concentrado perto de 50-60", () => {
+    const overalis = Array.from({ length: 200 }, (_, i) => {
+      const estado = criarEstadoInicial({ id: `j${i}`, nome: "Teste", posicao: "atacante", arquetipoId: "finalizador", clubeInicialId: "corinthians", temporadaInicial: 2027, random: Math.random });
+      return overallAtual(estado);
+    });
+
+    const distintos = new Set(overalis);
+    expect(distintos.size).toBeGreaterThan(5); // amplitude real, não um valor fixo repetido 200x
+
+    const media = overalis.reduce((soma, o) => soma + o, 0) / overalis.length;
+    expect(media).toBeGreaterThan(45);
+    expect(media).toBeLessThan(65);
+  });
+
+  it("sorteia um potencial de desenvolvimento oculto e já semeia a 1ª avaliação de olheiros (0 temporadas observadas)", () => {
+    const estado = estadoBase();
+    expect(estado.jogador.potencial).toBeDefined();
+    expect(estado.temporadasNaCarreira).toBe(0);
+    expect(estado.avaliacaoDeOlheiros).toBeDefined();
   });
 
   it("respeita idadeInicial customizada", () => {
@@ -169,6 +197,21 @@ describe("avancarTemporada", () => {
     const depois = avancarTemporada(estado, "SP");
     // nacional 50 libera marca_esportiva_nacional (min 40, 80_000); regional SP 40 libera loja_do_bairro (min 15, 5_000) e emissora_local (min 35, 20_000)
     expect(depois.patrimonio).toBe(80_000 + 5_000 + 20_000);
+  });
+
+  it("incrementa temporadasNaCarreira e reavalia avaliacaoDeOlheiros a cada temporada", () => {
+    const estado = estadoBase();
+    const depois = avancarTemporada(estado);
+    expect(depois.temporadasNaCarreira).toBe(1);
+    expect(depois.avaliacaoDeOlheiros).toBeDefined();
+  });
+
+  it("avaliação de olheiros converge pro potencial real depois de acompanhar o jogador por várias temporadas (nunca erra a partir da 4ª)", () => {
+    let estado = estadoBase();
+    for (let i = 0; i < 5; i++) estado = avancarTemporada(estado);
+
+    expect(estado.temporadasNaCarreira).toBe(5);
+    expect(estado.avaliacaoDeOlheiros).toBe(estado.jogador.potencial);
   });
 });
 

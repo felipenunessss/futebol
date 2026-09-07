@@ -15,6 +15,9 @@ function campeonatoDeTeste(times: string[]): CampeonatoSimulavel[] {
 }
 
 function estadoDeTeste() {
+  // random fixo — o teste chama estadoDeTeste() várias vezes esperando o MESMO overall inicial
+  // (ex: comparar antes/depois de jogarTemporada); com random de verdade cada chamada sortearia
+  // atributos diferentes (ver career/Player.ts criarEstadoInicial).
   return criarEstadoInicial({
     id: "j1",
     nome: "Jogador Teste",
@@ -22,6 +25,7 @@ function estadoDeTeste() {
     arquetipoId: "finalizador",
     clubeInicialId: "a",
     temporadaInicial: 2027,
+    random: () => 0.5,
   });
 }
 

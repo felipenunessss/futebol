@@ -1757,6 +1757,60 @@ ou clube.
   410 testes passando (`tests/market/valuation.test.ts` ganhou um teste
   específico garantindo que uma promessa recém-criada não zera mais).
 
+### 5.16. Amplitude no overall inicial + potencial de desenvolvimento oculto (implementado)
+
+`criarEstadoInicial` (`career/Player.ts`) montava todo jogador novo com
+atributos **fixos** (45 prioritário do arquétipo, 35 os demais — sem
+`random` nenhum, todo mundo idêntico, overall sempre ~38-40) e todo mundo
+crescia pela mesma velocidade. Pedido: overall inicial com amplitude de
+verdade, mas concentrado perto de 50-60; e, com probabilidade bem menor,
+o jogador poder ter um potencial de desenvolvimento melhor (evolui mais
+rápido) — confirmado com o jogador: só velocidade de crescimento (não
+teto máximo), e **oculto** (a UI nunca mostra o valor real, só uma
+avaliação de olheiros que pode errar e vai ficando mais precisa).
+
+- **Amplitude no overall**: cada atributo agora soma 2 fontes de ruído
+  triangular (`amostraTriangular`, soma de 2 sorteios uniformes — mais
+  concentrado no centro que uma distribuição uniforme pura, sem precisar
+  de biblioteca de normal de verdade): uma "qualidade geral" sorteada 1x
+  por jogador e aplicada a TODOS os atributos junto
+  (`AMPLITUDE_QUALIDADE_GERAL=16`) — é essa que dá amplitude real ao
+  overall, já que ruído por atributo isolado se cancelaria na média
+  (`calcularOverall` pondera muitos atributos); e um ruído menor por
+  atributo individual (`AMPLITUDE_ATRIBUTO_INICIAL=8`), só pra variar o
+  perfil dentro do mesmo jogador. Centros subiram de 45/35 pra 58/48
+  (prioritário/demais). Resultado validado com 2.000 sorteios: overall
+  entre ~35-69, média ~52, a maioria perto de 45-60.
+- **Potencial de desenvolvimento** (`progression/potencial.ts`, módulo
+  novo): 5 níveis sorteados 1x na criação, guardados OCULTOS em
+  `Jogador.potencial` (campo opcional — ausente = "regular"/1x, não
+  quebra as ~10 suítes de teste que constroem `Jogador` na mão) —
+  regular 62%/1x, acima da média 23%/1.15x, talento raro 10%/1.3x,
+  excepcional 4%/1.5x, geracional 1%/1.8x. O multiplicador entra em
+  `progression/xp.ts` `aplicarXpPartidaAoJogador`/`aplicarTreino`, ao
+  lado do multiplicador de arquétipo que já existia (mesma filosofia
+  "sem perks, só acelera atributo numérico").
+- **Avaliação de olheiros** (o que a UI mostra, nunca o valor real):
+  `gerarAvaliacaoDeOlheiros` sorteia uma estimativa com erro de até 2
+  níveis nas 2 primeiras temporadas, até 1 nível nas 2 seguintes, e
+  exata a partir da 5ª — `EstadoDeCarreira` ganhou
+  `temporadasNaCarreira`/`avaliacaoDeOlheiros`, recalculada a cada
+  `avancarTemporada` (que ganhou um `random` opcional). Mostrada na
+  criação de carreira e no resumo de fim de temporada, tanto na CLI
+  (`src/cli/index.ts`) quanto no wizard web
+  (`web/src/features/criacao-de-carreira/`).
+- **Efeito colateral bom**: como o overall inicial típico subiu de
+  ~38-40 pra ~50-55, as propostas salariais da recalibração da seção
+  5.15 ficam ainda mais plausíveis pra uma promessa recém-chegada
+  (R$7.000-15.000/mês típico, contra R$800-1.200 com o overall antigo).
+- **Validado**: 423 testes passando (`tests/progression/potencial.test.ts`
+  novo — distribuição dos níveis, avaliação nunca foge do catálogo válido
+  e fica exata a partir da 5ª temporada; testes novos em
+  `tests/career/Player.test.ts`/`tests/progression/xp.test.ts`), `npx tsc
+  --noEmit` limpo (raiz e `web/`), e um script ad-hoc confirmando a
+  distribuição de potencial batendo com a tabela (62/23/10/4/1% em 2.000
+  amostras) e a curva de salário reagindo de forma suave ao overall.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

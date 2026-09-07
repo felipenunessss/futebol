@@ -1,5 +1,6 @@
 import { ATRIBUTOS_POR_POSICAO, type Arquetipo, type Atributo, type Atributos, type Jogador } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
+import { multiplicadorDePotencial } from "./potencial.js";
 
 /**
  * Geração de XP e crescimento de atributo — ver docs/motor-de-partida.md
@@ -107,6 +108,11 @@ export function multiplicadorDoAtributo(atributo: Atributo, arquetipo: Arquetipo
   return arquetipo.atributos_prioritarios.includes(atributo) ? MULTIPLICADOR_PRIORITARIO : 1;
 }
 
+/** Combina o multiplicador de arquétipo (`multiplicadorDoAtributo`) com o de potencial de desenvolvimento oculto (`progression/potencial.ts` `multiplicadorDePotencial` — trata `jogador.potencial` ausente como "regular"/1x) — os dois aceleram o mesmo crescimento numérico, sem desbloquear efeito nenhum (mesma filosofia "sem perks" de sempre). */
+function multiplicadorTotalDoAtributo(atributo: Atributo, jogador: Jogador, arquetipo: Arquetipo): number {
+  return multiplicadorDoAtributo(atributo, arquetipo) * multiplicadorDePotencial(jogador.potencial);
+}
+
 /**
  * Aplica o XP de uma partida aos atributos do jogador — combina duas
  * fontes (ver docs/motor-de-partida.md seção 3): uma fração do XP total
@@ -129,7 +135,7 @@ export function aplicarXpPartidaAoJogador(
   const xpPorAtributoGeral = relevantes.length > 0 ? xpGeral / relevantes.length : 0;
   for (const atributo of relevantes) {
     const valorAtual = atributos[atributo] ?? 1;
-    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributoGeral, multiplicadorDoAtributo(atributo, arquetipo));
+    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributoGeral, multiplicadorTotalDoAtributo(atributo, jogador, arquetipo));
   }
 
   const xpEventos = xpTotalPartida * (1 - FRACAO_XP_GERAL);
@@ -138,7 +144,7 @@ export function aplicarXpPartidaAoJogador(
   for (const chance of chances) {
     const xpDaChance = xpPorChance * (chance.sucesso ? 1 : FATOR_XP_CHANCE_SEM_SUCESSO);
     const valorAtual = atributos[chance.atributoUsado] ?? 1;
-    atributos[chance.atributoUsado] = aplicarXpAtributo(valorAtual, xpDaChance, multiplicadorDoAtributo(chance.atributoUsado, arquetipo));
+    atributos[chance.atributoUsado] = aplicarXpAtributo(valorAtual, xpDaChance, multiplicadorTotalDoAtributo(chance.atributoUsado, jogador, arquetipo));
   }
 
   return atributos;
@@ -198,7 +204,7 @@ export function aplicarTreino(jogador: Jogador, arquetipo: Arquetipo, foco: Foco
   const xpPorAtributo = XP_POR_SESSAO_DE_TREINO / relevantes.length;
   for (const atributo of relevantes) {
     const valorAtual = atributos[atributo] ?? 1;
-    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributo, multiplicadorDoAtributo(atributo, arquetipo));
+    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributo, multiplicadorTotalDoAtributo(atributo, jogador, arquetipo));
   }
 
   return atributos;

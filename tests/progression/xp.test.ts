@@ -183,6 +183,28 @@ describe("aplicarXpPartidaAoJogador", () => {
     expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
   });
 
+  it("potencial de desenvolvimento oculto acelera o crescimento, ao lado do multiplicador de arquétipo", () => {
+    const regular = { ...jogadorBase(), potencial: "regular" as const };
+    const geracional = { ...jogadorBase(), potencial: "geracional" as const };
+    const chances: ChanceJogador[] = [chance({ atributoUsado: "cabeceio" })]; // não-prioritário, isola o efeito só do potencial
+
+    const ganhoRegular = aplicarXpPartidaAoJogador(regular, finalizador, chances, 100).cabeceio! - regular.atributos.cabeceio!;
+    const ganhoGeracional = aplicarXpPartidaAoJogador(geracional, finalizador, chances, 100).cabeceio! - geracional.atributos.cabeceio!;
+
+    expect(ganhoGeracional).toBeGreaterThan(ganhoRegular);
+  });
+
+  it("jogador sem `potencial` informado (comum em objeto Jogador construído na mão) se comporta como potencial 'regular' — retrocompatível", () => {
+    const semPotencial = jogadorBase(); // sem .potencial
+    const comRegular = { ...jogadorBase(), potencial: "regular" as const };
+    const chances: ChanceJogador[] = [chance({ atributoUsado: "cabeceio" })];
+
+    const atributosSemPotencial = aplicarXpPartidaAoJogador(semPotencial, finalizador, chances, 100);
+    const atributosComRegular = aplicarXpPartidaAoJogador(comRegular, finalizador, chances, 100);
+
+    expect(atributosSemPotencial.cabeceio).toBe(atributosComRegular.cabeceio);
+  });
+
   it("mesmo sem nenhuma chance, o XP geral ainda distribui crescimento pelos atributos da posição", () => {
     const jogador = jogadorBase();
     const atributos = aplicarXpPartidaAoJogador(jogador, finalizador, [], 100);

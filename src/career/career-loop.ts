@@ -644,7 +644,7 @@ export async function jogarTemporada(
   }
 
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
+  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal, random);
 
   return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
 }
@@ -925,7 +925,7 @@ export async function jogarTemporadaSemanal(
   }
 
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal);
+  estadoAtual = avancarTemporada(estadoAtual, regiaoFinal, random);
 
   return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
 }

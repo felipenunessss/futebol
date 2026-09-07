@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ARQUETIPOS, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual } from "@motor/career/Player.js";
+import { ROTULO_POTENCIAL } from "@motor/progression/potencial.js";
 import type { PropostaTransferencia } from "@motor/market/transfers.js";
 import { useCriacaoDeCarreira } from "./useCriacaoDeCarreira.js";
 
@@ -223,6 +224,11 @@ function PassoResumo({ estado, nomeClube, onFinalizar }: { estado: NonNullable<R
         <dt className="text-slate-400">Temporada</dt>
         <dd>{estado.temporada}</dd>
       </dl>
+      <p className="text-sm text-slate-400 border-t border-slate-800 pt-3">
+        Avaliação dos olheiros sobre seu potencial de desenvolvimento: <span className="text-slate-200 font-medium">{ROTULO_POTENCIAL[estado.avaliacaoDeOlheiros]}</span>
+        <br />
+        <span className="text-xs">Essa avaliação pode não ser exata ainda — vai ficando mais precisa conforme você joga.</span>
+      </p>
       <button type="button" onClick={onFinalizar} className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
         Começar a carreira
       </button>

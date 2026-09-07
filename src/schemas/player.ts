@@ -1,3 +1,5 @@
+import type { NivelDePotencial } from "../progression/potencial.js";
+
 /**
  * Atributos numéricos (0-99, estilo FIFA) — ver docs/motor-de-partida.md.
  * Sem perks: arquétipo só acelera o crescimento de alguns desses atributos,
@@ -92,6 +94,8 @@ export interface Jogador {
   arquetipo_id: string;
   idade: number;
   atributos: Atributos;
+  /** Potencial de desenvolvimento oculto (`progression/potencial.ts`) — nunca mostrado direto na UI, só a "avaliação de olheiros" (`career/Player.ts` `EstadoDeCarreira.avaliacaoDeOlheiros`). Ausente = tratado como "regular" (`multiplicadorDePotencial`) — mantém compatível quem monta um `Jogador` na mão (comum em teste) sem passar por `criarEstadoInicial`. */
+  potencial?: NivelDePotencial;
 }
 
 /**
