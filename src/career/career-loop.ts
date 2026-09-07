@@ -633,7 +633,10 @@ export async function jogarTemporada(
     random,
   };
 
-  for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario) {
+  // `pontoDeTreino: false` (ex: janela genérica de outros países CONMEBOL, ver
+  // `data/loaders/calendario.ts`) não conta como período de treino/cenário — só dá janela de
+  // semana pra competição, não muda quantas sessões de treino a temporada tem.
+  for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario.filter((p) => p.pontoDeTreino !== false)) {
     const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodo, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
     estadoAtual = estadoAposPeriodo;
     treinosResolvidos.push(treino);
@@ -848,7 +851,9 @@ export async function jogarTemporadaSemanal(
   for (let semana = 1; semana <= ultimaSemana; semana++) {
     semanaAtualParaContexto = semana;
 
-    const periodoQueComeca = periodos.find((p) => p.semanaInicio === semana);
+    // `pontoDeTreino: false` (ex: janela genérica de outros países CONMEBOL) só dá janela de
+    // semana pra competição, não dispara uma sessão de treino/cenário a mais na temporada.
+    const periodoQueComeca = periodos.find((p) => p.semanaInicio === semana && p.pontoDeTreino !== false);
     if (periodoQueComeca) {
       const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodoQueComeca, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
       estadoAtual = estadoAposPeriodo;

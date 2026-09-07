@@ -27,4 +27,38 @@ describe("calendario mestre", () => {
       ]),
     );
   });
+
+  it("ativa as ligas de outros países CONMEBOL, sem contar como ponto de treino a mais", () => {
+    const calendario = construirCalendarioPadrao(2027);
+    const outrosPaises = calendario.calendario.find((p) => p.periodo === "temporada-conmebol");
+
+    expect(outrosPaises).toBeDefined();
+    expect(outrosPaises?.pontoDeTreino).toBe(false);
+    expect(outrosPaises?.competicoes_ativas).toEqual(
+      expect.arrayContaining([
+        "argentina_primera",
+        "argentina_segunda",
+        "bolivia_primera",
+        "chile_primera",
+        "chile_segunda",
+        "colombia_primera_a",
+        "colombia_segunda",
+        "equador_primera",
+        "equador_segunda",
+        "paraguai_primera",
+        "paraguai_segunda",
+        "peru_primera",
+        "peru_segunda",
+        "uruguai_primera",
+        "uruguai_segunda",
+        "venezuela_primera",
+      ]),
+    );
+    // venezuela_segunda fica de fora de propósito (dado incompatível conhecido, ver docs/dados-a-verificar.md)
+    expect(outrosPaises?.competicoes_ativas).not.toContain("venezuela_segunda");
+
+    // só os períodos de treino de verdade contam (os 5 originais) — a janela nova não soma mais um.
+    const pontosDeTreino = calendario.calendario.filter((p) => p.pontoDeTreino !== false);
+    expect(pontosDeTreino).toHaveLength(5);
+  });
 });

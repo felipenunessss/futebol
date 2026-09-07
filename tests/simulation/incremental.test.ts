@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Club } from "../../src/schemas/club.js";
 import type { CampeonatoSimulavel } from "../../src/simulation/engine.js";
+import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../src/data/loaders/index.js";
 import { simularTemporadaPontosCorridos } from "../../src/simulation/season.js";
 import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
@@ -229,5 +230,29 @@ describe("criarCompeticoesIncrementaisDaTemporada", () => {
 
     expect(resultado.avulsas.has("brasileirao_serie_a")).toBe(true);
     expect(resultado.erros.some((e) => e.campeonatoId === "sulamericana")).toBe(true); // ativa no calendário mas não carregada
+  });
+
+  it("resolve com dado real as 4 ligas de outros países que já batem com formatos incrementais existentes (Bolívia, Chile 1ª, Paraguai 2ª, Peru 2ª)", async () => {
+    const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
+    const clubes = loadClubes();
+
+    const resultado = criarCompeticoesIncrementaisDaTemporada(2027, campeonatos, clubes, undefined, () => Math.random());
+
+    for (let semana = 1; semana <= 52; semana++) {
+      for (const estado of resultado.avulsas.values()) await avancarSemana(estado, semana, () => Math.random());
+      for (const conjunta of resultado.conjuntas) await avancarSemanaConjunta(conjunta, semana, () => Math.random());
+    }
+
+    for (const id of ["bolivia_primera", "chile_primera", "paraguai_segunda", "peru_segunda"]) {
+      const estado = resultado.avulsas.get(id)!;
+      const campeonato = campeonatos.find((c) => c.id === id)!;
+      expect(estado, `${id} deveria ter sido montado sem erro`).toBeDefined();
+      expect(estado.concluida).toBe(true);
+      expect(campeonato.times).toContain(estado.campeao);
+    }
+
+    // as ~13 competições que ainda precisam de formato incremental novo (Fase 2) continuam
+    // falhando de forma esperada — não travam a montagem das demais.
+    expect(resultado.erros.some((e) => e.campeonatoId === "argentina_primera")).toBe(true);
   });
 });

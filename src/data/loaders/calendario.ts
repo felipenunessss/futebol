@@ -40,6 +40,40 @@ const PERIODOS_PADRAO: PeriodoCalendario[] = [
     semanaInicio: 18,
     semanaFim: 48,
   },
+  {
+    // Ligas nacionais dos demais países CONMEBOL — janela ampla (semana 5-48, evitando só o
+    // começo do ano que hoje é todo estadual brasileiro) compartilhada por todas, estimativa de
+    // design como o resto do calendário (o jogo não tem datas de partida reais pra país nenhum).
+    // Cada país tem seu próprio formato (Apertura/Clausura, pontos corridos, etc — ver
+    // `simulation/engine.ts`/`simulation/incremental.ts`), mas todos cabem na mesma janela porque
+    // o motor incremental resolve cada competição de forma independente, sem disputa de "vaga" de
+    // semana entre elas. `venezuela_segunda` fica de fora — dado incompatível conhecido, ver
+    // `docs/dados-a-verificar.md` (a competição continuaria dando erro mesmo ativa).
+    // pontoDeTreino: false — só dá janela de semana pras competições, não soma uma 6ª sessão de
+    // treino/cenário na temporada (ver schemas/calendar.ts `PeriodoCalendario.pontoDeTreino`).
+    periodo: "temporada-conmebol",
+    pontoDeTreino: false,
+    competicoes_ativas: [
+      "argentina_primera",
+      "argentina_segunda",
+      "bolivia_primera",
+      "chile_primera",
+      "chile_segunda",
+      "colombia_primera_a",
+      "colombia_segunda",
+      "equador_primera",
+      "equador_segunda",
+      "paraguai_primera",
+      "paraguai_segunda",
+      "peru_primera",
+      "peru_segunda",
+      "uruguai_primera",
+      "uruguai_segunda",
+      "venezuela_primera",
+    ],
+    semanaInicio: 5,
+    semanaFim: 48,
+  },
 ];
 
 export function construirCalendarioPadrao(temporada: number): CalendarioMestre {
