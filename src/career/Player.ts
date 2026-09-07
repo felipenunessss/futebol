@@ -1,14 +1,13 @@
 import type { DesempenhoPartida } from "../progression/xp.js";
-import { aplicarXpPartidaAoJogador, calcularXpPartida } from "../progression/xp.js";
+import { calcularXpPartida, ganhoPorPonto, PONTOS_POR_NIVEL, xpParaProximoNivel } from "../progression/xp.js";
 import { aplicarDeclinioPorIdade } from "../progression/aging.js";
 import type { ImpactoCarreira, Reputacao } from "../progression/scenarios.js";
 import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
 import { patrociniosDisponiveis } from "./patrocinios.js";
-import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Jogador, type Posicao } from "../schemas/player.js";
-import type { ChanceJogador } from "../simulation/match.js";
+import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, calcularOverall, type Atributo, type Jogador, type Posicao } from "../schemas/player.js";
 import type { Contrato } from "../schemas/contract.js";
 import { statusMinimoPorIdade, type StatusNoClube } from "./status.js";
-import { gerarAvaliacaoDeOlheiros, sortearPotencial, type NivelDePotencial } from "../progression/potencial.js";
+import { gerarAvaliacaoDeOlheiros, multiplicadorDePotencial, sortearPotencial, type NivelDePotencial } from "../progression/potencial.js";
 
 /**
  * Estado de carreira do jogador — o "save" da carreira. Junta o `Jogador`
@@ -18,9 +17,13 @@ import { gerarAvaliacaoDeOlheiros, sortearPotencial, type NivelDePotencial } fro
  * `docs/motor-de-partida.md` seção 4, onde `progression/scenarios.ts` só
  * operava num par solto de campos).
  *
- * Sem perks/nível como recurso separado (decisão já registrada em
- * `docs/motor-de-partida.md`) — o overall é sempre derivado dos atributos
- * via `overallAtual`, nunca guardado aqui.
+ * `overall` continua sempre derivado dos atributos via `overallAtual`,
+ * nunca guardado aqui — mas desde a seção 5.16 existe sim um `nivel`
+ * separado dele: XP de partida/treino sobe `nivel` (`ganharXp`), e cada
+ * level-up dá `pontosDisponiveis` pra investir manualmente em qualquer
+ * atributo da posição (`investirPontos`, estilo Pro Clubs) — ainda "sem
+ * perks" no sentido de nunca desbloquear efeito especial, só acelera
+ * atributo numérico.
  */
 export interface EstadoDeCarreira {
   jogador: Jogador;
@@ -41,6 +44,12 @@ export interface EstadoDeCarreira {
   temporadasNaCarreira: number;
   /** Estimativa (pode estar errada) do potencial de desenvolvimento real do jogador (`jogador.potencial`, nunca exposto direto) — o que a UI deve mostrar. Recalculada a cada `avancarTemporada`. */
   avaliacaoDeOlheiros: NivelDePotencial;
+  /** Nível do jogador — começa em 1, sobe conforme `xpAcumulado` cruza `progression/xp.ts` `xpParaProximoNivel` (`ganharXp`). Separado do overall (que continua vindo só dos atributos, `overallAtual`). */
+  nivel: number;
+  /** XP acumulado rumo ao próximo nível — zera (com o resto sobrando) a cada level-up, não é cumulativo desde o início da carreira. */
+  xpAcumulado: number;
+  /** Pontos de atributo ganhos em level-ups e ainda não gastos (`investirPontos`) — não precisa gastar tudo de uma vez, fica acumulado. */
+  pontosDisponiveis: number;
 }
 
 export interface OpcoesEstadoInicial {
@@ -143,6 +152,9 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
     temporada: opcoes.temporadaInicial,
     temporadasNaCarreira: 0,
     avaliacaoDeOlheiros: gerarAvaliacaoDeOlheiros(potencial, 0, random),
+    nivel: 1,
+    xpAcumulado: 0,
+    pontosDisponiveis: 0,
     moral: MORAL_INICIAL,
     reputacao: criarReputacaoInicial(),
     relacoesInternas: RELACOES_INTERNAS_INICIAL,
@@ -159,23 +171,90 @@ export function overallAtual(estado: EstadoDeCarreira): number {
   return calcularOverall(estado.jogador, arquetipo);
 }
 
-/**
- * Aplica o desempenho de uma partida (via `chancesJogador` de
- * `simularPartida` convertidas em `DesempenhoPartida` por
- * `converterChancesEmDesempenho`) ao estado — XP total da partida
- * (`calcularXpPartida`) distribuído pelos atributos usados nas chances +
- * crescimento geral (`aplicarXpPartidaAoJogador`).
- */
-export function aplicarDesempenhoPartida(
-  estado: EstadoDeCarreira,
-  chances: ChanceJogador[],
-  desempenho: DesempenhoPartida,
-): EstadoDeCarreira {
-  const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
-  const xpTotal = calcularXpPartida(desempenho);
-  const atributos = aplicarXpPartidaAoJogador(estado.jogador, arquetipo, chances, xpTotal);
+export interface ResultadoGanhoDeXp {
+  estado: EstadoDeCarreira;
+  /** `true` se esse ganho de XP cruzou 1+ limiar de nível (`xpParaProximoNivel`) — uma partida/treino muito bom pode subir mais de 1 nível de uma vez. */
+  subiuDeNivel: boolean;
+  nivelAnterior: number;
+  nivelNovo: number;
+  /** `PONTOS_POR_NIVEL × quantos níveis subiram nesse ganho — 0 se `subiuDeNivel` for `false`. */
+  pontosGanhos: number;
+}
 
-  return { ...estado, jogador: { ...estado.jogador, atributos } };
+/**
+ * Aplica um ganho de XP (partida, `aplicarDesempenhoPartida`, ou treino,
+ * `career/career-loop.ts` `resolverPeriodoDaCarreira`) ao **nível** do
+ * jogador — desde a seção 5.16, XP não sobe atributo nenhum direto, só
+ * acumula rumo ao próximo nível (`progression/xp.ts` `xpParaProximoNivel`);
+ * cada nível dá `PONTOS_POR_NIVEL` pontos pra investir depois
+ * (`investirPontos`). O multiplicador de potencial de desenvolvimento
+ * oculto (`progression/potencial.ts` `multiplicadorDePotencial` — trata
+ * `jogador.potencial` ausente como "regular"/1x) acelera esse ganho, não
+ * o investimento de ponto em si. Processa quantos níveis forem
+ * necessários numa chamada só (XP muito alto pode cruzar 2+ limiares).
+ */
+export function ganharXp(estado: EstadoDeCarreira, xpBruto: number): ResultadoGanhoDeXp {
+  const xpComPotencial = xpBruto * multiplicadorDePotencial(estado.jogador.potencial);
+  const nivelAnterior = estado.nivel;
+
+  let nivel = estado.nivel;
+  let xpAcumulado = estado.xpAcumulado + xpComPotencial;
+  let pontosGanhos = 0;
+
+  while (xpAcumulado >= xpParaProximoNivel(nivel)) {
+    xpAcumulado -= xpParaProximoNivel(nivel);
+    nivel++;
+    pontosGanhos += PONTOS_POR_NIVEL;
+  }
+
+  return {
+    estado: { ...estado, nivel, xpAcumulado, pontosDisponiveis: estado.pontosDisponiveis + pontosGanhos },
+    subiuDeNivel: pontosGanhos > 0,
+    nivelAnterior,
+    nivelNovo: nivel,
+    pontosGanhos,
+  };
+}
+
+/**
+ * Investe `quantidade` pontos disponíveis num único atributo — soma
+ * `progression/xp.ts` `ganhoPorPonto` por ponto (mais se o atributo for
+ * prioritário do arquétipo, arquétipo aqui é multiplicador, nunca
+ * restrição: dá pra investir em qualquer atributo da posição), capado em
+ * 99. Lança erro se pedir mais pontos do que `estado.pontosDisponiveis`
+ * (mesmo padrão de validação de `criarEstadoInicial`).
+ */
+const ATRIBUTO_MAXIMO = 99;
+
+export function investirPontos(estado: EstadoDeCarreira, atributo: Atributo, quantidade: number): EstadoDeCarreira {
+  if (quantidade <= 0) {
+    throw new Error(`investirPontos: quantidade precisa ser positiva, recebeu ${quantidade}`);
+  }
+  if (quantidade > estado.pontosDisponiveis) {
+    throw new Error(`investirPontos: pediu ${quantidade} pontos em "${atributo}", só tem ${estado.pontosDisponiveis} disponíveis`);
+  }
+
+  const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
+  const valorAtual = estado.jogador.atributos[atributo] ?? 1;
+  const novoValor = Math.min(ATRIBUTO_MAXIMO, valorAtual + quantidade * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios));
+
+  return {
+    ...estado,
+    jogador: { ...estado.jogador, atributos: { ...estado.jogador.atributos, [atributo]: novoValor } },
+    pontosDisponiveis: estado.pontosDisponiveis - quantidade,
+  };
+}
+
+/**
+ * Aplica o desempenho de uma partida (via `DesempenhoPartida` já
+ * calculado por `converterChancesEmDesempenho`) ao estado — todo o XP da
+ * partida (`calcularXpPartida`) vai pro nível (`ganharXp`). Devolve o
+ * `ResultadoGanhoDeXp` completo (não só `estado`) pra quem chama saber se
+ * subiu de nível e notificar a UI (`career/career-loop.ts`
+ * `onNivelAlcancado`).
+ */
+export function aplicarDesempenhoPartida(estado: EstadoDeCarreira, desempenho: DesempenhoPartida): ResultadoGanhoDeXp {
+  return ganharXp(estado, calcularXpPartida(desempenho));
 }
 
 /**

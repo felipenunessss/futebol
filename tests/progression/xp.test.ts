@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
-  aplicarTreino,
-  aplicarXpAtributo,
-  aplicarXpPartidaAoJogador,
-  ATRIBUTOS_POR_FOCO,
   calcularNotaPartida,
   calcularXpPartida,
   converterChancesEmDesempenho,
+  ganhoPorPonto,
+  GANHO_POR_PONTO_PADRAO,
+  GANHO_POR_PONTO_PRIORITARIO,
+  PONTOS_POR_NIVEL,
+  xpDeSessaoDeTreino,
+  xpParaProximoNivel,
   type DesempenhoPartida,
 } from "../../src/progression/xp.js";
-import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
+import { buscarArquetipo } from "../../src/schemas/player.js";
 import type { ChanceJogador } from "../../src/simulation/match.js";
 
 function desempenho(overrides: Partial<DesempenhoPartida> = {}): DesempenhoPartida {
@@ -115,185 +117,48 @@ describe("calcularXpPartida", () => {
   });
 });
 
-describe("aplicarXpAtributo", () => {
-  it("aumenta o valor do atributo", () => {
-    expect(aplicarXpAtributo(50, 100)).toBeGreaterThan(50);
+describe("xpParaProximoNivel", () => {
+  it("cresce conforme o nível sobe (cada nível fica mais caro que o anterior)", () => {
+    expect(xpParaProximoNivel(2)).toBeGreaterThan(xpParaProximoNivel(1));
+    expect(xpParaProximoNivel(10)).toBeGreaterThan(xpParaProximoNivel(2));
   });
 
-  it("nunca ultrapassa 99", () => {
-    expect(aplicarXpAtributo(98, 100000)).toBeLessThanOrEqual(99);
-  });
-
-  it("tem retorno decrescente: o mesmo XP rende menos ganho perto do teto", () => {
-    const ganhoBaixo = aplicarXpAtributo(40, 100) - 40;
-    const ganhoAlto = aplicarXpAtributo(90, 100) - 90;
-    expect(ganhoAlto).toBeLessThan(ganhoBaixo);
-  });
-
-  it("multiplicador de arquétipo acelera o crescimento no atributo prioritário", () => {
-    const semMultiplicador = aplicarXpAtributo(50, 100, 1);
-    const comMultiplicador = aplicarXpAtributo(50, 100, 2);
-    expect(comMultiplicador).toBeGreaterThan(semMultiplicador);
+  it("nunca é zero ou negativo", () => {
+    expect(xpParaProximoNivel(1)).toBeGreaterThan(0);
   });
 });
 
-describe("aplicarXpPartidaAoJogador", () => {
+describe("ganhoPorPonto", () => {
   const finalizador = buscarArquetipo("finalizador"); // prioritários: finalizacao, posicionamento_ofensivo, frieza
 
-  function jogadorBase(): Jogador {
-    return {
-      id: "j1",
-      nome: "Teste",
-      posicao: "atacante",
-      arquetipo_id: finalizador.id,
-      idade: 22,
-      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 50])),
-    };
-  }
-
-  it("sobe o atributo usado numa chance específica", () => {
-    const jogador = jogadorBase();
-    const chances: ChanceJogador[] = [chance({ subtipo: "cabeceio", sucesso: true, atributoUsado: "cabeceio" })];
-
-    const atributos = aplicarXpPartidaAoJogador(jogador, finalizador, chances, 100);
-
-    expect(atributos.cabeceio!).toBeGreaterThan(jogador.atributos.cabeceio!);
+  it("atributo prioritário do arquétipo rende mais por ponto que um não-prioritário", () => {
+    expect(ganhoPorPonto("finalizacao", finalizador.atributos_prioritarios)).toBe(GANHO_POR_PONTO_PRIORITARIO);
+    expect(ganhoPorPonto("velocidade", finalizador.atributos_prioritarios)).toBe(GANHO_POR_PONTO_PADRAO);
   });
 
-  it("chance sem sucesso ainda rende XP pro atributo, só que menos que uma bem-sucedida", () => {
-    const jogador = jogadorBase();
-    const comSucesso = aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "cabeceio", sucesso: true })], 100);
-    const semSucesso = aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "cabeceio", sucesso: false })], 100);
-
-    expect(comSucesso.cabeceio!).toBeGreaterThan(semSucesso.cabeceio!);
-    expect(semSucesso.cabeceio!).toBeGreaterThan(jogador.atributos.cabeceio!); // ainda aprende algo com o erro
-  });
-
-  it("atributo prioritário do arquétipo cresce mais que um não-prioritário com o mesmo XP de chance", () => {
-    const jogador = jogadorBase();
-    const chancesPrioritario: ChanceJogador[] = [chance({ atributoUsado: "finalizacao" })]; // prioritário do Finalizador
-    const chancesNaoPrioritario: ChanceJogador[] = [chance({ atributoUsado: "velocidade" })]; // não é prioritário
-
-    const comPrioritario = aplicarXpPartidaAoJogador(jogador, finalizador, chancesPrioritario, 100);
-    const comNaoPrioritario = aplicarXpPartidaAoJogador(jogador, finalizador, chancesNaoPrioritario, 100);
-
-    const ganhoPrioritario = comPrioritario.finalizacao! - jogador.atributos.finalizacao!;
-    const ganhoNaoPrioritario = comNaoPrioritario.velocidade! - jogador.atributos.velocidade!;
-
-    expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
-  });
-
-  it("potencial de desenvolvimento oculto acelera o crescimento, ao lado do multiplicador de arquétipo", () => {
-    const regular = { ...jogadorBase(), potencial: "regular" as const };
-    const geracional = { ...jogadorBase(), potencial: "geracional" as const };
-    const chances: ChanceJogador[] = [chance({ atributoUsado: "cabeceio" })]; // não-prioritário, isola o efeito só do potencial
-
-    const ganhoRegular = aplicarXpPartidaAoJogador(regular, finalizador, chances, 100).cabeceio! - regular.atributos.cabeceio!;
-    const ganhoGeracional = aplicarXpPartidaAoJogador(geracional, finalizador, chances, 100).cabeceio! - geracional.atributos.cabeceio!;
-
-    expect(ganhoGeracional).toBeGreaterThan(ganhoRegular);
-  });
-
-  it("jogador sem `potencial` informado (comum em objeto Jogador construído na mão) se comporta como potencial 'regular' — retrocompatível", () => {
-    const semPotencial = jogadorBase(); // sem .potencial
-    const comRegular = { ...jogadorBase(), potencial: "regular" as const };
-    const chances: ChanceJogador[] = [chance({ atributoUsado: "cabeceio" })];
-
-    const atributosSemPotencial = aplicarXpPartidaAoJogador(semPotencial, finalizador, chances, 100);
-    const atributosComRegular = aplicarXpPartidaAoJogador(comRegular, finalizador, chances, 100);
-
-    expect(atributosSemPotencial.cabeceio).toBe(atributosComRegular.cabeceio);
-  });
-
-  it("mesmo sem nenhuma chance, o XP geral ainda distribui crescimento pelos atributos da posição", () => {
-    const jogador = jogadorBase();
-    const atributos = aplicarXpPartidaAoJogador(jogador, finalizador, [], 100);
-
-    for (const atributo of ATRIBUTOS_POR_POSICAO.atacante) {
-      expect(atributos[atributo]!).toBeGreaterThan(jogador.atributos[atributo]!);
-    }
-  });
-
-  it("não muta o objeto de atributos original do jogador", () => {
-    const jogador = jogadorBase();
-    const valorOriginal = jogador.atributos.finalizacao;
-    aplicarXpPartidaAoJogador(jogador, finalizador, [chance({ atributoUsado: "finalizacao" })], 100);
-    expect(jogador.atributos.finalizacao).toBe(valorOriginal);
+  it("arquétipo é multiplicador, não restrição — atributo fora da prioridade ainda rende algo", () => {
+    expect(ganhoPorPonto("velocidade", finalizador.atributos_prioritarios)).toBeGreaterThan(0);
   });
 });
 
-describe("aplicarTreino", () => {
-  const finalizador = buscarArquetipo("finalizador"); // prioritários: finalizacao, posicionamento_ofensivo, frieza
-
-  function jogadorBase(): Jogador {
-    return {
-      id: "j1",
-      nome: "Teste",
-      posicao: "atacante",
-      arquetipo_id: finalizador.id,
-      idade: 22,
-      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.atacante.map((a) => [a, 50])),
-    };
-  }
-
-  it("foco físico sobe só os atributos físicos relevantes pra posição, não os técnicos/táticos", () => {
-    const jogador = jogadorBase();
-    const atributos = aplicarTreino(jogador, finalizador, "fisico");
-
-    for (const atributo of ATRIBUTOS_POR_FOCO.fisico) {
-      if (ATRIBUTOS_POR_POSICAO.atacante.includes(atributo)) {
-        expect(atributos[atributo]!).toBeGreaterThan(jogador.atributos[atributo]!);
-      }
-    }
-    for (const atributo of ATRIBUTOS_POR_FOCO.tatico) {
-      if (ATRIBUTOS_POR_POSICAO.atacante.includes(atributo)) {
-        expect(atributos[atributo]!).toBe(jogador.atributos[atributo]!);
-      }
-    }
+describe("xpDeSessaoDeTreino", () => {
+  it("descanso não gera XP", () => {
+    expect(xpDeSessaoDeTreino("descanso")).toBe(0);
   });
 
-  it("foco técnico sobe atributos técnicos relevantes, não mexe nos físicos", () => {
-    const jogador = jogadorBase();
-    const atributos = aplicarTreino(jogador, finalizador, "tecnico");
+  it("físico/técnico/tático geram a mesma quantidade de XP — a diferença hoje é só narrativa, quem decide ONDE aplicar os pontos é o jogador (career/Player.ts investirPontos)", () => {
+    const fisico = xpDeSessaoDeTreino("fisico");
+    const tecnico = xpDeSessaoDeTreino("tecnico");
+    const tatico = xpDeSessaoDeTreino("tatico");
 
-    expect(atributos.finalizacao!).toBeGreaterThan(jogador.atributos.finalizacao!);
-    expect(atributos.velocidade!).toBe(jogador.atributos.velocidade!);
+    expect(fisico).toBeGreaterThan(0);
+    expect(fisico).toBe(tecnico);
+    expect(tecnico).toBe(tatico);
   });
+});
 
-  it("atributo prioritário do arquétipo cresce mais que um não-prioritário no mesmo foco", () => {
-    const jogador = jogadorBase();
-    const atributos = aplicarTreino(jogador, finalizador, "tecnico"); // finalizacao é prioritário, drible não é
-
-    const ganhoPrioritario = atributos.finalizacao! - jogador.atributos.finalizacao!;
-    const ganhoNaoPrioritario = atributos.drible! - jogador.atributos.drible!;
-    expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
-  });
-
-  it("foco descanso não muda nenhum atributo", () => {
-    const jogador = jogadorBase();
-    const atributos = aplicarTreino(jogador, finalizador, "descanso");
-    expect(atributos).toEqual(jogador.atributos);
-  });
-
-  it("posição sem nenhum atributo no foco escolhido não quebra, só não tem efeito", () => {
-    const goleiro: Jogador = {
-      id: "g1",
-      nome: "Goleiro Teste",
-      posicao: "goleiro",
-      arquetipo_id: "muralha",
-      idade: 25,
-      atributos: Object.fromEntries(ATRIBUTOS_POR_POSICAO.goleiro.map((a) => [a, 50])),
-    };
-    const muralha = buscarArquetipo("muralha");
-    // goleiro não tem nenhum atributo tático na lista de ATRIBUTOS_POR_POSICAO.goleiro
-    const atributos = aplicarTreino(goleiro, muralha, "tatico");
-    expect(atributos).toEqual(goleiro.atributos);
-  });
-
-  it("não muta o objeto de atributos original do jogador", () => {
-    const jogador = jogadorBase();
-    const valorOriginal = jogador.atributos.finalizacao;
-    aplicarTreino(jogador, finalizador, "tecnico");
-    expect(jogador.atributos.finalizacao).toBe(valorOriginal);
+describe("PONTOS_POR_NIVEL", () => {
+  it("é um número positivo (pontos concedidos por level-up, ver career/Player.ts ganharXp)", () => {
+    expect(PONTOS_POR_NIVEL).toBeGreaterThan(0);
   });
 });

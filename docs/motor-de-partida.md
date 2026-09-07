@@ -1811,6 +1811,77 @@ avaliação de olheiros que pode errar e vai ficando mais precisa).
   distribuição de potencial batendo com a tabela (62/23/10/4/1% em 2.000
   amostras) e a curva de salário reagindo de forma suave ao overall.
 
+### 5.17. Nível + pontos de atributo, estilo Pro Clubs (implementado)
+
+Pedido: substituir o crescimento automático de atributo (XP de partida/
+treino subindo atributo específico sozinho) por um sistema de **nível
+separado do overall** — XP passa a alimentar só esse nível; a cada
+level-up o jogador ganha pontos pra **distribuir manualmente em
+qualquer atributo da posição**, sem restrição de arquétipo (igual Pro
+Clubs/EA FC). Confirmado com o jogador: substitui de vez o crescimento
+automático, não roda em paralelo.
+
+- **Nível e XP** (`EstadoDeCarreira` ganhou `nivel`/`xpAcumulado`/
+  `pontosDisponiveis`, seeds 1/0/0 em `criarEstadoInicial`):
+  `progression/xp.ts` `xpParaProximoNivel(nivel) = 150 + nivel*50`
+  (cada nível um pouco mais caro que o anterior), `PONTOS_POR_NIVEL=3`.
+  As mesmas fontes de XP de sempre (`calcularXpPartida` de partida,
+  `xpDeSessaoDeTreino(foco)` de treino — 0 pra descanso, valor fixo
+  pros outros 3 focos) agora alimentam só o nível via `career/Player.ts`
+  `ganharXp` (novo), nunca atributo direto. O multiplicador de
+  **potencial de desenvolvimento** (seção 5.16) mudou de lugar: antes
+  acelerava o crescimento direto do atributo, agora acelera o ganho de
+  XP rumo ao nível — mesma ideia narrativa, reencaixada no novo
+  mecanismo. `ganharXp` processa 1+ level-ups de uma vez se o XP
+  cruzar mais de um limiar (partida excepcional).
+- **Gastando pontos**: `investirPontos(estado, atributo, quantidade)`
+  (`career/Player.ts`, novo) soma ao atributo escolhido — `progression/
+  xp.ts` `ganhoPorPonto`: **+1.5/ponto se o atributo for prioritário do
+  arquétipo, +1/ponto se não for** (arquétipo continua multiplicador,
+  nunca restrição — dá pra investir em QUALQUER atributo da posição),
+  capado em 99. Lança erro se pedir mais pontos do que
+  `pontosDisponiveis` ou quantidade ≤0.
+- **Quando o jogador escolhe onde investir**: uma vez por período do
+  calendário, logo depois do treino ser resolvido
+  (`career/career-loop.ts` `resolverPeriodoDaCarreira`, compartilhado
+  por `jogarTemporada`/`jogarTemporadaSemanal`) — hook novo
+  `escolherDistribuicaoDePontos` (devolve uma lista de `{atributo,
+  quantidade}`, pode investir em mais de um atributo por vez; itens que
+  não cabem no que sobrou são ignorados, não lança erro). Sem hook
+  (demos não-interativas), investe tudo no 1º atributo prioritário do
+  arquétipo. Não interrompe partida nenhuma — pontos ganhos em partida
+  só são oferecidos no próximo checkpoint de período.
+- **Notificação de level-up**: hook novo `onNivelAlcancado`
+  (`{nivelAnterior, nivelNovo, pontosGanhos}`), disparado por
+  `ganharXp` tanto pra XP de treino quanto de partida (essa última pode
+  disparar várias vezes numa temporada, uma por partida que cruzou
+  nível). A CLI usa isso pra imprimir "🎉 Subiu para o nível X!" tanto
+  no loop semanal quanto no resumo agregado de `jogarTemporada`.
+- **Consequência aceita conscientemente**: o foco de treino
+  (físico/técnico/tático) perde o papel de decidir QUAL atributo cresce
+  — os 3 agora geram a mesma quantidade de XP, mecanicamente
+  equivalentes (só descanso continua diferente, recuperando moral sem
+  gerar XP). A decisão de "onde investir" migrou inteira pro momento de
+  gastar pontos.
+- **CLI** (`src/cli/index.ts`): `escolherDistribuicaoDePontosInterativo`
+  (loop perguntando atributo + quantidade até os pontos acabarem ou o
+  jogador parar, mostrando o bônus de cada atributo) e `onNivelAlcancado`
+  (imprime a comemoração) plugados em `jogarTemporadaSemanal`; resumo de
+  fim de temporada mostra nível/XP/pontos disponíveis. Fora de escopo:
+  `web/` (só tem tela de criação de carreira ainda, sem tela de
+  temporada).
+- **Validado**: 424 testes passando (`tests/progression/xp.test.ts`
+  reescrito pras novas funções de curva/ponto, `tests/career/
+  Player.test.ts` ganhou `describe("ganharXp", ...)`/`describe(
+  "investirPontos", ...)`, `tests/career/career-loop.test.ts` ajustado
+  pra esperar nível/pontos mudando em vez de overall automático), `npx
+  tsc --noEmit` limpo (raiz e `web/`). Script ad-hoc: titular ativo por
+  3 temporadas sobe do nível 1 ao 18 com potencial regular e ao 25 com
+  potencial geracional (confirma o multiplicador acelerando o ganho de
+  XP); `investirPontos` confirmado dando +15 num atributo prioritário
+  e +10 num padrão pra 10 pontos cada, respeitando o teto de 99 e
+  lançando erro sem pontos disponíveis.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

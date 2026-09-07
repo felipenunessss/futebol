@@ -5,14 +5,15 @@ import {
   assinarContrato,
   avancarTemporada,
   criarEstadoInicial,
+  ganharXp,
+  investirPontos,
   mudarStatusNoClube,
   overallAtual,
   transferirParaClube,
   type EstadoDeCarreira,
 } from "../../src/career/Player.js";
 import type { Contrato } from "../../src/schemas/contract.js";
-import type { ChanceJogador } from "../../src/simulation/match.js";
-import type { DesempenhoPartida } from "../../src/progression/xp.js";
+import { xpParaProximoNivel, type DesempenhoPartida } from "../../src/progression/xp.js";
 
 function estadoBase(): EstadoDeCarreira {
   // random fixo — a maioria dos testes deste arquivo compara "antes vs depois" de alguma operação
@@ -108,27 +109,127 @@ describe("overallAtual", () => {
   });
 });
 
-describe("aplicarDesempenhoPartida", () => {
-  it("aumenta o overall depois de uma partida com bom desempenho", () => {
+describe("ganharXp", () => {
+  it("acumula XP sem subir de nível se ficar abaixo do limiar", () => {
     const estado = estadoBase();
-    const overallAntes = overallAtual(estado);
+    const resultado = ganharXp(estado, 10); // bem menos que xpParaProximoNivel(1)
 
-    const chances: ChanceJogador[] = [{ subtipo: "voleio", sucesso: true, atributoUsado: "finalizacao" }];
-    const desempenho: DesempenhoPartida = { gols: 1, assistencias: 0, desarmesBemSucedidos: 0, chancesPerdidas: 0, minutosJogados: 90, importancia: 1 };
+    expect(resultado.subiuDeNivel).toBe(false);
+    expect(resultado.estado.nivel).toBe(1);
+    expect(resultado.estado.xpAcumulado).toBeCloseTo(10);
+    expect(resultado.estado.pontosDisponiveis).toBe(0);
+  });
 
-    const depois = aplicarDesempenhoPartida(estado, chances, desempenho);
-    expect(overallAtual(depois)).toBeGreaterThan(overallAntes);
+  it("sobe de nível e concede pontos quando o XP cruza o limiar", () => {
+    const estado = estadoBase();
+    const limiar = xpParaProximoNivel(1);
+    const resultado = ganharXp(estado, limiar + 5);
+
+    expect(resultado.subiuDeNivel).toBe(true);
+    expect(resultado.nivelAnterior).toBe(1);
+    expect(resultado.nivelNovo).toBe(2);
+    expect(resultado.estado.nivel).toBe(2);
+    expect(resultado.estado.xpAcumulado).toBeCloseTo(5);
+    expect(resultado.estado.pontosDisponiveis).toBeGreaterThan(0);
+  });
+
+  it("um ganho de XP muito grande processa vários níveis de uma vez", () => {
+    const estado = estadoBase();
+    const xpEnorme = xpParaProximoNivel(1) + xpParaProximoNivel(2) + xpParaProximoNivel(3) + 1;
+    const resultado = ganharXp(estado, xpEnorme);
+
+    expect(resultado.estado.nivel).toBe(4);
+    expect(resultado.pontosGanhos).toBeGreaterThan(0);
+  });
+
+  it("potencial de desenvolvimento oculto acelera o ganho de XP (sobe de nível mais rápido)", () => {
+    const regular = { ...estadoBase(), jogador: { ...estadoBase().jogador, potencial: "regular" as const } };
+    const geracional = { ...estadoBase(), jogador: { ...estadoBase().jogador, potencial: "geracional" as const } };
+
+    const depoisRegular = ganharXp(regular, 50).estado.xpAcumulado;
+    const depoisGeracional = ganharXp(geracional, 50).estado.xpAcumulado;
+
+    expect(depoisGeracional).toBeGreaterThan(depoisRegular);
   });
 
   it("não muta o estado original", () => {
     const estado = estadoBase();
-    const valorOriginal = estado.jogador.atributos.finalizacao;
-    aplicarDesempenhoPartida(
-      estado,
-      [{ subtipo: "voleio", sucesso: true, atributoUsado: "finalizacao" }],
-      { gols: 1, assistencias: 0, desarmesBemSucedidos: 0, chancesPerdidas: 0, minutosJogados: 90, importancia: 1 },
-    );
-    expect(estado.jogador.atributos.finalizacao).toBe(valorOriginal);
+    const xpOriginal = estado.xpAcumulado;
+    ganharXp(estado, 500);
+    expect(estado.xpAcumulado).toBe(xpOriginal);
+  });
+});
+
+describe("investirPontos", () => {
+  it("soma o atributo escolhido e desconta do total de pontos disponíveis", () => {
+    const comPontos = { ...estadoBase(), pontosDisponiveis: 5 };
+    const valorAntes = comPontos.jogador.atributos.finalizacao!;
+
+    const depois = investirPontos(comPontos, "finalizacao", 2);
+
+    expect(depois.jogador.atributos.finalizacao!).toBeGreaterThan(valorAntes);
+    expect(depois.pontosDisponiveis).toBe(3);
+  });
+
+  it("atributo prioritário do arquétipo rende mais por ponto que um não-prioritário", () => {
+    // finalizador: prioritários = finalizacao, posicionamento_ofensivo, frieza
+    const comPontos = { ...estadoBase(), pontosDisponiveis: 10 };
+    const valorFinalizacaoAntes = comPontos.jogador.atributos.finalizacao!;
+    const valorVelocidadeAntes = comPontos.jogador.atributos.velocidade!;
+
+    const comPrioritario = investirPontos(comPontos, "finalizacao", 1);
+    const comNaoPrioritario = investirPontos(comPontos, "velocidade", 1);
+
+    const ganhoPrioritario = comPrioritario.jogador.atributos.finalizacao! - valorFinalizacaoAntes;
+    const ganhoNaoPrioritario = comNaoPrioritario.jogador.atributos.velocidade! - valorVelocidadeAntes;
+    expect(ganhoPrioritario).toBeGreaterThan(ganhoNaoPrioritario);
+  });
+
+  it("nunca ultrapassa 99", () => {
+    const quaseNoTeto = { ...estadoBase(), pontosDisponiveis: 50 };
+    quaseNoTeto.jogador = { ...quaseNoTeto.jogador, atributos: { ...quaseNoTeto.jogador.atributos, finalizacao: 98 } };
+
+    const depois = investirPontos(quaseNoTeto, "finalizacao", 10);
+    expect(depois.jogador.atributos.finalizacao).toBe(99);
+  });
+
+  it("lança erro se pedir mais pontos do que tem disponível", () => {
+    const comPontos = { ...estadoBase(), pontosDisponiveis: 2 };
+    expect(() => investirPontos(comPontos, "finalizacao", 3)).toThrow(/pontos/);
+  });
+
+  it("lança erro se a quantidade não for positiva", () => {
+    const comPontos = { ...estadoBase(), pontosDisponiveis: 5 };
+    expect(() => investirPontos(comPontos, "finalizacao", 0)).toThrow();
+  });
+
+  it("não muta o estado original", () => {
+    const comPontos = { ...estadoBase(), pontosDisponiveis: 5 };
+    const valorOriginal = comPontos.jogador.atributos.finalizacao;
+    investirPontos(comPontos, "finalizacao", 2);
+    expect(comPontos.jogador.atributos.finalizacao).toBe(valorOriginal);
+    expect(comPontos.pontosDisponiveis).toBe(5);
+  });
+});
+
+describe("aplicarDesempenhoPartida", () => {
+  it("soma XP de partida ao nível — não sobe atributo direto (isso agora é escolha manual, ver investirPontos)", () => {
+    const estado = estadoBase();
+    const valorAntes = estado.jogador.atributos.finalizacao;
+
+    const desempenho: DesempenhoPartida = { gols: 1, assistencias: 0, desarmesBemSucedidos: 0, chancesPerdidas: 0, minutosJogados: 90, importancia: 1 };
+    const resultado = aplicarDesempenhoPartida(estado, desempenho);
+
+    expect(resultado.estado.xpAcumulado + xpParaProximoNivel(estado.nivel) * (resultado.estado.nivel - estado.nivel)).toBeGreaterThan(estado.xpAcumulado);
+    expect(resultado.estado.jogador.atributos.finalizacao).toBe(valorAntes); // atributo só muda via investirPontos
+  });
+
+  it("não muta o estado original", () => {
+    const estado = estadoBase();
+    const xpOriginal = estado.xpAcumulado;
+    const desempenho: DesempenhoPartida = { gols: 1, assistencias: 0, desarmesBemSucedidos: 0, chancesPerdidas: 0, minutosJogados: 90, importancia: 1 };
+    aplicarDesempenhoPartida(estado, desempenho);
+    expect(estado.xpAcumulado).toBe(xpOriginal);
   });
 });
 

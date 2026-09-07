@@ -38,15 +38,17 @@ describe("jogarTemporada", () => {
     expect(resultado.estado.jogador.idade).toBe(19);
   });
 
-  it("aplica XP das partidas do jogador — overall muda em relação ao estado inicial", async () => {
+  it("aplica XP das partidas do jogador — nível/pontos disponíveis mudam em relação ao estado inicial (overall só muda por escolha manual, ver investirPontos)", async () => {
     const times = ["a", "b", "c", "d"];
     const estadoInicial = estadoDeTeste();
-    const overallInicial = overallAtual(estadoInicial);
 
     const resultado = await jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
-    // com random fixo em 0.5, o jogador participa de partidas reais do clube "a" — overall não deve ficar idêntico ao inicial
-    expect(overallAtual(resultado.estado)).not.toBe(overallInicial);
+    // com random fixo em 0.5, o jogador participa de partidas reais do clube "a" — o nível (ou ao
+    // menos o XP acumulado rumo a ele) não deve ficar idêntico ao inicial.
+    const subiuDeNivel = resultado.estado.nivel > estadoInicial.nivel;
+    const acumulouXp = resultado.estado.xpAcumulado > estadoInicial.xpAcumulado;
+    expect(subiuDeNivel || acumulouXp).toBe(true);
   });
 
   it("resolve um cenário por período do calendário padrão (5 períodos)", async () => {
@@ -65,7 +67,10 @@ describe("jogarTemporada", () => {
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.resumoPartidas.overallAntes).toBe(overallInicial);
-    // overallDepois reflete só o XP das partidas — o estado final ainda passa por treino/cenários depois, então pode subir mais
+    // overall não sobe mais sozinho por XP de partida (isso agora só acumula nível/pontos, ver
+    // career/Player.ts ganharXp/investirPontos) — overallDepois só muda se algum cenário resolvido
+    // no meio do caminho mexer em atributo direto (progression/scenarios.ts ImpactoCarreira.atributos),
+    // nunca deveria CAIR em relação ao inicial nesse teste (jogador jovem, sem declínio por idade ainda).
     expect(resultado.resumoPartidas.overallDepois).toBeGreaterThanOrEqual(resultado.resumoPartidas.overallAntes);
     expect(overallAtual(resultado.estado)).toBeGreaterThanOrEqual(resultado.resumoPartidas.overallDepois);
 
@@ -173,7 +178,7 @@ describe("jogarTemporada — treino", () => {
     expect(resultado.treinosResolvidos.every((t) => t.foco === "fisico")).toBe(true);
   });
 
-  it("foco 'descanso' recupera moral em vez de treinar atributo", async () => {
+  it("foco 'descanso' recupera moral e não gera XP (os demais focos geram XP, mas nenhum atributo direto — ver investirPontos)", async () => {
     const times = ["a", "b", "c", "d"];
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
       random: () => 0.5,

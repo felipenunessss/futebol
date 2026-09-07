@@ -17,21 +17,23 @@ import {
   type EstadoJogadorParaImpacto,
   type Opcao,
 } from "../progression/scenarios.js";
-import { converterChancesEmDesempenho, type FocoDeTreino } from "../progression/xp.js";
+import { converterChancesEmDesempenho, xpParaProximoNivel, type FocoDeTreino } from "../progression/xp.js";
 import { ROTULO_POTENCIAL } from "../progression/potencial.js";
-import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, type Posicao } from "../schemas/player.js";
+import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, buscarArquetipo, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "../simulation/live-match.js";
 import type { SubtipoChance } from "../simulation/tactics.js";
-import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, assinarContrato, avancarTemporada, criarEstadoInicial, overallAtual } from "../career/Player.js";
+import { aplicarDesempenhoPartida, aplicarImpactoDeCenario, assinarContrato, avancarTemporada, criarEstadoInicial, overallAtual, type EstadoDeCarreira } from "../career/Player.js";
 import {
   jogarTemporada,
   jogarTemporadaSemanal,
+  type AlocacaoDePontos,
   type CenarioResolvidoNaTemporada,
   type ContextoPartidaDoJogador,
   type ContextoPartidaDoJogadorSemanal,
   type ModoDePartida,
   type NegociacaoResolvidaNaTemporada,
+  type NivelAlcancadoNaTemporada,
   type PartidaDoJogadorMataMata,
   type PartidaDoJogadorPontosCorridos,
   type ResultadoTemporadaDeCarreira,
@@ -279,9 +281,10 @@ function simularCarreira(): void {
   console.log(`Chances do jogador: ${resultado.chancesJogador.length} (${resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)\n`);
 
   const desempenho = converterChancesEmDesempenho(resultado.chancesJogador, 90, 1.5); // clássico, importância maior
-  estado = aplicarDesempenhoPartida(estado, resultado.chancesJogador, desempenho);
+  const ganho = aplicarDesempenhoPartida(estado, desempenho);
+  estado = ganho.estado;
   console.log(`Gols: ${desempenho.gols} | Assistências: ${desempenho.assistencias} | Chances perdidas: ${desempenho.chancesPerdidas}`);
-  console.log(`Overall após a partida: ${overallAtual(estado)}\n`);
+  console.log(`Nível: ${estado.nivel} | XP acumulado: ${estado.xpAcumulado.toFixed(0)}/${xpParaProximoNivel(estado.nivel).toFixed(0)} | Pontos disponíveis: ${estado.pontosDisponiveis}${ganho.subiuDeNivel ? ` (subiu do nível ${ganho.nivelAnterior}!)` : ""}\n`);
 
   console.log(`--- Cenários da temporada (um sorteio por período do calendário) ---`);
   for (const periodo of construirCalendarioPadrao(estado.temporada).calendario) {
@@ -660,8 +663,48 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     if (treino.foco === "descanso") {
       console.log(`  -> Moral: ${treino.moralAntes} -> ${treino.moralDepois}`);
     } else {
-      console.log(`  -> Overall: ${treino.overallAntes} -> ${treino.overallDepois}`);
+      console.log(`  -> Sessão de treino (${treino.foco}) concluída — o XP conta pro seu nível, não pro atributo direto.`);
     }
+  };
+
+  const onNivelAlcancado = (info: NivelAlcancadoNaTemporada): void => {
+    console.log(`\n🎉 Subiu para o nível ${info.nivelNovo}! (+${info.pontosGanhos} ponto(s) de atributo pra distribuir)`);
+  };
+
+  const escolherDistribuicaoDePontosInterativo = async (estadoAtual: EstadoDeCarreira): Promise<AlocacaoDePontos[]> => {
+    const arquetipo = buscarArquetipo(estadoAtual.jogador.arquetipo_id);
+    const atributosDaPosicao = ATRIBUTOS_POR_POSICAO[estadoAtual.jogador.posicao];
+    const alocacoes: AlocacaoDePontos[] = [];
+    let pontosRestantes = estadoAtual.pontosDisponiveis;
+
+    console.log(`\n--- Distribuir pontos de atributo (${pontosRestantes} ${pontosRestantes === 1 ? "disponível" : "disponíveis"}) ---`);
+    atributosDaPosicao.forEach((atributo, i) => {
+      const rotuloBonus = arquetipo.atributos_prioritarios.includes(atributo) ? "prioritário do arquétipo, +1.5/ponto" : "+1/ponto";
+      console.log(`  ${i + 1}. ${atributo} (${estadoAtual.jogador.atributos[atributo] ?? 0}) [${rotuloBonus}]`);
+    });
+
+    while (pontosRestantes > 0) {
+      const respostaAtributo = (await perguntar(`Investir em qual atributo (número, ou Enter pra parar — ${pontosRestantes} ponto(s) restante(s))? `)).trim();
+      if (!respostaAtributo) break;
+
+      const indice = Number(respostaAtributo) - 1;
+      if (!(indice >= 0 && indice < atributosDaPosicao.length)) {
+        console.log("Opção inválida, tente de novo.");
+        continue;
+      }
+
+      const respostaQuantidade = (await perguntar(`Quantos pontos (máx ${pontosRestantes})? `)).trim();
+      const quantidade = Number(respostaQuantidade);
+      if (!(quantidade > 0 && quantidade <= pontosRestantes)) {
+        console.log("Quantidade inválida, tente de novo.");
+        continue;
+      }
+
+      alocacoes.push({ atributo: atributosDaPosicao[indice], quantidade });
+      pontosRestantes -= quantidade;
+    }
+
+    return alocacoes;
   };
 
   const onNegociacaoResolvida = (negociacao: NegociacaoResolvidaNaTemporada): void => {
@@ -742,6 +785,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       onPartidasResumidas,
       onStatusAtualizado,
       onTreinoResolvido,
+      escolherDistribuicaoDePontos: escolherDistribuicaoDePontosInterativo,
+      onNivelAlcancado,
       onPartidaPontosCorridos,
       onPartidaMataMata,
       escolherModoDePartida: escolherModoDePartidaInterativo,
@@ -756,6 +801,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     const competicoesOk = resultado.resultadoTemporada.competicoes.filter((c) => !c.erro);
     console.log(`\n=== Fim da temporada ${resultado.resultadoTemporada.temporada} — agora ${estado.temporada} ===`);
     console.log(`Clube: ${nomeDoClube(estado.clubeAtualId)} | Idade: ${estado.jogador.idade} | Overall: ${overallAtual(estado)} | Status: ${estado.statusNoClube}`);
+    console.log(`Nível: ${estado.nivel} | XP acumulado: ${estado.xpAcumulado.toFixed(0)}/${xpParaProximoNivel(estado.nivel).toFixed(0)} | Pontos disponíveis: ${estado.pontosDisponiveis}`);
     console.log(`Avaliação dos olheiros sobre seu potencial: ${ROTULO_POTENCIAL[estado.avaliacaoDeOlheiros]}`);
     console.log(`${competicoesOk.length}/${resultado.resultadoTemporada.competicoes.length} competições simuladas`);
     console.log(

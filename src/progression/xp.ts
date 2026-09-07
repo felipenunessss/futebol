@@ -1,11 +1,15 @@
-import { ATRIBUTOS_POR_POSICAO, type Arquetipo, type Atributo, type Atributos, type Jogador } from "../schemas/player.js";
+import type { Atributo } from "../schemas/player.js";
 import type { ChanceJogador } from "../simulation/match.js";
-import { multiplicadorDePotencial } from "./potencial.js";
 
 /**
- * Geração de XP e crescimento de atributo — ver docs/motor-de-partida.md
- * seção 3. Sem perks: XP alimenta diretamente o atributo, com retorno
- * decrescente perto de 99 e multiplicador de arquétipo nos prioritários.
+ * Geração de XP, nota de partida e curva de nível — ver
+ * docs/motor-de-partida.md seção 3. Desde a seção 5.16, XP de
+ * partida/treino não sobe atributo nenhum diretamente — só alimenta um
+ * **nível** (`career/Player.ts` `ganharXp`), e subir de nível dá pontos
+ * pra investir manualmente em QUALQUER atributo da posição
+ * (`career/Player.ts` `investirPontos`), estilo Pro Clubs. Continua
+ * "sem perks": pontos só somam atributo numérico, nunca desbloqueiam
+ * efeito especial.
  */
 
 export interface DesempenhoPartida {
@@ -62,7 +66,7 @@ const NOTA_BASE = 6;
 const NOTA_MINIMA = 0;
 const NOTA_MAXIMA = 10;
 
-/** Nota de desempenho (0-10, estilo cobertura esportiva) a partir dos eventos da partida. */
+/** Nota de desempenho (0-10, estilo cobertura esportiva) a partir dos eventos da partida — usada por `career/status.ts` `evoluirStatus`, sem relação com o nível/XP abaixo. */
 export function calcularNotaPartida(desempenho: DesempenhoPartida): number {
   const bonus =
     desempenho.gols * 1.2 +
@@ -78,134 +82,53 @@ export function calcularNotaPartida(desempenho: DesempenhoPartida): number {
 
 const XP_BASE_POR_PARTIDA = 100;
 
-/** XP total gerado pela partida — nota, tempo em campo e importância do jogo. */
+/** XP total gerado pela partida (rumo ao nível, `career/Player.ts` `ganharXp`) — nota, tempo em campo e importância do jogo. */
 export function calcularXpPartida(desempenho: DesempenhoPartida): number {
   const nota = calcularNotaPartida(desempenho);
   const fatorMinutos = Math.min(1, desempenho.minutosJogados / 90);
   return nota * fatorMinutos * desempenho.importancia * XP_BASE_POR_PARTIDA;
 }
 
-const GANHO_BASE = 0.02;
-
 /**
- * Aplica XP a um atributo (0-99), com retorno decrescente perto do teto —
- * sair de 90→99 custa muito mais XP que 40→50 — e multiplicador de
- * arquétipo (prioritário = cresce mais rápido, sem limite especial).
+ * Curva de XP necessária pra sair do nível `nivel` pro próximo — cada
+ * nível fica um pouco mais caro que o anterior. Estimativa de design,
+ * não fórmula validada (mesma ressalva de toda constante de progressão
+ * do jogo) — calibrada pra um titular ativo (partidas + treino) subir
+ * uns 8-12 níveis numa temporada cheia.
  */
-export function aplicarXpAtributo(valorAtual: number, xp: number, multiplicadorArquetipo = 1): number {
-  const fatorRetornoDecrescente = 1 - valorAtual / 100;
-  const ganho = xp * multiplicadorArquetipo * fatorRetornoDecrescente * GANHO_BASE;
-  return Math.min(99, valorAtual + ganho);
+export function xpParaProximoNivel(nivel: number): number {
+  return 150 + nivel * 50;
 }
 
-/** Multiplicador aplicado a um atributo prioritário do arquétipo — ver docs/motor-de-partida.md seção 3 ("1.5x-2x"). */
-const MULTIPLICADOR_PRIORITARIO = 1.5;
+/** Pontos de atributo ganhos a cada level-up (`career/Player.ts` `ganharXp`). */
+export const PONTOS_POR_NIVEL = 3;
 
-/** Quanto do XP total da partida vai pro crescimento geral (espalhado por todos os atributos da posição) em vez de pros atributos usados em chances específicas. */
-const FRACAO_XP_GERAL = 0.3;
+/** Quanto 1 ponto investido soma no atributo — mais se for prioritário do arquétipo (`career/Player.ts` `investirPontos`): o arquétipo continua sendo multiplicador, nunca restrição (dá pra investir em qualquer atributo da posição, só rende menos fora da prioridade). */
+export const GANHO_POR_PONTO_PRIORITARIO = 1.5;
+export const GANHO_POR_PONTO_PADRAO = 1;
 
-export function multiplicadorDoAtributo(atributo: Atributo, arquetipo: Arquetipo): number {
-  return arquetipo.atributos_prioritarios.includes(atributo) ? MULTIPLICADOR_PRIORITARIO : 1;
-}
-
-/** Combina o multiplicador de arquétipo (`multiplicadorDoAtributo`) com o de potencial de desenvolvimento oculto (`progression/potencial.ts` `multiplicadorDePotencial` — trata `jogador.potencial` ausente como "regular"/1x) — os dois aceleram o mesmo crescimento numérico, sem desbloquear efeito nenhum (mesma filosofia "sem perks" de sempre). */
-function multiplicadorTotalDoAtributo(atributo: Atributo, jogador: Jogador, arquetipo: Arquetipo): number {
-  return multiplicadorDoAtributo(atributo, arquetipo) * multiplicadorDePotencial(jogador.potencial);
-}
-
-/**
- * Aplica o XP de uma partida aos atributos do jogador — combina duas
- * fontes (ver docs/motor-de-partida.md seção 3): uma fração do XP total
- * (`FRACAO_XP_GERAL`) cresce igualmente todos os atributos relevantes da
- * posição (desempenho geral em campo); o resto se concentra no atributo
- * específico usado em cada chance (`chance.atributoUsado`) — chance com
- * sucesso rende XP cheio, chance sem sucesso ainda ensina algo, mas menos.
- * Não muta `jogador`; devolve os atributos atualizados.
- */
-export function aplicarXpPartidaAoJogador(
-  jogador: Jogador,
-  arquetipo: Arquetipo,
-  chances: ChanceJogador[],
-  xpTotalPartida: number,
-): Atributos {
-  const atributos: Atributos = { ...jogador.atributos };
-  const relevantes = ATRIBUTOS_POR_POSICAO[jogador.posicao];
-
-  const xpGeral = xpTotalPartida * FRACAO_XP_GERAL;
-  const xpPorAtributoGeral = relevantes.length > 0 ? xpGeral / relevantes.length : 0;
-  for (const atributo of relevantes) {
-    const valorAtual = atributos[atributo] ?? 1;
-    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributoGeral, multiplicadorTotalDoAtributo(atributo, jogador, arquetipo));
-  }
-
-  const xpEventos = xpTotalPartida * (1 - FRACAO_XP_GERAL);
-  const xpPorChance = chances.length > 0 ? xpEventos / chances.length : 0;
-  const FATOR_XP_CHANCE_SEM_SUCESSO = 0.4;
-  for (const chance of chances) {
-    const xpDaChance = xpPorChance * (chance.sucesso ? 1 : FATOR_XP_CHANCE_SEM_SUCESSO);
-    const valorAtual = atributos[chance.atributoUsado] ?? 1;
-    atributos[chance.atributoUsado] = aplicarXpAtributo(valorAtual, xpDaChance, multiplicadorTotalDoAtributo(chance.atributoUsado, jogador, arquetipo));
-  }
-
-  return atributos;
+export function ganhoPorPonto(atributo: Atributo, atributosPrioritarios: Atributo[]): number {
+  return atributosPrioritarios.includes(atributo) ? GANHO_POR_PONTO_PRIORITARIO : GANHO_POR_PONTO_PADRAO;
 }
 
 /**
  * Sessões de treino com escolha de foco — ver `docs/game-design.md` seção
- * 5.2 ("sessões de treino semanais com escolha de foco: físico, técnico,
- * tático, descanso"), pilar que ficou pendente até agora. É uma segunda
- * fonte de XP, independente do desempenho em partida
- * (`aplicarXpPartidaAoJogador`) — o jogador escolhe ativamente onde focar
- * em vez de só crescer passivamente pelo que a simulação de partida
- * gerar.
+ * 5.2. Desde a seção 5.16, o foco não filtra mais QUAL atributo cresce
+ * (isso virou escolha manual em `investirPontos`) — só decide se a sessão
+ * gera XP (`fisico`/`tecnico`/`tatico`, todas equivalentes em XP hoje) ou
+ * recupera moral sem gerar XP (`descanso`, `MORAL_RECUPERADA_NO_DESCANSO`).
+ * Mantido como 4 opções (não só "treinar"/"descansar") pela variedade
+ * narrativa na CLI, mesmo mecanicamente equivalentes entre si agora.
  */
 export type FocoDeTreino = "fisico" | "tecnico" | "tatico" | "descanso";
 
-/**
- * Categorização de atributo por foco de treino — diferente de
- * `progression/aging.ts` `CATEGORIA_POR_ATRIBUTO` (que separa só
- * físico/mental/sem_declínio pra fins de curva de idade); aqui "técnico"
- * e "tático" separam o que era uma categoria "mental" só na aging.ts,
- * porque faz sentido pro jogador escolher entre as duas ao treinar.
- * `descanso` não tem atributos associados — não treina nada, só recupera
- * moral (ver `aplicarTreino`).
- */
-export const ATRIBUTOS_POR_FOCO: Record<Exclude<FocoDeTreino, "descanso">, Atributo[]> = {
-  fisico: ["velocidade", "forca_fisica", "resistencia", "jogo_aereo", "reflexos"],
-  tecnico: ["finalizacao", "drible", "cruzamento", "passe_curto", "passe_longo", "cabeceio", "desarme", "interceptacao", "marcacao", "protecao_de_bola", "posicionamento_goleiro", "saida_de_gol", "distribuicao"],
-  tatico: ["visao_de_jogo", "frieza", "posicionamento_ofensivo", "posicionamento_defensivo", "movimentacao", "lideranca"],
-};
-
-/** XP de uma sessão de treino — estimativa de design (mesma ressalva das demais constantes do jogo): concentrado em poucos atributos (só os do foco escolhido, e só os relevantes pra posição do jogador), rende mais por atributo que a fração equivalente do XP de partida, mas 5 sessões (uma por período) não dominam a progressão da temporada sozinhas. */
+/** XP de uma sessão de treino — estimativa de design (mesma ressalva das demais constantes do jogo): rende mais que uma fração do XP de partida, mas 5 sessões (uma por período) não dominam a progressão da temporada sozinhas. */
 const XP_POR_SESSAO_DE_TREINO = 250;
 
-/** Moral recuperada ao escolher "descanso" como foco — não treina nenhum atributo. */
+/** Moral recuperada ao escolher "descanso" como foco — não gera XP. */
 export const MORAL_RECUPERADA_NO_DESCANSO = 8;
 
-/**
- * Aplica uma sessão de treino aos atributos do jogador — XP concentrado
- * só nos atributos do `foco` escolhido que são relevantes pra posição do
- * jogador (`ATRIBUTOS_POR_POSICAO`); `descanso` não muda nenhum atributo
- * (a recuperação de moral é responsabilidade de quem chama, ver
- * `MORAL_RECUPERADA_NO_DESCANSO`). Se a posição do jogador não tem
- * nenhum atributo no foco escolhido (ex: goleiro treinando "tático" —
- * `posicionamento_defensivo`/`posicionamento_ofensivo` não são atributos
- * de goleiro), a sessão não tem efeito — não é erro, só um treino sem
- * atributo relevante pra praticar. Não muta `jogador`; devolve os
- * atributos atualizados.
- */
-export function aplicarTreino(jogador: Jogador, arquetipo: Arquetipo, foco: FocoDeTreino): Atributos {
-  if (foco === "descanso") return { ...jogador.atributos };
-
-  const atributos: Atributos = { ...jogador.atributos };
-  const relevantes = ATRIBUTOS_POR_POSICAO[jogador.posicao].filter((atributo) => ATRIBUTOS_POR_FOCO[foco].includes(atributo));
-  if (relevantes.length === 0) return atributos;
-
-  const xpPorAtributo = XP_POR_SESSAO_DE_TREINO / relevantes.length;
-  for (const atributo of relevantes) {
-    const valorAtual = atributos[atributo] ?? 1;
-    atributos[atributo] = aplicarXpAtributo(valorAtual, xpPorAtributo, multiplicadorTotalDoAtributo(atributo, jogador, arquetipo));
-  }
-
-  return atributos;
+/** XP de uma sessão de treino (rumo ao nível, `career/Player.ts` `ganharXp`) — 0 pra "descanso" (não treina, só recupera moral, responsabilidade de quem chama). */
+export function xpDeSessaoDeTreino(foco: FocoDeTreino): number {
+  return foco === "descanso" ? 0 : XP_POR_SESSAO_DE_TREINO;
 }
