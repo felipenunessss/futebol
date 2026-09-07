@@ -271,6 +271,57 @@ describe("criarCompeticaoIncremental — séries + Torneo Competencia + regular 
   });
 });
 
+describe("criarCompeticaoIncremental — Tabla Anual (Argentina 1ª divisão, por id)", () => {
+  const times = ["a", "b", "c", "d", "e", "f"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "argentina_primera",
+    formato: {
+      turno: { nome: "Torneo Apertura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      returno: { nome: "Torneo Clausura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      final_estadual: { criterio: "tabla_anual_soma_apertura_clausura", ida_e_volta: false },
+    },
+    times,
+  };
+
+  it("soma apertura+clausura (reaproveitando o mesmo mecanismo de Paraguai 1ª) e produz 1 campeão válido", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 10 }, () => Math.random());
+    for (let semana = 1; semana <= 10; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+});
+
+describe("criarCompeticaoIncremental — 2 zonas + final direta + Reduzido (Argentina 2ª divisão, por id)", () => {
+  // 2 zonas de 4 (classificam_por_grupo=2: líder + mais 1 pro Reduzido) — pequeno o bastante pra
+  // rodar rápido, grande o bastante pra exercitar líder-de-zona + restante + perdedor-da-final.
+  const times = Array.from({ length: 8 }, (_, i) => `t${i + 1}`);
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "argentina_segunda",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 4, ida_e_volta: false, classificam_por_grupo: 2 },
+      final_estadual: { criterio: "final_direta_1_ascenso", ida_e_volta: false },
+      mata_mata: { fases: ["primeira_fase", "quartas", "semifinal", "final"], ida_e_volta: false },
+    },
+    times,
+  };
+
+  it("o campeão sai da final direta entre líderes de zona, e o Reduzido roda em paralelo sem erro", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 12 }, () => Math.random());
+    expect(estado.totalUnidades).toBe(totalDeRodadasEsperado(campeonato) + 1 + 4);
+
+    for (let semana = 1; semana <= 12; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+
+  function totalDeRodadasEsperado(c: CampeonatoSimulavel): number {
+    const n = c.formato.fase_grupos!.times_por_grupo;
+    return c.formato.fase_grupos!.ida_e_volta ? (n - 1) * 2 : n - 1;
+  }
+});
+
 describe("criarCompeticaoIncrementalConjunta (Libertadores + Sul-Americana)", () => {
   // Mesma base sintética de tests/simulation/engine.test.ts (receitaLibertadoresESulAmericanaConjunta).
   const libertadores: CampeonatoSimulavel = {
@@ -387,8 +438,8 @@ describe("criarCompeticoesIncrementaisDaTemporada", () => {
       expect(campeonato.times).toContain(estado.campeao);
     }
 
-    // as ~13 competições que ainda precisam de formato incremental novo (Fase 2) continuam
-    // falhando de forma esperada — não travam a montagem das demais.
-    expect(resultado.erros.some((e) => e.campeonatoId === "argentina_primera")).toBe(true);
+    // as competições que ainda precisam de formato incremental novo (Fase 2, em andamento)
+    // continuam falhando de forma esperada — não travam a montagem das demais.
+    expect(resultado.erros.some((e) => e.campeonatoId === "venezuela_primera")).toBe(true);
   });
 });

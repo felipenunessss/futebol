@@ -617,6 +617,54 @@ function passosUruguaiSegunda(campeonato: CampeonatoSimulavel, ratings: Record<s
   ];
 }
 
+/**
+ * Argentina 2ª divisão / Primera Nacional (por id, mesmo critério de `engine.ts`
+ * `receitaArgentinaSegunda`): 2 zonas, líder de cada uma disputa uma final direta pelo 1º ascenso
+ * (é o "campeão" retornado); os 7 restantes de cada zona (2º-8º, 14 no total) MAIS o perdedor
+ * dessa final entram no "Reduzido" escalonado, que decide o 2º ascenso — não muda quem é campeão.
+ * O perdedor da final direta é derivado do próprio confronto resolvido (`resultados[0].confrontos[0]`),
+ * não de um cálculo à parte.
+ */
+function passosArgentinaSegunda(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
+  const fg = campeonato.formato.fase_grupos!;
+  const finalEstadual = campeonato.formato.final_estadual!;
+
+  return [
+    {
+      unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
+      criar: () => criarFaseRodadas("grupos", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
+      aoConcluir: (fase, ctx) => {
+        const porGrupo = tabelasPorGrupo(fase as FaseRodadas);
+        ctx.lideresDeZona = porGrupo.map((g) => g.tabela[0].clubeId);
+        ctx.restantesParaOReduzido = porGrupo.flatMap((g) => g.tabela.slice(1, fg.classificam_por_grupo).map((linha) => linha.clubeId));
+      },
+    },
+    {
+      unidades: 1,
+      criar: (ctx) => criarFaseMataMata("final_direta", [{ nome: "final", ida_e_volta: finalEstadual.ida_e_volta, entrantes: ctx.lideresDeZona as string[] }]),
+      aoConcluir: (fase, ctx) => {
+        const faseMataMata = fase as FaseMataMata;
+        ctx.campeao = faseMataMata.vivos[0];
+        const confronto = faseMataMata.resultados[0]?.confrontos[0];
+        ctx.perdedorDaFinal = confronto ? (confronto.timeA === ctx.campeao ? confronto.timeB : confronto.timeA) : undefined;
+      },
+    },
+    {
+      unidades: 4,
+      criar: (ctx) =>
+        criarFaseMataMata("reduzido", [
+          { nome: "primeira_fase", ida_e_volta: false, entrantes: ctx.restantesParaOReduzido as string[] },
+          { nome: "quartas", ida_e_volta: true, entrantes: ctx.perdedorDaFinal ? [ctx.perdedorDaFinal as string] : [] },
+          { nome: "semifinal", ida_e_volta: true },
+          { nome: "final", ida_e_volta: true },
+        ]),
+      aoConcluir: () => {
+        // decide o 2º ascenso — não é "o campeão" retornado (já definido pela final direta, 1º ascenso).
+      },
+    },
+  ];
+}
+
 function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
   const fg = campeonato.formato.fase_grupos!;
   const fq = campeonato.formato.fase_quadrangular!;
@@ -721,6 +769,12 @@ function passosTurnoRetornoSomado(campeonato: CampeonatoSimulavel): PassoDeProgr
 function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string, number>, random: () => number): PassoDePrograma[] {
   if (campeonato.id === "carioca_a") return passosCarioca(campeonato);
   if (campeonato.id === "peru_primera") return passosPeruPrimeira(campeonato);
+  // Argentina 1ª (por id — mesma combinação de blocos ambígua de Peru 1ª/Carioca): o
+  // `final_estadual` ali não é uma final de verdade, é reaproveitado só pra representar a Tabla
+  // Anual (soma dos 2 torneios) — mecanicamente idêntico a Paraguai 1ª, ver `engine.ts`
+  // `receitaArgentina`/`receitaTurnoRetornoSomado`.
+  if (campeonato.id === "argentina_primera") return passosTurnoRetornoSomado(campeonato);
+  if (campeonato.id === "argentina_segunda") return passosArgentinaSegunda(campeonato, ratings);
   if (campeonato.id === "uruguai_primera") return passosUruguaiPrimeira(campeonato);
   if (campeonato.id === "uruguai_segunda") return passosUruguaiSegunda(campeonato, ratings);
 
