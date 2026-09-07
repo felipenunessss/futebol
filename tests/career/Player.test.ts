@@ -74,6 +74,27 @@ describe("criarEstadoInicial", () => {
     expect(estado.avaliacaoDeOlheiros).toBeDefined();
   });
 
+  it("repassa nacionalidade/numero pro jogador quando informados", () => {
+    const estado = criarEstadoInicial({
+      id: "j3",
+      nome: "Jogador Teste",
+      posicao: "atacante",
+      arquetipoId: "finalizador",
+      clubeInicialId: "corinthians",
+      temporadaInicial: 2027,
+      nacionalidade: "AR",
+      numero: 9,
+    });
+    expect(estado.jogador.nacionalidade).toBe("AR");
+    expect(estado.jogador.numero).toBe(9);
+  });
+
+  it("nacionalidade/numero ficam undefined quando omitidos (não quebra quem não passa por eles)", () => {
+    const estado = estadoBase();
+    expect(estado.jogador.nacionalidade).toBeUndefined();
+    expect(estado.jogador.numero).toBeUndefined();
+  });
+
   it("respeita idadeInicial customizada", () => {
     const estado = criarEstadoInicial({
       id: "j2",

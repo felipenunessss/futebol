@@ -745,18 +745,29 @@ export interface OpcoesJogarTemporadaSemanal extends Omit<OpcoesJogarTemporada, 
   /** Equivalente a `onPartidaPontosCorridos`, mas pra confrontos de mata-mata. */
   onPartidaMataMata?: (info: PartidaDoJogadorMataMata) => void | Promise<void>;
   /**
+   * Chamado pra todo confronto de pontos corridos resolvido numa competição
+   * em que o clube do jogador está, EXCETO os confrontos do próprio clube
+   * dele (esses vão pra `onPartidaPontosCorridos`, que já tem exibição rica
+   * própria) — deixa a UI mostrar o resto da rodada (placar dos outros
+   * jogos) além da partida do jogador.
+   */
+  onPartidaDaRodadaNaCompeticaoDoJogador?: (info: PartidaDoJogadorPontosCorridos) => void | Promise<void>;
+  /**
    * Chamado uma vez no início da temporada — quais OUTRAS competições ativas
-   * (que não a(s) do próprio clube do jogador, essas já têm a UI completa
-   * de sempre) ele quer acompanhar com resumo de tabela a cada período
-   * (`onResumoDePeriodoCampeonatoSeguido`). Sem esse callback, nenhuma é
-   * seguida.
+   * (além da(s) do próprio clube do jogador, que SEMPRE recebem resumo por
+   * período — ver `onResumoDePeriodoCampeonatoSeguido` — independente desta
+   * escolha) ele quer acompanhar também com resumo de tabela a cada
+   * período. Sem esse callback, nenhuma OUTRA é seguida (a própria
+   * continua aparecendo do mesmo jeito).
    */
   escolherCampeonatosParaSeguir?: (idsAtivos: string[], clubeAtualId: string) => string[] | Promise<string[]>;
   /**
-   * Chamado no fim de cada período do calendário, uma vez por competição
-   * seguida (ver `escolherCampeonatosParaSeguir`) — a tabela reflete só o
-   * que já foi resolvido até aquele ponto da temporada, nunca resultado
-   * futuro (`simulation/incremental.ts` `tabelaAtualDaCompeticao`).
+   * Chamado no fim de cada período do calendário, uma vez pra cada
+   * competição do PRÓPRIO clube do jogador (sempre) e uma vez por
+   * competição OUTRA que ele tenha escolhido seguir (ver
+   * `escolherCampeonatosParaSeguir`) — a tabela reflete só o que já foi
+   * resolvido até aquele ponto da temporada, nunca resultado futuro
+   * (`simulation/incremental.ts` `tabelaAtualDaCompeticao`).
    * **Cobertura parcial**: ausente se a competição estiver numa fase sem
    * "uma" tabela só no momento (mata-mata, ou fase de grupos com vários
    * grupos) — pendência de UI, não um erro.
@@ -802,6 +813,7 @@ export async function jogarTemporadaSemanal(
     onTreinoResolvido,
     onPartidaPontosCorridos,
     onPartidaMataMata,
+    onPartidaDaRodadaNaCompeticaoDoJogador,
     escolherModoDePartida,
     decidirChanceAoVivo,
     decidirEventoDePartida,
@@ -899,6 +911,8 @@ export async function jogarTemporadaSemanal(
         if (evento.confronto.mandante === clubeNoInicioDaTemporada || evento.confronto.visitante === clubeNoInicioDaTemporada) {
           await registrarPartidaDoJogador(campeonatoId, evento.resultado);
           await onPartidaPontosCorridos?.({ campeonatoId, evento });
+        } else {
+          await onPartidaDaRodadaNaCompeticaoDoJogador?.({ campeonatoId, evento });
         }
       },
       aoResolverConfrontoMataMata: async (evento) => {
@@ -953,9 +967,11 @@ export async function jogarTemporadaSemanal(
 
     const periodoQueTermina = periodos.find((p) => p.semanaFim === semana);
     if (periodoQueTermina && onResumoDePeriodoCampeonatoSeguido) {
-      for (const campeonatoId of idsSeguidos) {
-        const competicaoSeguida = encontrarCompeticao(campeonatoId);
-        const tabela = competicaoSeguida ? tabelaAtualDaCompeticao(competicaoSeguida) : undefined;
+      // a(s) competição(ões) do próprio jogador SEMPRE aparecem no resumo, além de qualquer
+      // outra que ele tenha escolhido seguir (ver doc de `escolherCampeonatosParaSeguir`).
+      for (const campeonatoId of new Set([...idsDoJogador, ...idsSeguidos])) {
+        const competicao = encontrarCompeticao(campeonatoId);
+        const tabela = competicao ? tabelaAtualDaCompeticao(competicao) : undefined;
         if (tabela) await onResumoDePeriodoCampeonatoSeguido(campeonatoId, periodoQueTermina.periodo, tabela);
       }
     }

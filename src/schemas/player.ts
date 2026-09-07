@@ -87,12 +87,36 @@ export function buscarArquetipo(id: string): Arquetipo {
   return arquetipo;
 }
 
+/**
+ * Nacionalidades disponíveis na criação de carreira — mesmos códigos ISO
+ * 3166-1 alpha-2 já usados em `Club.pais`/`src/data/clubes/*.json` (só os
+ * 10 países CONMEBOL já modelados no jogo, sem inventar lista maior).
+ * Puramente informativo por enquanto — não afeta nenhuma mecânica do motor,
+ * mesmo espírito de outros campos "flavor" como `Club.cidade`/`estadio`.
+ */
+export const NACIONALIDADES_CONMEBOL: { codigo: string; nome: string }[] = [
+  { codigo: "AR", nome: "Argentina" },
+  { codigo: "BO", nome: "Bolívia" },
+  { codigo: "BR", nome: "Brasil" },
+  { codigo: "CL", nome: "Chile" },
+  { codigo: "CO", nome: "Colômbia" },
+  { codigo: "EC", nome: "Equador" },
+  { codigo: "PE", nome: "Peru" },
+  { codigo: "PY", nome: "Paraguai" },
+  { codigo: "UY", nome: "Uruguai" },
+  { codigo: "VE", nome: "Venezuela" },
+];
+
 export interface Jogador {
   id: string;
   nome: string;
   posicao: Posicao;
   arquetipo_id: string;
   idade: number;
+  /** Código de `NACIONALIDADES_CONMEBOL` — opcional (mesmo padrão de `potencial?`) pra não quebrar suítes de teste que constroem `Jogador` na mão. */
+  nacionalidade?: string;
+  /** Número de camisa (1-99) — sem checar unicidade contra o resto do elenco, o motor não modela elenco completo como objetos `Jogador`. */
+  numero?: number;
   atributos: Atributos;
   /** Potencial de desenvolvimento oculto (`progression/potencial.ts`) — nunca mostrado direto na UI, só a "avaliação de olheiros" (`career/Player.ts` `EstadoDeCarreira.avaliacaoDeOlheiros`). Ausente = tratado como "regular" (`multiplicadorDePotencial`) — mantém compatível quem monta um `Jogador` na mão (comum em teste) sem passar por `criarEstadoInicial`. */
   potencial?: NivelDePotencial;

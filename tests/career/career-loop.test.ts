@@ -590,15 +590,38 @@ describe("jogarTemporadaSemanal", () => {
       },
     });
 
-    expect(idsOferecidos[0]).toEqual(["brasileirao_serie_b"]); // a própria competição do jogador (serie_a) não é oferecida
-    expect(resumos.length).toBeGreaterThan(0);
-    expect(resumos.every((r) => r.campeonatoId === "brasileirao_serie_b")).toBe(true);
+    expect(idsOferecidos[0]).toEqual(["brasileirao_serie_b"]); // a própria competição do jogador (serie_a) não é oferecida na lista de OUTRAS
 
-    // revelação progressiva: o total de jogos já disputados não pode diminuir de um resumo pro próximo,
-    // e o do primeiro resumo não pode já ser a temporada inteira (senão não seria "por período").
-    for (let i = 1; i < resumos.length; i++) {
-      expect(resumos[i].totalJogos).toBeGreaterThanOrEqual(resumos[i - 1].totalJogos);
+    // a própria competição (serie_a) sempre aparece no resumo, mesmo sem ter sido "seguida" — só serie_b
+    // precisava de escolherCampeonatosParaSeguir pra aparecer.
+    const resumosDaPropria = resumos.filter((r) => r.campeonatoId === "brasileirao_serie_a");
+    const resumosDaSeguida = resumos.filter((r) => r.campeonatoId === "brasileirao_serie_b");
+    expect(resumosDaPropria.length).toBeGreaterThan(0);
+    expect(resumosDaSeguida.length).toBeGreaterThan(0);
+
+    // revelação progressiva, por competição: o total de jogos já disputados não pode diminuir de um
+    // resumo pro próximo, e o do primeiro resumo não pode já ser a temporada inteira (senão não seria "por período").
+    for (const grupo of [resumosDaPropria, resumosDaSeguida]) {
+      for (let i = 1; i < grupo.length; i++) {
+        expect(grupo[i].totalJogos).toBeGreaterThanOrEqual(grupo[i - 1].totalJogos);
+      }
     }
+  });
+
+  it("onPartidaDaRodadaNaCompeticaoDoJogador dispara pros confrontos da competição do jogador que NÃO envolvem o clube dele", async () => {
+    const times = ["a", "b", "c", "d"];
+    const eventosDaRodada: { mandante: string; visitante: string }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: () => "rapida",
+      onPartidaDaRodadaNaCompeticaoDoJogador: (info) => {
+        eventosDaRodada.push({ mandante: info.evento.confronto.mandante, visitante: info.evento.confronto.visitante });
+      },
+    });
+
+    expect(eventosDaRodada.length).toBeGreaterThan(0);
+    expect(eventosDaRodada.every((e) => e.mandante !== "a" && e.visitante !== "a")).toBe(true);
   });
 });
 

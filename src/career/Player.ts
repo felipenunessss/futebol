@@ -60,6 +60,10 @@ export interface OpcoesEstadoInicial {
   clubeInicialId: string;
   temporadaInicial: number;
   idadeInicial?: number;
+  /** Ver `schemas/player.ts` `NACIONALIDADES_CONMEBOL`/`Jogador.nacionalidade` — opcional, sem valor default (a criação real sempre passa um). */
+  nacionalidade?: string;
+  /** Ver `schemas/player.ts` `Jogador.numero` — opcional, sem valor default. */
+  numero?: number;
   /** Injetável pra determinismo em teste — mesmo padrão do resto do jogo. Decide a amplitude dos atributos iniciais e o potencial de desenvolvimento oculto sorteados aqui. */
   random?: () => number;
 }
@@ -145,6 +149,8 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
       posicao: opcoes.posicao,
       arquetipo_id: opcoes.arquetipoId,
       idade: opcoes.idadeInicial ?? IDADE_INICIAL_PADRAO,
+      nacionalidade: opcoes.nacionalidade,
+      numero: opcoes.numero,
       atributos,
       potencial,
     },

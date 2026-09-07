@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ARQUETIPOS, type Posicao } from "@motor/schemas/player.js";
+import { ARQUETIPOS, NACIONALIDADES_CONMEBOL, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual } from "@motor/career/Player.js";
 import { ROTULO_POTENCIAL } from "@motor/progression/potencial.js";
 import type { PropostaTransferencia } from "@motor/market/transfers.js";
@@ -16,7 +16,7 @@ const ROTULO_POSICAO: Record<Posicao, string> = {
   atacante: "Atacante",
 };
 
-const PASSOS_EM_ORDEM = ["nome", "posicao", "arquetipo", "proposta", "resumo"] as const;
+const PASSOS_EM_ORDEM = ["nome", "nacionalidade", "posicao", "arquetipo", "numero", "proposta", "resumo"] as const;
 
 function nomeDoClube(clube: { nome: string; nome_popular?: string } | undefined, id: string): string {
   return clube?.nome_popular ?? clube?.nome ?? id;
@@ -32,8 +32,10 @@ export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (es
 
         <div className="mt-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-8">
           {criacao.passo === "nome" && <PassoNome onConfirmar={criacao.confirmarNome} />}
+          {criacao.passo === "nacionalidade" && <PassoNacionalidade onEscolher={criacao.escolherNacionalidade} />}
           {criacao.passo === "posicao" && <PassoPosicao onEscolher={criacao.escolherPosicao} />}
           {criacao.passo === "arquetipo" && criacao.posicao && <PassoArquetipo posicao={criacao.posicao} onEscolher={criacao.escolherArquetipo} />}
+          {criacao.passo === "numero" && <PassoNumero onConfirmar={criacao.confirmarNumero} />}
           {criacao.passo === "proposta" && (
             <PassoProposta propostas={criacao.propostas} clubePorId={criacao.clubePorId} clubes={criacao.clubes} onAceitar={criacao.aceitarProposta} onEscolherManualmente={criacao.escolherClubeManualmente} />
           )}
@@ -80,6 +82,64 @@ function PassoNome({ onConfirmar }: { onConfirmar: (nome: string) => void }) {
         />
       </label>
       <button type="submit" className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
+        Continuar
+      </button>
+    </form>
+  );
+}
+
+function PassoNacionalidade({ onEscolher }: { onEscolher: (codigo: string) => void }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold">Qual sua nacionalidade?</h2>
+      <div className="grid grid-cols-2 gap-3">
+        {NACIONALIDADES_CONMEBOL.map((nacionalidade) => (
+          <button
+            key={nacionalidade.codigo}
+            type="button"
+            onClick={() => onEscolher(nacionalidade.codigo)}
+            className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+          >
+            {nacionalidade.nome}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PassoNumero({ onConfirmar }: { onConfirmar: (numero: number) => void }) {
+  const [valor, setValor] = useState("");
+  const numero = Number(valor);
+  const valido = Number.isInteger(numero) && numero >= 1 && numero <= 99;
+
+  return (
+    <form
+      className="flex flex-col gap-4"
+      onSubmit={(evento) => {
+        evento.preventDefault();
+        if (valido) onConfirmar(numero);
+      }}
+    >
+      <h2 className="text-xl font-semibold">Qual seu número de camisa?</h2>
+      <label className="flex flex-col gap-1.5">
+        <span className="text-sm text-slate-400">Número (1-99)</span>
+        <input
+          autoFocus
+          type="number"
+          min={1}
+          max={99}
+          value={valor}
+          onChange={(evento) => setValor(evento.target.value)}
+          placeholder="10"
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 outline-none focus:border-emerald-500"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={!valido}
+        className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 transition-colors px-4 py-2.5 font-medium"
+      >
         Continuar
       </button>
     </form>
@@ -210,7 +270,11 @@ function PassoResumo({ estado, nomeClube, onFinalizar }: { estado: NonNullable<R
       <h2 className="text-xl font-semibold">Carreira criada!</h2>
       <dl className="grid grid-cols-2 gap-y-2 text-sm">
         <dt className="text-slate-400">Jogador</dt>
-        <dd>{estado.jogador.nome}</dd>
+        <dd>
+          {estado.jogador.nome} #{estado.jogador.numero}
+        </dd>
+        <dt className="text-slate-400">Nacionalidade</dt>
+        <dd>{NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estado.jogador.nacionalidade)?.nome ?? estado.jogador.nacionalidade}</dd>
         <dt className="text-slate-400">Posição</dt>
         <dd>{ROTULO_POSICAO[estado.jogador.posicao]}</dd>
         <dt className="text-slate-400">Clube</dt>

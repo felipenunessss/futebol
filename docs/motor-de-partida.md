@@ -1882,6 +1882,69 @@ automático, não roda em paralelo.
   e +10 num padrão pra 10 pontos cada, respeitando o teto de 99 e
   lançando erro sem pontos disponíveis.
 
+### 5.18. Tabela/rodada da própria competição na CLI + nacionalidade/número na criação (implementado)
+
+Dois pedidos do jogador. **Visualização**: jogando `npm run dev jogar`
+(carreira interativa, `jogarTemporadaSemanal`), só apareciam as partidas
+do PRÓPRIO clube (placar + posição na tabela antes/depois,
+`exibirPartidaPontosCorridos`) — a tabela completa da competição do
+jogador nunca aparecia (o hook de tabela,
+`onResumoDePeriodoCampeonatoSeguido`, só cobria competições OUTRAS que o
+jogador escolhesse seguir) e os jogos dos outros times da rodada nunca
+apareciam em lugar nenhum. **Nacionalidade/número**: `Jogador` não tinha
+nenhum dos dois campos.
+
+- **Tabela da própria competição**: `career/career-loop.ts`
+  `jogarTemporadaSemanal` passa a chamar `onResumoDePeriodoCampeonatoSeguido`
+  pra `idsDoJogador ∪ idsSeguidos` no fim de cada período, não só
+  `idsSeguidos` — a(s) competição(ões) do próprio jogador aparecem
+  sempre, sem precisar "seguir" a própria. `escolherCampeonatosParaSeguir`
+  continua só oferecendo as OUTRAS competições ativas (documentado no
+  JSDoc atualizado de `OpcoesJogarTemporadaSemanal`).
+- **Resto da rodada**: novo hook opcional
+  `onPartidaDaRodadaNaCompeticaoDoJogador` — dispara pra todo confronto
+  de pontos corridos resolvido numa competição em que o clube do
+  jogador está, EXCETO os confrontos do próprio clube (esses continuam
+  em `onPartidaPontosCorridos`, com a exibição rica de sempre).
+  Implementado dentro de `hooksSeForDoJogador`: o
+  `aoSimularConfrontoPontosCorridos` já recebia todo confronto da
+  competição (é `simulation/incremental.ts` `avancarSemana`/
+  `avancarSemanaConjunta` que itera o grupo inteiro) — só faltava
+  repassar os que não eram do jogador. CLI (`src/cli/index.ts`) imprime
+  uma linha compacta por jogo (`[outros jogos] Time A 2 x 1 Time B`).
+  Fora de escopo: mata-mata (só as partidas do próprio jogador
+  aparecem, cobertura já existente) e o motor em lote `jogarTemporada`
+  (usado só por `carreira`/`carreira-loop`/`temporada`, não pela
+  carreira interativa).
+- **Nacionalidade**: `schemas/player.ts` ganhou
+  `NACIONALIDADES_CONMEBOL` (10 entradas, mesmos códigos ISO alpha-2 já
+  usados em `Club.pais`/`src/data/clubes/*.json` — sem inventar lista
+  maior) e `Jogador.nacionalidade?: string`. **Número de camisa**:
+  `Jogador.numero?: number` (1-99, sem checar unicidade — o motor não
+  modela elenco completo como objetos `Jogador`). Ambos os campos
+  **opcionais**, mesmo padrão de `potencial?` (não quebra as suítes de
+  teste que constroem `Jogador` na mão). `career/Player.ts`
+  `OpcoesEstadoInicial` ganhou os dois campos, repassados direto pro
+  `jogador` dentro de `criarEstadoInicial`, sem valor default forçado.
+  Puramente informativo por enquanto — não afeta nenhuma mecânica do
+  motor, mesmo espírito de `Club.cidade`/`estadio`.
+- **Criação de carreira**: CLI (`jogarCarreiraInterativaCli`) ganhou os
+  passos de nacionalidade (logo após o nome) e número de camisa (logo
+  após o arquétipo), mostrados no cabeçalho da carreira. Wizard web
+  (`web/src/features/criacao-de-carreira/`) espelha o mesmo fluxo —
+  `PassoDeCriacao` ganhou `"nacionalidade"`/`"numero"`, ordem nome →
+  nacionalidade → posição → arquétipo → número → proposta → resumo,
+  novos componentes `PassoNacionalidade`/`PassoNumero`, `PassoResumo`
+  mostra os dois campos.
+- **Validado**: 427 testes passando (2 casos novos em
+  `tests/career/career-loop.test.ts` cobrindo o resumo sempre incluindo
+  a própria competição e o hook de "outros jogos"; 2 casos novos em
+  `tests/career/Player.test.ts` cobrindo nacionalidade/número passados
+  e omitidos), `npx tsc --noEmit` limpo (raiz e `web/`). Sessão real via
+  CLI confirmando os prompts de nacionalidade/número na criação, a
+  tabela da própria competição aparecendo a cada período e os placares
+  de outros jogos da rodada aparecendo junto com a partida do jogador.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

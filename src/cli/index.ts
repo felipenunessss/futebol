@@ -19,7 +19,7 @@ import {
 } from "../progression/scenarios.js";
 import { converterChancesEmDesempenho, xpParaProximoNivel, type FocoDeTreino } from "../progression/xp.js";
 import { ROTULO_POTENCIAL } from "../progression/potencial.js";
-import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, buscarArquetipo, type Posicao } from "../schemas/player.js";
+import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "../simulation/live-match.js";
 import type { SubtipoChance } from "../simulation/tactics.js";
@@ -442,6 +442,18 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   console.log("\n=== Criação de carreira ===");
   const nome = (await perguntar("Nome do jogador: ")).trim() || "Jogador Sem Nome";
 
+  console.log("\nNacionalidade:");
+  NACIONALIDADES_CONMEBOL.forEach((n, i) => console.log(`  ${i + 1}. ${n.nome}`));
+  let nacionalidade: string;
+  while (true) {
+    const escolha = Number((await perguntar("Escolha a nacionalidade (número): ")).trim());
+    if (escolha >= 1 && escolha <= NACIONALIDADES_CONMEBOL.length) {
+      nacionalidade = NACIONALIDADES_CONMEBOL[escolha - 1].codigo;
+      break;
+    }
+    console.log("Opção inválida, tente de novo.");
+  }
+
   const posicoes: Posicao[] = ["goleiro", "zagueiro", "lateral", "volante", "meia", "atacante"];
   console.log("\nPosições:");
   posicoes.forEach((p, i) => console.log(`  ${i + 1}. ${p}`));
@@ -468,10 +480,20 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     console.log("Opção inválida, tente de novo.");
   }
 
+  let numero: number;
+  while (true) {
+    const escolha = Number((await perguntar("Escolha seu número de camisa (1-99): ")).trim());
+    if (Number.isInteger(escolha) && escolha >= 1 && escolha <= 99) {
+      numero = escolha;
+      break;
+    }
+    console.log("Número inválido, tente de novo.");
+  }
+
   const TEMPORADA_INICIAL = 2027;
   // clubeInicialId provisório só pra poder calcular overall/perfil antes de existir um clube de verdade —
   // nunca é mostrado nem usado além disso: `assinarContrato`, logo abaixo, substitui pelo clube escolhido.
-  let estado = criarEstadoInicial({ id: "jogador_interativo", nome, posicao, arquetipoId, clubeInicialId: "", temporadaInicial: TEMPORADA_INICIAL });
+  let estado = criarEstadoInicial({ id: "jogador_interativo", nome, posicao, arquetipoId, clubeInicialId: "", temporadaInicial: TEMPORADA_INICIAL, nacionalidade, numero });
 
   const perfilDeNovato = {
     overall: overallAtual(estado),
@@ -538,7 +560,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
 
   const campeonatos = [...loadCampeonatosNacionais(), ...loadEstaduais()];
 
-  console.log(`\n=== ${estado.jogador.nome} (${posicao}) — ${nomeDoClube(clubeInicialId)}, temporada ${estado.temporada} ===`);
+  const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === nacionalidade)?.nome ?? nacionalidade;
+  console.log(`\n=== ${estado.jogador.nome} #${numero} (${posicao}, ${nomeDaNacionalidade}) — ${nomeDoClube(clubeInicialId)}, temporada ${estado.temporada} ===`);
   console.log(`Idade ${estado.jogador.idade} | Overall ${overallAtual(estado)} | Status: ${estado.statusNoClube}`);
   console.log(`Avaliação dos olheiros sobre seu potencial de desenvolvimento: ${ROTULO_POTENCIAL[estado.avaliacaoDeOlheiros]} (pode não ser exata ainda)\n`);
 
@@ -761,6 +784,12 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     imprimirTabela(tabela);
   };
 
+  /** Placar compacto dos outros jogos da rodada (times que não são o do jogador) — a partida do jogador já tem exibição rica própria (`exibirPartidaPontosCorridos`). */
+  const onPartidaDaRodadaNaCompeticaoDoJogador = (info: PartidaDoJogadorPontosCorridos): void => {
+    const { confronto, resultado } = info.evento;
+    console.log(`  [outros jogos] ${nomeDoClube(confronto.mandante)} ${resultado.golsCasa} x ${resultado.golsFora} ${nomeDoClube(confronto.visitante)}`);
+  };
+
   const onPartidasResumidas = (resumo: ResumoPartidasDaTemporada): void => {
     console.log(`\n--- Partidas da temporada ---`);
     for (const c of resumo.competicoes) {
@@ -789,6 +818,7 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
       onNivelAlcancado,
       onPartidaPontosCorridos,
       onPartidaMataMata,
+      onPartidaDaRodadaNaCompeticaoDoJogador,
       escolherModoDePartida: escolherModoDePartidaInterativo,
       decidirChanceAoVivo: decidirChanceAoVivoInterativo,
       decidirEventoDePartida: escolherOpcaoInterativa,
