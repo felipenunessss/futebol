@@ -1725,6 +1725,38 @@ partida sequer, porque a liga dele nunca estava ativa.
   formato em `tests/simulation/incremental.test.ts`, seguindo o mesmo
   padrão dos formatos anteriores), `npx tsc --noEmit` limpo.
 
+### 5.15. Recalibração de salário/valor de mercado — corrige propostas de R$1/mês (implementado)
+
+`market/valuation.ts` `calcularValorDeMercado` zerava pra qualquer overall
+≤ 40 (`OVERALL_MINIMO_COM_VALOR`) — como toda carreira nova começa com
+overall ~35-40 (`career/Player.ts`), isso zerava o valor de mercado (e por
+tabela o salário de abertura, `market/transfers.ts` `gerarProposta`) de
+praticamente toda carreira recém-criada e boa parte do início dela,
+gerando propostas visíveis de R$1/mês independente de posição, arquétipo
+ou clube.
+
+- `OVERALL_MINIMO_COM_VALOR` baixado de 40 pra 28 (bem abaixo de qualquer
+  overall inicial real) e `CONSTANTE_VALOR_BASE` recalibrada junto (20 →
+  29) — uma promessa de overall ~38 passa a valer dezenas de milhares
+  (salário de abertura na casa dos R$800-1.200/mês, dependendo de idade/
+  reputação), crescendo pra dezenas/centenas de milhares num profissional
+  consolidado (overall ~65-75 fica perto do exemplo de
+  `docs/game-design.md` seção 4 — R$45.000/mês num clube de força "alta")
+  e capando no teto salarial do clube pra craques.
+- `gerarProposta` ganhou um piso absoluto (`SALARIO_MENSAL_MINIMO`, R$800)
+  como rede de segurança — praticamente nunca acionado depois da
+  recalibração acima, só evita voltar a propor R$1 num caso extremo.
+- Ainda **estimativa de design, não fórmula validada** (mesma ressalva de
+  sempre) — só a calibração dos números mudou, a forma da curva
+  (cúbica com piso de overall) continua a mesma.
+- **Validado com dado real**: propostas iniciais de uma carreira nova
+  (overall 39) saem em R$800-811/mês + R$2.200-3.400 luvas (antes: R$1 +
+  R$2-6) — e a progressão por overall/clube em `market/valuation.ts` foi
+  conferida numericamente (overall 65 num clube "alta" fica perto de
+  R$56.000/mês, overall 85+ capa nos R$120.000/mês do teto do clube).
+  410 testes passando (`tests/market/valuation.test.ts` ganhou um teste
+  específico garantindo que uma promessa recém-criada não zera mais).
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

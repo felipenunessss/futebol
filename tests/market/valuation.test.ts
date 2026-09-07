@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest";
 import { calcularRatingDeInteresse, calcularValorDeMercado } from "../../src/market/valuation.js";
 
 describe("calcularValorDeMercado", () => {
-  it("jogador com overall muito baixo vale zero", () => {
-    expect(calcularValorDeMercado({ overall: 39, idade: 18, reputacaoNacional: 10 })).toBe(0);
+  it("jogador com overall muito baixo (abaixo do piso) vale zero", () => {
+    expect(calcularValorDeMercado({ overall: 20, idade: 18, reputacaoNacional: 10 })).toBe(0);
+  });
+
+  it("promessa recém-criada (overall ~39, ver career/Player.ts) já tem algum valor de mercado — não fica em R$0/R$1 (bug corrigido)", () => {
+    expect(calcularValorDeMercado({ overall: 39, idade: 18, reputacaoNacional: 10 })).toBeGreaterThan(0);
   });
 
   it("overall maior gera valor maior, tudo mais igual", () => {

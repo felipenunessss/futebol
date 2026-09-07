@@ -19,9 +19,23 @@ export interface PerfilDeMercado {
   multiplicadorStatus?: number;
 }
 
-const OVERALL_MINIMO_COM_VALOR = 40;
+/**
+ * `OVERALL_MINIMO_COM_VALOR` fica bem abaixo do overall inicial de
+ * qualquer carreira nova (~35-40, ver `career/Player.ts`
+ * `ATRIBUTO_PRIORITARIO_INICIAL`/`ATRIBUTO_NAO_PRIORITARIO_INICIAL`) —
+ * antes era 40, o que zerava o valor de mercado (e por tabela o salário,
+ * `market/transfers.ts` `gerarProposta`) de praticamente toda carreira
+ * recém-criada e boa parte do início dela, gerando propostas de R$1/mês.
+ * Recalibrado (`CONSTANTE_VALOR_BASE` ajustada junto) pra uma promessa
+ * de overall ~38 valer algumas dezenas de milhares (salário na casa dos
+ * milhares/mês), crescendo pra centenas de milhares num profissional
+ * consolidado (~70, mesma faixa do exemplo de `docs/game-design.md`
+ * seção 4: R$45.000/mês num clube "alta") e milhões num craque — ainda
+ * estimativa de design, não fórmula validada.
+ */
+const OVERALL_MINIMO_COM_VALOR = 28;
 const EXPOENTE_VALOR_BASE = 3;
-const CONSTANTE_VALOR_BASE = 20;
+const CONSTANTE_VALOR_BASE = 29;
 
 function valorBasePorOverall(overall: number): number {
   return Math.max(0, overall - OVERALL_MINIMO_COM_VALOR) ** EXPOENTE_VALOR_BASE * CONSTANTE_VALOR_BASE;

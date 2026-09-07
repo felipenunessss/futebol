@@ -61,6 +61,8 @@ const LUVAS_MINIMO_EM_SALARIOS = 2;
 const LUVAS_VARIACAO_EM_SALARIOS = 4;
 const ANOS_MINIMO = 2;
 const ANOS_VARIACAO = 3;
+/** Piso absoluto de salário — praticamente nunca acionado depois da recalibração de `valuation.ts` (`OVERALL_MINIMO_COM_VALOR`), só uma rede de segurança pra não voltar a propor R$1/mês num caso extremo (overall beirando o mínimo). */
+const SALARIO_MENSAL_MINIMO = 800;
 
 /**
  * Gera a proposta inicial de um clube — parte de uma referência salarial
@@ -88,7 +90,7 @@ export function gerarProposta(
   const tetoMensal = tetoSalarialMensal(clube);
   const salarioReferencia = Math.min(tetoMensal, Math.round(valorDeMercado / MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL));
   const fatorDeAbertura = FATOR_DE_ABERTURA_MINIMO + random() * FATOR_DE_ABERTURA_VARIACAO;
-  const salarioMensal = Math.max(1, Math.round(salarioReferencia * fatorDeAbertura));
+  const salarioMensal = Math.max(SALARIO_MENSAL_MINIMO, Math.round(salarioReferencia * fatorDeAbertura));
   const luvas = Math.round(salarioMensal * (LUVAS_MINIMO_EM_SALARIOS + random() * LUVAS_VARIACAO_EM_SALARIOS));
   const anos = ANOS_MINIMO + Math.floor(random() * ANOS_VARIACAO);
   const status = statusOferecido(statusAtual, {
