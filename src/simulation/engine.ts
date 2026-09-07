@@ -243,7 +243,7 @@ export async function receitaFaseGruposFaseQuadrangularEFinal(
   ratings: Record<string, number>,
   participacaoJogador: ParticipacaoJogadorClube | undefined,
   random: () => number,
-  eventos?: EventosSimulacaoTemporada,
+  _eventos?: EventosSimulacaoTemporada,
   resolverPartida: ResolverPartida = resolverPartidaPadrao,
 ): Promise<ResultadoCampeonatoSimples> {
   // Fase de grupos e quadrangular ainda não emitem evento (mesma pendência de receitaGruposEMataMata).

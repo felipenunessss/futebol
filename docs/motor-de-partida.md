@@ -1945,6 +1945,71 @@ nenhum dos dois campos.
   tabela da própria competição aparecendo a cada período e os placares
   de outros jogos da rodada aparecendo junto com a partida do jogador.
 
+### 5.19. Tela de temporada no app web, em React (implementado, v1)
+
+Até aqui o app web (`web/`) só tinha a criação de carreira — depois de
+criar, `App.tsx` só dava `console.log(estado)`. Pedido: construir de
+verdade, em React, a experiência principal do jogo (hoje só na CLI via
+`npm run dev jogar`): temporada jogada semana a semana, com treino,
+distribuição de pontos, partidas, tabela e cenários.
+
+- **Zero mudança em `src/`** (fora 2 correções de `noUnusedLocals` que
+  só o build do `web/` pegava, ver abaixo) — `career/career-loop.ts`
+  `jogarTemporadaSemanal` já foi desenhado pra isso: cada decisão
+  interativa é um hook opcional que pode devolver uma `Promise`. Em
+  React, uma Promise que só resolve no clique de um botão funciona
+  igual à CLI (que resolve no `readline`) — guarda o `resolve` num
+  estado, chama no `onClick`.
+- **`web/src/features/temporada/useTemporada.ts`** (novo, mesmo padrão
+  de `useCriacaoDeCarreira.ts`): monta o objeto de opções de
+  `jogarTemporadaSemanal` — `escolherFocoDeTreino`/
+  `escolherDistribuicaoDePontos`/`escolherOpcao` (cenário) guardam o
+  `resolve` num `promptPendente` (união discriminada, só 1 pendente por
+  vez); todo `onY` (treino, nível, cenário, negociação, partida
+  própria, partida da rodada, status, tabela por período) empurra um
+  evento num `feed` (união discriminada, mais recente primeiro). A 1ª
+  temporada começa sozinha quando a tela monta (mesmo espírito do
+  `jogar` da CLI).
+- **`web/src/features/temporada/TelaDeTemporada.tsx`** (novo):
+  cabeçalho (overall/status/moral/pontos disponíveis + barra de nível/
+  XP), painel de prompt quando há uma decisão pendente (`PromptFoco`,
+  `PromptDistribuicaoDePontos` — clicar no atributo soma 1 ponto por
+  clique, reaproveitando o mesmo bônus prioritário/padrão da CLI —,
+  `PromptCenario`), feed de eventos abaixo, e uma tela de resumo de fim
+  de temporada com botão "Jogar próxima temporada" (mesmo loop
+  `continuar`/`sair` da CLI, sem tela de saída — só o botão de
+  continuar).
+- **`web/src/App.tsx`**: troca de tela local (sem router — 1 carreira
+  por sessão) entre `CriacaoDeCarreira` e `TelaDeTemporada` depois que
+  `onCarreiraCriada` dispara.
+- **Escopo da v1 — decisões que ficam no padrão do motor, sem UI
+  própria ainda** (pendência, não bug — mesmo comportamento de quando o
+  hook não é passado): `escolherModoDePartida` (toda partida resolve
+  "rápida", sem menu por partida nem modo "ao vivo" narrado — motor já
+  suporta, só falta UI), `responderProposta` (contraproposta automática,
+  `market/negotiation.ts` `contrapropostaPadrao`) e
+  `escolherCampeonatosParaSeguir` (só a competição do próprio jogador
+  aparece na tabela por período — nenhuma outra é seguida).
+- **Correções incidentais**: `web/`'s `tsconfig.app.json` tem
+  `noUnusedLocals`/`noUnusedParameters` (a raiz não tem) — isso
+  denunciou 2 sobras que só apareciam no build do `web`:
+  `ResultadoGanhoDeXp` importado sem uso em `career/career-loop.ts`
+  (removido) e o parâmetro `eventos` de
+  `receitaFaseGruposFaseQuadrangularEFinal`
+  (`simulation/engine.ts`) sem uso ainda (renomeado `_eventos`, mesma
+  convenção já usada em `_grupoNome` no próprio `career-loop.ts` —
+  continua documentado como pendência de emissão de evento, não
+  removido).
+- **Validado**: `cd web && npx tsc -b --noEmit` e `npm run build`
+  limpos; `npm test`/`npx tsc --noEmit` na raiz continuam em 427
+  testes/limpos (nenhuma mudança de comportamento, só as 2 correções de
+  lint acima). **Não testado num navegador de verdade nesta sessão**
+  (sem ferramenta de automação de browser disponível) — só validado que
+  `npm run dev`/`npm run build` sobem sem erro; falta uma sessão manual
+  real (criar carreira → treino → distribuir pontos → cenário →
+  partidas → resumo → próxima temporada) pra confirmar a experiência
+  ponta a ponta.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

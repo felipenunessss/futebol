@@ -34,7 +34,7 @@ import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressado
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
 import { evoluirStatus, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
-import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira, type ResultadoGanhoDeXp } from "./Player.js";
+import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
