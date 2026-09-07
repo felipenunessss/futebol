@@ -8,11 +8,12 @@ Simulador de carreira de futebol (base Copero + Brasfoot + Pro Clubs), com foco 
 
 ## Stack
 
-- TypeScript (Node, ESM) — sem framework de UI ainda, só motor/dados/CLI.
+- TypeScript (Node, ESM) — motor/dados/CLI na raiz.
 - Testes: Vitest (`npm test`).
 - Execução: `tsx` (`npm run dev`, ou `npx tsx <arquivo>.ts` pra scripts avulsos).
 - Build: `npm run build` (`tsc`).
 - `gh` CLI já autenticado nesta máquina (conta `felipenunessss`); remote `origin` aponta pra `https://github.com/felipenunessss/futebol.git`.
+- **UI web** (`web/`): React + Vite + Tailwind, projeto separado (`package.json`/`tsconfig.json`/`node_modules` próprios, `cd web && npm run dev`/`npm run build`) — ver seção "App web" abaixo.
 
 ## Estrutura de pastas
 
@@ -48,7 +49,29 @@ tests/data/    — testes de integridade dos dados (referências, ids únicos, c
 
 export/        — snapshot consolidado (JSON + CSV) de clubes/estaduais/nacionais, gerado a partir de src/data/,
                  não é fonte de verdade — regenerar manualmente quando necessário (não há script pra isso ainda)
+
+web/           — app React (Vite + Tailwind), 100% client-side (sem backend), toolchain separado da raiz
+  src/data/browserLoaders.ts — equivalente de src/data/loaders/index.ts pro navegador (usa import.meta.glob
+                                em vez de node:fs); único ponto onde o app web tem um loader diferente do
+                                motor Node — o resto (simulation/, career/, market/, progression/) é
+                                importado direto de ../src via o alias "@motor" (ver web/vite.config.ts e
+                                web/tsconfig.app.json)
+  src/features/criacao-de-carreira/ — wizard de criação de carreira (nome/posição/arquétipo/proposta),
+                                       espelha src/cli/index.ts jogarCarreiraInterativaCli
 ```
+
+## App web (`web/`)
+
+- 100% client-side — o motor roda inteiro no navegador (é TS puro, sem dependência de Node), sem servidor
+  nenhum por trás. `web/src/data/browserLoaders.ts` é o único trecho que precisou de uma versão diferente
+  do motor Node (troca `node:fs` por `import.meta.glob` do Vite) — o resto do motor é importado direto de
+  `src/` via o alias `@motor` (`@motor/career/Player.js` etc.), sem duplicar nenhuma lógica de jogo.
+- `cd web && npm run dev` (servidor de desenvolvimento) / `npm run build` (build de produção) / `npx tsc -b`
+  (typecheck) — toolchain totalmente separado do `npm test`/`npx tsc --noEmit` da raiz, que continuam
+  intocados por qualquer mudança em `web/`.
+- Ao adicionar uma tela nova que precise de dado real (clubes/campeonatos), sempre pelas funções de
+  `browserLoaders.ts` — nunca importe `src/data/loaders/index.ts` direto num componente (quebra o build,
+  usa `node:fs`).
 
 ## Onde estão os dados (resumo rápido)
 
