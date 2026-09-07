@@ -7,6 +7,7 @@ import {
   gerarConfrontosPontosCorridos,
   linhaVazia,
   ordenarTabela,
+  somarTabelas,
   type Confronto,
   type EventoConfrontoPontosCorridos,
   type LinhaTabela,
@@ -323,6 +324,38 @@ function passosPontosCorridos(campeonato: CampeonatoSimulavel): PassoDePrograma[
   ];
 }
 
+/**
+ * `mata_mata` + `pontos_corridos` (Chile 2ª divisão) — espelha `engine.ts`
+ * `receitaPontosCorridosComLiguilla`: temporada inteira de pontos corridos decide a tabela, os
+ * `2^(nº de fases do mata_mata)` melhores colocados disputam uma liguilla de acesso.
+ */
+function passosPontosCorridosComLiguilla(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const idaEVolta = campeonato.formato.pontos_corridos!.ida_e_volta;
+  const mataMata = campeonato.formato.mata_mata!;
+  const quantidadeClassificados = Math.pow(2, mataMata.fases.length);
+
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, idaEVolta),
+      criar: () => criarFaseRodadas("liga", [campeonato.times], idaEVolta, quantidadeClassificados),
+      aoConcluir: (fase, ctx) => {
+        ctx.classificados = classificadosDaFase(fase as FaseRodadas);
+      },
+    },
+    {
+      unidades: mataMata.fases.length,
+      criar: (ctx) =>
+        criarFaseMataMata(
+          "liguilla",
+          mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.classificados as string[]) : undefined })),
+        ),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeao = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
 function passosFaseSuicaEMataMata(campeonato: CampeonatoSimulavel, random: () => number): PassoDePrograma[] {
   const suica = campeonato.formato.fase_suica!;
   const mataMata = campeonato.formato.mata_mata!;
@@ -415,6 +448,63 @@ function passosCarioca(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
   ];
 }
 
+/**
+ * Peru 1ª divisão (por id — mesma combinação de blocos que Argentina 1ª, `final_estadual,returno,turno`,
+ * com significado diferente, ver `engine.ts` `receitaPeruPrimeira`): mesmo clube campeão dos 2
+ * torneios = campeão automático; senão, liguilla de 4 (2 campeões de torneio + 2 melhores do
+ * acumulado). O caso automático reaproveita a degradação que `avancarEtapa` já faz pra uma etapa
+ * de 1 entrante só (sem jogo) — não precisa de nenhum mecanismo novo, só montar a lista de
+ * entrantes certa depois que turno/returno concluem.
+ */
+function passosPeruPrimeira(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const returno = campeonato.formato.returno!;
+  const finalEstadual = campeonato.formato.final_estadual!;
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
+      criar: () => criarFaseRodadas("turno", [campeonato.times], turno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabelaTurno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.tabelaTurno = tabelaTurno;
+        ctx.campeaoApertura = tabelaTurno[0].clubeId;
+      },
+    },
+    {
+      unidades: totalDeRodadas(campeonato.times.length, returno.ida_e_volta),
+      criar: () => criarFaseRodadas("returno", [campeonato.times], returno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabelaReturno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        const campeaoApertura = ctx.campeaoApertura as string;
+        const campeaoClausura = tabelaReturno[0].clubeId;
+        ctx.campeaoClausura = campeaoClausura;
+
+        if (campeaoApertura === campeaoClausura) {
+          ctx.entrantesLiguilla = [campeaoApertura];
+        } else {
+          const tabelaAcumulada = somarTabelas([ctx.tabelaTurno as LinhaTabela[], tabelaReturno]);
+          const melhoresDoAcumulado = tabelaAcumulada
+            .filter((linha) => linha.clubeId !== campeaoApertura && linha.clubeId !== campeaoClausura)
+            .slice(0, 2)
+            .map((linha) => linha.clubeId);
+          ctx.entrantesLiguilla = [campeaoApertura, campeaoClausura, ...melhoresDoAcumulado];
+        }
+      },
+    },
+    {
+      unidades: 2,
+      criar: (ctx) =>
+        criarFaseMataMata("liguilla", [
+          { nome: "semifinal", ida_e_volta: finalEstadual.ida_e_volta, entrantes: ctx.entrantesLiguilla as string[] },
+          { nome: "final", ida_e_volta: finalEstadual.ida_e_volta },
+        ]),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeao = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
 function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
   const fg = campeonato.formato.fase_grupos!;
   const fq = campeonato.formato.fase_quadrangular!;
@@ -487,8 +577,38 @@ function passosMataMata(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
   ];
 }
 
+/**
+ * `turno` + `returno` sem `final_estadual` nenhum (Paraguai 1ª divisão) — espelha `engine.ts`
+ * `receitaTurnoRetornoSomado`: soma as 2 tabelas direto, sem final nenhuma decidindo o campeão.
+ * Combinação de blocos inambígua (`returno,turno`, sem `final_estadual`) — Argentina/Carioca usam
+ * a mesma dupla `turno`/`returno`, mas sempre COM um bloco a mais (`final_estadual`), então nunca
+ * caem neste caso.
+ */
+function passosTurnoRetornoSomado(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const returno = campeonato.formato.returno!;
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
+      criar: () => criarFaseRodadas("turno", [campeonato.times], turno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        ctx.tabelaTurno = tabelaDoGrupoUnico(fase as FaseRodadas);
+      },
+    },
+    {
+      unidades: totalDeRodadas(campeonato.times.length, returno.ida_e_volta),
+      criar: () => criarFaseRodadas("returno", [campeonato.times], returno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabelaSomada = somarTabelas([ctx.tabelaTurno as LinhaTabela[], tabelaDoGrupoUnico(fase as FaseRodadas)]);
+        ctx.campeao = tabelaSomada[0].clubeId;
+      },
+    },
+  ];
+}
+
 function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string, number>, random: () => number): PassoDePrograma[] {
   if (campeonato.id === "carioca_a") return passosCarioca(campeonato);
+  if (campeonato.id === "peru_primera") return passosPeruPrimeira(campeonato);
 
   const formato = campeonato.formato;
   const blocos = Object.keys(formato)
@@ -511,6 +631,10 @@ function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string
       return passosFaseGruposEMataMata(campeonato, ratings);
     case "mata_mata":
       return passosMataMata(campeonato);
+    case "returno,turno":
+      return passosTurnoRetornoSomado(campeonato);
+    case "mata_mata,pontos_corridos":
+      return passosPontosCorridosComLiguilla(campeonato);
     default:
       throw new Error(`incremental: sem receita incremental pra combinação de blocos [${blocos}] (campeonato ${campeonato.id})`);
   }

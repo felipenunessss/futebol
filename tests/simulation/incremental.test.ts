@@ -135,6 +135,92 @@ describe("criarCompeticaoIncremental — mata_mata isolado com etapas (Copa do B
   });
 });
 
+describe("criarCompeticaoIncremental — turno + returno somado, sem final (Paraguai 1ª divisão)", () => {
+  const times = ["a", "b", "c", "d", "e", "f"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "paraguai_teste",
+    formato: {
+      turno: { nome: "Apertura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      returno: { nome: "Clausura", ida_e_volta: false, classificam_proxima_fase: times.length },
+    },
+    times,
+  };
+
+  it("resolve turno e depois returno, campeão é quem soma mais pontos nos dois", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 10 }, () => Math.random());
+    for (let semana = 1; semana <= 10; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+    // sem final nenhuma: o campeão sai só da soma das 2 tabelas, nunca de um confronto — nenhuma
+    // partida do jogador é gerada mesmo com participação, já que ele não está nas 2 fases só como espectador.
+  });
+
+  it("não conclui antes de terminar o returno inteiro", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 10 }, () => Math.random());
+    await avancarSemana(estado, 1, () => Math.random());
+    expect(estado.concluida).toBe(false);
+  });
+});
+
+describe("criarCompeticaoIncremental — pontos_corridos + liguilla de mata-mata (Chile 2ª divisão)", () => {
+  const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "chile_teste",
+    formato: {
+      pontos_corridos: { ida_e_volta: true, rodadas: 14 },
+      mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false }, // 2^2 = 4 classificados
+    },
+    times,
+  };
+
+  it("classifica os 4 melhores da liga pra liguilla e produz 1 campeão", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 16 }, () => Math.random());
+    for (let semana = 1; semana <= 16; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+});
+
+describe("criarCompeticaoIncremental — turno + returno com liguilla condicional (Peru 1ª divisão, por id)", () => {
+  const times = ["a", "b", "c", "d", "e", "f"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "peru_primera",
+    formato: {
+      turno: { nome: "Apertura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      returno: { nome: "Clausura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      final_estadual: { criterio: "liguilla_de_4", ida_e_volta: true },
+    },
+    times,
+  };
+
+  it("resolve turno, returno e a liguilla condicional, terminando com 1 campeão válido", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 12 }, () => Math.random());
+    expect(estado.totalUnidades).toBeGreaterThan(0);
+
+    for (let semana = 1; semana <= 12; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+
+  it("quando o mesmo clube domina os 2 torneios, vira campeão automático (sem gastar a liguilla)", async () => {
+    const ratingsDominantes = { ...ratings, a: 2400 };
+    const estado = criarCompeticaoIncremental(campeonato, ratingsDominantes, undefined, { semanaInicio: 1, semanaFim: 12 }, () => 0.01);
+    for (let semana = 1; semana <= 12; semana++) {
+      await avancarSemana(estado, semana, () => 0.01);
+    }
+    expect(estado.campeao).toBe("a");
+  });
+});
+
 describe("criarCompeticaoIncrementalConjunta (Libertadores + Sul-Americana)", () => {
   // Mesma base sintética de tests/simulation/engine.test.ts (receitaLibertadoresESulAmericanaConjunta).
   const libertadores: CampeonatoSimulavel = {
