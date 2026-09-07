@@ -414,6 +414,64 @@ function passosFaseSuicaMataMataEFinal(campeonato: CampeonatoSimulavel, random: 
   ];
 }
 
+/**
+ * Uruguai 1ª divisão (por id, mesmo critério de `engine.ts` `receitaUruguaiPrimeira`): Apertura e
+ * Clausura decididos pelo topo da própria tabela; mesmo clube campeão dos 2 = campeão automático;
+ * senão, semifinal entre os 2 campeões de torneio — se o líder da Tabla Anual (soma Apertura+
+ * Clausura) for um dos 2 semifinalistas, quem vencer a semifinal já é campeão; senão, o vencedor
+ * da semifinal ainda precisa vencer uma final contra o líder. Os 2 casos condicionais (auto-campeão
+ * sem semifinal, e semifinal decide sozinha sem final) reaproveitam a mesma degradação de
+ * `avancarEtapa` pra etapa de 1 entrante só — só varia a lista de entrantes montada depois que
+ * Apertura/Clausura concluem.
+ */
+function passosUruguaiPrimeira(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const returno = campeonato.formato.returno!;
+  const mataMata = campeonato.formato.mata_mata!;
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
+      criar: () => criarFaseRodadas("apertura", [campeonato.times], turno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabelaApertura = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.tabelaApertura = tabelaApertura;
+        ctx.campeaoApertura = tabelaApertura[0].clubeId;
+      },
+    },
+    {
+      unidades: totalDeRodadas(campeonato.times.length, returno.ida_e_volta),
+      criar: () => criarFaseRodadas("clausura", [campeonato.times], returno.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabelaClausura = tabelaDoGrupoUnico(fase as FaseRodadas);
+        const campeaoApertura = ctx.campeaoApertura as string;
+        const campeaoClausura = tabelaClausura[0].clubeId;
+        ctx.campeaoClausura = campeaoClausura;
+
+        if (campeaoApertura === campeaoClausura) {
+          ctx.entrantesSemifinal = [campeaoApertura];
+          ctx.entrantesFinal = undefined;
+        } else {
+          const tabelaAnual = somarTabelas([ctx.tabelaApertura as LinhaTabela[], tabelaClausura]);
+          const lider = tabelaAnual[0].clubeId;
+          ctx.entrantesSemifinal = [campeaoApertura, campeaoClausura];
+          ctx.entrantesFinal = lider === campeaoApertura || lider === campeaoClausura ? undefined : [lider];
+        }
+      },
+    },
+    {
+      unidades: 2,
+      criar: (ctx) =>
+        criarFaseMataMata("mata_mata", [
+          { nome: "semifinal", ida_e_volta: mataMata.ida_e_volta, entrantes: ctx.entrantesSemifinal as string[] },
+          { nome: "final", ida_e_volta: mataMata.ida_e_volta, entrantes: ctx.entrantesFinal as string[] | undefined },
+        ]),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeao = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
 /** Carioca (por id — mesma ressalva de `engine.ts` `receitaCarioca`: combinação de blocos ambígua, não dá pra despachar genericamente). */
 function passosCarioca(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
   const turno = campeonato.formato.turno!;
@@ -500,6 +558,60 @@ function passosPeruPrimeira(campeonato: CampeonatoSimulavel): PassoDePrograma[] 
         ]),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
+/**
+ * Uruguai 2ª divisão (por id, mesmo critério de `engine.ts` `receitaUruguaiSegunda`): 4 partes que
+ * não dependem uma da outra pra decidir o campeão — só o playoff depende da tabela regular já
+ * pronta. O campeão da divisão é sempre o líder da tabela regular (`pontos_corridos`); o Torneo
+ * Competencia (séries + final) e o playoff do 3º acesso (posições 3ª-6ª da regular) só são
+ * registrados/mostrados, não mudam quem é campeão — mesma aproximação documentada na receita em
+ * lote (o playoff real inclui condicionalmente o campeão do Torneo Competencia; aqui usa sempre
+ * as posições 3ª-6ª da regular).
+ */
+function passosUruguaiSegunda(campeonato: CampeonatoSimulavel, ratings: Record<string, number>): PassoDePrograma[] {
+  const fg = campeonato.formato.fase_grupos!;
+  const final = campeonato.formato.final_estadual!;
+  const pontosCorridos = campeonato.formato.pontos_corridos!;
+  const mataMata = campeonato.formato.mata_mata!;
+  const quantidadeNoPlayoff = Math.pow(2, mataMata.fases.length);
+
+  return [
+    {
+      unidades: totalDeRodadas(fg.times_por_grupo, fg.ida_e_volta),
+      criar: () => criarFaseRodadas("series", dividirEmGruposPorForca(campeonato.times, fg.num_grupos, ratings).map((g) => g.times), fg.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeoesDeSerie = tabelasPorGrupo(fase as FaseRodadas).map((g) => g.tabela[0].clubeId);
+      },
+    },
+    {
+      unidades: 1,
+      criar: (ctx) => criarFaseMataMata("final_torneio_competencia", [{ nome: "final", ida_e_volta: final.ida_e_volta, entrantes: ctx.campeoesDeSerie as string[] }]),
+      aoConcluir: () => {
+        // não decide o campeão da divisão — só é disputado/registrado (ver engine.ts receitaUruguaiSegunda).
+      },
+    },
+    {
+      unidades: totalDeRodadas(campeonato.times.length, pontosCorridos.ida_e_volta),
+      criar: () => criarFaseRodadas("regular", [campeonato.times], pontosCorridos.ida_e_volta, 1),
+      aoConcluir: (fase, ctx) => {
+        const tabela = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.campeao = tabela[0].clubeId;
+        ctx.participantesDoPlayoff = tabela.slice(2, 2 + quantidadeNoPlayoff).map((linha) => linha.clubeId);
+      },
+    },
+    {
+      unidades: mataMata.fases.length,
+      criar: (ctx) =>
+        criarFaseMataMata(
+          "playoff_acesso",
+          mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.participantesDoPlayoff as string[]) : undefined })),
+        ),
+      aoConcluir: () => {
+        // vencedor disputa uma vaga extra de acesso — não é "o campeão" (já definido pela tabela regular).
       },
     },
   ];
@@ -609,6 +721,8 @@ function passosTurnoRetornoSomado(campeonato: CampeonatoSimulavel): PassoDeProgr
 function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string, number>, random: () => number): PassoDePrograma[] {
   if (campeonato.id === "carioca_a") return passosCarioca(campeonato);
   if (campeonato.id === "peru_primera") return passosPeruPrimeira(campeonato);
+  if (campeonato.id === "uruguai_primera") return passosUruguaiPrimeira(campeonato);
+  if (campeonato.id === "uruguai_segunda") return passosUruguaiSegunda(campeonato, ratings);
 
   const formato = campeonato.formato;
   const blocos = Object.keys(formato)

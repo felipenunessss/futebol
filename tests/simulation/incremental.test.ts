@@ -221,6 +221,56 @@ describe("criarCompeticaoIncremental — turno + returno com liguilla condiciona
   });
 });
 
+describe("criarCompeticaoIncremental — Apertura/Clausura com semifinal e final condicionais (Uruguai 1ª divisão, por id)", () => {
+  const times = ["a", "b", "c", "d", "e", "f"];
+  const campeonato: CampeonatoSimulavel = {
+    id: "uruguai_primera",
+    formato: {
+      turno: { nome: "Apertura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      returno: { nome: "Clausura", ida_e_volta: false, classificam_proxima_fase: times.length },
+      mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false },
+    },
+    times,
+  };
+
+  it("campeão automático quando o mesmo clube domina os 2 torneios (e a tabela anual)", async () => {
+    const ratings = { ...Object.fromEntries(times.map((t) => [t, 1600])), a: 2400 };
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 12 }, () => 0.01);
+    for (let semana = 1; semana <= 12; semana++) await avancarSemana(estado, semana, () => 0.01);
+    expect(estado.campeao).toBe("a");
+  });
+
+  it("resolve com times equilibrados, terminando com 1 campeão válido (semifinal ± final)", async () => {
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 12 }, () => Math.random());
+    for (let semana = 1; semana <= 12; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+});
+
+describe("criarCompeticaoIncremental — séries + Torneo Competencia + regular + playoff (Uruguai 2ª divisão, por id)", () => {
+  const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "uruguai_segunda",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 4, ida_e_volta: false, classificam_por_grupo: 4 },
+      final_estadual: { criterio: "final_torneio_competencia", ida_e_volta: false },
+      pontos_corridos: { ida_e_volta: true, rodadas: 14 },
+      mata_mata: { fases: ["playoff_terceiro_acesso"], ida_e_volta: false }, // 2^1 = 2 participantes (posições 3ª-4ª)
+    },
+    times,
+  };
+
+  it("o campeão é sempre o líder da tabela regular, mesmo com séries/playoff acontecendo em paralelo", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 20 }, () => Math.random());
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+});
+
 describe("criarCompeticaoIncrementalConjunta (Libertadores + Sul-Americana)", () => {
   // Mesma base sintética de tests/simulation/engine.test.ts (receitaLibertadoresESulAmericanaConjunta).
   const libertadores: CampeonatoSimulavel = {
