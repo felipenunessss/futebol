@@ -3,11 +3,11 @@ import type { Club } from "@motor/schemas/club.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Atributo, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual, type EstadoDeCarreira } from "@motor/career/Player.js";
 import { xpParaProximoNivel, type FocoDeTreino } from "@motor/progression/xp.js";
-import type { Opcao } from "@motor/progression/scenarios.js";
+import type { ImpactoCarreira, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
-import type { AlocacaoDePontos } from "@motor/career/career-loop.js";
+import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
 import { useTemporada, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
@@ -40,12 +40,41 @@ function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
   return clube?.nome_popular ?? clube?.nome ?? id;
 }
 
+/** Data aproximada da semana (1-52) — o motor não tem calendário real, só o número da semana; aqui
+ * é só pra dar contexto de "quando" na tela, contando 7 dias por semana a partir de 1º de janeiro. */
+function intervaloDeSemana(temporada: number, semana: number): { inicio: Date; fim: Date } {
+  const inicio = new Date(Date.UTC(temporada, 0, 1 + (semana - 1) * 7));
+  const fim = new Date(Date.UTC(temporada, 0, 1 + (semana - 1) * 7 + 6));
+  return { inicio, fim };
+}
+
+function formatarData(data: Date): string {
+  return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "UTC" });
+}
+
+function posicaoNaTabela(tabela: LinhaTabela[] | undefined, clubeId: string): number | undefined {
+  const indice = tabela?.findIndex((linha) => linha.clubeId === clubeId) ?? -1;
+  return indice >= 0 ? indice + 1 : undefined;
+}
+
+function formatarImpactoResumido(impacto: ImpactoCarreira): string {
+  const partes: string[] = [];
+  for (const [atributo, delta] of Object.entries(impacto.atributos ?? {})) partes.push(`${atributo.replaceAll("_", " ")} ${delta! > 0 ? "+" : ""}${delta}`);
+  if (impacto.moral) partes.push(`moral ${impacto.moral > 0 ? "+" : ""}${impacto.moral}`);
+  if (impacto.reputacao) partes.push(`reputação ${impacto.reputacao > 0 ? "+" : ""}${impacto.reputacao}`);
+  if (impacto.reputacaoRegional) partes.push(`reputação regional ${impacto.reputacaoRegional > 0 ? "+" : ""}${impacto.reputacaoRegional}`);
+  if (impacto.relacoesInternas) partes.push(`relações internas ${impacto.relacoesInternas > 0 ? "+" : ""}${impacto.relacoesInternas}`);
+  return partes.length > 0 ? partes.join(", ") : "sem impacto numérico";
+}
+
 export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarreira }) {
   const temporada = useTemporada(estadoInicial);
-  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, resultado, clubePorId } = temporada;
+  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, tabelaPorCampeonato, resultado, clubePorId } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
-  const promptDaPartida = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
-  const promptDeCarreira = promptPendente && !promptDaPartida ? promptPendente : undefined;
+  const promptSemana = promptPendente?.tipo === "semana" ? promptPendente : undefined;
+  const promptPrePartida = promptPendente?.tipo === "pre_partida" ? promptPendente : undefined;
+  const promptDaPartidaAoVivo = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
+  const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptDaPartidaAoVivo ? promptPendente : undefined;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
@@ -58,11 +87,15 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           onAlternarAssistirAoVivo={temporada.alternarAssistirAoVivo}
         />
 
+        {promptSemana && <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} onContinuar={temporada.responderSemana} />}
+        {promptPrePartida && (
+          <PainelPrePartida contexto={promptPrePartida.contexto} clubePorId={clubePorId} tabelaPorCampeonato={tabelaPorCampeonato} onComecar={temporada.responderPrePartida} />
+        )}
         {partidaAoVivo && (
           <PainelPartidaAoVivo
             partida={partidaAoVivo}
             clubePorId={clubePorId}
-            prompt={promptDaPartida}
+            prompt={promptDaPartidaAoVivo}
             onResponderChance={temporada.responderChanceAoVivo}
             onResponderEvento={temporada.responderEventoAoVivo}
           />
@@ -144,6 +177,67 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
       {prompt.tipo === "foco" && <PromptFoco onEscolher={temporada.responderFoco} />}
       {prompt.tipo === "pontos" && <PromptDistribuicaoDePontos estado={prompt.estado} onConfirmar={temporada.responderDistribuicaoDePontos} />}
       {prompt.tipo === "cenario" && <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={temporada.responderCenario} />}
+    </div>
+  );
+}
+
+function PainelSemana({ info, temporada, onContinuar }: { info: AoIniciarSemanaInfo; temporada: number; onContinuar: () => void }) {
+  const { inicio, fim } = intervaloDeSemana(temporada, info.semana);
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3">
+      <h2 className="text-lg font-semibold">
+        Semana {info.semana} — {formatarData(inicio)} a {formatarData(fim)}
+      </h2>
+      {info.competicoesDoJogador.length > 0 ? (
+        <p className="text-sm text-slate-400">Competições do seu clube: {info.competicoesDoJogador.join(", ")}</p>
+      ) : (
+        <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
+      )}
+      <button type="button" onClick={onContinuar} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
+        Continuar
+      </button>
+    </div>
+  );
+}
+
+function PainelPrePartida({
+  contexto,
+  clubePorId,
+  tabelaPorCampeonato,
+  onComecar,
+}: {
+  contexto: ContextoPartidaDoJogadorSemanal;
+  clubePorId: Map<string, Club>;
+  tabelaPorCampeonato: Map<string, LinhaTabela[]>;
+  onComecar: () => void;
+}) {
+  const mandanteNome = nomeDoClube(clubePorId, contexto.mandanteId);
+  const visitanteNome = nomeDoClube(clubePorId, contexto.visitanteId);
+  const tabela = tabelaPorCampeonato.get(contexto.campeonatoId);
+  const posicaoMandante = posicaoNaTabela(tabela, contexto.mandanteId);
+  const posicaoVisitante = posicaoNaTabela(tabela, contexto.visitanteId);
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4">
+      <div className="text-xs uppercase tracking-wide text-emerald-400">
+        {contexto.campeonatoId} — semana {contexto.semana}
+      </div>
+      <div className="flex items-center justify-center gap-4">
+        <div className="text-right flex-1">
+          <div className="font-semibold">{mandanteNome}</div>
+          <div className="text-xs text-slate-400">{posicaoMandante ? `${posicaoMandante}º colocado` : "posição ainda não disponível"}</div>
+        </div>
+        <span className="text-slate-500 text-sm">x</span>
+        <div className="text-left flex-1">
+          <div className="font-semibold">{visitanteNome}</div>
+          <div className="text-xs text-slate-400">{posicaoVisitante ? `${posicaoVisitante}º colocado` : "posição ainda não disponível"}</div>
+        </div>
+      </div>
+      <p className="text-xs text-slate-500 text-center">Você joga {contexto.lado === "casa" ? "em casa" : "fora"}.</p>
+      <button type="button" onClick={onComecar} className="rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
+        Começar partida
+      </button>
     </div>
   );
 }
@@ -364,7 +458,14 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
             onClick={() => onEscolher(opcao)}
             className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
           >
-            {opcao.texto}
+            <div className="font-medium">{opcao.texto}</div>
+            <div className="mt-1 flex flex-col gap-0.5">
+              {opcao.resultados.map((resultado, indice) => (
+                <span key={indice} className="text-xs text-slate-400">
+                  {Math.round(resultado.probabilidade * 100)}% — {formatarImpactoResumido(resultado.impacto)}
+                </span>
+              ))}
+            </div>
           </button>
         ))}
       </div>

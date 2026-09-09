@@ -2057,6 +2057,62 @@ partida narrada de verdade, minuto a minuto.
   verdade nesta sessão (mesma ressalva da seção 5.19) — só validado que
   compila/builda sem erro.
 
+### 5.21. Ritmo semanal, tela pré-jogo e probabilidades nas escolhas (tela de temporada web)
+
+Depois de testar a simulação ao vivo (seção 5.20), 3 pedidos pra deixar
+o ritmo mais parecido com "jogar de verdade": parar o avanço por
+semana (mostrando o dia e qual campeonato é), mostrar a probabilidade
+de cada escolha nas telas de decisão, e ter uma tela antes do jogo
+mostrando contra quem é e a posição de cada time.
+
+- **2 mudanças aditivas em `src/career/career-loop.ts`** (só
+  `jogarTemporadaSemanal`, mesma arquitetura de hook injetável de
+  sempre — nenhuma quebra CLI/testes existentes, tudo opcional):
+  - Novo hook `aoIniciarSemana?: (info: AoIniciarSemanaInfo) => void | Promise<void>`,
+    chamado (com `await`) no topo do loop de semanas, antes de resolver
+    qualquer período/partida daquela semana — uma Promise que só
+    resolve num clique pausa o motor de verdade nesse ponto, sem
+    precisar de nenhuma mudança de arquitetura (mesmo princípio de todo
+    hook "on" já existente, que já é `await`ado).
+  - `ContextoPartidaDoJogadorSemanal` ganha `campeonatoId: string` —
+    implementado com uma variável mutável `campeonatoIdAtualParaContexto`
+    (mesmo padrão de `semanaAtualParaContexto`), setada antes de cada
+    `avancarSemana`/`avancarSemanaConjunta` no loop de competições, lida
+    dentro do `resolverPartida` compartilhado.
+- **`escolherModoDePartida` reformulado no lado web**
+  (`web/src/features/temporada/useTemporada.ts`): em vez de decidir
+  sozinho (como na v1 da seção 5.20), agora SEMPRE pausa com um prompt
+  `"pre_partida"` — a tela pré-jogo é o próprio "Começar partida" que
+  resolve a Promise com `"ao_vivo"` ou `"rapida"` conforme o toggle já
+  existente. Zero mudança de comportamento pra quem não assiste ao
+  vivo — só ganhou uma tela antes.
+- **Cache de posição na tabela** (`tabelaPorCampeonato`, client-side,
+  sem mudança em `src/`): alimentado por `tabelaDepois` de toda partida
+  observada — a do próprio jogador (`onPartidaPontosCorridos`) e as da
+  rodada (`onPartidaDaRodadaNaCompeticaoDoJogador`, religado só pra
+  isso, sem voltar pro feed visível). É uma aproximação (reflete só até
+  a última partida vista daquela competição, não necessariamente
+  "agora") — sem dado ainda, a tela mostra "posição ainda não
+  disponível" em vez de inventar.
+- **`web/src/features/temporada/TelaDeTemporada.tsx`** ganha:
+  - `PainelSemana` — "Semana N — DD/MM a DD/MM" (data aproximada:
+    7 dias por semana a partir de 1º de janeiro daquela temporada, o
+    motor não tem calendário real) + competições do próprio clube +
+    botão Continuar.
+  - `PainelPrePartida` — mandante x visitante, posição de cada um
+    (cache acima), lado do jogador, botão "Começar partida".
+  - `PromptCenario` (já compartilhado entre cenário de carreira e
+    evento de contexto ao vivo — um ponto de mudança cobre os dois)
+    passa a mostrar, sob cada opção, a probabilidade e um resumo do
+    impacto de cada resultado possível (`Opcao.resultados`).
+- **Validado**: `npm test` (429 testes, 2 casos novos em
+  `tests/career/career-loop.test.ts` — `aoIniciarSemana` dispara 1x por
+  semana com `competicoesDoJogador` correto, `escolherModoDePartida`
+  recebe o `campeonatoId` certo) + `npx tsc --noEmit` limpos na raiz;
+  `cd web && npx tsc -b --noEmit` e `npm run build` limpos. Não testado
+  num navegador de verdade nesta sessão (mesma ressalva das seções
+  anteriores).
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —

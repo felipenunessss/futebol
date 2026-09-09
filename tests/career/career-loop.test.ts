@@ -510,6 +510,38 @@ describe("jogarTemporadaSemanal", () => {
     expect(times).toContain(competicao?.resultado?.campeao);
   });
 
+  it("aoIniciarSemana dispara 1x por semana (1-52), sempre com a competição do jogador em competicoesDoJogador", async () => {
+    const times = ["a", "b", "c", "d"];
+    const semanas: { semana: number; competicoesDoJogador: string[] }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      aoIniciarSemana: (info) => {
+        semanas.push(info);
+      },
+    });
+
+    expect(semanas).toHaveLength(52);
+    expect(semanas.map((s) => s.semana)).toEqual(Array.from({ length: 52 }, (_, i) => i + 1));
+    expect(semanas.every((s) => s.competicoesDoJogador.includes("brasileirao_serie_a"))).toBe(true);
+  });
+
+  it("escolherModoDePartida recebe o campeonatoId certo da competição do confronto", async () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonatosIdsVistos = new Set<string>();
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: (contexto) => {
+        campeonatosIdsVistos.add(contexto.campeonatoId);
+        return "rapida";
+      },
+    });
+
+    expect(campeonatosIdsVistos.size).toBeGreaterThan(0);
+    expect([...campeonatosIdsVistos]).toEqual(["brasileirao_serie_a"]);
+  });
+
   it("intercala de verdade: pelo menos um treino acontece ANTES de alguma partida do jogador ainda por vir (não é mais 'todas as partidas primeiro, todos os treinos depois')", async () => {
     const times = ["a", "b", "c", "d"];
     const ordemDeEventos: string[] = [];

@@ -729,10 +729,29 @@ export async function jogarTemporada(
 export interface ContextoPartidaDoJogadorSemanal extends ContextoPartidaDoJogador {
   /** Semana do calendário (1-52, estimativa de design) em que essa partida está acontecendo — dá pra `escolherModoDePartida` decidir "pular até a metade"/"pular pro final" por SEMANA, não por contagem de partidas (ver `jogarTemporadaSemanal`). */
   semana: number;
+  /** Id da competição desse confronto específico — útil pra `escolherModoDePartida` mostrar uma tela pré-jogo com o nome/contexto da competição antes de decidir o modo. */
+  campeonatoId: string;
+}
+
+/** Info passada a `OpcoesJogarTemporadaSemanal.aoIniciarSemana`, uma vez por semana do calendário. */
+export interface AoIniciarSemanaInfo {
+  semana: number;
+  /** Ids das competições do PRÓPRIO clube do jogador ativas nesta temporada (mesmo conjunto a cada semana — repetido aqui só pra quem consome não precisar guardar estado à parte). */
+  competicoesDoJogador: string[];
 }
 
 export interface OpcoesJogarTemporadaSemanal extends Omit<OpcoesJogarTemporada, "escolherModoDePartida" | "onPartidaPontosCorridos" | "onPartidaMataMata"> {
   escolherModoDePartida?: (contexto: ContextoPartidaDoJogadorSemanal) => ModoDePartida | Promise<ModoDePartida>;
+  /**
+   * Chamado no início de cada semana do calendário (1-52), antes de
+   * resolver qualquer período/partida daquela semana — dá pra uma UI
+   * pausar de verdade e mostrar "semana X, competições Y/Z" antes de
+   * seguir (pode ser assíncrona, mesmo padrão de todo outro hook: uma
+   * Promise que só resolve num clique pausa o motor de verdade nesse
+   * ponto). Sem esse callback, a temporada não pausa nada aqui — mesmo
+   * comportamento de antes deste hook existir.
+   */
+  aoIniciarSemana?: (info: AoIniciarSemanaInfo) => void | Promise<void>;
   /**
    * Chamado a cada confronto de pontos corridos do clube do jogador — igual
    * `OpcoesJogarTemporada.onPartidaPontosCorridos`, mas aqui pode ser
@@ -814,6 +833,7 @@ export async function jogarTemporadaSemanal(
     onPartidaPontosCorridos,
     onPartidaMataMata,
     onPartidaDaRodadaNaCompeticaoDoJogador,
+    aoIniciarSemana,
     escolherModoDePartida,
     decidirChanceAoVivo,
     decidirEventoDePartida,
@@ -834,6 +854,8 @@ export async function jogarTemporadaSemanal(
   const impactosDePartidaAoVivo: ImpactoCarreira[] = [];
   let numeroDaPartidaDoJogador = 0;
   let semanaAtualParaContexto = 0;
+  /** Setada logo antes de cada `avancarSemana`/`avancarSemanaConjunta` (ver loop de semanas abaixo) — `resolverPartida` é compartilhado entre todas as competições, então é assim que ele sabe em qual delas está o confronto que está resolvendo agora (mesmo padrão de `semanaAtualParaContexto`). */
+  let campeonatoIdAtualParaContexto = "";
   let somaDeNotas = 0;
   let partidasComNota = 0;
   const golsPorCompeticao = new Map<string, number>();
@@ -866,6 +888,7 @@ export async function jogarTemporadaSemanal(
       mandanteId: contexto?.mandanteId ?? "",
       visitanteId: contexto?.visitanteId ?? "",
       semana: semanaAtualParaContexto,
+      campeonatoId: campeonatoIdAtualParaContexto,
     });
 
     if (modo !== "ao_vivo") {
@@ -947,6 +970,7 @@ export async function jogarTemporadaSemanal(
   const ultimaSemana = Math.max(52, ...periodos.map((p) => p.semanaFim));
   for (let semana = 1; semana <= ultimaSemana; semana++) {
     semanaAtualParaContexto = semana;
+    await aoIniciarSemana?.({ semana, competicoesDoJogador: [...idsDoJogador] });
 
     // `pontoDeTreino: false` (ex: janela genérica de outros países CONMEBOL) só dá janela de
     // semana pra competição, não dispara uma sessão de treino/cenário a mais na temporada.
@@ -959,9 +983,11 @@ export async function jogarTemporadaSemanal(
     }
 
     for (const [campeonatoId, competicaoEstado] of competicoes.avulsas) {
+      campeonatoIdAtualParaContexto = campeonatoId;
       await avancarSemana(competicaoEstado, semana, random, resolverPartida, hooksSeForDoJogador(campeonatoId));
     }
     for (const conjunta of competicoes.conjuntas) {
+      campeonatoIdAtualParaContexto = conjunta.lib.campeonatoId;
       await avancarSemanaConjunta(conjunta, semana, random, resolverPartida, hooksSeForDoJogador(conjunta.lib.campeonatoId), hooksSeForDoJogador(conjunta.sula.campeonatoId));
     }
 

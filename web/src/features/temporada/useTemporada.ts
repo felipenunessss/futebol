@@ -8,6 +8,7 @@ import type { EstadoDeCarreira } from "@motor/career/Player.js";
 import {
   jogarTemporadaSemanal,
   type AlocacaoDePontos,
+  type AoIniciarSemanaInfo,
   type ContextoPartidaDoJogadorSemanal,
   type ModoDePartida,
   type NegociacaoResolvidaNaTemporada,
@@ -37,12 +38,11 @@ const SUBTIPOS_DE_GOL = new Set<SubtipoChance>(["voleio", "cabeceio", "chute_de_
  * esperar `readline`, e os hooks "onY" empurram eventos num feed em vez
  * de `console.log`.
  *
- * Escopo da v1 (ver docs/motor-de-partida.md): `escolherModoDePartida`,
- * `responderProposta` e `escolherCampeonatosParaSeguir` ficam OMITIDOS
- * de propósito — o motor já tem um comportamento padrão sensato pra
- * cada um quando o hook não é passado (partida "rápida" sempre,
- * contraproposta automática, nenhuma outra competição seguida), então
- * não precisam de UI própria ainda.
+ * Escopo da v1 (ver docs/motor-de-partida.md): `responderProposta` e
+ * `escolherCampeonatosParaSeguir` ficam OMITIDOS de propósito — o motor
+ * já tem um comportamento padrão sensato pra cada um quando o hook não
+ * é passado (contraproposta automática, nenhuma outra competição
+ * seguida), então não precisam de UI própria ainda.
  */
 
 type EventoDeFeedVariante =
@@ -62,7 +62,9 @@ export type PromptPendente =
   | { tipo: "pontos"; estado: EstadoDeCarreira; resolve: (alocacoes: AlocacaoDePontos[]) => void }
   | { tipo: "cenario"; cenario: Cenario; resolve: (opcao: Opcao) => void }
   | { tipo: "chance_ao_vivo"; contexto: ContextoDecisaoChance; resolve: (resultado: ResultadoDecisaoChance) => void }
-  | { tipo: "evento_ao_vivo"; cenario: Cenario; resolve: (opcao: Opcao) => void };
+  | { tipo: "evento_ao_vivo"; cenario: Cenario; resolve: (opcao: Opcao) => void }
+  | { tipo: "semana"; info: AoIniciarSemanaInfo; resolve: () => void }
+  | { tipo: "pre_partida"; contexto: ContextoPartidaDoJogadorSemanal; resolve: (modo: ModoDePartida) => void };
 
 export type FaseDaTemporada = "jogando" | "resumo";
 
@@ -86,6 +88,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [resultado, setResultado] = useState<ResultadoTemporadaDeCarreira>();
   const [partidaAoVivo, setPartidaAoVivo] = useState<PartidaAoVivoEmAndamento>();
   const [assistirAoVivo, setAssistirAoVivo] = useState(true);
+  /** Última tabela conhecida de cada competição — alimentada por `tabelaDepois` de qualquer partida
+   * observada (própria ou da rodada, ver `atualizarTabela`), só pra mostrar posição na tela
+   * pré-jogo. Aproximação (reflete só até a última partida vista, não necessariamente "agora"). */
+  const [tabelaPorCampeonato, setTabelaPorCampeonato] = useState<Map<string, LinhaTabela[]>>(new Map());
   const proximoId = useRef(0);
   const jaIniciouPrimeiraTemporada = useRef(false);
   // `escolherModoDePartida` é capturado 1x por temporada (dentro do `opcoes` montado em
@@ -115,10 +121,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     return new Promise((resolve) => setPromptPendente({ tipo: "cenario", cenario, resolve }));
   }
 
-  function escolherModoDePartida(contexto: ContextoPartidaDoJogadorSemanal): ModoDePartida {
-    if (!assistirAoVivoRef.current) return "rapida";
-    setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
-    return "ao_vivo";
+  function atualizarTabela(campeonatoId: string, tabela: LinhaTabela[]): void {
+    setTabelaPorCampeonato((atual) => new Map(atual).set(campeonatoId, tabela));
+  }
+
+  function aoIniciarSemana(info: AoIniciarSemanaInfo): Promise<void> {
+    return new Promise((resolve) => setPromptPendente({ tipo: "semana", info, resolve }));
+  }
+
+  /** Pausa SEMPRE antes de qualquer partida do jogador (tela pré-jogo — Parte C) — o clique de
+   * "Começar partida" resolve com "ao_vivo" ou "rapida" conforme o toggle de assistir ao vivo. */
+  function escolherModoDePartida(contexto: ContextoPartidaDoJogadorSemanal): Promise<ModoDePartida> {
+    return new Promise((resolve) => setPromptPendente({ tipo: "pre_partida", contexto, resolve }));
   }
 
   function decidirChanceAoVivo(contexto: ContextoDecisaoChance): Promise<ResultadoDecisaoChance> {
@@ -172,6 +186,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       onCenarioResolvido: (resolvido) =>
         pushEvento({ tipo: "cenario", cenario: resolvido.cenario, opcao: resolvido.escolha.opcao, narrativa: resolvido.escolha.resultado.impacto.narrativa }),
       onNegociacaoResolvida: (negociacao) => pushEvento({ tipo: "negociacao", negociacao }),
+      aoIniciarSemana,
       escolherModoDePartida,
       decidirChanceAoVivo,
       decidirEventoDePartida,
@@ -181,8 +196,12 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         // a partida "ao vivo" já resolveu por completo antes deste hook disparar — some o painel
         // em andamento (o resultado final já vai pro feed permanente logo abaixo).
         setPartidaAoVivo(undefined);
+        atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_propria", info });
       },
+      // Só alimenta o cache de tabela (pra tela pré-jogo mostrar posição) — não empurra pro feed
+      // visível, senão volta o problema de ruído já corrigido (dezenas de jogos de outros clubes).
+      onPartidaDaRodadaNaCompeticaoDoJogador: (info) => atualizarTabela(info.campeonatoId, info.evento.tabelaDepois),
       onPartidaMataMata: (info) => {
         setPartidaAoVivo(undefined);
         pushEvento({ tipo: "partida_mata_mata", info });
@@ -236,6 +255,25 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setPromptPendente(undefined);
   }
 
+  function responderSemana(): void {
+    if (promptPendente?.tipo !== "semana") return;
+    promptPendente.resolve();
+    setPromptPendente(undefined);
+  }
+
+  function responderPrePartida(): void {
+    if (promptPendente?.tipo !== "pre_partida") return;
+    const { contexto, resolve } = promptPendente;
+    setPromptPendente(undefined);
+
+    if (assistirAoVivoRef.current) {
+      setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
+      resolve("ao_vivo");
+    } else {
+      resolve("rapida");
+    }
+  }
+
   function alternarAssistirAoVivo(): void {
     setAssistirAoVivo((atual) => {
       assistirAoVivoRef.current = !atual;
@@ -251,6 +289,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     partidaAoVivo,
     assistirAoVivo,
     alternarAssistirAoVivo,
+    tabelaPorCampeonato,
     resultado,
     clubePorId,
     jogarTemporada,
@@ -259,5 +298,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderCenario,
     responderChanceAoVivo,
     responderEventoAoVivo,
+    responderSemana,
+    responderPrePartida,
   };
 }
