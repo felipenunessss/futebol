@@ -39,14 +39,12 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
       <div className="mx-auto max-w-3xl flex flex-col gap-4">
         <Cabecalho estado={estadoAtual} nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)} nomeDaNacionalidade={nomeDaNacionalidade} />
 
-        {fase === "resumo" && resultado ? (
-          <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} onJogarProxima={() => void temporada.jogarTemporada()} />
-        ) : (
-          <>
-            {promptPendente && <PainelDePrompt prompt={promptPendente} temporada={temporada} />}
-            <Feed eventos={feed} clubePorId={clubePorId} />
-          </>
-        )}
+        {promptPendente && <PainelDePrompt prompt={promptPendente} temporada={temporada} />}
+        {fase === "resumo" && resultado && <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} onJogarProxima={() => void temporada.jogarTemporada()} />}
+
+        {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
+            placares das suas partidas aparecem conforme a temporada avança. */}
+        <Feed eventos={feed} clubePorId={clubePorId} />
       </div>
     </div>
   );
@@ -216,15 +214,16 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
 }
 
 function Feed({ eventos, clubePorId }: { eventos: EventoDeFeed[]; clubePorId: Map<string, Club> }) {
-  if (eventos.length === 0) {
-    return <p className="text-sm text-slate-500 px-1">A temporada está começando...</p>;
-  }
-
   return (
-    <div className="flex flex-col gap-2">
-      {eventos.map((evento) => (
-        <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} />
-      ))}
+    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-4 flex flex-col gap-2">
+      <h2 className="text-sm font-semibold text-slate-400 px-1">Partidas e eventos da temporada</h2>
+      <div className="flex flex-col gap-2 max-h-[28rem] overflow-y-auto pr-1">
+        {eventos.length === 0 ? (
+          <p className="text-sm text-slate-500 px-1 py-2">Nada aconteceu ainda — os placares e eventos vão aparecer aqui, mais recentes primeiro.</p>
+        ) : (
+          eventos.map((evento) => <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} />)
+        )}
+      </div>
     </div>
   );
 }
@@ -273,14 +272,6 @@ function EventoCard({ evento, clubePorId }: { evento: EventoDeFeed; clubePorId: 
           {resultado.chancesJogador.length > 0 && (
             <span className="text-slate-400"> — suas chances: {resultado.chancesJogador.length} ({resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)</span>
           )}
-        </Card>
-      );
-    }
-    case "partida_rodada": {
-      const { confronto, resultado } = evento.info.evento;
-      return (
-        <Card sutil>
-          {nomeDoClube(clubePorId, confronto.mandante)} {resultado.golsCasa} x {resultado.golsFora} {nomeDoClube(clubePorId, confronto.visitante)}
         </Card>
       );
     }

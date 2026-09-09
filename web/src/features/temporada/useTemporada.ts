@@ -38,7 +38,6 @@ type EventoDeFeedVariante =
   | { tipo: "cenario"; cenario: Cenario; opcao: Opcao; narrativa: string }
   | { tipo: "negociacao"; negociacao: NegociacaoResolvidaNaTemporada }
   | { tipo: "partida_propria"; info: PartidaDoJogadorPontosCorridos }
-  | { tipo: "partida_rodada"; info: PartidaDoJogadorPontosCorridos }
   | { tipo: "status"; info: StatusAtualizadoNaTemporada }
   | { tipo: "tabela"; campeonatoId: string; periodo: string; tabela: LinhaTabela[] };
 
@@ -100,7 +99,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         pushEvento({ tipo: "cenario", cenario: resolvido.cenario, opcao: resolvido.escolha.opcao, narrativa: resolvido.escolha.resultado.impacto.narrativa }),
       onNegociacaoResolvida: (negociacao) => pushEvento({ tipo: "negociacao", negociacao }),
       onPartidaPontosCorridos: (info) => pushEvento({ tipo: "partida_propria", info }),
-      onPartidaDaRodadaNaCompeticaoDoJogador: (info) => pushEvento({ tipo: "partida_rodada", info }),
       onStatusAtualizado: (info) => pushEvento({ tipo: "status", info }),
       onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => pushEvento({ tipo: "tabela", campeonatoId, periodo, tabela }),
     };
