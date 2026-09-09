@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ARQUETIPOS, NACIONALIDADES_CONMEBOL, type Posicao } from "@motor/schemas/player.js";
+import type { Club } from "@motor/schemas/club.js";
 import { overallAtual } from "@motor/career/Player.js";
 import { ROTULO_POTENCIAL } from "@motor/progression/potencial.js";
 import type { PropostaTransferencia } from "@motor/market/transfers.js";
@@ -22,6 +23,10 @@ function nomeDoClube(clube: { nome: string; nome_popular?: string } | undefined,
   return clube?.nome_popular ?? clube?.nome ?? id;
 }
 
+function bandeiraDoPais(codigoPais: string | undefined): string | undefined {
+  return NACIONALIDADES_CONMEBOL.find((n) => n.codigo === codigoPais)?.bandeira;
+}
+
 export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (estado: ReturnType<typeof useCriacaoDeCarreira>["estadoFinal"]) => void }) {
   const criacao = useCriacaoDeCarreira();
 
@@ -37,7 +42,14 @@ export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (es
           {criacao.passo === "arquetipo" && criacao.posicao && <PassoArquetipo posicao={criacao.posicao} onEscolher={criacao.escolherArquetipo} />}
           {criacao.passo === "numero" && <PassoNumero onConfirmar={criacao.confirmarNumero} />}
           {criacao.passo === "proposta" && (
-            <PassoProposta propostas={criacao.propostas} clubePorId={criacao.clubePorId} clubes={criacao.clubes} onAceitar={criacao.aceitarProposta} onEscolherManualmente={criacao.escolherClubeManualmente} />
+            <PassoProposta
+              propostas={criacao.propostas}
+              clubePorId={criacao.clubePorId}
+              clubes={criacao.clubes}
+              campeonatosPorClube={criacao.campeonatosPorClube}
+              onAceitar={criacao.aceitarProposta}
+              onEscolherManualmente={criacao.escolherClubeManualmente}
+            />
           )}
           {criacao.passo === "resumo" && criacao.estadoFinal && (
             <PassoResumo estado={criacao.estadoFinal} nomeClube={nomeDoClube(criacao.clubePorId.get(criacao.estadoFinal.clubeAtualId), criacao.estadoFinal.clubeAtualId)} onFinalizar={() => onCarreiraCriada?.(criacao.estadoFinal)} />
@@ -200,12 +212,14 @@ function PassoProposta({
   propostas,
   clubePorId,
   clubes,
+  campeonatosPorClube,
   onAceitar,
   onEscolherManualmente,
 }: {
   propostas: PropostaTransferencia[];
-  clubePorId: Map<string, { nome: string; nome_popular?: string }>;
-  clubes: { id: string; nome: string; nome_popular?: string }[];
+  clubePorId: Map<string, Club>;
+  clubes: Club[];
+  campeonatosPorClube: Map<string, { id: string; nome: string }[]>;
   onAceitar: (proposta: PropostaTransferencia) => void;
   onEscolherManualmente: (clubeId: string) => void;
 }) {
@@ -232,6 +246,7 @@ function PassoProposta({
               onClick={() => onEscolherManualmente(clube.id)}
               className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
             >
+              {bandeiraDoPais(clube.pais) && <span className="mr-1.5">{bandeiraDoPais(clube.pais)}</span>}
               {nomeDoClube(clube, clube.id)}
             </button>
           ))}
@@ -246,6 +261,9 @@ function PassoProposta({
       <div className="flex flex-col gap-3">
         {propostas.map((proposta) => {
           const termos = proposta.propostaInicial;
+          const clube = clubePorId.get(proposta.clubeOfertanteId);
+          const bandeira = bandeiraDoPais(clube?.pais);
+          const campeonatosDoClube = campeonatosPorClube.get(proposta.clubeOfertanteId) ?? [];
           return (
             <button
               key={proposta.clubeOfertanteId}
@@ -253,10 +271,22 @@ function PassoProposta({
               onClick={() => onAceitar(proposta)}
               className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
             >
-              <div className="font-medium">{nomeDoClube(clubePorId.get(proposta.clubeOfertanteId), proposta.clubeOfertanteId)}</div>
+              <div className="font-medium">
+                {bandeira && <span className="mr-1.5">{bandeira}</span>}
+                {nomeDoClube(clube, proposta.clubeOfertanteId)}
+              </div>
               <div className="mt-1 text-sm text-slate-400">
                 Status: {proposta.statusOferecido} · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
               </div>
+              {campeonatosDoClube.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {campeonatosDoClube.map((campeonato) => (
+                    <span key={campeonato.id} className="text-xs rounded-full bg-slate-700/60 text-slate-300 px-2 py-0.5">
+                      {campeonato.nome}
+                    </span>
+                  ))}
+                </div>
+              )}
             </button>
           );
         })}

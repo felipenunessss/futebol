@@ -6,6 +6,7 @@ import { xpParaProximoNivel, type FocoDeTreino } from "@motor/progression/xp.js"
 import type { ImpactoCarreira, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
+import { probabilidadeDeVencer } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
 import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
@@ -477,9 +478,11 @@ function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: Evento
   switch (evento.tipo) {
     case "chance_generica": {
       const time = evento.lado === "casa" ? mandanteNome : visitanteNome;
+      const percentual = Math.round(evento.probabilidade * 100);
       return (
         <p>
-          {evento.minuto}' {evento.gol ? <span className="text-emerald-400 font-medium">GOL do {time}!</span> : <>Chance perdida do {time}.</>}
+          {evento.minuto}' {evento.gol ? <span className="text-emerald-400 font-medium">GOL do {time}!</span> : <>Chance perdida do {time}.</>}{" "}
+          <span className="text-slate-500">({percentual}% de chance de gol)</span>
         </p>
       );
     }
@@ -490,9 +493,10 @@ function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: Evento
       if (finalizacao) texto = evento.chance.sucesso ? `GOL SEU! (${rotulo})` : `Você não converteu (${rotulo}).`;
       else if (evento.chance.subtipo === "passe_decisivo") texto = evento.chance.sucesso ? "Assistência sua!" : "Seu passe decisivo não deu certo.";
       else texto = evento.chance.sucesso ? "Desarme decisivo seu!" : "Você não conseguiu desarmar dessa vez.";
+      const percentual = Math.round(evento.probabilidade * 100);
       return (
         <p className={evento.chance.sucesso ? "text-emerald-400 font-medium" : ""}>
-          {evento.minuto}' {texto}
+          {evento.minuto}' {texto} <span className="text-slate-500">({percentual}% de chance)</span>
         </p>
       );
     }
@@ -512,26 +516,31 @@ function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: Evento
 }
 
 function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoChance; onEscolher: (resultado: ResultadoDecisaoChance) => void }) {
+  const opcoes: { rotulo: string; ajuste: ResultadoDecisaoChance }[] = [
+    { rotulo: "Arriscar, ir com tudo", ajuste: { ajusteForcaJogador: 150, ajusteForcaDefensiva: 0 } },
+    { rotulo: "Ajeitar antes de bater, com mais categoria", ajuste: { ajusteForcaJogador: 60, ajusteForcaDefensiva: -60 } },
+  ];
+
   return (
     <div className="border-t border-slate-800 pt-3 flex flex-col gap-2">
       <p className="text-sm font-medium">
         {contexto.minuto}' — chance sua! ({LABEL_SUBTIPO[contexto.subtipo]})
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => onEscolher({ ajusteForcaJogador: 150, ajusteForcaDefensiva: 0 })}
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors text-sm"
-        >
-          Arriscar, ir com tudo
-        </button>
-        <button
-          type="button"
-          onClick={() => onEscolher({ ajusteForcaJogador: 60, ajusteForcaDefensiva: -60 })}
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors text-sm"
-        >
-          Ajeitar antes de bater, com mais categoria
-        </button>
+        {opcoes.map(({ rotulo, ajuste }) => {
+          const percentual = Math.round(probabilidadeDeVencer(contexto.forcaJogadorBase + ajuste.ajusteForcaJogador, contexto.forcaDefensivaBase + ajuste.ajusteForcaDefensiva) * 100);
+          return (
+            <button
+              key={rotulo}
+              type="button"
+              onClick={() => onEscolher(ajuste)}
+              className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors text-sm"
+            >
+              {rotulo}
+              <div className="mt-1 text-xs text-slate-500">{percentual}% de chance</div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

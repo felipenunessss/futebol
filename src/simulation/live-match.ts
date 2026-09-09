@@ -45,6 +45,9 @@ export interface ContextoDecisaoChance {
   minuto: number;
   subtipo: SubtipoChance;
   atributoUsado: Atributo;
+  /** Força do jogador e da defesa adversária antes de qualquer ajuste de decisão — quem chama pode usar `probabilidadeDeVencer` (`match.ts`) pra mostrar a chance de sucesso de cada opção antes de escolher. */
+  forcaJogadorBase: number;
+  forcaDefensivaBase: number;
 }
 
 export interface ResultadoDecisaoChance {
@@ -57,8 +60,8 @@ export interface ResultadoDecisaoChance {
 const DECISAO_PADRAO: ResultadoDecisaoChance = { ajusteForcaJogador: 0, ajusteForcaDefensiva: 0 };
 
 export type EventoAoVivo =
-  | { tipo: "chance_generica"; minuto: number; lado: "casa" | "fora"; gol: boolean }
-  | { tipo: "chance_jogador"; minuto: number; chance: ChanceJogador }
+  | { tipo: "chance_generica"; minuto: number; lado: "casa" | "fora"; gol: boolean; probabilidade: number }
+  | { tipo: "chance_jogador"; minuto: number; chance: ChanceJogador; probabilidade: number }
   | { tipo: "evento_de_contexto"; minuto: number; cenario: Cenario; escolha: EscolhaResolvida }
   | { tipo: "apito_final"; golsCasa: number; golsFora: number };
 
@@ -190,8 +193,13 @@ export async function jogarPartidaAoVivo(
       const forcaDefensivaBase = perfilDefensor.defesa;
 
       const pausaParaDecisao = decidirChance !== undefined && random() < probabilidadeDePausarChance;
-      const decisao = pausaParaDecisao ? await decidirChance!({ minuto: slot.minuto, subtipo, atributoUsado }) : DECISAO_PADRAO;
-      const sucesso = resolverDuelo(forcaJogadorBase + decisao.ajusteForcaJogador, forcaDefensivaBase + decisao.ajusteForcaDefensiva, random) === "A";
+      const decisao = pausaParaDecisao
+        ? await decidirChance!({ minuto: slot.minuto, subtipo, atributoUsado, forcaJogadorBase, forcaDefensivaBase })
+        : DECISAO_PADRAO;
+      const forcaJogadorFinal = forcaJogadorBase + decisao.ajusteForcaJogador;
+      const forcaDefensivaFinal = forcaDefensivaBase + decisao.ajusteForcaDefensiva;
+      const probabilidade = probabilidadeDeVencer(forcaJogadorFinal, forcaDefensivaFinal);
+      const sucesso = resolverDuelo(forcaJogadorFinal, forcaDefensivaFinal, random) === "A";
 
       const chance: ChanceJogador = { subtipo, sucesso, atributoUsado };
       chancesJogador.push(chance);
@@ -199,14 +207,15 @@ export async function jogarPartidaAoVivo(
         if (lado === "casa") golsCasa++;
         else golsFora++;
       }
-      await onEvento?.({ tipo: "chance_jogador", minuto: slot.minuto, chance });
+      await onEvento?.({ tipo: "chance_jogador", minuto: slot.minuto, chance, probabilidade });
     } else {
+      const probabilidade = probabilidadeDeVencer(perfilAtacante.ataque, perfilDefensor.defesa);
       const gol = resolverDuelo(perfilAtacante.ataque, perfilDefensor.defesa, random) === "A";
       if (gol) {
         if (lado === "casa") golsCasa++;
         else golsFora++;
       }
-      await onEvento?.({ tipo: "chance_generica", minuto: slot.minuto, lado, gol });
+      await onEvento?.({ tipo: "chance_generica", minuto: slot.minuto, lado, gol, probabilidade });
     }
   }
 

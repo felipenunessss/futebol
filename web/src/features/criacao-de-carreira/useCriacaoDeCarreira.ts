@@ -4,7 +4,7 @@ import type { Contrato } from "@motor/schemas/contract.js";
 import { assinarContrato, criarEstadoInicial, overallAtual, type EstadoDeCarreira } from "@motor/career/Player.js";
 import { multiplicadorDeValorizacaoPorStatus } from "@motor/career/status.js";
 import { gerarPropostasIniciais, type PropostaTransferencia } from "@motor/market/transfers.js";
-import { loadClubes } from "../../data/browserLoaders.js";
+import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
 
 /**
  * Estado + regras do wizard de criação de carreira — espelha o fluxo de
@@ -31,6 +31,20 @@ export function useCriacaoDeCarreira() {
 
   const clubes = useMemo(() => loadClubes(), []);
   const clubePorId = useMemo(() => new Map(clubes.map((c) => [c.id, c])), [clubes]);
+  const estaduais = useMemo(() => loadEstaduais(), []);
+  const nacionais = useMemo(() => loadCampeonatosNacionais(), []);
+  /** Nomes dos campeonatos (estaduais + nacionais) que cada clube disputa, por Club.id — pra mostrar na tela de propostas. */
+  const campeonatosPorClube = useMemo(() => {
+    const mapa = new Map<string, { id: string; nome: string }[]>();
+    for (const campeonato of [...nacionais, ...estaduais]) {
+      for (const clubeId of campeonato.times) {
+        const lista = mapa.get(clubeId) ?? [];
+        lista.push({ id: campeonato.id, nome: campeonato.nome });
+        mapa.set(clubeId, lista);
+      }
+    }
+    return mapa;
+  }, [estaduais, nacionais]);
 
   function confirmarNome(valorDigitado: string): void {
     setNome(valorDigitado.trim() || "Jogador Sem Nome");
@@ -109,6 +123,7 @@ export function useCriacaoDeCarreira() {
     posicao,
     clubes,
     clubePorId,
+    campeonatosPorClube,
     propostas,
     estadoFinal,
     confirmarNome,
