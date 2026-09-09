@@ -82,7 +82,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "São Leopoldo",
-    "estadio": "João Correa da Silveira"
+    "estadio": "João Correa da Silveira",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qxkc471625417009.png"
   },
   {
     "id": "apafut",
@@ -112,7 +113,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3rfbk51774626965.png"
   },
   {
     "id": "brasil_farroupilha",
@@ -128,7 +130,8 @@
     "nome_popular": "Esportivo",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Bento Gonçalves"
+    "cidade": "Bento Gonçalves",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yx0bc81625417871.png"
   },
   {
     "id": "sc_gaucho",
@@ -136,7 +139,8 @@
     "nome_popular": "Gaúcho",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Passo Fundo"
+    "cidade": "Passo Fundo",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vgybrn1756641620.png"
   },
   {
     "id": "gloria",
@@ -144,7 +148,8 @@
     "nome_popular": "Glória",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Vacaria"
+    "cidade": "Vacaria",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/kfq0s21642707550.png"
   },
   {
     "id": "gramadense",
@@ -178,7 +183,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Passo Fundo",
-    "estadio": "Vermelhão da Serra"
+    "estadio": "Vermelhão da Serra",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vgybrn1756641620.png"
   },
   {
     "id": "pelotas",
@@ -187,7 +193,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Pelotas",
-    "estadio": "Boca do Lobo"
+    "estadio": "Boca do Lobo",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/twaji51754066161.png"
   },
   {
     "id": "santa_cruz_rs",
@@ -196,7 +203,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Santa Cruz do Sul",
-    "estadio": "Dos Plátanos"
+    "estadio": "Dos Plátanos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vvusuv1464886343.png"
   },
   {
     "id": "uniao_frederiquense",

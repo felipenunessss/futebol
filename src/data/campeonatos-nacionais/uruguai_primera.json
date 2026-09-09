@@ -5,10 +5,21 @@
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
-    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
-    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 1 },
+    "turno": {
+      "nome": "Torneo Apertura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 1
+    },
+    "returno": {
+      "nome": "Torneo Clausura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 1
+    },
     "mata_mata": {
-      "fases": ["semifinal_campeonato", "final_campeonato"],
+      "fases": [
+        "semifinal_campeonato",
+        "final_campeonato"
+      ],
       "ida_e_volta": false
     }
   },
@@ -20,11 +31,30 @@
     "rebaixamento_proxima_divisao": 3
   },
   "classicos": [
-    { "time_a": "penarol", "time_b": "nacional_uy", "nome": "Clásico Uruguayo", "peso_midia": 5 }
+    {
+      "time_a": "penarol",
+      "time_b": "nacional_uy",
+      "nome": "Clásico Uruguayo",
+      "peso_midia": 5
+    }
   ],
   "times": [
-    "penarol", "nacional_uy", "danubio", "defensor_sporting", "boston_river", "cerro_largo",
-    "racing_uy", "montevideo_wanderers", "juventud", "liverpool_uy", "progreso", "albion",
-    "cerro", "central_espanol", "deportivo_maldonado", "montevideo_city_torque"
-  ]
+    "penarol",
+    "nacional_uy",
+    "danubio",
+    "defensor_sporting",
+    "boston_river",
+    "cerro_largo",
+    "racing_uy",
+    "montevideo_wanderers",
+    "juventud",
+    "liverpool_uy",
+    "progreso",
+    "albion",
+    "cerro",
+    "central_espanol",
+    "deportivo_maldonado",
+    "montevideo_city_torque"
+  ],
+  "escudo_url": "https://r2.thesportsdb.com/images/media/league/badge/3p98xv1740672448.png"
 }

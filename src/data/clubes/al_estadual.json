@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/gojj1r1625417178.png"
   },
   {
     "id": "coruripe",
@@ -17,7 +18,8 @@
     "nome_popular": "Coruripe",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Coruripe"
+    "cidade": "Coruripe",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/9alf4k1754030036.png"
   },
   {
     "id": "cruzeiro_al",
@@ -37,7 +39,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/t34dwo1645296075.png"
   },
   {
     "id": "murici",
@@ -45,7 +48,8 @@
     "nome_popular": "Murici",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Murici"
+    "cidade": "Murici",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/so7dbd1708235018.png"
   },
   {
     "id": "penedense",
@@ -53,6 +57,7 @@
     "nome_popular": "Penedense",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Penedo"
+    "cidade": "Penedo",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m27zmj1733810252.png"
   }
 ]

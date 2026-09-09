@@ -17,4 +17,6 @@ export interface CampeonatoNacional {
   premiacao: Premiacao;
   classicos: Classico[];
   times: string[]; // Club.id[]
+  /** URL externa do escudo/emblema da competição (ver `schemas/club.ts` `Club.escudo_url` — mesma fonte/convenção, mesma ausência esperada pra maioria). */
+  escudo_url?: string;
 }

@@ -1,32 +1,391 @@
 [
-  { "id": "penarol", "nome": "Club Atlético Peñarol", "nome_popular": "Peñarol", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1670 },
-  { "id": "nacional_uy", "nome": "Club Nacional de Football", "nome_popular": "Nacional", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1627 },
-  { "id": "danubio", "nome": "Danubio Fútbol Club", "nome_popular": "Danubio", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1487 },
-  { "id": "defensor_sporting", "nome": "Defensor Sporting Club", "nome_popular": "Defensor Sporting", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1508 },
-  { "id": "boston_river", "nome": "Boston River", "nome_popular": "Boston River", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1513 },
-  { "id": "cerro_largo", "nome": "Cerro Largo Fútbol Club", "nome_popular": "Cerro Largo", "pais": "UY", "cidade": "Melo", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1515 },
-  { "id": "racing_uy", "nome": "Racing Club de Montevideo", "nome_popular": "Racing", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1572 },
-  { "id": "montevideo_wanderers", "nome": "Montevideo Wanderers Fútbol Club", "nome_popular": "Wanderers", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1506 },
-  { "id": "juventud", "nome": "Club Atlético Juventud", "nome_popular": "Juventud", "pais": "UY", "cidade": "Las Piedras", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1513 },
-  { "id": "liverpool_uy", "nome": "Liverpool Fútbol Club", "nome_popular": "Liverpool", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1571 },
-  { "id": "progreso", "nome": "Club Atlético Progreso", "nome_popular": "Progreso", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1411 },
-  { "id": "albion", "nome": "Albion Fútbol Club", "nome_popular": "Albion", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1514 },
-  { "id": "cerro", "nome": "Club Atlético Cerro", "nome_popular": "Cerro", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1451 },
-  { "id": "central_espanol", "nome": "Central Español Fútbol Club", "nome_popular": "Central Español", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1532 },
-  { "id": "deportivo_maldonado", "nome": "Deportivo Maldonado", "nome_popular": "Maldonado", "pais": "UY", "cidade": "Maldonado", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1538 },
-  { "id": "montevideo_city_torque", "nome": "Montevideo City Torque", "nome_popular": "Montevideo City", "pais": "UY", "cidade": "Montevidéu", "divisao_nacional": { "pais": "UY", "nivel": 1 }, "rating_inicial": 1587 },
-  { "id": "atenas_uy", "nome": "Club Atlético Atenas", "nome_popular": "Atenas", "pais": "UY", "cidade": "San Carlos", "estadio": "Ateniense", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "cerrito", "nome": "Club Cerrito", "nome_popular": "Cerrito", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Maracaná", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "colon_uy", "nome": "Club Atlético Colón", "nome_popular": "Colón", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "fenix", "nome": "Centro Atlético Fénix", "nome_popular": "Fénix", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Capurro", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "huracan_uy", "nome": "Huracán Fútbol Club", "nome_popular": "Huracán", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "la_luz", "nome": "Club Atlético La Luz", "nome_popular": "La Luz", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "miramar_misiones", "nome": "Miramar Misiones", "nome_popular": "Miramar Misiones", "pais": "UY", "cidade": "Montevidéu", "estadio": "Charrúa", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1441 },
-  { "id": "oriental_uy", "nome": "Club Atlético Oriental", "nome_popular": "Oriental", "pais": "UY", "cidade": "La Paz", "estadio": "Parque Palermo", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "paysandu_uy", "nome": "Paysandú Fútbol Club", "nome_popular": "Paysandú", "pais": "UY", "cidade": "Paysandú", "estadio": "Artigas", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "plaza_colonia", "nome": "Club Plaza Colonia de Deportes", "nome_popular": "Plaza Colonia", "pais": "UY", "cidade": "Colonia del Sacramento", "estadio": "Juan Gaspar Prandi", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1489 },
-  { "id": "rentistas", "nome": "Club Atlético Rentistas", "nome_popular": "Rentistas", "pais": "UY", "cidade": "Montevidéu", "estadio": "Complejo Rentistas", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "river_plate_uy", "nome": "River Plate Fútbol Club", "nome_popular": "River Plate", "pais": "UY", "cidade": "Montevidéu", "estadio": "Federico Omar Saroldi", "divisao_nacional": { "pais": "UY", "nivel": 2 }, "rating_inicial": 1445 },
-  { "id": "tacuarembo", "nome": "Tacuarembó Fútbol Club", "nome_popular": "Tacuarembó", "pais": "UY", "cidade": "Tacuarembó", "estadio": "Raúl Saturnino Goyenola", "divisao_nacional": { "pais": "UY", "nivel": 2 } },
-  { "id": "uruguay_montevideo", "nome": "Club Uruguay Montevideo", "nome_popular": "Uruguay Montevideo", "pais": "UY", "cidade": "Montevidéu", "estadio": "Parque ANCAP", "divisao_nacional": { "pais": "UY", "nivel": 2 } }
+  {
+    "id": "penarol",
+    "nome": "Club Atlético Peñarol",
+    "nome_popular": "Peñarol",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1670
+  },
+  {
+    "id": "nacional_uy",
+    "nome": "Club Nacional de Football",
+    "nome_popular": "Nacional",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1627
+  },
+  {
+    "id": "danubio",
+    "nome": "Danubio Fútbol Club",
+    "nome_popular": "Danubio",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1487
+  },
+  {
+    "id": "defensor_sporting",
+    "nome": "Defensor Sporting Club",
+    "nome_popular": "Defensor Sporting",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1508
+  },
+  {
+    "id": "boston_river",
+    "nome": "Boston River",
+    "nome_popular": "Boston River",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1513
+  },
+  {
+    "id": "cerro_largo",
+    "nome": "Cerro Largo Fútbol Club",
+    "nome_popular": "Cerro Largo",
+    "pais": "UY",
+    "cidade": "Melo",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1515
+  },
+  {
+    "id": "racing_uy",
+    "nome": "Racing Club de Montevideo",
+    "nome_popular": "Racing",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1572
+  },
+  {
+    "id": "montevideo_wanderers",
+    "nome": "Montevideo Wanderers Fútbol Club",
+    "nome_popular": "Wanderers",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1506
+  },
+  {
+    "id": "juventud",
+    "nome": "Club Atlético Juventud",
+    "nome_popular": "Juventud",
+    "pais": "UY",
+    "cidade": "Las Piedras",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1513,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1ntter1766506778.png"
+  },
+  {
+    "id": "liverpool_uy",
+    "nome": "Liverpool Fútbol Club",
+    "nome_popular": "Liverpool",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1571,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/kfaher1737969724.png",
+    "cor_primaria": "#C8102E",
+    "cor_secundaria": "#FFFFFF"
+  },
+  {
+    "id": "progreso",
+    "nome": "Club Atlético Progreso",
+    "nome_popular": "Progreso",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1411,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/oh4ksb1621865842.png"
+  },
+  {
+    "id": "albion",
+    "nome": "Albion Fútbol Club",
+    "nome_popular": "Albion",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1514,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ne1nse1624645327.png"
+  },
+  {
+    "id": "cerro",
+    "nome": "Club Atlético Cerro",
+    "nome_popular": "Cerro",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1451,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wtuxsq1464887392.png"
+  },
+  {
+    "id": "central_espanol",
+    "nome": "Central Español Fútbol Club",
+    "nome_popular": "Central Español",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1532,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/nu9wnd1624645331.png"
+  },
+  {
+    "id": "deportivo_maldonado",
+    "nome": "Deportivo Maldonado",
+    "nome_popular": "Maldonado",
+    "pais": "UY",
+    "cidade": "Maldonado",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1538,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0fmxza1580234592.png"
+  },
+  {
+    "id": "montevideo_city_torque",
+    "nome": "Montevideo City Torque",
+    "nome_popular": "Montevideo City",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 1
+    },
+    "rating_inicial": 1587,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/v7urjn1580234584.png"
+  },
+  {
+    "id": "atenas_uy",
+    "nome": "Club Atlético Atenas",
+    "nome_popular": "Atenas",
+    "pais": "UY",
+    "cidade": "San Carlos",
+    "estadio": "Ateniense",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m145jb1694151931.png"
+  },
+  {
+    "id": "cerrito",
+    "nome": "Club Cerrito",
+    "nome_popular": "Cerrito",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque Maracaná",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m0w93p1621866343.png"
+  },
+  {
+    "id": "colon_uy",
+    "nome": "Club Atlético Colón",
+    "nome_popular": "Colón",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque Palermo",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/l72gz21712750680.png"
+  },
+  {
+    "id": "fenix",
+    "nome": "Centro Atlético Fénix",
+    "nome_popular": "Fénix",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque Capurro",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3iz2f51581352430.png"
+  },
+  {
+    "id": "huracan_uy",
+    "nome": "Huracán Fútbol Club",
+    "nome_popular": "Huracán",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque Palermo",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/kppi2b1775776550.png"
+  },
+  {
+    "id": "la_luz",
+    "nome": "Club Atlético La Luz",
+    "nome_popular": "La Luz",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque Palermo",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/k2i5ho1647977067.png"
+  },
+  {
+    "id": "miramar_misiones",
+    "nome": "Miramar Misiones",
+    "nome_popular": "Miramar Misiones",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Charrúa",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "rating_inicial": 1441,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7dvfx11647976997.png"
+  },
+  {
+    "id": "oriental_uy",
+    "nome": "Club Atlético Oriental",
+    "nome_popular": "Oriental",
+    "pais": "UY",
+    "cidade": "La Paz",
+    "estadio": "Parque Palermo",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/4wuxhs1630265199.png"
+  },
+  {
+    "id": "paysandu_uy",
+    "nome": "Paysandú Fútbol Club",
+    "nome_popular": "Paysandú",
+    "pais": "UY",
+    "cidade": "Paysandú",
+    "estadio": "Artigas",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/9rrdrn1740851540.png"
+  },
+  {
+    "id": "plaza_colonia",
+    "nome": "Club Plaza Colonia de Deportes",
+    "nome_popular": "Plaza Colonia",
+    "pais": "UY",
+    "cidade": "Colonia del Sacramento",
+    "estadio": "Juan Gaspar Prandi",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "rating_inicial": 1489,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/s0gfrz1517658228.png"
+  },
+  {
+    "id": "rentistas",
+    "nome": "Club Atlético Rentistas",
+    "nome_popular": "Rentistas",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Complejo Rentistas",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/uzupx11618944176.png"
+  },
+  {
+    "id": "river_plate_uy",
+    "nome": "River Plate Fútbol Club",
+    "nome_popular": "River Plate",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Federico Omar Saroldi",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "rating_inicial": 1445,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/03dmi31645539717.png",
+    "cor_primaria": "#E3201C",
+    "cor_secundaria": "#FFFFFF"
+  },
+  {
+    "id": "tacuarembo",
+    "nome": "Tacuarembó Fútbol Club",
+    "nome_popular": "Tacuarembó",
+    "pais": "UY",
+    "cidade": "Tacuarembó",
+    "estadio": "Raúl Saturnino Goyenola",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e3jc751727017020.png"
+  },
+  {
+    "id": "uruguay_montevideo",
+    "nome": "Club Uruguay Montevideo",
+    "nome_popular": "Uruguay Montevideo",
+    "pais": "UY",
+    "cidade": "Montevidéu",
+    "estadio": "Parque ANCAP",
+    "divisao_nacional": {
+      "pais": "UY",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/09w9oj1727017090.png"
+  }
 ]

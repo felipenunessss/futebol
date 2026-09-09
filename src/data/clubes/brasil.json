@@ -12,7 +12,10 @@
       "nivel": 1
     },
     "forca_financeira": "muito_alta",
-    "rating_inicial": 1839
+    "rating_inicial": 1839,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/syptwx1473538074.png",
+    "cor_primaria": "#000000",
+    "cor_secundaria": "#CC001A"
   },
   {
     "id": "palmeiras",
@@ -27,7 +30,10 @@
       "nivel": 1
     },
     "forca_financeira": "muito_alta",
-    "rating_inicial": 1826
+    "rating_inicial": 1826,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vsqwqp1473538105.png",
+    "cor_primaria": "#006437",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "sao_paulo",
@@ -42,7 +48,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1696
+    "rating_inicial": 1696,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/sxpupx1473538135.png",
+    "cor_primaria": "#FFFFFF",
+    "cor_secundaria": "#fe0000"
   },
   {
     "id": "corinthians",
@@ -57,7 +66,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1718
+    "rating_inicial": 1718,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vvuvps1473538042.png",
+    "cor_primaria": "#010101",
+    "cor_secundaria": "#CC2031"
   },
   {
     "id": "santos",
@@ -72,7 +84,10 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1675
+    "rating_inicial": 1675,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/j8xk9g1679447486.png",
+    "cor_primaria": "#FFFFFF",
+    "cor_secundaria": "#000000"
   },
   {
     "id": "gremio",
@@ -87,7 +102,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1676
+    "rating_inicial": 1676,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/uvpwyt1473538089.png",
+    "cor_primaria": "#0D80BF",
+    "cor_secundaria": "#000000"
   },
   {
     "id": "internacional",
@@ -102,7 +120,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1673
+    "rating_inicial": 1673,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yprvxx1473538097.png",
+    "cor_primaria": "#E5050F",
+    "cor_secundaria": "#ffffff"
   },
   {
     "id": "cruzeiro",
@@ -117,7 +138,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1744
+    "rating_inicial": 1744,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/upsvvu1473538059.png",
+    "cor_primaria": "#2F529E",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "atletico_mg",
@@ -147,7 +171,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1701
+    "rating_inicial": 1701,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bs5mbw1733004596.png",
+    "cor_primaria": "#000000",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "fluminense",
@@ -162,7 +189,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1741
+    "rating_inicial": 1741,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/stvvwp1473538082.png",
+    "cor_primaria": "#910029",
+    "cor_secundaria": "#006941"
   },
   {
     "id": "vasco_da_gama",
@@ -177,7 +207,10 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1668
+    "rating_inicial": 1668,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ynqlxo1630521109.png",
+    "cor_primaria": "#000000",
+    "cor_secundaria": "#e71e00"
   },
   {
     "id": "bahia",
@@ -477,7 +510,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1463
+    "rating_inicial": 1463,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wbss4d1644929547.png"
   },
   {
     "id": "novorizontino",
@@ -492,7 +526,8 @@
       "nivel": 2
     },
     "forca_financeira": "muito_baixa",
-    "rating_inicial": 1695
+    "rating_inicial": 1695,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2qwxw51617198963.png"
   },
   {
     "id": "mirassol",
@@ -507,7 +542,8 @@
       "nivel": 1
     },
     "forca_financeira": "muito_baixa",
-    "rating_inicial": 1687
+    "rating_inicial": 1687,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pw8uo11765900737.png"
   },
   {
     "id": "america_mg",
@@ -536,7 +572,8 @@
       "pais": "BR",
       "nivel": 4
     },
-    "rating_inicial": 1464
+    "rating_inicial": 1464,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1uj3n31579340660.png"
   },
   {
     "id": "athletic_club_mg",
@@ -565,7 +602,8 @@
       "nivel": 1
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1625
+    "rating_inicial": 1625,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/u36jfy1579341655.png"
   },
   {
     "id": "operario_ferroviario",
@@ -593,7 +631,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1527
+    "rating_inicial": 1527,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/xp2z9j1740846583.png"
   },
   {
     "id": "atletico_goianiense",
@@ -621,7 +660,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1452
+    "rating_inicial": 1452,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/v9y3ye1579337829.png"
   },
   {
     "id": "csa",
@@ -634,7 +674,8 @@
       "pais": "BR",
       "nivel": 4
     },
-    "rating_inicial": 1526
+    "rating_inicial": 1526,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ekzl671560365911.png"
   },
   {
     "id": "paysandu",
@@ -647,7 +688,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1516
+    "rating_inicial": 1516,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/9rrdrn1740851540.png"
   },
   {
     "id": "amazonas_fc",
@@ -661,7 +703,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1519
+    "rating_inicial": 1519,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/owccd41754110658.png"
   },
   {
     "id": "rio_branco_es",
@@ -698,7 +741,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ucyzoq1733810901.png"
   },
   {
     "id": "pouso_alegre",
@@ -711,7 +755,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7kazoj1679129032.png"
   },
   {
     "id": "sao_jose_rs",
@@ -724,7 +769,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2mxcvh1736635801.png"
   },
   {
     "id": "sao_luiz",
@@ -737,7 +783,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/o1tviq1688105899.png"
   },
   {
     "id": "santa_catarina_ec",
@@ -750,7 +797,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/n5g1521768446890.png"
   },
   {
     "id": "nova_iguacu",
@@ -763,7 +811,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7fc7co1740846884.png"
   },
   {
     "id": "portuguesa_rj",
@@ -813,7 +862,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/07wd4q1754136987.png"
   },
   {
     "id": "noroeste",
@@ -825,7 +875,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zgkcd81754137165.png"
   },
   {
     "id": "xv_de_piracicaba",
@@ -837,7 +888,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6p1au71774629161.png"
   },
   {
     "id": "sao_joseense",
@@ -849,7 +901,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/j0ji0e1679387868.png"
   },
   {
     "id": "operario_vg",

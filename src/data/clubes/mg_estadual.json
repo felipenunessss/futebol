@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Patos de Minas",
-    "estadio": "Zama Maciel"
+    "estadio": "Zama Maciel",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/owelir1768839914.png"
   },
   {
     "id": "democrata_gv",
@@ -28,7 +29,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Montes Claros",
-    "estadio": "Juvêncio Augusto Soares"
+    "estadio": "Juvêncio Augusto Soares",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/y0dlri1768839568.png"
   },
   {
     "id": "itabirito",
@@ -36,7 +38,8 @@
     "nome_popular": "Itabirito",
     "pais": "BR",
     "estado": "MG",
-    "cidade": "Itabirito"
+    "cidade": "Itabirito",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/8y553y1733806140.png"
   },
   {
     "id": "betim_fc",
@@ -49,7 +52,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3adbop1769912270.png"
   },
   {
     "id": "boa_esporte",
@@ -58,7 +62,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Varginha",
-    "estadio": "Municipal Prefeito Luiz Dilzon de Melo"
+    "estadio": "Municipal Prefeito Luiz Dilzon de Melo",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/18hzbf1495461880.png"
   },
   {
     "id": "patrocinense",
@@ -67,7 +72,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Patrocínio",
-    "estadio": "Pedro Alves do Nascimento"
+    "estadio": "Pedro Alves do Nascimento",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m39wdh1736676574.png"
   },
   {
     "id": "caldense",
@@ -76,7 +82,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Poços de Caldas",
-    "estadio": "Municipal Ronaldo Junqueira"
+    "estadio": "Municipal Ronaldo Junqueira",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6yl2if1625417413.png"
   },
   {
     "id": "guarani_mg",
@@ -94,7 +101,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Patos de Minas",
-    "estadio": "Bernardo Rubinger de Queiroz"
+    "estadio": "Bernardo Rubinger de Queiroz",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/fecta91681104203.png"
   },
   {
     "id": "uberaba_sc",
@@ -111,7 +119,8 @@
     "nome_popular": "Coimbra",
     "pais": "BR",
     "estado": "MG",
-    "cidade": "Contagem"
+    "cidade": "Contagem",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2nh0o11737782681.png"
   },
   {
     "id": "democrata_sl",

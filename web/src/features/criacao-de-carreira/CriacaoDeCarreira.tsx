@@ -5,6 +5,8 @@ import { overallAtual } from "@motor/career/Player.js";
 import { ROTULO_POTENCIAL } from "@motor/progression/potencial.js";
 import type { PropostaTransferencia } from "@motor/market/transfers.js";
 import { useCriacaoDeCarreira } from "./useCriacaoDeCarreira.js";
+import { Escudo } from "../../components/Escudo.js";
+import { corDeTextoContrastante } from "../../lib/contraste.js";
 
 const POSICOES: Posicao[] = ["goleiro", "zagueiro", "lateral", "volante", "meia", "atacante"];
 
@@ -29,13 +31,20 @@ function bandeiraDoPais(codigoPais: string | undefined): string | undefined {
 
 export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (estado: ReturnType<typeof useCriacaoDeCarreira>["estadoFinal"]) => void }) {
   const criacao = useCriacaoDeCarreira();
+  const clubeContratado = criacao.estadoFinal ? criacao.clubePorId.get(criacao.estadoFinal.clubeAtualId) : undefined;
+  // Só na tela de resumo (depois do contrato assinado) a página assume a cor do clube — nos passos
+  // anteriores (ainda sem clube) fica no fundo padrão.
+  const corDeFundo = criacao.passo === "resumo" ? clubeContratado?.cor_primaria : undefined;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+    <div
+      className="min-h-screen flex items-center justify-center p-6 transition-colors"
+      style={{ backgroundColor: corDeFundo ?? "#020617", color: corDeFundo ? corDeTextoContrastante(corDeFundo) : "#f1f5f9" }}
+    >
       <div className="w-full max-w-xl">
         <Progresso passoAtual={criacao.passo} />
 
-        <div className="mt-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-8">
+        <div className="mt-6 rounded-2xl bg-slate-900 text-slate-100 border shadow-xl p-8" style={{ borderColor: clubeContratado?.cor_secundaria || "rgb(30 41 59)" /* border-slate-800 */ }}>
           {criacao.passo === "nome" && <PassoNome onConfirmar={criacao.confirmarNome} />}
           {criacao.passo === "nacionalidade" && <PassoNacionalidade onEscolher={criacao.escolherNacionalidade} />}
           {criacao.passo === "posicao" && <PassoPosicao onEscolher={criacao.escolherPosicao} />}
@@ -52,7 +61,12 @@ export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (es
             />
           )}
           {criacao.passo === "resumo" && criacao.estadoFinal && (
-            <PassoResumo estado={criacao.estadoFinal} nomeClube={nomeDoClube(criacao.clubePorId.get(criacao.estadoFinal.clubeAtualId), criacao.estadoFinal.clubeAtualId)} onFinalizar={() => onCarreiraCriada?.(criacao.estadoFinal)} />
+            <PassoResumo
+              estado={criacao.estadoFinal}
+              nomeClube={nomeDoClube(clubeContratado, criacao.estadoFinal.clubeAtualId)}
+              escudoClube={clubeContratado?.escudo_url}
+              onFinalizar={() => onCarreiraCriada?.(criacao.estadoFinal)}
+            />
           )}
         </div>
       </div>
@@ -247,7 +261,8 @@ function PassoProposta({
               className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
             >
               {bandeiraDoPais(clube.pais) && <span className="mr-1.5">{bandeiraDoPais(clube.pais)}</span>}
-              {nomeDoClube(clube, clube.id)}
+              <Escudo url={clube.escudo_url} alt="" tamanho={18} />
+              <span className="ml-1.5">{nomeDoClube(clube, clube.id)}</span>
             </button>
           ))}
         </div>
@@ -271,8 +286,9 @@ function PassoProposta({
               onClick={() => onAceitar(proposta)}
               className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
             >
-              <div className="font-medium">
-                {bandeira && <span className="mr-1.5">{bandeira}</span>}
+              <div className="font-medium flex items-center gap-1.5">
+                {bandeira && <span>{bandeira}</span>}
+                <Escudo url={clube?.escudo_url} alt="" tamanho={18} />
                 {nomeDoClube(clube, proposta.clubeOfertanteId)}
               </div>
               <div className="mt-1 text-sm text-slate-400">
@@ -295,7 +311,17 @@ function PassoProposta({
   );
 }
 
-function PassoResumo({ estado, nomeClube, onFinalizar }: { estado: NonNullable<ReturnType<typeof useCriacaoDeCarreira>["estadoFinal"]>; nomeClube: string; onFinalizar: () => void }) {
+function PassoResumo({
+  estado,
+  nomeClube,
+  escudoClube,
+  onFinalizar,
+}: {
+  estado: NonNullable<ReturnType<typeof useCriacaoDeCarreira>["estadoFinal"]>;
+  nomeClube: string;
+  escudoClube: string | undefined;
+  onFinalizar: () => void;
+}) {
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-xl font-semibold">Carreira criada!</h2>
@@ -314,7 +340,10 @@ function PassoResumo({ estado, nomeClube, onFinalizar }: { estado: NonNullable<R
         <dt className="text-slate-400">Posição</dt>
         <dd>{ROTULO_POSICAO[estado.jogador.posicao]}</dd>
         <dt className="text-slate-400">Clube</dt>
-        <dd>{nomeClube}</dd>
+        <dd className="flex items-center gap-1.5">
+          <Escudo url={escudoClube} alt="" tamanho={18} />
+          {nomeClube}
+        </dd>
         <dt className="text-slate-400">Idade</dt>
         <dd>{estado.jogador.idade}</dd>
         <dt className="text-slate-400">Overall</dt>

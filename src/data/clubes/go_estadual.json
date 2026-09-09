@@ -10,7 +10,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pr51nl1768793595.png"
   },
   {
     "id": "anapolina",
@@ -19,7 +20,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Anápolis",
-    "estadio": "Jonas Duarte"
+    "estadio": "Jonas Duarte",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wjphfd1768793254.png"
   },
   {
     "id": "abecat",
@@ -32,7 +34,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mrqg2o1768793015.png"
   },
   {
     "id": "centro_oeste_go",
@@ -41,7 +44,8 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Senador Canedo",
-    "estadio": "Jaime Guerra"
+    "estadio": "Jaime Guerra",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/oeknb11768794072.png"
   },
   {
     "id": "anapolis_fc",
@@ -55,7 +59,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1503
+    "rating_inicial": 1503,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ofh9od1733798605.png"
   },
   {
     "id": "crac",
@@ -68,7 +73,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/5gwxrj1768793743.png"
   },
   {
     "id": "goiatuba",
@@ -81,7 +87,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2usq571768794461.png"
   },
   {
     "id": "inhumas",
@@ -94,7 +101,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3tq1aa1754116774.png"
   },
   {
     "id": "jataiense",
@@ -103,6 +111,7 @@
     "pais": "BR",
     "estado": "GO",
     "cidade": "Jataí",
-    "estadio": "Arapucão"
+    "estadio": "Arapucão",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/d0f6hv1754066793.png"
   }
 ]

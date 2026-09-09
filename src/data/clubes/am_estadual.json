@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pzlh1q1767023556.png"
   },
   {
     "id": "itacoatiara",
@@ -17,7 +18,8 @@
     "nome_popular": "Itacoatiara",
     "pais": "BR",
     "estado": "AM",
-    "cidade": "Itacoatiara"
+    "cidade": "Itacoatiara",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/iqzotv1767024269.png"
   },
   {
     "id": "nacional_am",
@@ -41,7 +43,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/50h5jf1713439328.png"
   },
   {
     "id": "parintins",
@@ -49,7 +52,8 @@
     "nome_popular": "Parintins",
     "pais": "BR",
     "estado": "AM",
-    "cidade": "Parintins"
+    "cidade": "Parintins",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jb13c61754110230.png"
   },
   {
     "id": "princesa_do_solimoes",
@@ -58,7 +62,8 @@
     "pais": "BR",
     "estado": "AM",
     "cidade": "Manacapuru",
-    "estadio": "Gilbertão"
+    "estadio": "Gilbertão",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/s5y7uc1677056373.png"
   },
   {
     "id": "sao_raimundo_am",

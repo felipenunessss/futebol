@@ -1,34 +1,401 @@
 [
-  { "id": "colo_colo", "nome": "Club Social y Deportivo Colo-Colo", "nome_popular": "Colo-Colo", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1673 },
-  { "id": "universidad_de_chile", "nome": "Club Universidad de Chile", "nome_popular": "U. de Chile", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1627 },
-  { "id": "universidad_catolica", "nome": "Club Deportivo Universidad Católica", "nome_popular": "U. Católica", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1638 },
-  { "id": "audax_italiano", "nome": "Audax Italiano La Florida", "nome_popular": "Audax Italiano", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1556 },
-  { "id": "cobresal", "nome": "Club de Deportes Cobresal", "nome_popular": "Cobresal", "pais": "CL", "cidade": "El Salvador", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1470 },
-  { "id": "coquimbo_unido", "nome": "Club Social y Deportivo Coquimbo Unido", "nome_popular": "Coquimbo Unido", "pais": "CL", "cidade": "Coquimbo", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1627 },
-  { "id": "deportes_concepcion", "nome": "Club de Deportes Concepción", "nome_popular": "Deportes Concepción", "pais": "CL", "cidade": "Concepción", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1532 },
-  { "id": "deportes_la_serena", "nome": "Club de Deportes La Serena", "nome_popular": "La Serena", "pais": "CL", "cidade": "La Serena", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1469 },
-  { "id": "deportes_limache", "nome": "Club Deportivo Deportes Limache", "nome_popular": "Deportes Limache", "pais": "CL", "cidade": "Limache", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1536 },
-  { "id": "everton_cl", "nome": "Everton de Viña del Mar", "nome_popular": "Everton", "pais": "CL", "cidade": "Viña del Mar", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1535 },
-  { "id": "huachipato", "nome": "Club Deportivo Acero Huachipato", "nome_popular": "Huachipato", "pais": "CL", "cidade": "Talcahuano", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1518 },
-  { "id": "nublense", "nome": "Club de Deportes Ñublense", "nome_popular": "Ñublense", "pais": "CL", "cidade": "Chillán", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1563 },
-  { "id": "ohiggins", "nome": "Club Social y Deportivo O'Higgins", "nome_popular": "O'Higgins", "pais": "CL", "cidade": "Rancagua", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1569 },
-  { "id": "palestino", "nome": "Club Deportivo Palestino", "nome_popular": "Palestino", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1552 },
-  { "id": "union_la_calera", "nome": "Club de Deportes Unión La Calera", "nome_popular": "Unión La Calera", "pais": "CL", "cidade": "La Calera", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1490 },
-  { "id": "universidad_de_concepcion", "nome": "Club Deportes Universidad de Concepción", "nome_popular": "U. de Concepción", "pais": "CL", "cidade": "Concepción", "divisao_nacional": { "pais": "CL", "nivel": 1 }, "rating_inicial": 1453 },
-  { "id": "san_marcos_de_arica", "nome": "Club Deportivo San Marcos de Arica", "nome_popular": "San Marcos de Arica", "pais": "CL", "cidade": "Arica", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_iquique", "nome": "Club de Deportes Iquique", "nome_popular": "Deportes Iquique", "pais": "CL", "cidade": "Iquique", "divisao_nacional": { "pais": "CL", "nivel": 2 }, "rating_inicial": 1496 },
-  { "id": "cobreloa", "nome": "Club de Deportes Cobreloa", "nome_popular": "Cobreloa", "pais": "CL", "cidade": "Calama", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_antofagasta", "nome": "Club de Deportes Antofagasta", "nome_popular": "Deportes Antofagasta", "pais": "CL", "cidade": "Antofagasta", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_copiapo", "nome": "Club de Deportes Copiapó", "nome_popular": "Deportes Copiapó", "pais": "CL", "cidade": "Copiapó", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "san_luis_de_quillota", "nome": "Club de Deportes San Luis de Quillota", "nome_popular": "San Luis de Quillota", "pais": "CL", "cidade": "Quillota", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "santiago_wanderers", "nome": "Club de Deportes Santiago Wanderers", "nome_popular": "Santiago Wanderers", "pais": "CL", "cidade": "Valparaíso", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "union_san_felipe", "nome": "Club Social y Deportivo Unión San Felipe", "nome_popular": "Unión San Felipe", "pais": "CL", "cidade": "San Felipe", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_recoleta", "nome": "Club Deportivo Recoleta", "nome_popular": "Deportes Recoleta", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "magallanes", "nome": "Club Social y Deportivo Magallanes", "nome_popular": "Magallanes", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "union_espanola", "nome": "Club Deportivo Unión Española", "nome_popular": "Unión Española", "pais": "CL", "cidade": "Santiago", "divisao_nacional": { "pais": "CL", "nivel": 2 }, "rating_inicial": 1477 },
-  { "id": "deportes_santa_cruz", "nome": "Club Deportivo Santa Cruz", "nome_popular": "Deportes Santa Cruz", "pais": "CL", "cidade": "Santa Cruz", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "curico_unido", "nome": "Club de Deportes Curicó Unido", "nome_popular": "Curicó Unido", "pais": "CL", "cidade": "Curicó", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "rangers_talca", "nome": "Club Social y Deportivo Rangers", "nome_popular": "Rangers de Talca", "pais": "CL", "cidade": "Talca", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_temuco", "nome": "Club de Deportes Temuco", "nome_popular": "Deportes Temuco", "pais": "CL", "cidade": "Temuco", "divisao_nacional": { "pais": "CL", "nivel": 2 } },
-  { "id": "deportes_puerto_montt", "nome": "Club de Deportes Puerto Montt", "nome_popular": "Deportes Puerto Montt", "pais": "CL", "cidade": "Puerto Montt", "divisao_nacional": { "pais": "CL", "nivel": 2 } }
+  {
+    "id": "colo_colo",
+    "nome": "Club Social y Deportivo Colo-Colo",
+    "nome_popular": "Colo-Colo",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1673
+  },
+  {
+    "id": "universidad_de_chile",
+    "nome": "Club Universidad de Chile",
+    "nome_popular": "U. de Chile",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1627
+  },
+  {
+    "id": "universidad_catolica",
+    "nome": "Club Deportivo Universidad Católica",
+    "nome_popular": "U. Católica",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1638
+  },
+  {
+    "id": "audax_italiano",
+    "nome": "Audax Italiano La Florida",
+    "nome_popular": "Audax Italiano",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1556
+  },
+  {
+    "id": "cobresal",
+    "nome": "Club de Deportes Cobresal",
+    "nome_popular": "Cobresal",
+    "pais": "CL",
+    "cidade": "El Salvador",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1470
+  },
+  {
+    "id": "coquimbo_unido",
+    "nome": "Club Social y Deportivo Coquimbo Unido",
+    "nome_popular": "Coquimbo Unido",
+    "pais": "CL",
+    "cidade": "Coquimbo",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1627
+  },
+  {
+    "id": "deportes_concepcion",
+    "nome": "Club de Deportes Concepción",
+    "nome_popular": "Deportes Concepción",
+    "pais": "CL",
+    "cidade": "Concepción",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1532,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bn8l9d1719394347.png",
+    "cor_primaria": "#64368D",
+    "cor_secundaria": "#FFFFFF"
+  },
+  {
+    "id": "deportes_la_serena",
+    "nome": "Club de Deportes La Serena",
+    "nome_popular": "La Serena",
+    "pais": "CL",
+    "cidade": "La Serena",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1469,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vs7mxv1677600646.png"
+  },
+  {
+    "id": "deportes_limache",
+    "nome": "Club Deportivo Deportes Limache",
+    "nome_popular": "Deportes Limache",
+    "pais": "CL",
+    "cidade": "Limache",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1536,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1bd0ws1706521384.png"
+  },
+  {
+    "id": "everton_cl",
+    "nome": "Everton de Viña del Mar",
+    "nome_popular": "Everton",
+    "pais": "CL",
+    "cidade": "Viña del Mar",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1535,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/eqayrf1523184794.png",
+    "cor_primaria": "#003399",
+    "cor_secundaria": "#FFFFFF"
+  },
+  {
+    "id": "huachipato",
+    "nome": "Club Deportivo Acero Huachipato",
+    "nome_popular": "Huachipato",
+    "pais": "CL",
+    "cidade": "Talcahuano",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1518,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/uhzow91736214236.png"
+  },
+  {
+    "id": "nublense",
+    "nome": "Club de Deportes Ñublense",
+    "nome_popular": "Ñublense",
+    "pais": "CL",
+    "cidade": "Chillán",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1563,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0jpiwm1610649915.png"
+  },
+  {
+    "id": "ohiggins",
+    "nome": "Club Social y Deportivo O'Higgins",
+    "nome_popular": "O'Higgins",
+    "pais": "CL",
+    "cidade": "Rancagua",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1569
+  },
+  {
+    "id": "palestino",
+    "nome": "Club Deportivo Palestino",
+    "nome_popular": "Palestino",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1552,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/62site1756091114.png"
+  },
+  {
+    "id": "union_la_calera",
+    "nome": "Club de Deportes Unión La Calera",
+    "nome_popular": "Unión La Calera",
+    "pais": "CL",
+    "cidade": "La Calera",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1490,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vadt5t1769834071.png"
+  },
+  {
+    "id": "universidad_de_concepcion",
+    "nome": "Club Deportes Universidad de Concepción",
+    "nome_popular": "U. de Concepción",
+    "pais": "CL",
+    "cidade": "Concepción",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 1
+    },
+    "rating_inicial": 1453,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/rwbqxy1624628427.png"
+  },
+  {
+    "id": "san_marcos_de_arica",
+    "nome": "Club Deportivo San Marcos de Arica",
+    "nome_popular": "San Marcos de Arica",
+    "pais": "CL",
+    "cidade": "Arica",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/r0f5fk1681108567.png"
+  },
+  {
+    "id": "deportes_iquique",
+    "nome": "Club de Deportes Iquique",
+    "nome_popular": "Deportes Iquique",
+    "pais": "CL",
+    "cidade": "Iquique",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "rating_inicial": 1496,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/noodnh1756084851.png"
+  },
+  {
+    "id": "cobreloa",
+    "nome": "Club de Deportes Cobreloa",
+    "nome_popular": "Cobreloa",
+    "pais": "CL",
+    "cidade": "Calama",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/y971we1756782437.png"
+  },
+  {
+    "id": "deportes_antofagasta",
+    "nome": "Club de Deportes Antofagasta",
+    "nome_popular": "Deportes Antofagasta",
+    "pais": "CL",
+    "cidade": "Antofagasta",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/01yji51602188105.png"
+  },
+  {
+    "id": "deportes_copiapo",
+    "nome": "Club de Deportes Copiapó",
+    "nome_popular": "Deportes Copiapó",
+    "pais": "CL",
+    "cidade": "Copiapó",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lzii2a1611771823.png"
+  },
+  {
+    "id": "san_luis_de_quillota",
+    "nome": "Club de Deportes San Luis de Quillota",
+    "nome_popular": "San Luis de Quillota",
+    "pais": "CL",
+    "cidade": "Quillota",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/s9fnfi1610649930.png"
+  },
+  {
+    "id": "santiago_wanderers",
+    "nome": "Club de Deportes Santiago Wanderers",
+    "nome_popular": "Santiago Wanderers",
+    "pais": "CL",
+    "cidade": "Valparaíso",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ablr721757220570.png"
+  },
+  {
+    "id": "union_san_felipe",
+    "nome": "Club Social y Deportivo Unión San Felipe",
+    "nome_popular": "Unión San Felipe",
+    "pais": "CL",
+    "cidade": "San Felipe",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mj9p961734970963.png"
+  },
+  {
+    "id": "deportes_recoleta",
+    "nome": "Club Deportivo Recoleta",
+    "nome_popular": "Deportes Recoleta",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/q0tu3t1697646634.png"
+  },
+  {
+    "id": "magallanes",
+    "nome": "Club Social y Deportivo Magallanes",
+    "nome_popular": "Magallanes",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ky0u9y1757129967.png"
+  },
+  {
+    "id": "union_espanola",
+    "nome": "Club Deportivo Unión Española",
+    "nome_popular": "Unión Española",
+    "pais": "CL",
+    "cidade": "Santiago",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "rating_inicial": 1477,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3ixbl71756141900.png"
+  },
+  {
+    "id": "deportes_santa_cruz",
+    "nome": "Club Deportivo Santa Cruz",
+    "nome_popular": "Deportes Santa Cruz",
+    "pais": "CL",
+    "cidade": "Santa Cruz",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/15m53x1610649871.png"
+  },
+  {
+    "id": "curico_unido",
+    "nome": "Club de Deportes Curicó Unido",
+    "nome_popular": "Curicó Unido",
+    "pais": "CL",
+    "cidade": "Curicó",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/chf0p61756787786.png"
+  },
+  {
+    "id": "rangers_talca",
+    "nome": "Club Social y Deportivo Rangers",
+    "nome_popular": "Rangers de Talca",
+    "pais": "CL",
+    "cidade": "Talca",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ybf68r1610649923.png"
+  },
+  {
+    "id": "deportes_temuco",
+    "nome": "Club de Deportes Temuco",
+    "nome_popular": "Deportes Temuco",
+    "pais": "CL",
+    "cidade": "Temuco",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/gzz5os1677471036.png"
+  },
+  {
+    "id": "deportes_puerto_montt",
+    "nome": "Club de Deportes Puerto Montt",
+    "nome_popular": "Deportes Puerto Montt",
+    "pais": "CL",
+    "cidade": "Puerto Montt",
+    "divisao_nacional": {
+      "pais": "CL",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/k1wdah1677471408.png"
+  }
 ]

@@ -1,30 +1,342 @@
 [
-  { "id": "aucas", "nome": "Sociedad Deportiva Aucas", "nome_popular": "Aucas", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1601 },
-  { "id": "barcelona_sc", "nome": "Barcelona Sporting Club", "nome_popular": "Barcelona", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1625 },
-  { "id": "delfin", "nome": "Delfín Sporting Club", "nome_popular": "Delfín", "pais": "EC", "cidade": "Manta", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1483 },
-  { "id": "deportivo_cuenca", "nome": "Club Deportivo Cuenca", "nome_popular": "Deportivo Cuenca", "pais": "EC", "cidade": "Cuenca", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1531 },
-  { "id": "el_nacional", "nome": "Club Deportivo El Nacional", "nome_popular": "El Nacional", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 2 }, "rating_inicial": 1509 },
-  { "id": "emelec", "nome": "Club Sport Emelec", "nome_popular": "Emelec", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1556 },
-  { "id": "guayaquil_city", "nome": "Guayaquil City Fútbol Club", "nome_popular": "Guayaquil City", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1553 },
-  { "id": "independiente_del_valle", "nome": "Independiente del Valle", "nome_popular": "Independiente del Valle", "pais": "EC", "cidade": "Sangolquí", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1760 },
-  { "id": "ldu_quito", "nome": "Liga Deportiva Universitaria de Quito", "nome_popular": "LDU Quito", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1689 },
-  { "id": "leones_ec", "nome": "Leones Fútbol Club", "nome_popular": "Leones", "pais": "EC", "cidade": "Atuntaqui", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1559 },
-  { "id": "libertad_ec", "nome": "Libertad Fútbol Club", "nome_popular": "Libertad", "pais": "EC", "cidade": "Loja", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1566 },
-  { "id": "macara", "nome": "Club Social y Deportivo Macará", "nome_popular": "Macará", "pais": "EC", "cidade": "Ambato", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1629 },
-  { "id": "manta_fc", "nome": "Manta Fútbol Club", "nome_popular": "Manta", "pais": "EC", "cidade": "Manta", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1444 },
-  { "id": "mushuc_runa", "nome": "Club Mushuc Runa", "nome_popular": "Mushuc Runa", "pais": "EC", "cidade": "Ambato", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1559 },
-  { "id": "orense", "nome": "Orense Sporting Club", "nome_popular": "Orense", "pais": "EC", "cidade": "Machala", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1534 },
-  { "id": "tecnico_universitario", "nome": "Club Técnico Universitario", "nome_popular": "Técnico Universitario", "pais": "EC", "cidade": "Ambato", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1487 },
-  { "id": "universidad_catolica_ec", "nome": "Club Deportivo Universidad Católica", "nome_popular": "Universidad Católica", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 1 }, "rating_inicial": 1659 },
-  { "id": "de_julio_22", "nome": "22 de Julio Fútbol Club", "nome_popular": "22 de Julio", "pais": "EC", "cidade": "Esmeraldas", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "de_octubre_9", "nome": "9 de Octubre Fútbol Club", "nome_popular": "9 de Octubre", "pais": "EC", "cidade": "La Troncal", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "atletico_rojiblanco", "nome": "Atlético Rojiblanco Fútbol Club", "nome_popular": "Atlético Rojiblanco", "pais": "EC", "cidade": "Guayaquil", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "cuenca_juniors", "nome": "Club Deportivo Cuenca Juniors", "nome_popular": "Cuenca Juniors", "pais": "EC", "cidade": "Cuenca", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "cumbaya_fc", "nome": "Cumbayá Fútbol Club", "nome_popular": "Cumbayá", "pais": "EC", "cidade": "Cayambe", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "gualaceo", "nome": "Gualaceo Sporting Club", "nome_popular": "Gualaceo", "pais": "EC", "cidade": "Gualaceo", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "independiente_juniors_ec", "nome": "Club Deportivo Independiente Juniors", "nome_popular": "Independiente Juniors", "pais": "EC", "cidade": "Sangolquí", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "liga_portoviejo", "nome": "Liga Deportiva Universitaria de Portoviejo", "nome_popular": "Liga de Portoviejo", "pais": "EC", "cidade": "Portoviejo", "estadio": "Reales Tamarindos", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "san_antonio_ec", "nome": "San Antonio Fútbol Club", "nome_popular": "San Antonio", "pais": "EC", "cidade": "Ibarra", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "santo_domingo_ec", "nome": "Sociedad Deportivo Santo Domingo", "nome_popular": "Santo Domingo", "pais": "EC", "cidade": "Santo Domingo", "divisao_nacional": { "pais": "EC", "nivel": 2 } },
-  { "id": "vinotinto_ecuador", "nome": "Vinotinto del Ecuador Fútbol Club", "nome_popular": "Vinotinto Ecuador", "pais": "EC", "cidade": "Quito", "divisao_nacional": { "pais": "EC", "nivel": 2 }, "rating_inicial": 1498 }
+  {
+    "id": "aucas",
+    "nome": "Sociedad Deportiva Aucas",
+    "nome_popular": "Aucas",
+    "pais": "EC",
+    "cidade": "Quito",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1601,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6vf1py1770395139.png"
+  },
+  {
+    "id": "barcelona_sc",
+    "nome": "Barcelona Sporting Club",
+    "nome_popular": "Barcelona",
+    "pais": "EC",
+    "cidade": "Guayaquil",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1625,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wq9sir1639406443.png",
+    "cor_primaria": "#004d98",
+    "cor_secundaria": "#a50044"
+  },
+  {
+    "id": "delfin",
+    "nome": "Delfín Sporting Club",
+    "nome_popular": "Delfín",
+    "pais": "EC",
+    "cidade": "Manta",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1483,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/drhsv91579961166.png"
+  },
+  {
+    "id": "deportivo_cuenca",
+    "nome": "Club Deportivo Cuenca",
+    "nome_popular": "Deportivo Cuenca",
+    "pais": "EC",
+    "cidade": "Cuenca",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1531,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lb2br81736221977.png"
+  },
+  {
+    "id": "el_nacional",
+    "nome": "Club Deportivo El Nacional",
+    "nome_popular": "El Nacional",
+    "pais": "EC",
+    "cidade": "Quito",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    },
+    "rating_inicial": 1509,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/d1bstv1736221692.png"
+  },
+  {
+    "id": "emelec",
+    "nome": "Club Sport Emelec",
+    "nome_popular": "Emelec",
+    "pais": "EC",
+    "cidade": "Guayaquil",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1556,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/15ovlq1579959696.png"
+  },
+  {
+    "id": "guayaquil_city",
+    "nome": "Guayaquil City Fútbol Club",
+    "nome_popular": "Guayaquil City",
+    "pais": "EC",
+    "cidade": "Guayaquil",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1553,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/9lgwun1740586446.png"
+  },
+  {
+    "id": "independiente_del_valle",
+    "nome": "Independiente del Valle",
+    "nome_popular": "Independiente del Valle",
+    "pais": "EC",
+    "cidade": "Sangolquí",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1760,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qku0lv1737622736.png"
+  },
+  {
+    "id": "ldu_quito",
+    "nome": "Liga Deportiva Universitaria de Quito",
+    "nome_popular": "LDU Quito",
+    "pais": "EC",
+    "cidade": "Quito",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1689,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/5tf5ch1736404372.png"
+  },
+  {
+    "id": "leones_ec",
+    "nome": "Leones Fútbol Club",
+    "nome_popular": "Leones",
+    "pais": "EC",
+    "cidade": "Atuntaqui",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1559,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/q8yw9a1734021908.png"
+  },
+  {
+    "id": "libertad_ec",
+    "nome": "Libertad Fútbol Club",
+    "nome_popular": "Libertad",
+    "pais": "EC",
+    "cidade": "Loja",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1566
+  },
+  {
+    "id": "macara",
+    "nome": "Club Social y Deportivo Macará",
+    "nome_popular": "Macará",
+    "pais": "EC",
+    "cidade": "Ambato",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1629,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bretri1579959665.png"
+  },
+  {
+    "id": "manta_fc",
+    "nome": "Manta Fútbol Club",
+    "nome_popular": "Manta",
+    "pais": "EC",
+    "cidade": "Manta",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1444
+  },
+  {
+    "id": "mushuc_runa",
+    "nome": "Club Mushuc Runa",
+    "nome_popular": "Mushuc Runa",
+    "pais": "EC",
+    "cidade": "Ambato",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1559
+  },
+  {
+    "id": "orense",
+    "nome": "Orense Sporting Club",
+    "nome_popular": "Orense",
+    "pais": "EC",
+    "cidade": "Machala",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1534
+  },
+  {
+    "id": "tecnico_universitario",
+    "nome": "Club Técnico Universitario",
+    "nome_popular": "Técnico Universitario",
+    "pais": "EC",
+    "cidade": "Ambato",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1487
+  },
+  {
+    "id": "universidad_catolica_ec",
+    "nome": "Club Deportivo Universidad Católica",
+    "nome_popular": "Universidad Católica",
+    "pais": "EC",
+    "cidade": "Quito",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 1
+    },
+    "rating_inicial": 1659
+  },
+  {
+    "id": "de_julio_22",
+    "nome": "22 de Julio Fútbol Club",
+    "nome_popular": "22 de Julio",
+    "pais": "EC",
+    "cidade": "Esmeraldas",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "de_octubre_9",
+    "nome": "9 de Octubre Fútbol Club",
+    "nome_popular": "9 de Octubre",
+    "pais": "EC",
+    "cidade": "La Troncal",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "atletico_rojiblanco",
+    "nome": "Atlético Rojiblanco Fútbol Club",
+    "nome_popular": "Atlético Rojiblanco",
+    "pais": "EC",
+    "cidade": "Guayaquil",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "cuenca_juniors",
+    "nome": "Club Deportivo Cuenca Juniors",
+    "nome_popular": "Cuenca Juniors",
+    "pais": "EC",
+    "cidade": "Cuenca",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "cumbaya_fc",
+    "nome": "Cumbayá Fútbol Club",
+    "nome_popular": "Cumbayá",
+    "pais": "EC",
+    "cidade": "Cayambe",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "gualaceo",
+    "nome": "Gualaceo Sporting Club",
+    "nome_popular": "Gualaceo",
+    "pais": "EC",
+    "cidade": "Gualaceo",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "independiente_juniors_ec",
+    "nome": "Club Deportivo Independiente Juniors",
+    "nome_popular": "Independiente Juniors",
+    "pais": "EC",
+    "cidade": "Sangolquí",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "liga_portoviejo",
+    "nome": "Liga Deportiva Universitaria de Portoviejo",
+    "nome_popular": "Liga de Portoviejo",
+    "pais": "EC",
+    "cidade": "Portoviejo",
+    "estadio": "Reales Tamarindos",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "san_antonio_ec",
+    "nome": "San Antonio Fútbol Club",
+    "nome_popular": "San Antonio",
+    "pais": "EC",
+    "cidade": "Ibarra",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "santo_domingo_ec",
+    "nome": "Sociedad Deportivo Santo Domingo",
+    "nome_popular": "Santo Domingo",
+    "pais": "EC",
+    "cidade": "Santo Domingo",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "vinotinto_ecuador",
+    "nome": "Vinotinto del Ecuador Fútbol Club",
+    "nome_popular": "Vinotinto Ecuador",
+    "pais": "EC",
+    "cidade": "Quito",
+    "divisao_nacional": {
+      "pais": "EC",
+      "nivel": 2
+    },
+    "rating_inicial": 1498
+  }
 ]

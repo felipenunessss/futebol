@@ -57,7 +57,8 @@
     "nome_popular": "Teresina",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Teresina"
+    "cidade": "Teresina",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/kgf6j21769532799.png"
   },
   {
     "id": "parnahyba",
@@ -77,6 +78,7 @@
     "nome_popular": "CAP",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Teresina"
+    "cidade": "Teresina",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7h7ob81626384199.png"
   }
 ]

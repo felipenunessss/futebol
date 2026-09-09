@@ -12,6 +12,7 @@ import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
 import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
+import { Escudo } from "../../components/Escudo.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
@@ -39,6 +40,10 @@ const LABEL_SUBTIPO: Record<SubtipoChance, string> = {
   passe_decisivo: "passe decisivo",
   desarme_decisivo: "desarme decisivo",
 };
+
+function escudoDoClube(clubePorId: Map<string, Club>, id: string): string | undefined {
+  return clubePorId.get(id)?.escudo_url;
+}
 
 function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
   const clube = clubePorId.get(id);
@@ -110,6 +115,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         <Cabecalho
           estado={estadoAtual}
           nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
+          escudoClube={escudoDoClube(clubePorId, estadoAtual.clubeAtualId)}
           nomeDaNacionalidade={nomeDaNacionalidade}
           estatisticasCarreira={estatisticasCarreira}
           nomePorCampeonato={nomePorCampeonato}
@@ -204,6 +210,7 @@ function PainelDeCompeticoes({
 function Cabecalho({
   estado,
   nomeClube,
+  escudoClube,
   nomeDaNacionalidade,
   estatisticasCarreira,
   nomePorCampeonato,
@@ -212,6 +219,7 @@ function Cabecalho({
 }: {
   estado: EstadoDeCarreira;
   nomeClube: string;
+  escudoClube: string | undefined;
   nomeDaNacionalidade: string | undefined;
   estatisticasCarreira: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
@@ -229,7 +237,8 @@ function Cabecalho({
         <h1 className="text-xl font-semibold">
           {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {nomeDaNacionalidade}
         </h1>
-        <span className="text-sm text-slate-400">
+        <span className="text-sm text-slate-400 flex items-center gap-1.5">
+          <Escudo url={escudoClube} alt={nomeClube} tamanho={18} />
           {nomeClube} · Temporada {estado.temporada}
         </span>
       </div>
@@ -491,12 +500,18 @@ function PainelPrePartida({
       </div>
       <div className="flex items-center justify-center gap-4">
         <div className="text-right flex-1">
-          <div className="font-semibold">{mandanteNome}</div>
+          <div className="font-semibold flex items-center justify-end gap-1.5">
+            {mandanteNome}
+            <Escudo url={escudoDoClube(clubePorId, contexto.mandanteId)} alt={mandanteNome} />
+          </div>
           <div className="text-xs text-slate-400">{posicaoMandante ? `${posicaoMandante}º colocado` : "posição ainda não disponível"}</div>
         </div>
         <span className="text-slate-500 text-sm">x</span>
         <div className="text-left flex-1">
-          <div className="font-semibold">{visitanteNome}</div>
+          <div className="font-semibold flex items-center gap-1.5">
+            <Escudo url={escudoDoClube(clubePorId, contexto.visitanteId)} alt={visitanteNome} />
+            {visitanteNome}
+          </div>
           <div className="text-xs text-slate-400">{posicaoVisitante ? `${posicaoVisitante}º colocado` : "posição ainda não disponível"}</div>
         </div>
       </div>
@@ -558,11 +573,17 @@ function PainelPartidaAoVivo({
         Ao vivo — {partida.minutoAtual}'
       </div>
       <div className="flex items-center justify-center gap-4">
-        <span className="text-right flex-1 font-medium">{mandanteNome}</span>
+        <span className="text-right flex-1 font-medium flex items-center justify-end gap-1.5">
+          {mandanteNome}
+          <Escudo url={escudoDoClube(clubePorId, partida.mandanteId)} alt={mandanteNome} />
+        </span>
         <span className="tabular-nums text-2xl font-bold px-2">
           {partida.golsCasa} x {partida.golsFora}
         </span>
-        <span className="text-left flex-1 font-medium">{visitanteNome}</span>
+        <span className="text-left flex-1 font-medium flex items-center gap-1.5">
+          <Escudo url={escudoDoClube(clubePorId, partida.visitanteId)} alt={visitanteNome} />
+          {visitanteNome}
+        </span>
       </div>
       <div ref={listaRef} className="flex flex-col gap-1 max-h-56 overflow-y-auto text-sm text-slate-300 border-t border-slate-800 pt-2">
         {partida.eventos.length === 0 ? (
@@ -889,11 +910,17 @@ function PainelResultadoDaRodada({
                 key={indice}
                 className={`flex items-center justify-between rounded-lg px-3 py-1.5 ${c.ehDoJogador ? "bg-emerald-950/60 border border-emerald-800" : "bg-slate-800/60"}`}
               >
-                <span className="flex-1 text-right truncate">{nomeDoClube(clubePorId, c.mandanteId)}</span>
+                <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+                  {nomeDoClube(clubePorId, c.mandanteId)}
+                  <Escudo url={escudoDoClube(clubePorId, c.mandanteId)} alt="" tamanho={16} />
+                </span>
                 <span className="px-3 font-medium tabular-nums shrink-0">
                   {c.golsCasa} x {c.golsFora}
                 </span>
-                <span className="flex-1 truncate">{nomeDoClube(clubePorId, c.visitanteId)}</span>
+                <span className="flex-1 flex items-center gap-1.5 truncate">
+                  <Escudo url={escudoDoClube(clubePorId, c.visitanteId)} alt="" tamanho={16} />
+                  {nomeDoClube(clubePorId, c.visitanteId)}
+                </span>
               </div>
             ))}
           </div>
@@ -910,11 +937,17 @@ function PainelResultadoDaRodada({
             {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — {resultadoDaRodada.etapa}, resultado
           </h2>
           <div className="flex items-center justify-between rounded-lg px-3 py-1.5 bg-emerald-950/60 border border-emerald-800 text-sm">
-            <span className="flex-1 text-right truncate">{nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}</span>
+            <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+              {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}
+              <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)} alt="" tamanho={16} />
+            </span>
             <span className="px-3 font-medium tabular-nums shrink-0">
               {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
             </span>
-            <span className="flex-1 truncate">{nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}</span>
+            <span className="flex-1 flex items-center gap-1.5 truncate">
+              <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)} alt="" tamanho={16} />
+              {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
+            </span>
           </div>
           <p className={resultadoDaRodada.eliminado ? "text-slate-400 text-sm" : "text-emerald-400 text-sm font-medium"}>
             {resultadoDaRodada.eliminado ? "Eliminado(a) dessa competição." : "Avançou para a próxima fase!"}
@@ -963,7 +996,12 @@ function TabelaCard({
             {tabela.slice(0, 10).map((linha, indice) => (
               <tr key={linha.clubeId} className="border-t border-slate-800">
                 <td className="pr-2 py-1">{indice + 1}</td>
-                <td className="pr-2 py-1">{nomeDoClube(clubePorId, linha.clubeId)}</td>
+                <td className="pr-2 py-1">
+                  <span className="flex items-center gap-1.5">
+                    <Escudo url={escudoDoClube(clubePorId, linha.clubeId)} alt="" tamanho={14} />
+                    {nomeDoClube(clubePorId, linha.clubeId)}
+                  </span>
+                </td>
                 <td className="pr-2 py-1 text-right">{linha.pontos}</td>
                 <td className="pr-2 py-1 text-right">{linha.jogos}</td>
                 <td className="pr-2 py-1 text-right">{linha.vitorias}</td>

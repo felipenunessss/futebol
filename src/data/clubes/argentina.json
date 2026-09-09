@@ -1,70 +1,938 @@
 [
-  { "id": "boca_juniors", "nome": "Club Atlético Boca Juniors", "nome_popular": "Boca Juniors", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1733 },
-  { "id": "independiente", "nome": "Club Atlético Independiente", "nome_popular": "Independiente", "pais": "AR", "estado": "Buenos Aires", "cidade": "Avellaneda", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1671 },
-  { "id": "san_lorenzo", "nome": "Club Atlético San Lorenzo de Almagro", "nome_popular": "San Lorenzo", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1623 },
-  { "id": "deportivo_riestra", "nome": "Club Atlético Deportivo Riestra", "nome_popular": "Riestra", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1601 },
-  { "id": "talleres_cordoba", "nome": "Club Atlético Talleres", "nome_popular": "Talleres", "pais": "AR", "estado": "Córdoba", "cidade": "Córdoba", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1626 },
-  { "id": "instituto_cordoba", "nome": "Instituto Atlético Central Córdoba", "nome_popular": "Instituto", "pais": "AR", "estado": "Córdoba", "cidade": "Córdoba", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1649 },
-  { "id": "platense", "nome": "Club Atlético Platense", "nome_popular": "Platense", "pais": "AR", "estado": "Buenos Aires", "cidade": "Vicente López", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1610 },
-  { "id": "estudiantes_lp", "nome": "Club Estudiantes de La Plata", "nome_popular": "Estudiantes (LP)", "pais": "AR", "estado": "Buenos Aires", "cidade": "La Plata", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1701 },
-  { "id": "gimnasia_mendoza", "nome": "Gimnasia y Esgrima de Mendoza", "nome_popular": "Gimnasia (Mendoza)", "pais": "AR", "estado": "Mendoza", "cidade": "Mendoza", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1637 },
-  { "id": "velez_sarsfield", "nome": "Club Atlético Vélez Sarsfield", "nome_popular": "Vélez", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1697 },
-  { "id": "newells_old_boys", "nome": "Club Atlético Newell's Old Boys", "nome_popular": "Newell's", "pais": "AR", "estado": "Santa Fe", "cidade": "Rosario", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1592 },
-  { "id": "union_santa_fe", "nome": "Club Atlético Unión", "nome_popular": "Unión", "pais": "AR", "estado": "Santa Fe", "cidade": "Santa Fe", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1624 },
-  { "id": "lanus", "nome": "Club Atlético Lanús", "nome_popular": "Lanús", "pais": "AR", "estado": "Buenos Aires", "cidade": "Lanús", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1659 },
-  { "id": "central_cordoba_sde", "nome": "Club Atlético Central Córdoba (Santiago del Estero)", "nome_popular": "Central Córdoba (SdE)", "pais": "AR", "estado": "Santiago del Estero", "cidade": "Santiago del Estero", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1606 },
-  { "id": "defensa_y_justicia", "nome": "Club Social y Deportivo Defensa y Justicia", "nome_popular": "Defensa y Justicia", "pais": "AR", "estado": "Buenos Aires", "cidade": "Florencio Varela", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1618 },
-
-  { "id": "river_plate", "nome": "Club Atlético River Plate", "nome_popular": "River Plate", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1707 },
-  { "id": "racing_club", "nome": "Racing Club", "nome_popular": "Racing Club", "pais": "AR", "estado": "Buenos Aires", "cidade": "Avellaneda", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1699 },
-  { "id": "huracan", "nome": "Club Atlético Huracán", "nome_popular": "Huracán", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1656 },
-  { "id": "barracas_central", "nome": "Club Atlético Barracas Central", "nome_popular": "Barracas Central", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1603 },
-  { "id": "belgrano_cordoba", "nome": "Club Atlético Belgrano", "nome_popular": "Belgrano", "pais": "AR", "estado": "Córdoba", "cidade": "Córdoba", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1675 },
-  { "id": "estudiantes_rio_cuarto", "nome": "Asociación Atlética Estudiantes (Río Cuarto)", "nome_popular": "Estudiantes (RC)", "pais": "AR", "estado": "Córdoba", "cidade": "Río Cuarto", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1539 },
-  { "id": "independiente_rivadavia", "nome": "Club Sportivo Independiente Rivadavia", "nome_popular": "Independiente Rivadavia", "pais": "AR", "estado": "Mendoza", "cidade": "Mendoza", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1714 },
-  { "id": "gimnasia_la_plata", "nome": "Club de Gimnasia y Esgrima La Plata", "nome_popular": "Gimnasia (LP)", "pais": "AR", "estado": "Buenos Aires", "cidade": "La Plata", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1654 },
-  { "id": "tigre", "nome": "Club Atlético Tigre", "nome_popular": "Tigre", "pais": "AR", "estado": "Buenos Aires", "cidade": "Victoria", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1646 },
-  { "id": "argentinos_juniors", "nome": "Asociación Atlética Argentinos Juniors", "nome_popular": "Argentinos Juniors", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1727 },
-  { "id": "sarmiento_junin", "nome": "Club Atlético Sarmiento", "nome_popular": "Sarmiento (Junín)", "pais": "AR", "estado": "Buenos Aires", "cidade": "Junín", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1589 },
-  { "id": "rosario_central", "nome": "Club Atlético Rosario Central", "nome_popular": "Rosario Central", "pais": "AR", "estado": "Santa Fe", "cidade": "Rosario", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1708 },
-  { "id": "banfield", "nome": "Club Atlético Banfield", "nome_popular": "Banfield", "pais": "AR", "estado": "Buenos Aires", "cidade": "Banfield", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1579 },
-  { "id": "atletico_tucuman", "nome": "Club Atlético Tucumán", "nome_popular": "Atlético Tucumán", "pais": "AR", "estado": "Tucumán", "cidade": "San Miguel de Tucumán", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1620 },
-  { "id": "aldosivi", "nome": "Club Atlético Aldosivi", "nome_popular": "Aldosivi", "pais": "AR", "estado": "Buenos Aires", "cidade": "Mar del Plata", "divisao_nacional": { "pais": "AR", "nivel": 1 }, "rating_inicial": 1536 },
-
-  { "id": "acassuso", "nome": "Club Atlético Acassuso", "nome_popular": "Acassuso", "pais": "AR", "estado": "Buenos Aires", "cidade": "Boulogne", "estadio": "La Quema", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1450 },
-  { "id": "agropecuario", "nome": "Club Atlético Agropecuario", "nome_popular": "Agropecuario", "pais": "AR", "estado": "Buenos Aires", "cidade": "Carlos Casares", "estadio": "Ofelia Rosenzuaig", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1540 },
-  { "id": "all_boys", "nome": "Club Atlético All Boys", "nome_popular": "All Boys", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "estadio": "Islas Malvinas", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1520 },
-  { "id": "almagro", "nome": "Club Almagro", "nome_popular": "Almagro", "pais": "AR", "estado": "Buenos Aires", "cidade": "José Ingenieros", "estadio": "Tres de Febrero", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1513 },
-  { "id": "almirante_brown", "nome": "Club Almirante Brown", "nome_popular": "Almirante Brown", "pais": "AR", "estado": "Buenos Aires", "cidade": "San Justo", "estadio": "Fragata Presidente Sarmiento", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1555 },
-  { "id": "atlanta", "nome": "Club Atlético Atlanta", "nome_popular": "Atlanta", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "estadio": "Don León Kolbowsky", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1560 },
-  { "id": "atletico_rafaela", "nome": "Club Atlético Rafaela", "nome_popular": "Atlético de Rafaela", "pais": "AR", "estado": "Santa Fe", "cidade": "Rafaela", "estadio": "Nuevo Monumental", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1531 },
-  { "id": "central_norte_salta", "nome": "Central Norte Atlético Club", "nome_popular": "Central Norte", "pais": "AR", "estado": "Salta", "cidade": "Salta", "estadio": "Padre Ernesto Martearena", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1480 },
-  { "id": "chacarita_juniors", "nome": "Club Atlético Chacarita Juniors", "nome_popular": "Chacarita Juniors", "pais": "AR", "estado": "Buenos Aires", "cidade": "Villa Maipú", "estadio": "Chacarita Juniors", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1517 },
-  { "id": "chaco_for_ever", "nome": "Club Atlético Chaco For Ever", "nome_popular": "Chaco For Ever", "pais": "AR", "estado": "Chaco", "cidade": "Resistencia", "estadio": "Juan Alberto García", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1528 },
-  { "id": "ciudad_de_bolivar", "nome": "Club Ciudad de Bolívar", "nome_popular": "Ciudad de Bolívar", "pais": "AR", "estado": "Buenos Aires", "cidade": "San Carlos de Bolívar", "estadio": "Municipal Eva Perón", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1542 },
-  { "id": "colegiales", "nome": "Club Atlético Colegiales", "nome_popular": "Colegiales", "pais": "AR", "estado": "Buenos Aires", "cidade": "Munro", "estadio": "Libertarios Unidos", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1566 },
-  { "id": "colon_santa_fe", "nome": "Club Atlético Colón", "nome_popular": "Colón", "pais": "AR", "estado": "Santa Fe", "cidade": "Santa Fe", "estadio": "Brigadier General Estanislao López", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1567 },
-  { "id": "defensores_de_belgrano", "nome": "Club Defensores de Belgrano", "nome_popular": "Defensores de Belgrano", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "estadio": "Juan Pasquale", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1534 },
-  { "id": "deportivo_madryn", "nome": "Club Deportivo Madryn", "nome_popular": "Deportivo Madryn", "pais": "AR", "estado": "Chubut", "cidade": "Puerto Madryn", "estadio": "Abel Sastre", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1620 },
-  { "id": "deportivo_maipu", "nome": "Club Deportivo Maipú", "nome_popular": "Deportivo Maipú", "pais": "AR", "estado": "Mendoza", "cidade": "Maipú", "estadio": "Omar Higinio Sperdutti", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1576 },
-  { "id": "deportivo_moron", "nome": "Club Deportivo Morón", "nome_popular": "Deportivo Morón", "pais": "AR", "estado": "Buenos Aires", "cidade": "Morón", "estadio": "Nuevo Francisco Urbano", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1617 },
-  { "id": "estudiantes_caseros", "nome": "Club Atlético Estudiantes", "nome_popular": "Estudiantes (BA)", "pais": "AR", "estado": "Buenos Aires", "cidade": "Caseros", "estadio": "Ciudad de Caseros", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1581 },
-  { "id": "ferrocarril_midland", "nome": "Ferrocarril Midland", "nome_popular": "Ferrocarril Midland", "pais": "AR", "estado": "Buenos Aires", "cidade": "Libertad", "estadio": "Ciudad de Libertad", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1616 },
-  { "id": "ferro_carril_oeste", "nome": "Club Ferro Carril Oeste", "nome_popular": "Ferro Carril Oeste", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "estadio": "Arquitecto Ricardo Etcheverri", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1592 },
-  { "id": "gimnasia_esgrima_jujuy", "nome": "Gimnasia y Esgrima de Jujuy", "nome_popular": "Gimnasia (Jujuy)", "pais": "AR", "estado": "Jujuy", "cidade": "San Salvador de Jujuy", "estadio": "23 de Agosto", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1595 },
-  { "id": "gimnasia_tiro_salta", "nome": "Gimnasia y Tiro", "nome_popular": "Gimnasia y Tiro", "pais": "AR", "estado": "Salta", "cidade": "Salta", "estadio": "Gigante del Norte", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1585 },
-  { "id": "godoy_cruz", "nome": "Club Deportivo Godoy Cruz Antonio Tomba", "nome_popular": "Godoy Cruz", "pais": "AR", "estado": "Mendoza", "cidade": "Godoy Cruz", "estadio": "Feliciano Gambarte", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1606 },
-  { "id": "guemes_santiago", "nome": "Club Atlético Güemes", "nome_popular": "Güemes", "pais": "AR", "estado": "Santiago del Estero", "cidade": "Santiago del Estero", "estadio": "Arturo Miranda", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1480 },
-  { "id": "los_andes", "nome": "Club Atlético Los Andes", "nome_popular": "Los Andes", "pais": "AR", "estado": "Buenos Aires", "cidade": "Lomas de Zamora", "estadio": "Eduardo Gallardón", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1530 },
-  { "id": "mitre_santiago", "nome": "Club Atlético Mitre", "nome_popular": "Mitre", "pais": "AR", "estado": "Santiago del Estero", "cidade": "Santiago del Estero", "estadio": "Doctores José y Antonio Castiglione", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1518 },
-  { "id": "nueva_chicago", "nome": "Club Atlético Nueva Chicago", "nome_popular": "Nueva Chicago", "pais": "AR", "estado": "Buenos Aires", "cidade": "Buenos Aires", "estadio": "Nueva Chicago", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1518 },
-  { "id": "patronato", "nome": "Patronato de la Juventud Católica", "nome_popular": "Patronato", "pais": "AR", "estado": "Entre Ríos", "cidade": "Paraná", "estadio": "Presbítero Bartolomé Grella", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1522 },
-  { "id": "quilmes", "nome": "Quilmes Atlético Club", "nome_popular": "Quilmes", "pais": "AR", "estado": "Buenos Aires", "cidade": "Quilmes", "estadio": "Centenario Ciudad de Quilmes", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1556 },
-  { "id": "racing_cordoba", "nome": "Racing Club de Córdoba", "nome_popular": "Racing (Córdoba)", "pais": "AR", "estado": "Córdoba", "cidade": "Córdoba", "estadio": "Miguel Sancho", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1515 },
-  { "id": "san_martin_sj", "nome": "Club Atlético San Martín", "nome_popular": "San Martín (SJ)", "pais": "AR", "estado": "San Juan", "cidade": "San Juan", "estadio": "Ingeniero Hilario Sánchez", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1599 },
-  { "id": "san_martin_tucuman", "nome": "Club Atlético San Martín", "nome_popular": "San Martín (Tucumán)", "pais": "AR", "estado": "Tucumán", "cidade": "San Miguel de Tucumán", "estadio": "La Ciudadela", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1584 },
-  { "id": "san_miguel", "nome": "Club Atlético San Miguel", "nome_popular": "San Miguel", "pais": "AR", "estado": "Buenos Aires", "cidade": "Los Polvorines", "estadio": "Malvinas Argentinas", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1521 },
-  { "id": "san_telmo", "nome": "Club Atlético San Telmo", "nome_popular": "San Telmo", "pais": "AR", "estado": "Buenos Aires", "cidade": "Isla Maciel", "estadio": "Doctor Osvaldo Baletto", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1495 },
-  { "id": "temperley", "nome": "Club Atlético Temperley", "nome_popular": "Temperley", "pais": "AR", "estado": "Buenos Aires", "cidade": "Turdera", "estadio": "Alfredo Beranger", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1608 },
-  { "id": "tristan_suarez", "nome": "Club Social y Deportivo Tristán Suárez", "nome_popular": "Tristán Suárez", "pais": "AR", "estado": "Buenos Aires", "cidade": "Tristán Suárez", "estadio": "20 de Octubre", "divisao_nacional": { "pais": "AR", "nivel": 2 }, "rating_inicial": 1610 }
+  {
+    "id": "boca_juniors",
+    "nome": "Club Atlético Boca Juniors",
+    "nome_popular": "Boca Juniors",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1733,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bm7krb1775741582.png"
+  },
+  {
+    "id": "independiente",
+    "nome": "Club Atlético Independiente",
+    "nome_popular": "Independiente",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Avellaneda",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1671,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/eki4nd1580842605.png"
+  },
+  {
+    "id": "san_lorenzo",
+    "nome": "Club Atlético San Lorenzo de Almagro",
+    "nome_popular": "San Lorenzo",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1623
+  },
+  {
+    "id": "deportivo_riestra",
+    "nome": "Club Atlético Deportivo Riestra",
+    "nome_popular": "Riestra",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1601,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/332h0l1578824392.png"
+  },
+  {
+    "id": "talleres_cordoba",
+    "nome": "Club Atlético Talleres",
+    "nome_popular": "Talleres",
+    "pais": "AR",
+    "estado": "Córdoba",
+    "cidade": "Córdoba",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1626,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7hum2t1769310938.png"
+  },
+  {
+    "id": "instituto_cordoba",
+    "nome": "Instituto Atlético Central Córdoba",
+    "nome_popular": "Instituto",
+    "pais": "AR",
+    "estado": "Córdoba",
+    "cidade": "Córdoba",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1649,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jup59w1578825794.png",
+    "cor_primaria": "#DF1414",
+    "cor_secundaria": "#ffffff"
+  },
+  {
+    "id": "platense",
+    "nome": "Club Atlético Platense",
+    "nome_popular": "Platense",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Vicente López",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1610,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lbs14n1769317149.png"
+  },
+  {
+    "id": "estudiantes_lp",
+    "nome": "Club Estudiantes de La Plata",
+    "nome_popular": "Estudiantes (LP)",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "La Plata",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1701,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zppckr1739500494.png"
+  },
+  {
+    "id": "gimnasia_mendoza",
+    "nome": "Gimnasia y Esgrima de Mendoza",
+    "nome_popular": "Gimnasia (Mendoza)",
+    "pais": "AR",
+    "estado": "Mendoza",
+    "cidade": "Mendoza",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1637,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/h11mlf1677636958.png"
+  },
+  {
+    "id": "velez_sarsfield",
+    "nome": "Club Atlético Vélez Sarsfield",
+    "nome_popular": "Vélez",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1697,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m40lco1677473315.png"
+  },
+  {
+    "id": "newells_old_boys",
+    "nome": "Club Atlético Newell's Old Boys",
+    "nome_popular": "Newell's",
+    "pais": "AR",
+    "estado": "Santa Fe",
+    "cidade": "Rosario",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1592,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/23aftf1580842633.png"
+  },
+  {
+    "id": "union_santa_fe",
+    "nome": "Club Atlético Unión",
+    "nome_popular": "Unión",
+    "pais": "AR",
+    "estado": "Santa Fe",
+    "cidade": "Santa Fe",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1624,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/btnx6q1734587495.png"
+  },
+  {
+    "id": "lanus",
+    "nome": "Club Atlético Lanús",
+    "nome_popular": "Lanús",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Lanús",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1659
+  },
+  {
+    "id": "central_cordoba_sde",
+    "nome": "Club Atlético Central Córdoba (Santiago del Estero)",
+    "nome_popular": "Central Córdoba (SdE)",
+    "pais": "AR",
+    "estado": "Santiago del Estero",
+    "cidade": "Santiago del Estero",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1606
+  },
+  {
+    "id": "defensa_y_justicia",
+    "nome": "Club Social y Deportivo Defensa y Justicia",
+    "nome_popular": "Defensa y Justicia",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Florencio Varela",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1618
+  },
+  {
+    "id": "river_plate",
+    "nome": "Club Atlético River Plate",
+    "nome_popular": "River Plate",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1707
+  },
+  {
+    "id": "racing_club",
+    "nome": "Racing Club",
+    "nome_popular": "Racing Club",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Avellaneda",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1699
+  },
+  {
+    "id": "huracan",
+    "nome": "Club Atlético Huracán",
+    "nome_popular": "Huracán",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1656
+  },
+  {
+    "id": "barracas_central",
+    "nome": "Club Atlético Barracas Central",
+    "nome_popular": "Barracas Central",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1603
+  },
+  {
+    "id": "belgrano_cordoba",
+    "nome": "Club Atlético Belgrano",
+    "nome_popular": "Belgrano",
+    "pais": "AR",
+    "estado": "Córdoba",
+    "cidade": "Córdoba",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1675
+  },
+  {
+    "id": "estudiantes_rio_cuarto",
+    "nome": "Asociación Atlética Estudiantes (Río Cuarto)",
+    "nome_popular": "Estudiantes (RC)",
+    "pais": "AR",
+    "estado": "Córdoba",
+    "cidade": "Río Cuarto",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1539
+  },
+  {
+    "id": "independiente_rivadavia",
+    "nome": "Club Sportivo Independiente Rivadavia",
+    "nome_popular": "Independiente Rivadavia",
+    "pais": "AR",
+    "estado": "Mendoza",
+    "cidade": "Mendoza",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1714
+  },
+  {
+    "id": "gimnasia_la_plata",
+    "nome": "Club de Gimnasia y Esgrima La Plata",
+    "nome_popular": "Gimnasia (LP)",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "La Plata",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1654
+  },
+  {
+    "id": "tigre",
+    "nome": "Club Atlético Tigre",
+    "nome_popular": "Tigre",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Victoria",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1646
+  },
+  {
+    "id": "argentinos_juniors",
+    "nome": "Asociación Atlética Argentinos Juniors",
+    "nome_popular": "Argentinos Juniors",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1727
+  },
+  {
+    "id": "sarmiento_junin",
+    "nome": "Club Atlético Sarmiento",
+    "nome_popular": "Sarmiento (Junín)",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Junín",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1589
+  },
+  {
+    "id": "rosario_central",
+    "nome": "Club Atlético Rosario Central",
+    "nome_popular": "Rosario Central",
+    "pais": "AR",
+    "estado": "Santa Fe",
+    "cidade": "Rosario",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1708
+  },
+  {
+    "id": "banfield",
+    "nome": "Club Atlético Banfield",
+    "nome_popular": "Banfield",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Banfield",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1579
+  },
+  {
+    "id": "atletico_tucuman",
+    "nome": "Club Atlético Tucumán",
+    "nome_popular": "Atlético Tucumán",
+    "pais": "AR",
+    "estado": "Tucumán",
+    "cidade": "San Miguel de Tucumán",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1620
+  },
+  {
+    "id": "aldosivi",
+    "nome": "Club Atlético Aldosivi",
+    "nome_popular": "Aldosivi",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Mar del Plata",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 1
+    },
+    "rating_inicial": 1536
+  },
+  {
+    "id": "acassuso",
+    "nome": "Club Atlético Acassuso",
+    "nome_popular": "Acassuso",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Boulogne",
+    "estadio": "La Quema",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1450
+  },
+  {
+    "id": "agropecuario",
+    "nome": "Club Atlético Agropecuario",
+    "nome_popular": "Agropecuario",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Carlos Casares",
+    "estadio": "Ofelia Rosenzuaig",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1540,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jt027i1766678890.png"
+  },
+  {
+    "id": "all_boys",
+    "nome": "Club Atlético All Boys",
+    "nome_popular": "All Boys",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "estadio": "Islas Malvinas",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1520,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zo4vm01578824142.png"
+  },
+  {
+    "id": "almagro",
+    "nome": "Club Almagro",
+    "nome_popular": "Almagro",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "José Ingenieros",
+    "estadio": "Tres de Febrero",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1513,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zv7sju1578825975.png"
+  },
+  {
+    "id": "almirante_brown",
+    "nome": "Club Almirante Brown",
+    "nome_popular": "Almirante Brown",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "San Justo",
+    "estadio": "Fragata Presidente Sarmiento",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1555,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/81i8mf1615822788.png"
+  },
+  {
+    "id": "atlanta",
+    "nome": "Club Atlético Atlanta",
+    "nome_popular": "Atlanta",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "estadio": "Don León Kolbowsky",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1560,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ey0i4o1775792685.png"
+  },
+  {
+    "id": "atletico_rafaela",
+    "nome": "Club Atlético Rafaela",
+    "nome_popular": "Atlético de Rafaela",
+    "pais": "AR",
+    "estado": "Santa Fe",
+    "cidade": "Rafaela",
+    "estadio": "Nuevo Monumental",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1531,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/v9b3yf1677638367.png"
+  },
+  {
+    "id": "central_norte_salta",
+    "nome": "Central Norte Atlético Club",
+    "nome_popular": "Central Norte",
+    "pais": "AR",
+    "estado": "Salta",
+    "cidade": "Salta",
+    "estadio": "Padre Ernesto Martearena",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1480,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/b0uo2b1678853683.png"
+  },
+  {
+    "id": "chacarita_juniors",
+    "nome": "Club Atlético Chacarita Juniors",
+    "nome_popular": "Chacarita Juniors",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Villa Maipú",
+    "estadio": "Chacarita Juniors",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1517,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pjam301511624231.png"
+  },
+  {
+    "id": "chaco_for_ever",
+    "nome": "Club Atlético Chaco For Ever",
+    "nome_popular": "Chaco For Ever",
+    "pais": "AR",
+    "estado": "Chaco",
+    "cidade": "Resistencia",
+    "estadio": "Juan Alberto García",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1528
+  },
+  {
+    "id": "ciudad_de_bolivar",
+    "nome": "Club Ciudad de Bolívar",
+    "nome_popular": "Ciudad de Bolívar",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "San Carlos de Bolívar",
+    "estadio": "Municipal Eva Perón",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1542,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mgsv551730785508.png"
+  },
+  {
+    "id": "colegiales",
+    "nome": "Club Atlético Colegiales",
+    "nome_popular": "Colegiales",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Munro",
+    "estadio": "Libertarios Unidos",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1566,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ikdykr1677993843.png"
+  },
+  {
+    "id": "colon_santa_fe",
+    "nome": "Club Atlético Colón",
+    "nome_popular": "Colón",
+    "pais": "AR",
+    "estado": "Santa Fe",
+    "cidade": "Santa Fe",
+    "estadio": "Brigadier General Estanislao López",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1567,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/l72gz21712750680.png"
+  },
+  {
+    "id": "defensores_de_belgrano",
+    "nome": "Club Defensores de Belgrano",
+    "nome_popular": "Defensores de Belgrano",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "estadio": "Juan Pasquale",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1534,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/8n9orj1578823535.png"
+  },
+  {
+    "id": "deportivo_madryn",
+    "nome": "Club Deportivo Madryn",
+    "nome_popular": "Deportivo Madryn",
+    "pais": "AR",
+    "estado": "Chubut",
+    "cidade": "Puerto Madryn",
+    "estadio": "Abel Sastre",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1620,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/b2recn1626207994.png"
+  },
+  {
+    "id": "deportivo_maipu",
+    "nome": "Club Deportivo Maipú",
+    "nome_popular": "Deportivo Maipú",
+    "pais": "AR",
+    "estado": "Mendoza",
+    "cidade": "Maipú",
+    "estadio": "Omar Higinio Sperdutti",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1576,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/skx52p1615822799.png"
+  },
+  {
+    "id": "deportivo_moron",
+    "nome": "Club Deportivo Morón",
+    "nome_popular": "Deportivo Morón",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Morón",
+    "estadio": "Nuevo Francisco Urbano",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1617,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/iamiej1578821893.png"
+  },
+  {
+    "id": "estudiantes_caseros",
+    "nome": "Club Atlético Estudiantes",
+    "nome_popular": "Estudiantes (BA)",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Caseros",
+    "estadio": "Ciudad de Caseros",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1581,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zppckr1739500494.png"
+  },
+  {
+    "id": "ferrocarril_midland",
+    "nome": "Ferrocarril Midland",
+    "nome_popular": "Ferrocarril Midland",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Libertad",
+    "estadio": "Ciudad de Libertad",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1616,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/l6vmj01730784534.png"
+  },
+  {
+    "id": "ferro_carril_oeste",
+    "nome": "Club Ferro Carril Oeste",
+    "nome_popular": "Ferro Carril Oeste",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "estadio": "Arquitecto Ricardo Etcheverri",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1592,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qv5l9p1578822488.png"
+  },
+  {
+    "id": "gimnasia_esgrima_jujuy",
+    "nome": "Gimnasia y Esgrima de Jujuy",
+    "nome_popular": "Gimnasia (Jujuy)",
+    "pais": "AR",
+    "estado": "Jujuy",
+    "cidade": "San Salvador de Jujuy",
+    "estadio": "23 de Agosto",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1595,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1jxpz51677637810.png"
+  },
+  {
+    "id": "gimnasia_tiro_salta",
+    "nome": "Gimnasia y Tiro",
+    "nome_popular": "Gimnasia y Tiro",
+    "pais": "AR",
+    "estado": "Salta",
+    "cidade": "Salta",
+    "estadio": "Gigante del Norte",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1585,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/epmttr1678849271.png"
+  },
+  {
+    "id": "godoy_cruz",
+    "nome": "Club Deportivo Godoy Cruz Antonio Tomba",
+    "nome_popular": "Godoy Cruz",
+    "pais": "AR",
+    "estado": "Mendoza",
+    "cidade": "Godoy Cruz",
+    "estadio": "Feliciano Gambarte",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1606,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/d3c0ds1517768584.png"
+  },
+  {
+    "id": "guemes_santiago",
+    "nome": "Club Atlético Güemes",
+    "nome_popular": "Güemes",
+    "pais": "AR",
+    "estado": "Santiago del Estero",
+    "cidade": "Santiago del Estero",
+    "estadio": "Arturo Miranda",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1480,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pvd49s1615822794.png"
+  },
+  {
+    "id": "los_andes",
+    "nome": "Club Atlético Los Andes",
+    "nome_popular": "Los Andes",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Lomas de Zamora",
+    "estadio": "Eduardo Gallardón",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1530,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yjfgav1626632717.png"
+  },
+  {
+    "id": "mitre_santiago",
+    "nome": "Club Atlético Mitre",
+    "nome_popular": "Mitre",
+    "pais": "AR",
+    "estado": "Santiago del Estero",
+    "cidade": "Santiago del Estero",
+    "estadio": "Doctores José y Antonio Castiglione",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1518,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/818q3i1578818850.png"
+  },
+  {
+    "id": "nueva_chicago",
+    "nome": "Club Atlético Nueva Chicago",
+    "nome_popular": "Nueva Chicago",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Buenos Aires",
+    "estadio": "Nueva Chicago",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1518,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/b37wr31677635658.png"
+  },
+  {
+    "id": "patronato",
+    "nome": "Patronato de la Juventud Católica",
+    "nome_popular": "Patronato",
+    "pais": "AR",
+    "estado": "Entre Ríos",
+    "cidade": "Paraná",
+    "estadio": "Presbítero Bartolomé Grella",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1522,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/diz3me1678849584.png"
+  },
+  {
+    "id": "quilmes",
+    "nome": "Quilmes Atlético Club",
+    "nome_popular": "Quilmes",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Quilmes",
+    "estadio": "Centenario Ciudad de Quilmes",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1556,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1nj5uk1517769025.png"
+  },
+  {
+    "id": "racing_cordoba",
+    "nome": "Racing Club de Córdoba",
+    "nome_popular": "Racing (Córdoba)",
+    "pais": "AR",
+    "estado": "Córdoba",
+    "cidade": "Córdoba",
+    "estadio": "Miguel Sancho",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1515,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jeqlsn1677638050.png"
+  },
+  {
+    "id": "san_martin_sj",
+    "nome": "Club Atlético San Martín",
+    "nome_popular": "San Martín (SJ)",
+    "pais": "AR",
+    "estado": "San Juan",
+    "cidade": "San Juan",
+    "estadio": "Ingeniero Hilario Sánchez",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1599,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lfbuwg1734661613.png"
+  },
+  {
+    "id": "san_martin_tucuman",
+    "nome": "Club Atlético San Martín",
+    "nome_popular": "San Martín (Tucumán)",
+    "pais": "AR",
+    "estado": "Tucumán",
+    "cidade": "San Miguel de Tucumán",
+    "estadio": "La Ciudadela",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1584
+  },
+  {
+    "id": "san_miguel",
+    "nome": "Club Atlético San Miguel",
+    "nome_popular": "San Miguel",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Los Polvorines",
+    "estadio": "Malvinas Argentinas",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1521
+  },
+  {
+    "id": "san_telmo",
+    "nome": "Club Atlético San Telmo",
+    "nome_popular": "San Telmo",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Isla Maciel",
+    "estadio": "Doctor Osvaldo Baletto",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1495
+  },
+  {
+    "id": "temperley",
+    "nome": "Club Atlético Temperley",
+    "nome_popular": "Temperley",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Turdera",
+    "estadio": "Alfredo Beranger",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1608
+  },
+  {
+    "id": "tristan_suarez",
+    "nome": "Club Social y Deportivo Tristán Suárez",
+    "nome_popular": "Tristán Suárez",
+    "pais": "AR",
+    "estado": "Buenos Aires",
+    "cidade": "Tristán Suárez",
+    "estadio": "20 de Octubre",
+    "divisao_nacional": {
+      "pais": "AR",
+      "nivel": 2
+    },
+    "rating_inicial": 1610
+  }
 ]

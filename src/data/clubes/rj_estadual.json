@@ -6,7 +6,10 @@
     "pais": "BR",
     "estado": "RJ",
     "cidade": "Rio de Janeiro",
-    "estadio": "Moça Bonita"
+    "estadio": "Moça Bonita",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3yrwfp1625417293.png",
+    "cor_primaria": "#c22a1e",
+    "cor_secundaria": "#ffffff"
   },
   {
     "id": "boavista_rj",
@@ -15,7 +18,10 @@
     "pais": "BR",
     "estado": "RJ",
     "cidade": "Saquarema",
-    "estadio": "Elcyr Resende de Mendonça"
+    "estadio": "Elcyr Resende de Mendonça",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/usi98v1628853974.png",
+    "cor_primaria": "#faeb01",
+    "cor_secundaria": "#000000"
   },
   {
     "id": "madureira",
@@ -28,7 +34,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/oy3gbu1737510151.png"
   },
   {
     "id": "marica",
@@ -41,7 +48,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/09p7jm1733808424.png"
   },
   {
     "id": "volta_redonda",
@@ -55,7 +63,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1499
+    "rating_inicial": 1499,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/phc5fs1736379773.png"
   },
   {
     "id": "americano",
@@ -79,7 +88,8 @@
     "nome_popular": "Audax Rio",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Saquarema"
+    "cidade": "Saquarema",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lkecix1713439311.png"
   },
   {
     "id": "duque_de_caxias",
@@ -95,7 +105,8 @@
     "nome_popular": "Olaria",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Rio de Janeiro"
+    "cidade": "Rio de Janeiro",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/on7zs31733851315.png"
   },
   {
     "id": "perolas_negras",
@@ -103,7 +114,8 @@
     "nome_popular": "Pérolas Negras",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Resende"
+    "cidade": "Resende",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1no3we1645296118.png"
   },
   {
     "id": "petropolis",
@@ -119,7 +131,8 @@
     "nome_popular": "Resende",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Resende"
+    "cidade": "Resende",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mytuls1688107923.png"
   },
   {
     "id": "sao_goncalo_ec",

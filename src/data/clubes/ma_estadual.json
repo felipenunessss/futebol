@@ -10,7 +10,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1522
+    "rating_inicial": 1522,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/t1km461513102217.png"
   },
   {
     "id": "imperatriz",
@@ -23,7 +24,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7b83521579340502.png"
   },
   {
     "id": "iape",
@@ -36,7 +38,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e8drop1754117586.png"
   },
   {
     "id": "sampaio_correa_ma",
@@ -49,7 +52,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2jjjlk1701366513.png"
   },
   {
     "id": "moto_club",
@@ -61,7 +65,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/4ypkwo1625422339.png"
   },
   {
     "id": "tuntum",
@@ -70,7 +75,8 @@
     "pais": "BR",
     "estado": "MA",
     "cidade": "Tuntum",
-    "estadio": "Rafael Seabra"
+    "estadio": "Rafael Seabra",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/n034ct1754118172.png"
   },
   {
     "id": "luminense_ma",
@@ -78,7 +84,8 @@
     "nome_popular": "Luminense",
     "pais": "BR",
     "estado": "MA",
-    "cidade": "Paço do Lumiar"
+    "cidade": "Paço do Lumiar",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/gnhqc01768836339.png"
   },
   {
     "id": "itz_sport",
@@ -87,6 +94,7 @@
     "pais": "BR",
     "estado": "MA",
     "cidade": "Imperatriz",
-    "estadio": "Frei Epifânio D'Abadia"
+    "estadio": "Frei Epifânio D'Abadia",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jbwpta1768796021.png"
   }
 ]

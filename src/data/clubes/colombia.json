@@ -1,38 +1,449 @@
 [
-  { "id": "aguilas_doradas", "nome": "Corporación Deportiva Águilas Doradas Rionegro", "nome_popular": "Águilas Doradas", "pais": "CO", "cidade": "Rionegro", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1539 },
-  { "id": "alianza_valledupar", "nome": "Alianza Valledupar Fútbol Club", "nome_popular": "Alianza Valledupar", "pais": "CO", "cidade": "Valledupar", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1482 },
-  { "id": "america_de_cali", "nome": "América de Cali", "nome_popular": "América de Cali", "pais": "CO", "cidade": "Cali", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1654 },
-  { "id": "atletico_bucaramanga", "nome": "Atlético Bucaramanga", "nome_popular": "Bucaramanga", "pais": "CO", "cidade": "Bucaramanga", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1597 },
-  { "id": "atletico_nacional", "nome": "Atlético Nacional", "nome_popular": "Nacional", "pais": "CO", "cidade": "Medellín", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1709 },
-  { "id": "boyaca_chico", "nome": "Boyacá Chicó Fútbol Club", "nome_popular": "Boyacá Chicó", "pais": "CO", "cidade": "Tunja", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1427 },
-  { "id": "cucuta_deportivo", "nome": "Cúcuta Deportivo", "nome_popular": "Cúcuta", "pais": "CO", "cidade": "Cúcuta", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1461 },
-  { "id": "deportes_tolima", "nome": "Deportes Tolima", "nome_popular": "Tolima", "pais": "CO", "cidade": "Ibagué", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1632 },
-  { "id": "deportivo_cali", "nome": "Deportivo Cali", "nome_popular": "Deportivo Cali", "pais": "CO", "cidade": "Palmira", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1545 },
-  { "id": "deportivo_pasto", "nome": "Deportivo Pasto", "nome_popular": "Pasto", "pais": "CO", "cidade": "Pasto", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1511 },
-  { "id": "deportivo_pereira", "nome": "Deportivo Pereira", "nome_popular": "Pereira", "pais": "CO", "cidade": "Pereira", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1484 },
-  { "id": "fortaleza_cf", "nome": "Fortaleza Fútbol Club", "nome_popular": "Fortaleza CEIF", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1520 },
-  { "id": "independiente_medellin", "nome": "Independiente Medellín", "nome_popular": "Medellín (DIM)", "pais": "CO", "cidade": "Medellín", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1643 },
-  { "id": "internacional_de_bogota", "nome": "Internacional de Bogotá", "nome_popular": "Internacional", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 } },
-  { "id": "jaguares_cordoba", "nome": "Jaguares de Córdoba", "nome_popular": "Jaguares", "pais": "CO", "cidade": "Montería", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1437 },
-  { "id": "junior_barranquilla", "nome": "Club Atlético Junior", "nome_popular": "Junior", "pais": "CO", "cidade": "Barranquilla", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1607 },
-  { "id": "llaneros", "nome": "Llaneros Fútbol Club", "nome_popular": "Llaneros", "pais": "CO", "cidade": "Villavicencio", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1524 },
-  { "id": "millonarios", "nome": "Millonarios Fútbol Club", "nome_popular": "Millonarios", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1619 },
-  { "id": "once_caldas", "nome": "Once Caldas", "nome_popular": "Once Caldas", "pais": "CO", "cidade": "Manizales", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1623 },
-  { "id": "santa_fe_co", "nome": "Independiente Santa Fe", "nome_popular": "Santa Fe", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 1 }, "rating_inicial": 1645 },
-  { "id": "atletico_fc_co", "nome": "Atlético Fútbol Club", "nome_popular": "Atlético F. C.", "pais": "CO", "cidade": "Cali", "estadio": "Olímpico Pascual Guerrero", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "barranquilla_fc", "nome": "Barranquilla Fútbol Club", "nome_popular": "Barranquilla F. C.", "pais": "CO", "cidade": "Barranquilla", "estadio": "Municipal Romelio Martínez", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "boca_juniors_cali", "nome": "Boca Juniors de Cali", "nome_popular": "Boca Juniors de Cali", "pais": "CO", "cidade": "Cali", "estadio": "Olímpico Pascual Guerrero", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "bogota_fc", "nome": "Bogotá Fútbol Club", "nome_popular": "Bogotá F. C.", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "deportes_quindio", "nome": "Deportes Quindío", "nome_popular": "Deportes Quindío", "pais": "CO", "cidade": "Armenia", "estadio": "Centenario de Armenia", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "envigado_fc", "nome": "Envigado Fútbol Club", "nome_popular": "Envigado F. C.", "pais": "CO", "cidade": "Envigado", "estadio": "Polideportivo Sur", "divisao_nacional": { "pais": "CO", "nivel": 2 }, "rating_inicial": 1475 },
-  { "id": "independiente_valle_cauca", "nome": "Independiente Valle del Cauca", "nome_popular": "Independiente Yumbo", "pais": "CO", "cidade": "Yumbo", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "inter_de_palmira", "nome": "Inter de Palmira", "nome_popular": "Inter de Palmira", "pais": "CO", "cidade": "Palmira", "estadio": "Francisco Rivera Escobar", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "itagui_leones", "nome": "Itagüí Leones Fútbol Club", "nome_popular": "Itagüí Leones", "pais": "CO", "cidade": "Itagüí", "estadio": "Metropolitano Ciudad de Itagüí", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "orsomarso", "nome": "Orsomarso Sociedad Anónima Deportiva", "nome_popular": "Orsomarso", "pais": "CO", "cidade": "Yumbo", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "patriotas_fc", "nome": "Patriotas Boyacá Fútbol Club", "nome_popular": "Patriotas", "pais": "CO", "cidade": "Tunja", "estadio": "La Independencia", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "real_cartagena", "nome": "Real Cartagena", "nome_popular": "Real Cartagena", "pais": "CO", "cidade": "Cartagena", "estadio": "Olímpico Jaime Morón León", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "real_cundinamarca", "nome": "Real Cundinamarca", "nome_popular": "Real Cundinamarca", "pais": "CO", "cidade": "Mosquera", "estadio": "Municipal de Mosquera", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "real_santander", "nome": "Real Santander", "nome_popular": "Real Santander", "pais": "CO", "cidade": "Piedecuesta", "estadio": "Villa Concha", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "tigres_fc_co", "nome": "Tigres Fútbol Club", "nome_popular": "Tigres F. C.", "pais": "CO", "cidade": "Bogotá", "divisao_nacional": { "pais": "CO", "nivel": 2 } },
-  { "id": "union_magdalena", "nome": "Unión Magdalena", "nome_popular": "Unión Magdalena", "pais": "CO", "cidade": "Santa Marta", "estadio": "Sierra Nevada", "divisao_nacional": { "pais": "CO", "nivel": 2 }, "rating_inicial": 1521 }
+  {
+    "id": "aguilas_doradas",
+    "nome": "Corporación Deportiva Águilas Doradas Rionegro",
+    "nome_popular": "Águilas Doradas",
+    "pais": "CO",
+    "cidade": "Rionegro",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1539,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6d7qas1703002070.png"
+  },
+  {
+    "id": "alianza_valledupar",
+    "nome": "Alianza Valledupar Fútbol Club",
+    "nome_popular": "Alianza Valledupar",
+    "pais": "CO",
+    "cidade": "Valledupar",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1482,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/efldut1715066310.png"
+  },
+  {
+    "id": "america_de_cali",
+    "nome": "América de Cali",
+    "nome_popular": "América de Cali",
+    "pais": "CO",
+    "cidade": "Cali",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1654,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/lwxcn71576156105.png"
+  },
+  {
+    "id": "atletico_bucaramanga",
+    "nome": "Atlético Bucaramanga",
+    "nome_popular": "Bucaramanga",
+    "pais": "CO",
+    "cidade": "Bucaramanga",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1597,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/rtjs411576157184.png"
+  },
+  {
+    "id": "atletico_nacional",
+    "nome": "Atlético Nacional",
+    "nome_popular": "Nacional",
+    "pais": "CO",
+    "cidade": "Medellín",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1709
+  },
+  {
+    "id": "boyaca_chico",
+    "nome": "Boyacá Chicó Fútbol Club",
+    "nome_popular": "Boyacá Chicó",
+    "pais": "CO",
+    "cidade": "Tunja",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1427,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/boe8tv1677602771.png"
+  },
+  {
+    "id": "cucuta_deportivo",
+    "nome": "Cúcuta Deportivo",
+    "nome_popular": "Cúcuta",
+    "pais": "CO",
+    "cidade": "Cúcuta",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1461,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/petg3h1778087075.png"
+  },
+  {
+    "id": "deportes_tolima",
+    "nome": "Deportes Tolima",
+    "nome_popular": "Tolima",
+    "pais": "CO",
+    "cidade": "Ibagué",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1632,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/4bscjt1766423328.png"
+  },
+  {
+    "id": "deportivo_cali",
+    "nome": "Deportivo Cali",
+    "nome_popular": "Deportivo Cali",
+    "pais": "CO",
+    "cidade": "Palmira",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1545,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/isc2yu1580833286.png"
+  },
+  {
+    "id": "deportivo_pasto",
+    "nome": "Deportivo Pasto",
+    "nome_popular": "Pasto",
+    "pais": "CO",
+    "cidade": "Pasto",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1511
+  },
+  {
+    "id": "deportivo_pereira",
+    "nome": "Deportivo Pereira",
+    "nome_popular": "Pereira",
+    "pais": "CO",
+    "cidade": "Pereira",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1484
+  },
+  {
+    "id": "fortaleza_cf",
+    "nome": "Fortaleza Fútbol Club",
+    "nome_popular": "Fortaleza CEIF",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1520
+  },
+  {
+    "id": "independiente_medellin",
+    "nome": "Independiente Medellín",
+    "nome_popular": "Medellín (DIM)",
+    "pais": "CO",
+    "cidade": "Medellín",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1643
+  },
+  {
+    "id": "internacional_de_bogota",
+    "nome": "Internacional de Bogotá",
+    "nome_popular": "Internacional",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    }
+  },
+  {
+    "id": "jaguares_cordoba",
+    "nome": "Jaguares de Córdoba",
+    "nome_popular": "Jaguares",
+    "pais": "CO",
+    "cidade": "Montería",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1437
+  },
+  {
+    "id": "junior_barranquilla",
+    "nome": "Club Atlético Junior",
+    "nome_popular": "Junior",
+    "pais": "CO",
+    "cidade": "Barranquilla",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1607
+  },
+  {
+    "id": "llaneros",
+    "nome": "Llaneros Fútbol Club",
+    "nome_popular": "Llaneros",
+    "pais": "CO",
+    "cidade": "Villavicencio",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1524
+  },
+  {
+    "id": "millonarios",
+    "nome": "Millonarios Fútbol Club",
+    "nome_popular": "Millonarios",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1619
+  },
+  {
+    "id": "once_caldas",
+    "nome": "Once Caldas",
+    "nome_popular": "Once Caldas",
+    "pais": "CO",
+    "cidade": "Manizales",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1623
+  },
+  {
+    "id": "santa_fe_co",
+    "nome": "Independiente Santa Fe",
+    "nome_popular": "Santa Fe",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 1
+    },
+    "rating_inicial": 1645
+  },
+  {
+    "id": "atletico_fc_co",
+    "nome": "Atlético Fútbol Club",
+    "nome_popular": "Atlético F. C.",
+    "pais": "CO",
+    "cidade": "Cali",
+    "estadio": "Olímpico Pascual Guerrero",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "barranquilla_fc",
+    "nome": "Barranquilla Fútbol Club",
+    "nome_popular": "Barranquilla F. C.",
+    "pais": "CO",
+    "cidade": "Barranquilla",
+    "estadio": "Municipal Romelio Martínez",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "boca_juniors_cali",
+    "nome": "Boca Juniors de Cali",
+    "nome_popular": "Boca Juniors de Cali",
+    "pais": "CO",
+    "cidade": "Cali",
+    "estadio": "Olímpico Pascual Guerrero",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "bogota_fc",
+    "nome": "Bogotá Fútbol Club",
+    "nome_popular": "Bogotá F. C.",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "deportes_quindio",
+    "nome": "Deportes Quindío",
+    "nome_popular": "Deportes Quindío",
+    "pais": "CO",
+    "cidade": "Armenia",
+    "estadio": "Centenario de Armenia",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "envigado_fc",
+    "nome": "Envigado Fútbol Club",
+    "nome_popular": "Envigado F. C.",
+    "pais": "CO",
+    "cidade": "Envigado",
+    "estadio": "Polideportivo Sur",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "rating_inicial": 1475
+  },
+  {
+    "id": "independiente_valle_cauca",
+    "nome": "Independiente Valle del Cauca",
+    "nome_popular": "Independiente Yumbo",
+    "pais": "CO",
+    "cidade": "Yumbo",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "inter_de_palmira",
+    "nome": "Inter de Palmira",
+    "nome_popular": "Inter de Palmira",
+    "pais": "CO",
+    "cidade": "Palmira",
+    "estadio": "Francisco Rivera Escobar",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    }
+  },
+  {
+    "id": "itagui_leones",
+    "nome": "Itagüí Leones Fútbol Club",
+    "nome_popular": "Itagüí Leones",
+    "pais": "CO",
+    "cidade": "Itagüí",
+    "estadio": "Metropolitano Ciudad de Itagüí",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/53cp0d1615832193.png"
+  },
+  {
+    "id": "orsomarso",
+    "nome": "Orsomarso Sociedad Anónima Deportiva",
+    "nome_popular": "Orsomarso",
+    "pais": "CO",
+    "cidade": "Yumbo",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/o2lntb1615832201.png"
+  },
+  {
+    "id": "patriotas_fc",
+    "nome": "Patriotas Boyacá Fútbol Club",
+    "nome_popular": "Patriotas",
+    "pais": "CO",
+    "cidade": "Tunja",
+    "estadio": "La Independencia",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vvo3s51576166056.png"
+  },
+  {
+    "id": "real_cartagena",
+    "nome": "Real Cartagena",
+    "nome_popular": "Real Cartagena",
+    "pais": "CO",
+    "cidade": "Cartagena",
+    "estadio": "Olímpico Jaime Morón León",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1galb31615832205.png"
+  },
+  {
+    "id": "real_cundinamarca",
+    "nome": "Real Cundinamarca",
+    "nome_popular": "Real Cundinamarca",
+    "pais": "CO",
+    "cidade": "Mosquera",
+    "estadio": "Municipal de Mosquera",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/3c46781721453110.png",
+    "cor_primaria": "#438a58",
+    "cor_secundaria": "#ffc30c"
+  },
+  {
+    "id": "real_santander",
+    "nome": "Real Santander",
+    "nome_popular": "Real Santander",
+    "pais": "CO",
+    "cidade": "Piedecuesta",
+    "estadio": "Villa Concha",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6j410j1754334140.png"
+  },
+  {
+    "id": "tigres_fc_co",
+    "nome": "Tigres Fútbol Club",
+    "nome_popular": "Tigres F. C.",
+    "pais": "CO",
+    "cidade": "Bogotá",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/x6mzk41615832215.png"
+  },
+  {
+    "id": "union_magdalena",
+    "nome": "Unión Magdalena",
+    "nome_popular": "Unión Magdalena",
+    "pais": "CO",
+    "cidade": "Santa Marta",
+    "estadio": "Sierra Nevada",
+    "divisao_nacional": {
+      "pais": "CO",
+      "nivel": 2
+    },
+    "rating_inicial": 1521,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/i1fl6p1677602554.png"
+  }
 ]

@@ -11,7 +11,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1554
+    "rating_inicial": 1554,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yvvyps1473538067.png"
   },
   {
     "id": "carlos_renaux",
@@ -20,7 +21,8 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Brusque",
-    "estadio": "Augusto Bauer"
+    "estadio": "Augusto Bauer",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/4jxg0v1768446524.png"
   },
   {
     "id": "joinville",
@@ -33,7 +35,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wpxl1u1733807689.png"
   },
   {
     "id": "brusque_fc",
@@ -47,7 +50,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1534
+    "rating_inicial": 1534,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/o7p43b1766507803.png"
   },
   {
     "id": "camboriu_fc",
@@ -55,7 +59,8 @@
     "nome_popular": "Camboriú",
     "pais": "BR",
     "estado": "SC",
-    "cidade": "Balneário Camboriú"
+    "cidade": "Balneário Camboriú",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jj653v1677056354.png"
   },
   {
     "id": "concordia_ac",
@@ -64,7 +69,8 @@
     "pais": "BR",
     "estado": "SC",
     "cidade": "Concórdia",
-    "estadio": "Domingos Machado de Lima"
+    "estadio": "Domingos Machado de Lima",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/dpycy11768446734.png"
   },
   {
     "id": "marcilio_dias",
@@ -76,7 +82,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/uvjyru1625419323.png"
   },
   {
     "id": "barra_fc",
@@ -89,6 +96,7 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1483
+    "rating_inicial": 1483,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bu1jtg1713439315.png"
   }
 ]

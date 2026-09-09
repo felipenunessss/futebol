@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/a8y08e1733805359.png"
   },
   {
     "id": "santa_cruz_ac",
@@ -29,7 +30,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e2y8mj1753338368.png"
   },
   {
     "id": "sao_francisco_ac",
@@ -46,7 +48,8 @@
     "pais": "BR",
     "estado": "AC",
     "cidade": "Senador Guiomard",
-    "estadio": "Naborzão"
+    "estadio": "Naborzão",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qu03tz1753338162.png"
   },
   {
     "id": "humaita_ac",
@@ -58,7 +61,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/p1el131642707555.png"
   },
   {
     "id": "vasco_da_gama_ac",

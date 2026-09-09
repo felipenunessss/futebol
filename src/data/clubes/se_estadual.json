@@ -14,7 +14,8 @@
     "pais": "BR",
     "estado": "SE",
     "cidade": "Nossa Senhora da Glória",
-    "estadio": "Editon Oliveira da Silva"
+    "estadio": "Editon Oliveira da Silva",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1nj5rz1767261077.png"
   },
   {
     "id": "dorense",
@@ -22,7 +23,8 @@
     "nome_popular": "Dorense",
     "pais": "BR",
     "estado": "SE",
-    "cidade": "Nossa Senhora das Dores"
+    "cidade": "Nossa Senhora das Dores",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/iz4h9f1754163011.png"
   },
   {
     "id": "guarany_porto_da_folha",
@@ -30,7 +32,8 @@
     "nome_popular": "Guarany",
     "pais": "BR",
     "estado": "SE",
-    "cidade": "Porto da Folha"
+    "cidade": "Porto da Folha",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jxoxfr1754162062.png"
   },
   {
     "id": "itabaiana",
@@ -43,7 +46,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1429
+    "rating_inicial": 1429,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/u0v5vk1766508720.png"
   },
   {
     "id": "lagarto",
@@ -55,7 +59,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/c2ckbi1733807843.png"
   },
   {
     "id": "falcon",

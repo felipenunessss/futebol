@@ -10,7 +10,8 @@
       "pais": "BR",
       "nivel": 4
     },
-    "rating_inicial": 1474
+    "rating_inicial": 1474,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m1ampq1766507477.png"
   },
   {
     "id": "america_rn",
@@ -30,7 +31,8 @@
     "nome_popular": "Globo",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Ceará-Mirim"
+    "cidade": "Ceará-Mirim",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/a1tinu1678167131.png"
   },
   {
     "id": "laguna",
@@ -42,7 +44,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/c60elh1754140116.png"
   },
   {
     "id": "potiguar_mossoro",
@@ -50,7 +53,8 @@
     "nome_popular": "Potiguar",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Mossoró"
+    "cidade": "Mossoró",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/rdxl8v1713439337.png"
   },
   {
     "id": "potyguar_seridoense",
@@ -58,7 +62,8 @@
     "nome_popular": "Potyguar",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Currais Novos"
+    "cidade": "Currais Novos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/5hky3q1769570838.png"
   },
   {
     "id": "qfc",
@@ -66,7 +71,8 @@
     "nome_popular": "QFC",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Parnamirim"
+    "cidade": "Parnamirim",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ubj60e1769572889.png"
   },
   {
     "id": "santa_cruz_rn",

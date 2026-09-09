@@ -5,7 +5,8 @@
     "nome_popular": "Foz do Iguaçu",
     "pais": "BR",
     "estado": "PR",
-    "cidade": "Foz do Iguaçu"
+    "cidade": "Foz do Iguaçu",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/84tkjp1769206369.png"
   },
   {
     "id": "fc_cascavel",
@@ -18,7 +19,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7mm0n41678204210.png"
   },
   {
     "id": "cianorte",
@@ -31,7 +33,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/410zld1714066552.png"
   },
   {
     "id": "azuriz",
@@ -44,7 +47,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/sy5amu1688106820.png"
   },
   {
     "id": "maringa_fc",
@@ -57,7 +61,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1534
+    "rating_inicial": 1534,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/u8cdlj1677056366.png"
   },
   {
     "id": "andraus",
@@ -65,7 +70,8 @@
     "nome_popular": "Andraus",
     "pais": "BR",
     "estado": "PR",
-    "cidade": "Campo Largo"
+    "cidade": "Campo Largo",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6pgio61754136794.png"
   },
   {
     "id": "galo_maringa",
@@ -73,6 +79,7 @@
     "nome_popular": "Galo Maringá",
     "pais": "BR",
     "estado": "PR",
-    "cidade": "Maringá"
+    "cidade": "Maringá",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pxj1k21769206043.png"
   }
 ]

@@ -1,18 +1,209 @@
 [
-  { "id": "always_ready", "nome": "Club Always Ready", "nome_popular": "Always Ready", "pais": "BO", "cidade": "El Alto", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1580 },
-  { "id": "abb", "nome": "Academia del Balompié Boliviano", "nome_popular": "ABB", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1321 },
-  { "id": "aurora", "nome": "Club Aurora", "nome_popular": "Aurora", "pais": "BO", "cidade": "Cochabamba", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1444 },
-  { "id": "blooming", "nome": "Club Blooming", "nome_popular": "Blooming", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1420 },
-  { "id": "bolivar", "nome": "Club Bolívar", "nome_popular": "Bolívar", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1654 },
-  { "id": "guabira", "nome": "Club Deportivo Guabirá", "nome_popular": "Guabirá", "pais": "BO", "cidade": "Montero", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1417 },
-  { "id": "gv_san_jose", "nome": "Club Gualberto Villarroel Deportivo San José", "nome_popular": "GV San José", "pais": "BO", "cidade": "Oruro", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1409 },
-  { "id": "independiente_petrolero", "nome": "Club Independiente Petrolero", "nome_popular": "Independiente Petrolero", "pais": "BO", "cidade": "Sucre", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1418 },
-  { "id": "nacional_potosi", "nome": "Club Atlético Nacional Potosí", "nome_popular": "Nacional Potosí", "pais": "BO", "cidade": "Potosí", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1460 },
-  { "id": "oriente_petrolero", "nome": "Club Deportivo Oriente Petrolero", "nome_popular": "Oriente Petrolero", "pais": "BO", "cidade": "Santa Cruz de la Sierra", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1395 },
-  { "id": "real_oruro", "nome": "Club Deportivo Real Oruro", "nome_popular": "Real Oruro", "pais": "BO", "cidade": "Oruro", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1396 },
-  { "id": "real_potosi", "nome": "Club Real Potosí", "nome_popular": "Real Potosí", "pais": "BO", "cidade": "Potosí", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1491 },
-  { "id": "real_tomayapo", "nome": "Club Deportivo Real Tomayapo", "nome_popular": "Real Tomayapo", "pais": "BO", "cidade": "Tarija", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1382 },
-  { "id": "san_antonio_bulo_bulo", "nome": "San Antonio de Bulo Bulo", "nome_popular": "San Antonio", "pais": "BO", "cidade": "Bulo Bulo", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1402 },
-  { "id": "the_strongest", "nome": "Club The Strongest", "nome_popular": "The Strongest", "pais": "BO", "cidade": "La Paz", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1583 },
-  { "id": "universitario_vinto", "nome": "Universitario de Vinto", "nome_popular": "Universitario de Vinto", "pais": "BO", "cidade": "Vinto", "divisao_nacional": { "pais": "BO", "nivel": 1 }, "rating_inicial": 1344 }
+  {
+    "id": "always_ready",
+    "nome": "Club Always Ready",
+    "nome_popular": "Always Ready",
+    "pais": "BO",
+    "cidade": "El Alto",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1580,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/g7rlnw1618943620.png"
+  },
+  {
+    "id": "abb",
+    "nome": "Academia del Balompié Boliviano",
+    "nome_popular": "ABB",
+    "pais": "BO",
+    "cidade": "La Paz",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1321,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mbaccx1730933659.png"
+  },
+  {
+    "id": "aurora",
+    "nome": "Club Aurora",
+    "nome_popular": "Aurora",
+    "pais": "BO",
+    "cidade": "Cochabamba",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1444,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/9jmurg1579798447.png"
+  },
+  {
+    "id": "blooming",
+    "nome": "Club Blooming",
+    "nome_popular": "Blooming",
+    "pais": "BO",
+    "cidade": "Santa Cruz de la Sierra",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1420,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mslln91766423827.png"
+  },
+  {
+    "id": "bolivar",
+    "nome": "Club Bolívar",
+    "nome_popular": "Bolívar",
+    "pais": "BO",
+    "cidade": "La Paz",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1654,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0o5jrz1579798499.png"
+  },
+  {
+    "id": "guabira",
+    "nome": "Club Deportivo Guabirá",
+    "nome_popular": "Guabirá",
+    "pais": "BO",
+    "cidade": "Montero",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1417,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/84bxl51579798562.png"
+  },
+  {
+    "id": "gv_san_jose",
+    "nome": "Club Gualberto Villarroel Deportivo San José",
+    "nome_popular": "GV San José",
+    "pais": "BO",
+    "cidade": "Oruro",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1409,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/nwqcop1706108669.png"
+  },
+  {
+    "id": "independiente_petrolero",
+    "nome": "Club Independiente Petrolero",
+    "nome_popular": "Independiente Petrolero",
+    "pais": "BO",
+    "cidade": "Sucre",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1418,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/v0t6g61614284889.png"
+  },
+  {
+    "id": "nacional_potosi",
+    "nome": "Club Atlético Nacional Potosí",
+    "nome_popular": "Nacional Potosí",
+    "pais": "BO",
+    "cidade": "Potosí",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1460,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/exe2i31579798886.png"
+  },
+  {
+    "id": "oriente_petrolero",
+    "nome": "Club Deportivo Oriente Petrolero",
+    "nome_popular": "Oriente Petrolero",
+    "pais": "BO",
+    "cidade": "Santa Cruz de la Sierra",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1395,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yfvkiz1774884306.png"
+  },
+  {
+    "id": "real_oruro",
+    "nome": "Club Deportivo Real Oruro",
+    "nome_popular": "Real Oruro",
+    "pais": "BO",
+    "cidade": "Oruro",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1396,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yo9i1w1764347774.png"
+  },
+  {
+    "id": "real_potosi",
+    "nome": "Club Real Potosí",
+    "nome_popular": "Real Potosí",
+    "pais": "BO",
+    "cidade": "Potosí",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1491,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/v976og1579799083.png"
+  },
+  {
+    "id": "real_tomayapo",
+    "nome": "Club Deportivo Real Tomayapo",
+    "nome_popular": "Real Tomayapo",
+    "pais": "BO",
+    "cidade": "Tarija",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1382,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7rtter1774884498.png"
+  },
+  {
+    "id": "san_antonio_bulo_bulo",
+    "nome": "San Antonio de Bulo Bulo",
+    "nome_popular": "San Antonio",
+    "pais": "BO",
+    "cidade": "Bulo Bulo",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1402,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/b4sbj21688514660.png"
+  },
+  {
+    "id": "the_strongest",
+    "nome": "Club The Strongest",
+    "nome_popular": "The Strongest",
+    "pais": "BO",
+    "cidade": "La Paz",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1583
+  },
+  {
+    "id": "universitario_vinto",
+    "nome": "Universitario de Vinto",
+    "nome_popular": "Universitario de Vinto",
+    "pais": "BO",
+    "cidade": "Vinto",
+    "divisao_nacional": {
+      "pais": "BO",
+      "nivel": 1
+    },
+    "rating_inicial": 1344,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/snysxt1703001779.png"
+  }
 ]

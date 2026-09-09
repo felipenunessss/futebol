@@ -13,7 +13,8 @@
     "nome_popular": "Castanhal",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Castanhal"
+    "cidade": "Castanhal",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/xj9d3n1625417602.png"
   },
   {
     "id": "tuna_luso",
@@ -25,7 +26,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/r4id9r1768861243.png"
   },
   {
     "id": "aguia_de_maraba",
@@ -37,7 +39,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/j58nnm1733799372.png"
   },
   {
     "id": "capitao_poco",
@@ -45,7 +48,8 @@
     "nome_popular": "Capitão Poço",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Capitão Poço"
+    "cidade": "Capitão Poço",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e3bj2z1754131423.png"
   },
   {
     "id": "santa_rosa_pa",
@@ -53,7 +57,8 @@
     "nome_popular": "Santa Rosa",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Belém"
+    "cidade": "Belém",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/suiefh1768863881.png"
   },
   {
     "id": "cameta",
@@ -61,7 +66,8 @@
     "nome_popular": "Cametá",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Cametá"
+    "cidade": "Cametá",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/tl43e91713439317.png"
   },
   {
     "id": "sao_francisco_pa",
@@ -69,7 +75,8 @@
     "nome_popular": "São Francisco",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Santarém"
+    "cidade": "Santarém",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qqssgm1677056378.png"
   },
   {
     "id": "sao_raimundo_pa",
@@ -85,6 +92,7 @@
     "nome_popular": "Amazônia",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Santarém"
+    "cidade": "Santarém",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wlym8x1768863086.png"
   }
 ]

@@ -166,7 +166,8 @@
     "nome_popular": "São José",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São José dos Campos"
+    "cidade": "São José dos Campos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2mxcvh1736635801.png"
   },
   {
     "id": "sertaozinho",
@@ -182,7 +183,8 @@
     "nome_popular": "Taubaté",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Taubaté"
+    "cidade": "Taubaté",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6xlvwq1764126850.png"
   },
   {
     "id": "votuporanguense",
@@ -190,7 +192,8 @@
     "nome_popular": "Votuporanguense",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Votuporanga"
+    "cidade": "Votuporanga",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mznfgu1733852405.png"
   },
   {
     "id": "bandeirante",
@@ -222,7 +225,8 @@
     "nome_popular": "Francana",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Franca"
+    "cidade": "Franca",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/gntpa01754477094.png"
   },
   {
     "id": "itapirense",
@@ -230,7 +234,8 @@
     "nome_popular": "Itapirense",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Itapira"
+    "cidade": "Itapira",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/i9ojys1754477324.png"
   },
   {
     "id": "marilia",
@@ -238,7 +243,8 @@
     "nome_popular": "Marília",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Marília"
+    "cidade": "Marília",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/njgqjs1626277139.png"
   },
   {
     "id": "paulista_jundiai",
@@ -254,7 +260,8 @@
     "nome_popular": "Portuguesa Santista",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Santos"
+    "cidade": "Santos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/w84dye1754478942.png"
   },
   {
     "id": "rio_branco_americana",
@@ -262,7 +269,8 @@
     "nome_popular": "Rio Branco (Americana)",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Americana"
+    "cidade": "Americana",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/tmq2kt1754478725.png"
   },
   {
     "id": "rio_claro",
@@ -295,7 +303,8 @@
     "nome_popular": "União São João",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Araçoiaba da Serra"
+    "cidade": "Araçoiaba da Serra",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/tnjln21754476119.png"
   },
   {
     "id": "ec_sao_bernardo",
@@ -304,7 +313,8 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "São Bernardo do Campo",
-    "estadio": "1º de Maio"
+    "estadio": "1º de Maio",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0kt1ah1688106304.png"
   },
   {
     "id": "uniao_suzano",
@@ -322,7 +332,8 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Jaú",
-    "estadio": "Zezinho Magalhães"
+    "estadio": "Zezinho Magalhães",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/htmk921734113781.png"
   },
   {
     "id": "inter_de_bebedouro",
@@ -338,7 +349,8 @@
     "nome_popular": "São Caetano",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São Caetano do Sul"
+    "cidade": "São Caetano do Sul",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e72hdi1593453914.png"
   },
   {
     "id": "penapolense",
@@ -403,7 +415,8 @@
     "nome_popular": "Comercial",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Ribeirão Preto"
+    "cidade": "Ribeirão Preto",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/kymwdf1771006776.png"
   },
   {
     "id": "tanabi",

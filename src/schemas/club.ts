@@ -31,4 +31,23 @@ export interface Club {
    * sozinho pelos resultados simulados (não é um valor estático).
    */
   rating_inicial?: number;
+  /**
+   * URL externa do escudo do clube (populado via `scripts/buscar-escudos.ts`,
+   * fonte TheSportsDB) — puramente visual, não afeta nenhuma mecânica do
+   * motor. Ausente quando não foi encontrado um escudo confiável pra esse
+   * clube (ver `docs/dados-a-verificar.md`); a UI web precisa tratar esse
+   * caso (sem imagem/fallback), nunca assumir que está presente.
+   */
+  escudo_url?: string;
+  /**
+   * Cores do clube em hex (ex: "#CC001A"), mesma fonte/script que
+   * `escudo_url` — `cor_primaria` é a 1ª cor reportada pelo TheSportsDB,
+   * `cor_secundaria` a 2ª (quando existe). Puramente visual (ex: fundo da
+   * tela ao assinar contrato); como não há garantia de contraste nem de
+   * qual das duas é "a cor de fundo" vs "a cor de detalhe" pro clube real,
+   * quem for usar isso pra fundo de tela precisa calcular o contraste do
+   * texto em runtime (luminância), nunca assumir texto claro ou escuro.
+   */
+  cor_primaria?: string;
+  cor_secundaria?: string;
 }

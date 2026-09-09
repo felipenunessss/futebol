@@ -283,6 +283,23 @@ pesquisado/confirmado por falta de fonte do nome oficial da rivalidade
 pesquisados. Equador: mantidos só os 2 já existentes, sem 3º por falta de
 fonte boa o suficiente.
 
+## Escudos e cores de clube/competição (`escudo_url`/`cor_primaria`/`cor_secundaria`)
+
+Populado por `scripts/buscar-escudos.ts` (busca na API pública TheSportsDB,
+chave de teste gratuita — só grava a URL externa retornada, nunca baixa a
+imagem). Resultado da rodada mais recente: **340/678 clubes** com escudo
+(a maioria dos clubes de estaduais pequenos/menos conhecidos não está
+catalogada na API — esperado, dado o tamanho da base) e **6/62
+competições** (o endpoint de busca de ligas da chave de teste limita a
+poucos resultados por país, então a maior parte dos estaduais/copas
+nacionais não é encontrável assim — precisaria de uma chave paga da
+TheSportsDB ou de outra fonte pra fechar essa lacuna). Cores (`cor_primaria`/
+`cor_secundaria`) só vêm junto quando o clube tem essa informação cadastrada
+na API — bem mais rara que o escudo em si, mesmo entre os clubes achados.
+Reexecutar o script é seguro (idempotente, só atualiza o que a busca achar
+de novo); útil pra tentar cobrir os que ainda faltam se a API atualizar seu
+catálogo.
+
 ## Como resolver
 
 Cada item acima deveria ser confirmado contra a fonte primária (site da
