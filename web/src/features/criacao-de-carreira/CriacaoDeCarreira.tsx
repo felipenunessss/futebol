@@ -100,6 +100,7 @@ function PassoNacionalidade({ onEscolher }: { onEscolher: (codigo: string) => vo
             onClick={() => onEscolher(nacionalidade.codigo)}
             className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
           >
+            <span className="mr-2">{nacionalidade.bandeira}</span>
             {nacionalidade.nome}
           </button>
         ))}
@@ -274,7 +275,12 @@ function PassoResumo({ estado, nomeClube, onFinalizar }: { estado: NonNullable<R
           {estado.jogador.nome} #{estado.jogador.numero}
         </dd>
         <dt className="text-slate-400">Nacionalidade</dt>
-        <dd>{NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estado.jogador.nacionalidade)?.nome ?? estado.jogador.nacionalidade}</dd>
+        <dd>
+          {(() => {
+            const n = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estado.jogador.nacionalidade);
+            return n ? `${n.bandeira} ${n.nome}` : estado.jogador.nacionalidade;
+          })()}
+        </dd>
         <dt className="text-slate-400">Posição</dt>
         <dd>{ROTULO_POSICAO[estado.jogador.posicao]}</dd>
         <dt className="text-slate-400">Clube</dt>

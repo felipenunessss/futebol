@@ -8,7 +8,8 @@ import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
-import { useTemporada, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
+import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
+import type { StatusNoClube } from "@motor/career/status.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
   goleiro: "Goleiro",
@@ -73,26 +74,41 @@ function formatarImpactoResumido(impacto: ImpactoCarreira): string {
 
 export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarreira }) {
   const temporada = useTemporada(estadoInicial);
-  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, tabelaPorCampeonato, resultado, clubePorId, nomePorCampeonato } = temporada;
+  const {
+    estadoAtual,
+    fase,
+    feed,
+    promptPendente,
+    partidaAoVivo,
+    tabelaPorCampeonato,
+    faseMataMataPorCampeonato,
+    competicoesDoJogador,
+    estatisticasCarreira,
+    resultado,
+    clubePorId,
+    nomePorCampeonato,
+  } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
   const promptSemana = promptPendente?.tipo === "semana" ? promptPendente : undefined;
   const promptPrePartida = promptPendente?.tipo === "pre_partida" ? promptPendente : undefined;
+  const promptSeguirCampeonatos = promptPendente?.tipo === "seguir_campeonatos" ? promptPendente : undefined;
   const promptDaPartidaAoVivo = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
-  const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptDaPartidaAoVivo ? promptPendente : undefined;
+  const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
+  const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+      {competicoesDoJogador.length > 0 && (
+        <PainelDeCompeticoes competicoesDoJogador={competicoesDoJogador} tabelaPorCampeonato={tabelaPorCampeonato} faseMataMataPorCampeonato={faseMataMataPorCampeonato} clubeId={estadoAtual.clubeAtualId} nomePorCampeonato={nomePorCampeonato} />
+      )}
       <div className="mx-auto max-w-3xl flex flex-col gap-4">
-        <Cabecalho
-          estado={estadoAtual}
-          nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
-          nomeDaNacionalidade={nomeDaNacionalidade}
-          assistirAoVivo={assistirAoVivo}
-          onAlternarAssistirAoVivo={temporada.alternarAssistirAoVivo}
-        />
+        <Cabecalho estado={estadoAtual} nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)} nomeDaNacionalidade={nomeDaNacionalidade} estatisticasCarreira={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />
 
         {promptSemana && (
           <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.responderSemana} />
+        )}
+        {promptSeguirCampeonatos && (
+          <PainelSeguirCampeonatos idsAtivos={promptSeguirCampeonatos.idsAtivos} nomePorCampeonato={nomePorCampeonato} onConfirmar={temporada.responderSeguirCampeonatos} />
         )}
         {promptPrePartida && (
           <PainelPrePartida
@@ -100,7 +116,9 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
             clubePorId={clubePorId}
             nomePorCampeonato={nomePorCampeonato}
             tabelaPorCampeonato={tabelaPorCampeonato}
-            onComecar={temporada.responderPrePartida}
+            status={estadoAtual.statusNoClube}
+            lesionado={lesionado}
+            onEscolher={temporada.responderPrePartida}
           />
         )}
         {partidaAoVivo && (
@@ -125,21 +143,58 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   );
 }
 
+function PainelDeCompeticoes({
+  competicoesDoJogador,
+  tabelaPorCampeonato,
+  faseMataMataPorCampeonato,
+  clubeId,
+  nomePorCampeonato,
+}: {
+  competicoesDoJogador: string[];
+  tabelaPorCampeonato: Map<string, LinhaTabela[]>;
+  faseMataMataPorCampeonato: Map<string, { etapa: string; eliminado: boolean }>;
+  clubeId: string;
+  nomePorCampeonato: Map<string, string>;
+}) {
+  return (
+    <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
+      <h2 className="font-semibold text-slate-400">Suas competições</h2>
+      {competicoesDoJogador.map((campeonatoId) => {
+        const posicao = posicaoNaTabela(tabelaPorCampeonato.get(campeonatoId), clubeId);
+        const fase = faseMataMataPorCampeonato.get(campeonatoId);
+        return (
+          <div key={campeonatoId} className="border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
+            <div className="font-medium text-slate-200">{nomeDoCampeonato(nomePorCampeonato, campeonatoId)}</div>
+            {fase ? (
+              <div className={fase.eliminado ? "text-slate-500" : "text-emerald-400"}>{fase.eliminado ? `Eliminado (${fase.etapa})` : fase.etapa}</div>
+            ) : posicao ? (
+              <div className="text-slate-400">{posicao}º colocado</div>
+            ) : (
+              <div className="text-slate-500">aguardando dados</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Cabecalho({
   estado,
   nomeClube,
   nomeDaNacionalidade,
-  assistirAoVivo,
-  onAlternarAssistirAoVivo,
+  estatisticasCarreira,
+  nomePorCampeonato,
 }: {
   estado: EstadoDeCarreira;
   nomeClube: string;
   nomeDaNacionalidade: string | undefined;
-  assistirAoVivo: boolean;
-  onAlternarAssistirAoVivo: () => void;
+  estatisticasCarreira: EstatisticasCarreira;
+  nomePorCampeonato: Map<string, string>;
 }) {
   const xpNecessario = xpParaProximoNivel(estado.nivel);
   const progresso = Math.min(100, Math.round((estado.xpAcumulado / xpNecessario) * 100));
+  const [mostrarEstatisticas, setMostrarEstatisticas] = useState(false);
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3">
@@ -168,10 +223,37 @@ function Cabecalho({
           <div className="h-full bg-emerald-500" style={{ width: `${progresso}%` }} />
         </div>
       </div>
-      <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
-        <input type="checkbox" checked={assistirAoVivo} onChange={onAlternarAssistirAoVivo} className="accent-emerald-500" />
-        Assistir minhas partidas ao vivo (senão elas resolvem direto pro placar final)
-      </label>
+      <button type="button" onClick={() => setMostrarEstatisticas((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+        {mostrarEstatisticas ? "Ocultar" : "Ver"} estatísticas da carreira
+      </button>
+      {mostrarEstatisticas && <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />}
+    </div>
+  );
+}
+
+function PainelEstatisticas({ estatisticas, nomePorCampeonato }: { estatisticas: EstatisticasCarreira; nomePorCampeonato: Map<string, string> }) {
+  return (
+    <div className="rounded-lg bg-slate-800/60 p-3 text-sm flex flex-col gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <Stat rotulo="Temporadas" valor={estatisticas.temporadas} />
+        <Stat rotulo="Partidas" valor={estatisticas.partidas} />
+        <Stat rotulo="Gols" valor={estatisticas.gols} />
+        <Stat rotulo="Assistências" valor={estatisticas.assistencias} />
+      </div>
+      <div>
+        <div className="text-slate-400 text-xs mb-1">Títulos ({estatisticas.titulos.length})</div>
+        {estatisticas.titulos.length === 0 ? (
+          <p className="text-xs text-slate-500">Nenhum título ainda.</p>
+        ) : (
+          <ul className="text-xs text-slate-300 flex flex-col gap-0.5">
+            {estatisticas.titulos.map((t, indice) => (
+              <li key={indice}>
+                🏆 {nomeDoCampeonato(nomePorCampeonato, t.campeonatoId)} — {t.temporada}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
@@ -225,18 +307,68 @@ function PainelSemana({
   );
 }
 
+function PainelSeguirCampeonatos({
+  idsAtivos,
+  nomePorCampeonato,
+  onConfirmar,
+}: {
+  idsAtivos: string[];
+  nomePorCampeonato: Map<string, string>;
+  onConfirmar: (idsEscolhidos: string[]) => void;
+}) {
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
+
+  function alternar(id: string): void {
+    setSelecionados((atual) => {
+      const novo = new Set(atual);
+      if (novo.has(id)) novo.delete(id);
+      else novo.add(id);
+      return novo;
+    });
+  }
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3">
+      <h2 className="text-lg font-semibold">Outras competições ativas nesta temporada</h2>
+      <p className="text-sm text-slate-400">Escolha quais você quer acompanhar com resumo de tabela a cada período (nenhuma é obrigatória).</p>
+      <div className="grid gap-2 max-h-72 overflow-y-auto pr-1">
+        {idsAtivos.map((id) => (
+          <label key={id} className="flex items-center gap-2 rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 cursor-pointer hover:border-emerald-500 transition-colors">
+            <input type="checkbox" checked={selecionados.has(id)} onChange={() => alternar(id)} className="accent-emerald-500" />
+            {nomeDoCampeonato(nomePorCampeonato, id)}
+          </label>
+        ))}
+      </div>
+      <button type="button" onClick={() => onConfirmar([...selecionados])} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
+        Confirmar
+      </button>
+    </div>
+  );
+}
+
+const ROTULO_STATUS: Record<StatusNoClube, string> = {
+  promessa: "Promessa",
+  reserva: "Reserva",
+  titular: "Titular",
+  idolo: "Ídolo",
+};
+
 function PainelPrePartida({
   contexto,
   clubePorId,
   nomePorCampeonato,
   tabelaPorCampeonato,
-  onComecar,
+  status,
+  lesionado,
+  onEscolher,
 }: {
   contexto: ContextoPartidaDoJogadorSemanal;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
-  onComecar: () => void;
+  status: StatusNoClube;
+  lesionado: boolean;
+  onEscolher: (escolha: EscolhaDePrePartida) => void;
 }) {
   const mandanteNome = nomeDoClube(clubePorId, contexto.mandanteId);
   const visitanteNome = nomeDoClube(clubePorId, contexto.visitanteId);
@@ -260,10 +392,32 @@ function PainelPrePartida({
           <div className="text-xs text-slate-400">{posicaoVisitante ? `${posicaoVisitante}º colocado` : "posição ainda não disponível"}</div>
         </div>
       </div>
-      <p className="text-xs text-slate-500 text-center">Você joga {contexto.lado === "casa" ? "em casa" : "fora"}.</p>
-      <button type="button" onClick={onComecar} className="rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
-        Começar partida
-      </button>
+      <p className="text-xs text-slate-500 text-center">
+        Você joga {contexto.lado === "casa" ? "em casa" : "fora"} — status no elenco: <span className="text-slate-300">{ROTULO_STATUS[status]}</span>
+      </p>
+      {lesionado && <p className="text-xs text-amber-400 text-center">⚠️ Você está jogando lesionado — cuidado com as decisões durante a partida.</p>}
+      <div className="grid gap-2">
+        <button type="button" onClick={() => onEscolher("rapida")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
+          Simulação rápida (direto pro resultado)
+        </button>
+        <button
+          type="button"
+          onClick={() => onEscolher("ate_a_metade")}
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+        >
+          Simular até a metade da temporada (não pergunta de novo até lá)
+        </button>
+        <button
+          type="button"
+          onClick={() => onEscolher("ate_o_final")}
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+        >
+          Simular até o final da temporada direto (não pergunta mais nada este ano)
+        </button>
+        <button type="button" onClick={() => onEscolher("ao_vivo")} className="rounded-lg bg-emerald-900/40 border border-emerald-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors">
+          Simular o jogo (ao vivo — pausa em lances importantes)
+        </button>
+      </div>
     </div>
   );
 }
@@ -558,6 +712,14 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
           {resultado.chancesJogador.length > 0 && (
             <span className="text-slate-400"> — suas chances: {resultado.chancesJogador.length} ({resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)</span>
           )}
+        </Card>
+      );
+    }
+    case "partida_rodada": {
+      const { confronto, resultado } = evento.info.evento;
+      return (
+        <Card sutil>
+          {nomeDoClube(clubePorId, confronto.mandante)} {resultado.golsCasa} x {resultado.golsFora} {nomeDoClube(clubePorId, confronto.visitante)}
         </Card>
       );
     }

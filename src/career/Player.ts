@@ -50,6 +50,8 @@ export interface EstadoDeCarreira {
   xpAcumulado: number;
   /** Pontos de atributo ganhos em level-ups e ainda não gastos (`investirPontos`) — não precisa gastar tudo de uma vez, fica acumulado. */
   pontosDisponiveis: number;
+  /** Memória narrativa persistente entre cenários (ex: `"lesionado"`) — ver `progression/scenarios.ts` `Gatilho.requerBandeiras`/`excluiSeBandeiras` e `ImpactoCarreira.ativarBandeiras`/`desativarBandeiras`. */
+  bandeirasNarrativas: string[];
 }
 
 export interface OpcoesEstadoInicial {
@@ -161,6 +163,7 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
     nivel: 1,
     xpAcumulado: 0,
     pontosDisponiveis: 0,
+    bandeirasNarrativas: [],
     moral: MORAL_INICIAL,
     reputacao: criarReputacaoInicial(),
     relacoesInternas: RELACOES_INTERNAS_INICIAL,
@@ -279,6 +282,7 @@ export function aplicarImpactoDeCenario(
     moral: estado.moral,
     reputacao: estado.reputacao,
     relacoesInternas: estado.relacoesInternas,
+    bandeirasNarrativas: estado.bandeirasNarrativas,
   };
   const atualizado = aplicarImpacto(parcial, impacto, regiaoAtual);
 
@@ -288,6 +292,7 @@ export function aplicarImpactoDeCenario(
     moral: atualizado.moral,
     reputacao: atualizado.reputacao,
     relacoesInternas: atualizado.relacoesInternas,
+    bandeirasNarrativas: atualizado.bandeirasNarrativas,
   };
 }
 

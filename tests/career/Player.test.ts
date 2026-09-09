@@ -283,6 +283,17 @@ describe("aplicarImpactoDeCenario", () => {
     expect(depois.temporada).toBe(estado.temporada);
     expect(depois.jogador.posicao).toBe(estado.jogador.posicao);
   });
+
+  it("ativa e desativa bandeirasNarrativas a partir do impacto", () => {
+    const estado = estadoBase();
+    expect(estado.bandeirasNarrativas).toEqual([]);
+
+    const lesionado = aplicarImpactoDeCenario(estado, { ativarBandeiras: ["lesionado"], narrativa: "x" });
+    expect(lesionado.bandeirasNarrativas).toEqual(["lesionado"]);
+
+    const recuperado = aplicarImpactoDeCenario(lesionado, { desativarBandeiras: ["lesionado"], narrativa: "x" });
+    expect(recuperado.bandeirasNarrativas).toEqual([]);
+  });
 });
 
 describe("transferirParaClube", () => {

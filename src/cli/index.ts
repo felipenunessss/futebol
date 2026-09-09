@@ -228,6 +228,7 @@ function simularCenario(): void {
     moral: 50,
     reputacao: { nacional: 50, porRegiao: { SP: 20 } },
     relacoesInternas: 50,
+    bandeirasNarrativas: [],
   };
   const escolha = resolverEscolha(opcaoEscolhida);
   const estadoDepois = aplicarImpacto(estadoAntes, escolha.resultado.impacto, "SP");

@@ -86,6 +86,7 @@ describe("aplicarImpacto", () => {
       moral: 50,
       reputacao: { nacional: 50, porRegiao: {} },
       relacoesInternas: 50,
+      bandeirasNarrativas: [],
     };
   }
 
@@ -148,6 +149,24 @@ describe("aplicarImpacto", () => {
     const estado = estadoBase();
     const resultado = aplicarImpacto(estado, { narrativa: "nada acontece" });
     expect(resultado).toEqual(estado);
+  });
+
+  it("ativarBandeiras liga uma bandeira nova sem duplicar quem já estava ativa", () => {
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), bandeirasNarrativas: ["lesionado"] };
+    const resultado = aplicarImpacto(estado, { ativarBandeiras: ["lesionado", "ja_teve_lesao"], narrativa: "x" });
+    expect(resultado.bandeirasNarrativas.sort()).toEqual(["ja_teve_lesao", "lesionado"]);
+  });
+
+  it("desativarBandeiras remove só a bandeira pedida, preservando as demais", () => {
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), bandeirasNarrativas: ["lesionado", "ja_teve_lesao"] };
+    const resultado = aplicarImpacto(estado, { desativarBandeiras: ["lesionado"], narrativa: "x" });
+    expect(resultado.bandeirasNarrativas).toEqual(["ja_teve_lesao"]);
+  });
+
+  it("sem ativarBandeiras/desativarBandeiras, bandeirasNarrativas não muda (mesma referência)", () => {
+    const estado: EstadoJogadorParaImpacto = { ...estadoBase(), bandeirasNarrativas: ["lesionado"] };
+    const resultado = aplicarImpacto(estado, { narrativa: "x" });
+    expect(resultado.bandeirasNarrativas).toBe(estado.bandeirasNarrativas);
   });
 });
 
@@ -225,6 +244,33 @@ describe("cenarioElegivel / filtrarCenariosElegiveis", () => {
     const cenario = CENARIOS.find((c) => c.id === "proposta_clube_grande")!;
     expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "reta_final" })).toBe(false);
     expect(cenarioElegivel(cenario, { ...contextoBase(), momento: "pre_temporada" })).toBe(true);
+  });
+
+  it("requerBandeiras exige TODAS as bandeiras listadas ativas", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { requerBandeiras: ["lesionado"] } };
+    expect(cenarioElegivel(cenario, contextoBase())).toBe(false); // sem bandeirasNarrativas no contexto, equivale a nenhuma ativa
+    expect(cenarioElegivel(cenario, { ...contextoBase(), bandeirasNarrativas: [] })).toBe(false);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), bandeirasNarrativas: ["outra"] })).toBe(false);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), bandeirasNarrativas: ["lesionado"] })).toBe(true);
+  });
+
+  it("excluiSeBandeiras torna inelegível se QUALQUER uma das bandeiras estiver ativa", () => {
+    const cenario: Cenario = { id: "x", titulo: "x", descricao: "x", opcoes: [], gatilho: { excluiSeBandeiras: ["lesionado"] } };
+    expect(cenarioElegivel(cenario, contextoBase())).toBe(true); // sem bandeira nenhuma, não exclui
+    expect(cenarioElegivel(cenario, { ...contextoBase(), bandeirasNarrativas: ["outra"] })).toBe(true);
+    expect(cenarioElegivel(cenario, { ...contextoBase(), bandeirasNarrativas: ["lesionado"] })).toBe(false);
+  });
+
+  it("cadeia real de lesão: cenário de nova lesão fica inelegível enquanto já lesionado, e o de retorno só fica elegível lesionado", () => {
+    const novaLesao = CENARIOS.find((c) => c.id === "lesao_treino")!;
+    const retorno = CENARIOS.find((c) => c.id === "retorno_de_lesao_com_receio_de_recair")!;
+    const contextoLesionado: ContextoSorteio = { ...contextoBase(), momento: "temporada_regular", bandeirasNarrativas: ["lesionado"] };
+    const contextoSaudavel: ContextoSorteio = { ...contextoBase(), momento: "temporada_regular", bandeirasNarrativas: [] };
+
+    expect(cenarioElegivel(novaLesao, contextoSaudavel)).toBe(true);
+    expect(cenarioElegivel(novaLesao, contextoLesionado)).toBe(false);
+    expect(cenarioElegivel(retorno, contextoSaudavel)).toBe(false);
+    expect(cenarioElegivel(retorno, contextoLesionado)).toBe(true);
   });
 });
 

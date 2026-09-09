@@ -94,17 +94,17 @@ export function buscarArquetipo(id: string): Arquetipo {
  * Puramente informativo por enquanto — não afeta nenhuma mecânica do motor,
  * mesmo espírito de outros campos "flavor" como `Club.cidade`/`estadio`.
  */
-export const NACIONALIDADES_CONMEBOL: { codigo: string; nome: string }[] = [
-  { codigo: "AR", nome: "Argentina" },
-  { codigo: "BO", nome: "Bolívia" },
-  { codigo: "BR", nome: "Brasil" },
-  { codigo: "CL", nome: "Chile" },
-  { codigo: "CO", nome: "Colômbia" },
-  { codigo: "EC", nome: "Equador" },
-  { codigo: "PE", nome: "Peru" },
-  { codigo: "PY", nome: "Paraguai" },
-  { codigo: "UY", nome: "Uruguai" },
-  { codigo: "VE", nome: "Venezuela" },
+export const NACIONALIDADES_CONMEBOL: { codigo: string; nome: string; bandeira: string }[] = [
+  { codigo: "AR", nome: "Argentina", bandeira: "🇦🇷" },
+  { codigo: "BO", nome: "Bolívia", bandeira: "🇧🇴" },
+  { codigo: "BR", nome: "Brasil", bandeira: "🇧🇷" },
+  { codigo: "CL", nome: "Chile", bandeira: "🇨🇱" },
+  { codigo: "CO", nome: "Colômbia", bandeira: "🇨🇴" },
+  { codigo: "EC", nome: "Equador", bandeira: "🇪🇨" },
+  { codigo: "PE", nome: "Peru", bandeira: "🇵🇪" },
+  { codigo: "PY", nome: "Paraguai", bandeira: "🇵🇾" },
+  { codigo: "UY", nome: "Uruguai", bandeira: "🇺🇾" },
+  { codigo: "VE", nome: "Venezuela", bandeira: "🇻🇪" },
 ];
 
 export interface Jogador {

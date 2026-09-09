@@ -439,6 +439,7 @@ async function resolverPeriodoDaCarreira(
     moral: estadoAtual.moral,
     relacoesInternas: estadoAtual.relacoesInternas,
     momento,
+    bandeirasNarrativas: estadoAtual.bandeirasNarrativas,
   };
 
   // Cenários "de transferência" (compra ou venda forçada) só entram no sorteio quando há o

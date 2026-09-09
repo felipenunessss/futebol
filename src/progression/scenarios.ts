@@ -28,6 +28,17 @@ export interface ImpactoCarreira {
   reputacaoRegional?: number;
   /** Delta nas relações com elenco/comissão técnica/diretoria (um número só, agregado — ver docs/motor-de-partida.md). Clampado 0-100. */
   relacoesInternas?: number;
+  /**
+   * Liga "bandeiras" narrativas (string livre, ex: `"lesionado"`) no
+   * estado do jogador — memória persistente entre cenários, pra dar
+   * coerência/timeline (ex: só oferecer "retorno de lesão" depois de um
+   * cenário que ativou `"lesionado"`). Ver `Gatilho.requerBandeiras`/
+   * `excluiSeBandeiras` e `career/Player.ts` `EstadoDeCarreira.bandeirasNarrativas`.
+   * Idempotente — ativar uma bandeira já ativa não duplica.
+   */
+  ativarBandeiras?: string[];
+  /** Desliga bandeiras narrativas — ver `ativarBandeiras`. Idempotente. */
+  desativarBandeiras?: string[];
   /** Texto livre descrevendo o desfecho, pra mostrar ao jogador. */
   narrativa: string;
 }
@@ -122,6 +133,15 @@ export interface Gatilho {
   relacoesInternasMaxima?: number;
   /** Momentos em que o cenário faz sentido (ver `MomentoDeCarreira`). Omitido = qualquer momento. */
   momentos?: MomentoDeCarreira[];
+  /**
+   * Bandeiras narrativas que TODAS precisam estar ativas pro cenário ser
+   * elegível (ver `ImpactoCarreira.ativarBandeiras`) — ex: um cenário de
+   * "retorno de lesão" exige `["lesionado"]`, senão não faz sentido
+   * acontecer. Omitido = não exige nenhuma.
+   */
+  requerBandeiras?: string[];
+  /** Bandeiras narrativas que, se QUALQUER uma estiver ativa, tornam o cenário inelegível — ex: um cenário de "nova lesão" exclui `["lesionado"]` (não rola ficar lesionado de novo por cima). Omitido = não exclui nenhuma. */
+  excluiSeBandeiras?: string[];
 }
 
 /** Contexto atual do jogador/carreira usado pra decidir quais cenários são elegíveis (ver `filtrarCenariosElegiveis`). */
@@ -134,6 +154,8 @@ export interface ContextoSorteio {
   relacoesInternas: number;
   /** Omitido = não filtra por momento, mesmo que algum cenário declare `gatilho.momentos`. */
   momento?: MomentoDeCarreira;
+  /** Bandeiras narrativas ativas agora (ver `Gatilho.requerBandeiras`/`excluiSeBandeiras`) — omitido equivale a nenhuma ativa. */
+  bandeirasNarrativas?: string[];
 }
 
 /** Confere se um cenário é elegível num contexto — usado por `filtrarCenariosElegiveis`. */
@@ -152,6 +174,10 @@ export function cenarioElegivel(cenario: Cenario, contexto: ContextoSorteio): bo
   if (g.relacoesInternasMinima !== undefined && contexto.relacoesInternas < g.relacoesInternasMinima) return false;
   if (g.relacoesInternasMaxima !== undefined && contexto.relacoesInternas > g.relacoesInternasMaxima) return false;
   if (g.momentos && contexto.momento && !g.momentos.includes(contexto.momento)) return false;
+
+  const bandeiras = contexto.bandeirasNarrativas ?? [];
+  if (g.requerBandeiras && !g.requerBandeiras.every((b) => bandeiras.includes(b))) return false;
+  if (g.excluiSeBandeiras && g.excluiSeBandeiras.some((b) => bandeiras.includes(b))) return false;
 
   return true;
 }
@@ -250,6 +276,8 @@ export interface EstadoJogadorParaImpacto {
   moral: number;
   reputacao: Reputacao;
   relacoesInternas: number;
+  /** Ver `ImpactoCarreira.ativarBandeiras`/`desativarBandeiras` e `ContextoSorteio.bandeirasNarrativas`. */
+  bandeirasNarrativas: string[];
 }
 
 /**
@@ -277,6 +305,14 @@ export function aplicarImpacto(
     porRegiao[regiaoAtual] = clamp((porRegiao[regiaoAtual] ?? 0) + impacto.reputacaoRegional, 0, 100);
   }
 
+  let bandeirasNarrativas = estado.bandeirasNarrativas;
+  if (impacto.ativarBandeiras?.length || impacto.desativarBandeiras?.length) {
+    const conjunto = new Set(bandeirasNarrativas);
+    for (const b of impacto.ativarBandeiras ?? []) conjunto.add(b);
+    for (const b of impacto.desativarBandeiras ?? []) conjunto.delete(b);
+    bandeirasNarrativas = [...conjunto];
+  }
+
   return {
     atributos,
     moral: clamp(estado.moral + (impacto.moral ?? 0), 0, 100),
@@ -285,6 +321,7 @@ export function aplicarImpacto(
       porRegiao,
     },
     relacoesInternas: clamp(estado.relacoesInternas + (impacto.relacoesInternas ?? 0), 0, 100),
+    bandeirasNarrativas,
   };
 }
 
@@ -335,13 +372,21 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_treino",
     titulo: "Lesão durante o treino",
     descricao: "Numa sessão de treino, você sente uma dor muscular incomum. O departamento médico pede pra você decidir como seguir.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
+    gatilho: { momentos: ["temporada_regular", "reta_final"], excluiSeBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "jogar_mesmo_assim",
         texto: "Ignorar a dor e jogar mesmo assim",
         resultados: [
-          { probabilidade: 0.3, impacto: { atributos: { forca_fisica: -5, resistencia: -5 }, moral: -10, narrativa: "A dor piora em campo — você fica semanas fora por lesão mais séria." } },
+          {
+            probabilidade: 0.3,
+            impacto: {
+              atributos: { forca_fisica: -5, resistencia: -5 },
+              moral: -10,
+              ativarBandeiras: ["lesionado", "ja_teve_lesao"],
+              narrativa: "A dor piora em campo — você fica semanas fora por lesão mais séria.",
+            },
+          },
           { probabilidade: 0.7, impacto: { atributos: { frieza: 2 }, moral: 5, narrativa: "Você aguenta bem, sem sequelas, e ganha confiança por ter enfrentado a dor." } },
         ],
       },
@@ -820,22 +865,24 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_grave_temporada",
     titulo: "Lesão grave, temporada em risco",
     descricao: "Um exame aponta uma lesão séria — o departamento médico apresenta duas linhas de tratamento.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
+    // A premissa já É a lesão (o exame a confirma) — toda opção/resultado ativa "lesionado", a
+    // escolha aqui é só o tratamento. excluiSeBandeiras evita empilhar em cima de outra já ativa.
+    gatilho: { momentos: ["temporada_regular", "reta_final"], excluiSeBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "cirurgia_e_recuperacao_padrao",
         texto: "Cirurgia e reabilitação no ritmo recomendado",
         resultados: [
-          { probabilidade: 0.8, impacto: { moral: -5, narrativa: "A recuperação é longa, mas sem sequelas — você volta no ritmo esperado." } },
-          { probabilidade: 0.2, impacto: { atributos: { resistencia: -3 }, moral: -15, narrativa: "A recuperação tem complicações e demora mais do que o previsto." } },
+          { probabilidade: 0.8, impacto: { moral: -5, ativarBandeiras: ["lesionado", "ja_teve_lesao"], narrativa: "A recuperação é longa, mas sem sequelas — você volta no ritmo esperado." } },
+          { probabilidade: 0.2, impacto: { atributos: { resistencia: -3 }, moral: -15, ativarBandeiras: ["lesionado", "ja_teve_lesao"], narrativa: "A recuperação tem complicações e demora mais do que o previsto." } },
         ],
       },
       {
         id: "tratamento_experimental_acelerado",
         texto: "Arriscar um tratamento experimental pra voltar mais rápido",
         resultados: [
-          { probabilidade: 0.4, impacto: { moral: 10, narrativa: "O tratamento funciona e você volta bem antes do previsto." } },
-          { probabilidade: 0.6, impacto: { atributos: { resistencia: -6, forca_fisica: -4 }, moral: -20, narrativa: "O risco não compensa — a lesão se agrava e deixa sequelas." } },
+          { probabilidade: 0.4, impacto: { moral: 10, ativarBandeiras: ["lesionado", "ja_teve_lesao"], narrativa: "O tratamento funciona e você volta bem antes do previsto." } },
+          { probabilidade: 0.6, impacto: { atributos: { resistencia: -6, forca_fisica: -4 }, moral: -20, ativarBandeiras: ["lesionado", "ja_teve_lesao"], narrativa: "O risco não compensa — a lesão se agrava e deixa sequelas." } },
         ],
       },
     ],
@@ -1731,7 +1778,9 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_recorrente_de_desgaste",
     titulo: "Lesão recorrente de desgaste",
     descricao: "Uma dor que já apareceu outras vezes na temporada volta a incomodar.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
+    // "Recorrente" só faz sentido pra quem já teve alguma lesão na carreira — e é uma dor pontual,
+    // não uma nova lesão séria, então não faz sentido rolar enquanto já está lesionado (fora de campo).
+    gatilho: { momentos: ["temporada_regular", "reta_final"], requerBandeiras: ["ja_teve_lesao"], excluiSeBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "investir_em_tratamento_preventivo",
@@ -1892,14 +1941,22 @@ export const CENARIOS: Cenario[] = [
     id: "lesao_as_vesperas_de_torneio",
     titulo: "Lesão às vésperas de um grande torneio",
     descricao: "Um desconforto muscular aparece justamente às vésperas da estreia de um grande torneio.",
-    gatilho: { reputacaoNacionalMinima: 35 },
+    gatilho: { reputacaoNacionalMinima: 35, excluiSeBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "arriscar_jogar_mesmo_assim",
         texto: "Arriscar jogar mesmo assim",
         resultados: [
           { probabilidade: 0.4, impacto: { reputacao: 10, narrativa: "Você joga bem apesar do desconforto e o torneio sai sem sequelas." } },
-          { probabilidade: 0.6, impacto: { atributos: { resistencia: -5 }, moral: -15, narrativa: "A lesão piora em pleno torneio e você desfalca a equipe nos jogos seguintes." } },
+          {
+            probabilidade: 0.6,
+            impacto: {
+              atributos: { resistencia: -5 },
+              moral: -15,
+              ativarBandeiras: ["lesionado", "ja_teve_lesao"],
+              narrativa: "A lesão piora em pleno torneio e você desfalca a equipe nos jogos seguintes.",
+            },
+          },
         ],
       },
       {
@@ -4362,21 +4419,24 @@ export const CENARIOS: Cenario[] = [
     id: "retorno_de_lesao_com_receio_de_recair",
     titulo: "Retorno de lesão com receio de recair",
     descricao: "De volta aos gramados após uma lesão longa, um receio silencioso de recair te acompanha.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
+    // Parte da premissa "de volta aos gramados" — só faz sentido depois de um cenário que ativou
+    // "lesionado", e qualquer desfecho aqui já te devolve à ativa (mesmo o desfecho "ruim" é só um
+    // desconforto passageiro, não uma nova lesão que tire você de campo de novo).
+    gatilho: { momentos: ["temporada_regular", "reta_final"], requerBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "jogar_com_confianca_total",
         texto: "Jogar com confiança total, sem se poupar",
         resultados: [
-          { probabilidade: 0.65, impacto: { atributos: { frieza: 2 }, moral: 10, narrativa: "A confiança total ajuda a recuperar seu melhor nível rapidamente." } },
-          { probabilidade: 0.35, impacto: { atributos: { resistencia: -3 }, moral: -10, narrativa: "O receio se confirma parcialmente, com um novo desconforto na região." } },
+          { probabilidade: 0.65, impacto: { atributos: { frieza: 2 }, moral: 10, desativarBandeiras: ["lesionado"], narrativa: "A confiança total ajuda a recuperar seu melhor nível rapidamente." } },
+          { probabilidade: 0.35, impacto: { atributos: { resistencia: -3 }, moral: -10, desativarBandeiras: ["lesionado"], narrativa: "O receio se confirma parcialmente, com um novo desconforto na região." } },
         ],
       },
       {
         id: "voltar_com_cautela_gradual",
         texto: "Voltar com cautela, aumentando a carga aos poucos",
         resultados: [
-          { probabilidade: 1, impacto: { atributos: { resistencia: 1 }, narrativa: "A volta gradual é mais segura, mesmo que mais lenta." } },
+          { probabilidade: 1, impacto: { atributos: { resistencia: 1 }, desativarBandeiras: ["lesionado"], narrativa: "A volta gradual é mais segura, mesmo que mais lenta." } },
         ],
       },
     ],
@@ -4430,14 +4490,22 @@ export const CENARIOS: Cenario[] = [
     id: "dilema_de_jogar_amistoso_de_selecao_com_risco_de_lesao",
     titulo: "Amistoso de seleção com risco de lesão",
     descricao: "Um amistoso de seleção sem grande importância competitiva ainda assim carrega risco físico real.",
-    gatilho: { reputacaoNacionalMinima: 35 },
+    gatilho: { reputacaoNacionalMinima: 35, excluiSeBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "jogar_o_amistoso_normalmente",
         texto: "Jogar o amistoso normalmente",
         resultados: [
           { probabilidade: 0.8, impacto: { reputacao: 5, narrativa: "O amistoso passa sem incidentes, e sua presença é bem avaliada." } },
-          { probabilidade: 0.2, impacto: { atributos: { resistencia: -4 }, moral: -12, narrativa: "Um lance banal do amistoso resulta numa lesão que ninguém esperava." } },
+          {
+            probabilidade: 0.2,
+            impacto: {
+              atributos: { resistencia: -4 },
+              moral: -12,
+              ativarBandeiras: ["lesionado", "ja_teve_lesao"],
+              narrativa: "Um lance banal do amistoso resulta numa lesão que ninguém esperava.",
+            },
+          },
         ],
       },
       {
@@ -4773,20 +4841,20 @@ export const CENARIOS: Cenario[] = [
     id: "reencontro_com_torcida_apos_longa_lesao",
     titulo: "Reencontro com a torcida após longa lesão",
     descricao: "Depois de meses afastado por lesão grave, você finalmente reencontra a torcida no estádio.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
+    gatilho: { momentos: ["temporada_regular", "reta_final"], requerBandeiras: ["lesionado"] },
     opcoes: [
       {
         id: "fazer_um_gesto_de_gratidao_a_torcida",
         texto: "Fazer um gesto de gratidão à torcida pelo apoio durante a lesão",
         resultados: [
-          { probabilidade: 1, impacto: { reputacaoRegional: 15, moral: 10, narrativa: "O gesto de gratidão emociona o estádio inteiro no seu retorno." } },
+          { probabilidade: 1, impacto: { reputacaoRegional: 15, moral: 10, desativarBandeiras: ["lesionado"], narrativa: "O gesto de gratidão emociona o estádio inteiro no seu retorno." } },
         ],
       },
       {
         id: "focar_apenas_no_jogo_no_retorno",
         texto: "Focar apenas no jogo, sem gestos especiais",
         resultados: [
-          { probabilidade: 1, impacto: { moral: 5, narrativa: "O retorno discreto ainda assim é celebrado pela torcida presente." } },
+          { probabilidade: 1, impacto: { moral: 5, desativarBandeiras: ["lesionado"], narrativa: "O retorno discreto ainda assim é celebrado pela torcida presente." } },
         ],
       },
     ],

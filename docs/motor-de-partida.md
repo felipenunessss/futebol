@@ -2113,8 +2113,87 @@ mostrando contra quem é e a posição de cada time.
   num navegador de verdade nesta sessão (mesma ressalva das seções
   anteriores).
 
+### 5.22. Bandeiras narrativas (coerência de cenários), estatísticas de carreira e retomada de itens da tela web
+
+Depois de testar mais a tela de temporada, uma lista grande de pedidos:
+cenários aleatórios com coerência (não sortear "lesão" já lesionado),
+resultados de outros jogos de volta no feed, o menu completo de modo
+de partida (que só existia na CLI), escolher quais campeonatos
+acompanhar, bandeiras nas nacionalidades, um painel fixo com as
+competições do time, estatísticas de carreira, e uma tela pré-jogo
+mostrando titular/reserva/etc — tudo "conectado com os eventos".
+
+- **Bandeiras narrativas** (`src/progression/scenarios.ts`, mecanismo
+  novo e genérico): `ImpactoCarreira` ganha `ativarBandeiras`/
+  `desativarBandeiras` (string livre, ex: `"lesionado"`);
+  `Gatilho` ganha `requerBandeiras`/`excluiSeBandeiras`;
+  `ContextoSorteio`/`EstadoJogadorParaImpacto` carregam
+  `bandeirasNarrativas`; `cenarioElegivel`/`aplicarImpacto` passam a
+  usar os dois. `career/Player.ts` `EstadoDeCarreira` ganha
+  `bandeirasNarrativas: string[]` (seed `[]`), threaded por
+  `aplicarImpactoDeCenario`; `career-loop.ts` passa
+  `estadoAtual.bandeirasNarrativas` no `ContextoSorteio` de cada
+  cenário sorteado.
+  - **Escopo honesto**: o catálogo tem 610 cenários — não dá pra
+    auditar todos numa sessão. Apliquei o mecanismo POR COMPLETO só na
+    cadeia de lesão (o exemplo literal do pedido): `lesao_treino`,
+    `lesao_grave_temporada`, `lesao_as_vesperas_de_torneio` e
+    `dilema_de_jogar_amistoso_de_selecao_com_risco_de_lesao` ativam
+    `"lesionado"`+`"ja_teve_lesao"` no desfecho ruim (ou sempre, no
+    caso de `lesao_grave_temporada`, cuja premissa já é a lesão) e
+    excluem `"lesionado"` do próprio gatilho (não rola ficar lesionado
+    de novo por cima); `retorno_de_lesao_com_receio_de_recair` e
+    `reencontro_com_torcida_apos_longa_lesao` exigem `"lesionado"` e
+    desativam em qualquer desfecho; `lesao_recorrente_de_desgaste`
+    exige `"ja_teve_lesao"` (histórico) e exclui `"lesionado"` (não é
+    uma lesão nova). `lesao_de_um_titular_abre_espaco` (lesão de um
+    companheiro, não do jogador) não mexe. **Os outros ~600 cenários
+    continuam sem bandeira** — pendência explícita, não escondida;
+    dá pra aplicar o mesmo mecanismo a outras cadeias incrementalmente.
+- **Estatísticas de carreira**: 100% client-side
+  (`web/src/features/temporada/useTemporada.ts`, `estatisticasCarreira`)
+  — soma partidas/gols/assistências/títulos a cada temporada que
+  termina, a partir do que `ResultadoTemporadaDeCarreira` já carrega.
+  Nenhuma mudança em `src/` — o motor não guarda isso. Mostrado num
+  painel que abre pelo cabeçalho ("Ver estatísticas da carreira").
+- **Retomada de itens da tela web** (`useTemporada.ts`/`TelaDeTemporada.tsx`):
+  `escolherCampeonatosParaSeguir` religado (`PainelSeguirCampeonatos`,
+  1x por temporada); `onPartidaDaRodadaNaCompeticaoDoJogador` volta a
+  aparecer no feed (estilo discreto, `Card sutil`); `escolherModoDePartida`
+  virou o menu de 4 opções da CLI (rápida / até a metade / até o final
+  / ao vivo, mesmo `modoAutoAteSemana`) — substitui o toggle simples
+  da v1; `PainelDeCompeticoes` fixo no canto superior direito mostra
+  posição (pontos corridos) ou fase/eliminação (mata-mata) de cada
+  competição do jogador; `PainelPrePartida` ganhou status
+  (titular/reserva/etc) e aviso se `bandeirasNarrativas` tiver
+  `"lesionado"` — só informativo, **não impede a partida ainda**
+  (fazer lesão de verdade tirar o jogador de campo é mudança de motor
+  maior, pendência separada). `NACIONALIDADES_CONMEBOL`
+  (`src/schemas/player.ts`) ganhou campo `bandeira` (emoji), usado na
+  criação de carreira (escolha + resumo).
+- **Validado**: `npm test` (436 testes, 7 novos cobrindo
+  requerBandeiras/excluiSeBandeiras/ativarBandeiras/desativarBandeiras
+  em `tests/progression/scenarios.test.ts` — incluindo um teste com os
+  cenários REAIS da cadeia de lesão, não só cenários sintéticos — e
+  `aplicarImpactoDeCenario` em `tests/career/Player.test.ts`) + `npx
+  tsc --noEmit` limpos na raiz; `cd web && npx tsc -b --noEmit` e `npm
+  run build` limpos. Não testado num navegador de verdade nesta sessão.
+
 ## 6. Pendências / próximos passos
 
+- **Bandeiras narrativas no resto do catálogo de cenários** (seção
+  5.22): o mecanismo de `requerBandeiras`/`excluiSeBandeiras`/
+  `ativarBandeiras`/`desativarBandeiras` é genérico, mas só foi
+  aplicado na cadeia de lesão (7 cenários) — os outros ~600 cenários do
+  catálogo continuam sem bandeira nenhuma. Aplicar incrementalmente a
+  outras cadeias óbvias (renovação de contrato, rivalidades,
+  aposentadoria) quando fizer sentido.
+- **Lesão ainda não impede fisicamente o jogador de jogar** (seção
+  5.22): `bandeirasNarrativas` inclui `"lesionado"` e a tela pré-jogo
+  já avisa, mas o motor não usa isso pra reduzir minutagem/tirar o
+  jogador de partidas de verdade — teria que checar a bandeira em
+  `career/career-loop.ts` antes de incluir `participacaoJogador` numa
+  partida. Mudança de motor maior, não feita ainda.
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
   267/678 clubes com rating real (ver seções 1.1-1.5), o resto no fallback
   por decisão de design documentada (clube sem exposição competitiva
