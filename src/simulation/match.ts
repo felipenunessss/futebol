@@ -31,9 +31,33 @@ export function probabilidadeDeVencer(forcaA: number, forcaB: number): number {
   return 1 / (1 + Math.pow(10, (forcaB - forcaA) / 400));
 }
 
+/**
+ * Teto/piso aplicado só à conversão de UMA chance pontual (uma finalização,
+ * um desarme) — `probabilidadeDeVencer` satura perto de 0/1 pra gaps de
+ * rating comuns entre divisões diferentes (ex: ~450+ de diferença já chega a
+ * ~99%), o que fazia cada uma das ~10-14 chances de uma partida virar quase
+ * certeza pro time forte e produzia placares tipo 10-0/11-0 rotineiros
+ * mesmo com bastante ruído de perfil (`VARIANCIA_PERFIL`). Calibrado junto
+ * com `CHANCES_BASE_POR_PARTIDA`/`VANTAGEM_MAXIMA_DE_MEIO` (ver histórico do
+ * commit) pra times de divisões bem distantes (~900 de gap de rating)
+ * ficarem em torno de 4x1 na média, com goleada de 6+ gols de diferença
+ * numa fração pequena (~4%) das partidas, não na maioria delas. Não se
+ * aplica ao duelo de meio-campo que decide a FATIA de chances de cada time
+ * (`simularPartida`/`live-match.ts` continuam usando `probabilidadeDeVencer`
+ * puro ali) — só limita a conversão de cada chance já distribuída, pra
+ * manter zebra pontual possível mesmo entre times muito desiguais.
+ */
+const PROBABILIDADE_MINIMA_POR_DUELO = 0.3;
+const PROBABILIDADE_MAXIMA_POR_DUELO = 0.55;
+
+/** `probabilidadeDeVencer` com o teto/piso de `resolverDuelo` já aplicado — exportado pra quem quiser EXIBIR a chance de um duelo pontual (ex: UI de partida ao vivo) mostrar o número que de fato vale, não a probabilidade bruta saturada. */
+export function probabilidadeDeDuelo(forcaA: number, forcaB: number): number {
+  return Math.min(PROBABILIDADE_MAXIMA_POR_DUELO, Math.max(PROBABILIDADE_MINIMA_POR_DUELO, probabilidadeDeVencer(forcaA, forcaB)));
+}
+
 /** Exportado pra `simulation/live-match.ts` reaproveitar o mesmo duelo sem duplicar a fórmula. */
 export function resolverDuelo(forcaA: number, forcaB: number, random: () => number): "A" | "B" {
-  return random() < probabilidadeDeVencer(forcaA, forcaB) ? "A" : "B";
+  return random() < probabilidadeDeDuelo(forcaA, forcaB) ? "A" : "B";
 }
 
 export interface ChanceJogador {
@@ -114,9 +138,9 @@ export function participacaoNoConfronto(
 }
 
 /** Exportado pra `simulation/live-match.ts` calcular o mesmo total de chances de uma partida sem duplicar a conta. */
-export const CHANCES_BASE_POR_PARTIDA = 10;
-/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.3 = até 80%/20% num duelo muito dominante). Exportado pelo mesmo motivo que `CHANCES_BASE_POR_PARTIDA`. */
-export const VANTAGEM_MAXIMA_DE_MEIO = 0.3;
+export const CHANCES_BASE_POR_PARTIDA = 6;
+/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.2 = até 70%/30% num duelo muito dominante). Exportado pelo mesmo motivo que `CHANCES_BASE_POR_PARTIDA`. */
+export const VANTAGEM_MAXIMA_DE_MEIO = 0.2;
 
 export interface ResultadoPartida {
   golsCasa: number;

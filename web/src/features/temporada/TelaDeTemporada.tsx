@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { PeriodoCalendario } from "@motor/schemas/calendar.js";
+import { construirCalendarioPadrao } from "@motor/data/loaders/calendario.js";
 import type { Club } from "@motor/schemas/club.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Atributo, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual, type EstadoDeCarreira } from "@motor/career/Player.js";
@@ -6,10 +8,11 @@ import { xpParaProximoNivel, type FocoDeTreino } from "@motor/progression/xp.js"
 import type { ImpactoCarreira, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
-import { probabilidadeDeVencer } from "@motor/simulation/match.js";
+import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
-import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
+import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
+import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
@@ -96,6 +99,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   const promptDaPartidaAoVivo = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
   const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
   const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
+  const { resultadoDaRodada } = temporada;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
@@ -103,37 +107,54 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         <PainelDeCompeticoes competicoesDoJogador={competicoesDoJogador} tabelaPorCampeonato={tabelaPorCampeonato} faseMataMataPorCampeonato={faseMataMataPorCampeonato} clubeId={estadoAtual.clubeAtualId} nomePorCampeonato={nomePorCampeonato} />
       )}
       <div className="mx-auto max-w-3xl flex flex-col gap-4">
-        <Cabecalho estado={estadoAtual} nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)} nomeDaNacionalidade={nomeDaNacionalidade} estatisticasCarreira={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />
+        <Cabecalho
+          estado={estadoAtual}
+          nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
+          nomeDaNacionalidade={nomeDaNacionalidade}
+          estatisticasCarreira={estatisticasCarreira}
+          nomePorCampeonato={nomePorCampeonato}
+          focoAutomatico={temporada.focoAutomatico}
+          onDesligarTreinoAutomatico={temporada.desligarTreinoAutomatico}
+        />
 
-        {promptSemana && (
-          <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.responderSemana} />
-        )}
-        {promptSeguirCampeonatos && (
-          <PainelSeguirCampeonatos idsAtivos={promptSeguirCampeonatos.idsAtivos} nomePorCampeonato={nomePorCampeonato} onConfirmar={temporada.responderSeguirCampeonatos} />
-        )}
-        {promptPrePartida && (
-          <PainelPrePartida
-            contexto={promptPrePartida.contexto}
-            clubePorId={clubePorId}
-            nomePorCampeonato={nomePorCampeonato}
-            tabelaPorCampeonato={tabelaPorCampeonato}
-            status={estadoAtual.statusNoClube}
-            lesionado={lesionado}
-            onEscolher={temporada.responderPrePartida}
-          />
-        )}
-        {partidaAoVivo && (
-          <PainelPartidaAoVivo
-            partida={partidaAoVivo}
-            clubePorId={clubePorId}
-            prompt={promptDaPartidaAoVivo}
-            onResponderChance={temporada.responderChanceAoVivo}
-            onResponderEvento={temporada.responderEventoAoVivo}
-          />
-        )}
-        {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
-        {fase === "resumo" && resultado && (
-          <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onJogarProxima={() => void temporada.jogarTemporada()} />
+        {/* Enquanto a tela de resultados da rodada está aberta, nenhum outro prompt aparece —
+            o motor já resolveu tudo (não está pausado por causa disso), é só a UI que espera o
+            clique em "avançar" antes de revelar o que já está pendente (ver `useTemporada.ts`). */}
+        {resultadoDaRodada ? (
+          <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
+        ) : (
+          <>
+            {promptSemana && (
+              <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.responderSemana} />
+            )}
+            {promptSeguirCampeonatos && (
+              <PainelSeguirCampeonatos idsAtivos={promptSeguirCampeonatos.idsAtivos} nomePorCampeonato={nomePorCampeonato} onConfirmar={temporada.responderSeguirCampeonatos} />
+            )}
+            {promptPrePartida && (
+              <PainelPrePartida
+                contexto={promptPrePartida.contexto}
+                clubePorId={clubePorId}
+                nomePorCampeonato={nomePorCampeonato}
+                tabelaPorCampeonato={tabelaPorCampeonato}
+                status={estadoAtual.statusNoClube}
+                lesionado={lesionado}
+                onEscolher={temporada.responderPrePartida}
+              />
+            )}
+            {partidaAoVivo && (
+              <PainelPartidaAoVivo
+                partida={partidaAoVivo}
+                clubePorId={clubePorId}
+                prompt={promptDaPartidaAoVivo}
+                onResponderChance={temporada.responderChanceAoVivo}
+                onResponderEvento={temporada.responderEventoAoVivo}
+              />
+            )}
+            {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
+            {fase === "resumo" && resultado && (
+              <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onJogarProxima={() => void temporada.jogarTemporada()} />
+            )}
+          </>
         )}
 
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
@@ -186,16 +207,21 @@ function Cabecalho({
   nomeDaNacionalidade,
   estatisticasCarreira,
   nomePorCampeonato,
+  focoAutomatico,
+  onDesligarTreinoAutomatico,
 }: {
   estado: EstadoDeCarreira;
   nomeClube: string;
   nomeDaNacionalidade: string | undefined;
   estatisticasCarreira: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
+  focoAutomatico: FocoDeTreino | undefined;
+  onDesligarTreinoAutomatico: () => void;
 }) {
   const xpNecessario = xpParaProximoNivel(estado.nivel);
   const progresso = Math.min(100, Math.round((estado.xpAcumulado / xpNecessario) * 100));
   const [mostrarEstatisticas, setMostrarEstatisticas] = useState(false);
+  const [mostrarAtributos, setMostrarAtributos] = useState(false);
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3">
@@ -224,10 +250,28 @@ function Cabecalho({
           <div className="h-full bg-emerald-500" style={{ width: `${progresso}%` }} />
         </div>
       </div>
-      <button type="button" onClick={() => setMostrarEstatisticas((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
-        {mostrarEstatisticas ? "Ocultar" : "Ver"} estatísticas da carreira
-      </button>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button type="button" onClick={() => setMostrarEstatisticas((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+          {mostrarEstatisticas ? "Ocultar" : "Ver"} estatísticas da carreira
+        </button>
+        <button type="button" onClick={() => setMostrarAtributos((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
+          {mostrarAtributos ? "Ocultar" : "Ver"} atributos
+        </button>
+        {focoAutomatico && (
+          <span className="text-xs text-slate-400">
+            Treino rápido ativado ({ROTULO_FOCO[focoAutomatico]}) ·{" "}
+            <button type="button" onClick={onDesligarTreinoAutomatico} className="text-emerald-400 hover:text-emerald-300 transition-colors">
+              voltar a perguntar
+            </button>
+          </span>
+        )}
+      </div>
       {mostrarEstatisticas && <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />}
+      {mostrarAtributos && (
+        <div className="rounded-lg bg-slate-800/60 p-3">
+          <RadarDeAtributos atributos={estado.jogador.atributos} atributosDaPosicao={ATRIBUTOS_POR_POSICAO[estado.jogador.posicao]} />
+        </div>
+      )}
     </div>
   );
 }
@@ -278,6 +322,67 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
   );
 }
 
+const ROTULO_PERIODO: Record<string, string> = {
+  "jan-1a_quinz": "Janeiro (1ª quinzena)",
+  fev: "Fevereiro",
+  mar: "Março",
+  abr: "Abril",
+  "mai-nov": "Maio a novembro",
+  "temporada-conmebol": "Ligas CONMEBOL (fora do Brasil)",
+};
+
+function rotuloPeriodo(periodo: string): string {
+  return ROTULO_PERIODO[periodo] ?? periodo.replaceAll("_", " ").replaceAll("-", " ");
+}
+
+/**
+ * Calendário da TEMPORADA (não semana a semana — o motor não tem granularidade diária/semanal
+ * de "treino terça, jogo sábado", só janelas de período, ver `data/loaders/calendario.ts`) —
+ * mostra em qual período cada treino/cenário acontece (`pontoDeTreino`) e em quais janelas o
+ * clube do jogador tem competição ativa, com o período atual destacado.
+ */
+function CalendarioDaTemporada({
+  periodos,
+  semanaAtual,
+  competicoesDoJogador,
+  nomePorCampeonato,
+}: {
+  periodos: PeriodoCalendario[];
+  semanaAtual: number;
+  competicoesDoJogador: string[];
+  nomePorCampeonato: Map<string, string>;
+}) {
+  return (
+    <div className="rounded-lg bg-slate-800/60 p-3">
+      <div className="text-xs font-medium text-slate-400 mb-2">Calendário da temporada</div>
+      <div className="flex flex-col gap-1.5">
+        {periodos.map((periodo) => {
+          const ehPeriodoAtual = semanaAtual >= periodo.semanaInicio && semanaAtual <= periodo.semanaFim;
+          const temTreino = periodo.pontoDeTreino !== false;
+          const competicoesDoJogadorNoPeriodo = periodo.competicoes_ativas.filter((id) => competicoesDoJogador.includes(id));
+
+          return (
+            <div
+              key={periodo.periodo}
+              className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-3 py-1.5 text-xs ${ehPeriodoAtual ? "bg-emerald-950/60 border border-emerald-700" : "bg-slate-900/60"}`}
+            >
+              <span className="w-40 shrink-0 text-slate-300 font-medium">{rotuloPeriodo(periodo.periodo)}</span>
+              <span className="text-slate-500 tabular-nums shrink-0">sem. {periodo.semanaInicio}-{periodo.semanaFim}</span>
+              {temTreino && <span title="Treino/cenário toda semana desse período">🏋️ treino</span>}
+              {competicoesDoJogadorNoPeriodo.length > 0 ? (
+                <span className="text-emerald-400">⚽ {competicoesDoJogadorNoPeriodo.map((id) => nomeDoCampeonato(nomePorCampeonato, id)).join(", ")}</span>
+              ) : (
+                <span className="text-slate-500">sem jogo do seu clube</span>
+              )}
+              {ehPeriodoAtual && <span className="text-emerald-400 font-medium ml-auto">você está aqui</span>}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function PainelSemana({
   info,
   temporada,
@@ -290,6 +395,7 @@ function PainelSemana({
   onContinuar: () => void;
 }) {
   const { inicio, fim } = intervaloDeSemana(temporada, info.semana);
+  const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3">
@@ -301,6 +407,7 @@ function PainelSemana({
       ) : (
         <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
       )}
+      <CalendarioDaTemporada periodos={periodos} semanaAtual={info.semana} competicoesDoJogador={info.competicoesDoJogador} nomePorCampeonato={nomePorCampeonato} />
       <button type="button" onClick={onContinuar} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
         Continuar
       </button>
@@ -528,7 +635,7 @@ function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoCh
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {opcoes.map(({ rotulo, ajuste }) => {
-          const percentual = Math.round(probabilidadeDeVencer(contexto.forcaJogadorBase + ajuste.ajusteForcaJogador, contexto.forcaDefensivaBase + ajuste.ajusteForcaDefensiva) * 100);
+          const percentual = Math.round(probabilidadeDeDuelo(contexto.forcaJogadorBase + ajuste.ajusteForcaJogador, contexto.forcaDefensivaBase + ajuste.ajusteForcaDefensiva) * 100);
           return (
             <button
               key={rotulo}
@@ -546,13 +653,14 @@ function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoCh
   );
 }
 
-function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino) => void }) {
+function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino, manterAutomatico: boolean) => void }) {
   const focos: { foco: FocoDeTreino; descricao: string }[] = [
     { foco: "fisico", descricao: "velocidade, força, resistência, jogo aéreo, reflexos" },
     { foco: "tecnico", descricao: "finalização, drible, passe, marcação, etc — depende da posição" },
     { foco: "tatico", descricao: "visão de jogo, frieza, posicionamento, liderança" },
     { foco: "descanso", descricao: "recupera moral, não gera XP" },
   ];
+  const [treinoRapido, setTreinoRapido] = useState(false);
 
   return (
     <div className="flex flex-col gap-3">
@@ -562,7 +670,7 @@ function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino) => void }
           <button
             key={f.foco}
             type="button"
-            onClick={() => onEscolher(f.foco)}
+            onClick={() => onEscolher(f.foco, treinoRapido)}
             className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
           >
             <div className="font-medium">{ROTULO_FOCO[f.foco]}</div>
@@ -570,6 +678,10 @@ function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino) => void }
           </button>
         ))}
       </div>
+      <label className="flex items-center gap-2 text-xs text-slate-400 mt-1">
+        <input type="checkbox" checked={treinoRapido} onChange={(evento) => setTreinoRapido(evento.target.checked)} className="accent-emerald-500" />
+        Treino rápido — usar essa escolha em todos os treinos seguintes, sem perguntar de novo
+      </label>
     </div>
   );
 }
@@ -751,6 +863,69 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
     case "tabela":
       return <TabelaCard campeonatoId={evento.campeonatoId} periodo={evento.periodo} tabela={evento.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />;
   }
+}
+
+function PainelResultadoDaRodada({
+  resultadoDaRodada,
+  clubePorId,
+  nomePorCampeonato,
+  onAvancar,
+}: {
+  resultadoDaRodada: ResultadoDaRodadaExibido;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  onAvancar: () => void;
+}) {
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4">
+      {resultadoDaRodada.tipo === "pontos_corridos" ? (
+        <>
+          <h2 className="text-lg font-semibold">
+            {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — Rodada {resultadoDaRodada.rodada}, resultados
+          </h2>
+          <div className="flex flex-col gap-1.5 text-sm">
+            {resultadoDaRodada.confrontos.map((c, indice) => (
+              <div
+                key={indice}
+                className={`flex items-center justify-between rounded-lg px-3 py-1.5 ${c.ehDoJogador ? "bg-emerald-950/60 border border-emerald-800" : "bg-slate-800/60"}`}
+              >
+                <span className="flex-1 text-right truncate">{nomeDoClube(clubePorId, c.mandanteId)}</span>
+                <span className="px-3 font-medium tabular-nums shrink-0">
+                  {c.golsCasa} x {c.golsFora}
+                </span>
+                <span className="flex-1 truncate">{nomeDoClube(clubePorId, c.visitanteId)}</span>
+              </div>
+            ))}
+          </div>
+          {resultadoDaRodada.tabela && (
+            <div>
+              <div className="text-sm font-medium text-slate-300 mb-1.5">Classificação</div>
+              <TabelaCard campeonatoId={resultadoDaRodada.campeonatoId} periodo={`rodada ${resultadoDaRodada.rodada}`} tabela={resultadoDaRodada.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <h2 className="text-lg font-semibold">
+            {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — {resultadoDaRodada.etapa}, resultado
+          </h2>
+          <div className="flex items-center justify-between rounded-lg px-3 py-1.5 bg-emerald-950/60 border border-emerald-800 text-sm">
+            <span className="flex-1 text-right truncate">{nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}</span>
+            <span className="px-3 font-medium tabular-nums shrink-0">
+              {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
+            </span>
+            <span className="flex-1 truncate">{nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}</span>
+          </div>
+          <p className={resultadoDaRodada.eliminado ? "text-slate-400 text-sm" : "text-emerald-400 text-sm font-medium"}>
+            {resultadoDaRodada.eliminado ? "Eliminado(a) dessa competição." : "Avançou para a próxima fase!"}
+          </p>
+        </>
+      )}
+      <button type="button" onClick={onAvancar} className="self-start rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium text-sm">
+        Avançar pra próxima semana
+      </button>
+    </div>
+  );
 }
 
 function TabelaCard({

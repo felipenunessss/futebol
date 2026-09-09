@@ -7,6 +7,7 @@ import {
   PESO_ENVOLVIMENTO_ATAQUE,
   VANTAGEM_MAXIMA_DE_MEIO,
   forcaDoAtributo,
+  probabilidadeDeDuelo,
   probabilidadeDeVencer,
   resolverDuelo,
   type ChanceJogador,
@@ -198,7 +199,7 @@ export async function jogarPartidaAoVivo(
         : DECISAO_PADRAO;
       const forcaJogadorFinal = forcaJogadorBase + decisao.ajusteForcaJogador;
       const forcaDefensivaFinal = forcaDefensivaBase + decisao.ajusteForcaDefensiva;
-      const probabilidade = probabilidadeDeVencer(forcaJogadorFinal, forcaDefensivaFinal);
+      const probabilidade = probabilidadeDeDuelo(forcaJogadorFinal, forcaDefensivaFinal);
       const sucesso = resolverDuelo(forcaJogadorFinal, forcaDefensivaFinal, random) === "A";
 
       const chance: ChanceJogador = { subtipo, sucesso, atributoUsado };
@@ -209,7 +210,7 @@ export async function jogarPartidaAoVivo(
       }
       await onEvento?.({ tipo: "chance_jogador", minuto: slot.minuto, chance, probabilidade });
     } else {
-      const probabilidade = probabilidadeDeVencer(perfilAtacante.ataque, perfilDefensor.defesa);
+      const probabilidade = probabilidadeDeDuelo(perfilAtacante.ataque, perfilDefensor.defesa);
       const gol = resolverDuelo(perfilAtacante.ataque, perfilDefensor.defesa, random) === "A";
       if (gol) {
         if (lado === "casa") golsCasa++;

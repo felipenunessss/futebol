@@ -91,6 +91,29 @@ export interface FaseMataMata {
   eliminado: boolean;
 }
 
+interface ConfrontoResultado {
+  mandanteId: string;
+  visitanteId: string;
+  golsCasa: number;
+  golsFora: number;
+  ehDoJogador: boolean;
+}
+
+/**
+ * Tela de "resultados da rodada" mostrada assim que a partida do próprio
+ * jogador termina — junta os outros confrontos da mesma rodada (buferizados
+ * conforme chegam por `onPartidaDaRodadaNaCompeticaoDoJogador`, que dispara
+ * um a um, sem sinalizar "rodada completa") com a tabela/fase atual, e só
+ * então libera pra próxima semana (`responderResultadoDaRodada`). O motor
+ * não pausa por causa disso — ele já resolveu tudo antes deste hook disparar
+ * (ver `onPartidaPontosCorridos`/`onPartidaMataMata`) — é só a UI que espera
+ * o clique antes de revelar o próximo prompt (pré-partida da próxima
+ * semana, por exemplo), pra não pular a rodada sem o jogador ver.
+ */
+export type ResultadoDaRodadaExibido =
+  | { tipo: "pontos_corridos"; campeonatoId: string; rodada: number; confrontos: ConfrontoResultado[]; tabela: LinhaTabela[] | undefined }
+  | { tipo: "mata_mata"; campeonatoId: string; etapa: string; confrontoDoJogador: ConfrontoResultado; eliminado: boolean };
+
 export interface TituloDeCarreira {
   campeonatoId: string;
   temporada: number;
@@ -138,6 +161,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * de um ref pra ler o valor mais recente mesmo dentro dessa clausura.
    */
   const modoAutoAteSemanaRef = useRef<number | undefined>(undefined);
+  /**
+   * Foco de treino automático ("treino rápido") — quando definido, pula o
+   * `PromptFoco` e resolve direto com esse foco, sem perguntar de novo.
+   * Ref por causa da mesma clausura de `jogarTemporada()` que já explica
+   * `modoAutoAteSemanaRef` acima; `focoAutomatico` (estado) só existe pra UI
+   * mostrar/desligar, o ref é que vale de verdade dentro da Promise.
+   */
+  const focoAutomaticoRef = useRef<FocoDeTreino | undefined>(undefined);
+  const [focoAutomatico, setFocoAutomatico] = useState<FocoDeTreino>();
+  const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
+  /** Confrontos da rodada atual de cada competição, acumulados conforme os hooks disparam (ver `ResultadoDaRodadaExibido`). Reseta ao detectar que uma nova rodada começou. */
+  const bufferRodadaRef = useRef<Map<string, { rodada: number; confrontos: ConfrontoResultado[] }>>(new Map());
 
   const clubes = useMemo(() => loadClubes(), []);
   const clubePorId = useMemo(() => new Map(clubes.map((c) => [c.id, c])), [clubes]);
@@ -151,6 +186,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function escolherFocoDeTreino(estado: EstadoDeCarreira): Promise<FocoDeTreino> {
     setEstadoAtual(estado);
+    if (focoAutomaticoRef.current !== undefined) return Promise.resolve(focoAutomaticoRef.current);
     return new Promise((resolve) => setPromptPendente({ tipo: "foco", resolve }));
   }
 
@@ -165,6 +201,19 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function atualizarTabela(campeonatoId: string, tabela: LinhaTabela[]): void {
     setTabelaPorCampeonato((atual) => new Map(atual).set(campeonatoId, tabela));
+  }
+
+  function registrarConfrontoNoBufferDaRodada(campeonatoId: string, rodada: number, confronto: ConfrontoResultado): void {
+    const atual = bufferRodadaRef.current.get(campeonatoId);
+    if (!atual || atual.rodada !== rodada) {
+      bufferRodadaRef.current.set(campeonatoId, { rodada, confrontos: [confronto] });
+    } else {
+      atual.confrontos.push(confronto);
+    }
+  }
+
+  function responderResultadoDaRodada(): void {
+    setResultadoDaRodada(undefined);
   }
 
   function aoIniciarSemana(info: AoIniciarSemanaInfo): Promise<void> {
@@ -255,16 +304,53 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         setPartidaAoVivo(undefined);
         atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_propria", info });
+        const { confronto, resultado: resultadoDaPartida } = info.evento;
+        registrarConfrontoNoBufferDaRodada(info.campeonatoId, confronto.rodada, {
+          mandanteId: confronto.mandante,
+          visitanteId: confronto.visitante,
+          golsCasa: resultadoDaPartida.golsCasa,
+          golsFora: resultadoDaPartida.golsFora,
+          ehDoJogador: true,
+        });
+        const bufferDaRodada = bufferRodadaRef.current.get(info.campeonatoId);
+        setResultadoDaRodada({
+          tipo: "pontos_corridos",
+          campeonatoId: info.campeonatoId,
+          rodada: confronto.rodada,
+          confrontos: bufferDaRodada ? [...bufferDaRodada.confrontos] : [],
+          tabela: info.evento.tabelaDepois,
+        });
       },
       escolherCampeonatosParaSeguir,
       onPartidaDaRodadaNaCompeticaoDoJogador: (info) => {
         atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_rodada", info });
+        registrarConfrontoNoBufferDaRodada(info.campeonatoId, info.evento.confronto.rodada, {
+          mandanteId: info.evento.confronto.mandante,
+          visitanteId: info.evento.confronto.visitante,
+          golsCasa: info.evento.resultado.golsCasa,
+          golsFora: info.evento.resultado.golsFora,
+          ehDoJogador: false,
+        });
       },
       onPartidaMataMata: (info) => {
         setPartidaAoVivo(undefined);
-        setFaseMataMataPorCampeonato((atual) => new Map(atual).set(info.campeonatoId, { etapa: info.evento.etapa, eliminado: info.evento.confronto.vencedor !== estadoAtual.clubeAtualId }));
+        const eliminado = info.evento.confronto.vencedor !== estadoAtual.clubeAtualId;
+        setFaseMataMataPorCampeonato((atual) => new Map(atual).set(info.campeonatoId, { etapa: info.evento.etapa, eliminado }));
         pushEvento({ tipo: "partida_mata_mata", info });
+        setResultadoDaRodada({
+          tipo: "mata_mata",
+          campeonatoId: info.campeonatoId,
+          etapa: info.evento.etapa,
+          confrontoDoJogador: {
+            mandanteId: info.evento.confronto.timeA,
+            visitanteId: info.evento.confronto.timeB,
+            golsCasa: info.evento.confronto.golsA,
+            golsFora: info.evento.confronto.golsB,
+            ehDoJogador: true,
+          },
+          eliminado,
+        });
       },
       onStatusAtualizado: (info) => pushEvento({ tipo: "status", info }),
       onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => pushEvento({ tipo: "tabela", campeonatoId, periodo, tabela }),
@@ -297,10 +383,20 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function responderFoco(foco: FocoDeTreino): void {
+  /** `manterAutomatico` liga o "treino rápido" — próximos treinos usam esse foco sem perguntar de novo (ver `desligarTreinoAutomatico`). */
+  function responderFoco(foco: FocoDeTreino, manterAutomatico = false): void {
     if (promptPendente?.tipo !== "foco") return;
+    if (manterAutomatico) {
+      focoAutomaticoRef.current = foco;
+      setFocoAutomatico(foco);
+    }
     promptPendente.resolve(foco);
     setPromptPendente(undefined);
+  }
+
+  function desligarTreinoAutomatico(): void {
+    focoAutomaticoRef.current = undefined;
+    setFocoAutomatico(undefined);
   }
 
   function responderDistribuicaoDePontos(alocacoes: AlocacaoDePontos[]): void {
@@ -378,5 +474,9 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderSemana,
     responderPrePartida,
     responderSeguirCampeonatos,
+    focoAutomatico,
+    desligarTreinoAutomatico,
+    resultadoDaRodada,
+    responderResultadoDaRodada,
   };
 }
