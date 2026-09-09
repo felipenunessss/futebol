@@ -40,6 +40,10 @@ function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
   return clube?.nome_popular ?? clube?.nome ?? id;
 }
 
+function nomeDoCampeonato(nomePorCampeonato: Map<string, string>, id: string): string {
+  return nomePorCampeonato.get(id) ?? id;
+}
+
 /** Data aproximada da semana (1-52) — o motor não tem calendário real, só o número da semana; aqui
  * é só pra dar contexto de "quando" na tela, contando 7 dias por semana a partir de 1º de janeiro. */
 function intervaloDeSemana(temporada: number, semana: number): { inicio: Date; fim: Date } {
@@ -69,7 +73,7 @@ function formatarImpactoResumido(impacto: ImpactoCarreira): string {
 
 export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarreira }) {
   const temporada = useTemporada(estadoInicial);
-  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, tabelaPorCampeonato, resultado, clubePorId } = temporada;
+  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, tabelaPorCampeonato, resultado, clubePorId, nomePorCampeonato } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
   const promptSemana = promptPendente?.tipo === "semana" ? promptPendente : undefined;
   const promptPrePartida = promptPendente?.tipo === "pre_partida" ? promptPendente : undefined;
@@ -87,9 +91,17 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           onAlternarAssistirAoVivo={temporada.alternarAssistirAoVivo}
         />
 
-        {promptSemana && <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} onContinuar={temporada.responderSemana} />}
+        {promptSemana && (
+          <PainelSemana info={promptSemana.info} temporada={estadoAtual.temporada} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.responderSemana} />
+        )}
         {promptPrePartida && (
-          <PainelPrePartida contexto={promptPrePartida.contexto} clubePorId={clubePorId} tabelaPorCampeonato={tabelaPorCampeonato} onComecar={temporada.responderPrePartida} />
+          <PainelPrePartida
+            contexto={promptPrePartida.contexto}
+            clubePorId={clubePorId}
+            nomePorCampeonato={nomePorCampeonato}
+            tabelaPorCampeonato={tabelaPorCampeonato}
+            onComecar={temporada.responderPrePartida}
+          />
         )}
         {partidaAoVivo && (
           <PainelPartidaAoVivo
@@ -101,11 +113,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           />
         )}
         {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
-        {fase === "resumo" && resultado && <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} onJogarProxima={() => void temporada.jogarTemporada()} />}
+        {fase === "resumo" && resultado && (
+          <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onJogarProxima={() => void temporada.jogarTemporada()} />
+        )}
 
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
             placares das suas partidas aparecem conforme a temporada avança. */}
-        <Feed eventos={feed} clubePorId={clubePorId} />
+        <Feed eventos={feed} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />
       </div>
     </div>
   );
@@ -181,7 +195,17 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
   );
 }
 
-function PainelSemana({ info, temporada, onContinuar }: { info: AoIniciarSemanaInfo; temporada: number; onContinuar: () => void }) {
+function PainelSemana({
+  info,
+  temporada,
+  nomePorCampeonato,
+  onContinuar,
+}: {
+  info: AoIniciarSemanaInfo;
+  temporada: number;
+  nomePorCampeonato: Map<string, string>;
+  onContinuar: () => void;
+}) {
   const { inicio, fim } = intervaloDeSemana(temporada, info.semana);
 
   return (
@@ -190,7 +214,7 @@ function PainelSemana({ info, temporada, onContinuar }: { info: AoIniciarSemanaI
         Semana {info.semana} — {formatarData(inicio)} a {formatarData(fim)}
       </h2>
       {info.competicoesDoJogador.length > 0 ? (
-        <p className="text-sm text-slate-400">Competições do seu clube: {info.competicoesDoJogador.join(", ")}</p>
+        <p className="text-sm text-slate-400">Competições do seu clube: {info.competicoesDoJogador.map((id) => nomeDoCampeonato(nomePorCampeonato, id)).join(", ")}</p>
       ) : (
         <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
       )}
@@ -204,11 +228,13 @@ function PainelSemana({ info, temporada, onContinuar }: { info: AoIniciarSemanaI
 function PainelPrePartida({
   contexto,
   clubePorId,
+  nomePorCampeonato,
   tabelaPorCampeonato,
   onComecar,
 }: {
   contexto: ContextoPartidaDoJogadorSemanal;
   clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
   onComecar: () => void;
 }) {
@@ -221,7 +247,7 @@ function PainelPrePartida({
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4">
       <div className="text-xs uppercase tracking-wide text-emerald-400">
-        {contexto.campeonatoId} — semana {contexto.semana}
+        {nomeDoCampeonato(nomePorCampeonato, contexto.campeonatoId)} — semana {contexto.semana}
       </div>
       <div className="flex items-center justify-center gap-4">
         <div className="text-right flex-1">
@@ -473,7 +499,7 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
   );
 }
 
-function Feed({ eventos, clubePorId }: { eventos: EventoDeFeed[]; clubePorId: Map<string, Club> }) {
+function Feed({ eventos, clubePorId, nomePorCampeonato }: { eventos: EventoDeFeed[]; clubePorId: Map<string, Club>; nomePorCampeonato: Map<string, string> }) {
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-4 flex flex-col gap-2">
       <h2 className="text-sm font-semibold text-slate-400 px-1">Partidas e eventos da temporada</h2>
@@ -481,14 +507,14 @@ function Feed({ eventos, clubePorId }: { eventos: EventoDeFeed[]; clubePorId: Ma
         {eventos.length === 0 ? (
           <p className="text-sm text-slate-500 px-1 py-2">Nada aconteceu ainda — os placares e eventos vão aparecer aqui, mais recentes primeiro.</p>
         ) : (
-          eventos.map((evento) => <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} />)
+          eventos.map((evento) => <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />)
         )}
       </div>
     </div>
   );
 }
 
-function EventoCard({ evento, clubePorId }: { evento: EventoDeFeed; clubePorId: Map<string, Club> }) {
+function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoDeFeed; clubePorId: Map<string, Club>; nomePorCampeonato: Map<string, string> }) {
   switch (evento.tipo) {
     case "treino":
       return (
@@ -552,15 +578,27 @@ function EventoCard({ evento, clubePorId }: { evento: EventoDeFeed; clubePorId: 
         </Card>
       );
     case "tabela":
-      return <TabelaCard campeonatoId={evento.campeonatoId} periodo={evento.periodo} tabela={evento.tabela} clubePorId={clubePorId} />;
+      return <TabelaCard campeonatoId={evento.campeonatoId} periodo={evento.periodo} tabela={evento.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />;
   }
 }
 
-function TabelaCard({ campeonatoId, periodo, tabela, clubePorId }: { campeonatoId: string; periodo: string; tabela: LinhaTabela[]; clubePorId: Map<string, Club> }) {
+function TabelaCard({
+  campeonatoId,
+  periodo,
+  tabela,
+  clubePorId,
+  nomePorCampeonato,
+}: {
+  campeonatoId: string;
+  periodo: string;
+  tabela: LinhaTabela[];
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+}) {
   return (
     <div className="rounded-xl bg-slate-900 border border-slate-800 p-4">
       <div className="text-sm font-medium mb-2">
-        {campeonatoId} — resumo do período {periodo}
+        {nomeDoCampeonato(nomePorCampeonato, campeonatoId)} — resumo do período {periodo}
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-xs tabular-nums">
@@ -609,10 +647,12 @@ function Card({ children, destaque, sutil }: { children: React.ReactNode; destaq
 function ResumoDeTemporada({
   resultado,
   clubePorId,
+  nomePorCampeonato,
   onJogarProxima,
 }: {
   resultado: NonNullable<ReturnType<typeof useTemporada>["resultado"]>;
   clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
   onJogarProxima: () => void;
 }) {
   return (
@@ -626,10 +666,12 @@ function ResumoDeTemporada({
         {resultado.resumoPartidas.competicoes.map((c) => (
           <div key={c.campeonatoId} className="rounded-lg bg-slate-800/60 px-3 py-2 text-sm">
             {c.erro ? (
-              <span className="text-slate-500">✗ {c.campeonatoId}: não simulada ({c.erro})</span>
+              <span className="text-slate-500">
+                ✗ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: não simulada ({c.erro})
+              </span>
             ) : (
               <span>
-                ✓ {c.campeonatoId}: campeão {nomeDoClube(clubePorId, c.campeao!)}
+                ✓ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: campeão {nomeDoClube(clubePorId, c.campeao!)}
                 {c.partidasDoJogador > 0 && (
                   <span className="text-slate-400">
                     {" "}

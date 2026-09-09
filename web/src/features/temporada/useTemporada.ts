@@ -102,6 +102,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const clubes = useMemo(() => loadClubes(), []);
   const clubePorId = useMemo(() => new Map(clubes.map((c) => [c.id, c])), [clubes]);
   const campeonatos = useMemo(() => [...loadCampeonatosNacionais(), ...loadEstaduais()], []);
+  /** Nome de exibição (ex: "Campeonato Brasileiro Série C") por id (ex: "brasileirao_serie_c") — pra UI nunca mostrar o id bruto com "_". */
+  const nomePorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.nome])), [campeonatos]);
 
   function pushEvento(evento: EventoDeFeedVariante): void {
     setFeed((atual) => [{ ...evento, id: `evt-${proximoId.current++}` }, ...atual]);
@@ -292,6 +294,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     tabelaPorCampeonato,
     resultado,
     clubePorId,
+    nomePorCampeonato,
     jogarTemporada,
     responderFoco,
     responderDistribuicaoDePontos,
