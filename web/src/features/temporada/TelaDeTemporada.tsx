@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Club } from "@motor/schemas/club.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Atributo, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual, type EstadoDeCarreira } from "@motor/career/Player.js";
 import { xpParaProximoNivel, type FocoDeTreino } from "@motor/progression/xp.js";
 import type { Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
+import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
+import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos } from "@motor/career/career-loop.js";
-import { useTemporada, type EventoDeFeed, type PromptPendente } from "./useTemporada.js";
+import { useTemporada, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente } from "./useTemporada.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
   goleiro: "Goleiro",
@@ -24,6 +26,15 @@ const ROTULO_FOCO: Record<FocoDeTreino, string> = {
   descanso: "Descanso",
 };
 
+const LABEL_SUBTIPO: Record<SubtipoChance, string> = {
+  voleio: "voleio",
+  cabeceio: "cabeceio",
+  chute_de_fora: "chute de fora da área",
+  jogada_individual: "jogada individual",
+  passe_decisivo: "passe decisivo",
+  desarme_decisivo: "desarme decisivo",
+};
+
 function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
   const clube = clubePorId.get(id);
   return clube?.nome_popular ?? clube?.nome ?? id;
@@ -31,15 +42,32 @@ function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
 
 export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarreira }) {
   const temporada = useTemporada(estadoInicial);
-  const { estadoAtual, fase, feed, promptPendente, resultado, clubePorId } = temporada;
+  const { estadoAtual, fase, feed, promptPendente, partidaAoVivo, assistirAoVivo, resultado, clubePorId } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
+  const promptDaPartida = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
+  const promptDeCarreira = promptPendente && !promptDaPartida ? promptPendente : undefined;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
       <div className="mx-auto max-w-3xl flex flex-col gap-4">
-        <Cabecalho estado={estadoAtual} nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)} nomeDaNacionalidade={nomeDaNacionalidade} />
+        <Cabecalho
+          estado={estadoAtual}
+          nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
+          nomeDaNacionalidade={nomeDaNacionalidade}
+          assistirAoVivo={assistirAoVivo}
+          onAlternarAssistirAoVivo={temporada.alternarAssistirAoVivo}
+        />
 
-        {promptPendente && <PainelDePrompt prompt={promptPendente} temporada={temporada} />}
+        {partidaAoVivo && (
+          <PainelPartidaAoVivo
+            partida={partidaAoVivo}
+            clubePorId={clubePorId}
+            prompt={promptDaPartida}
+            onResponderChance={temporada.responderChanceAoVivo}
+            onResponderEvento={temporada.responderEventoAoVivo}
+          />
+        )}
+        {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
         {fase === "resumo" && resultado && <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} onJogarProxima={() => void temporada.jogarTemporada()} />}
 
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
@@ -50,7 +78,19 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   );
 }
 
-function Cabecalho({ estado, nomeClube, nomeDaNacionalidade }: { estado: EstadoDeCarreira; nomeClube: string; nomeDaNacionalidade: string | undefined }) {
+function Cabecalho({
+  estado,
+  nomeClube,
+  nomeDaNacionalidade,
+  assistirAoVivo,
+  onAlternarAssistirAoVivo,
+}: {
+  estado: EstadoDeCarreira;
+  nomeClube: string;
+  nomeDaNacionalidade: string | undefined;
+  assistirAoVivo: boolean;
+  onAlternarAssistirAoVivo: () => void;
+}) {
   const xpNecessario = xpParaProximoNivel(estado.nivel);
   const progresso = Math.min(100, Math.round((estado.xpAcumulado / xpNecessario) * 100));
 
@@ -81,6 +121,10 @@ function Cabecalho({ estado, nomeClube, nomeDaNacionalidade }: { estado: EstadoD
           <div className="h-full bg-emerald-500" style={{ width: `${progresso}%` }} />
         </div>
       </div>
+      <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+        <input type="checkbox" checked={assistirAoVivo} onChange={onAlternarAssistirAoVivo} className="accent-emerald-500" />
+        Assistir minhas partidas ao vivo (senão elas resolvem direto pro placar final)
+      </label>
     </div>
   );
 }
@@ -100,6 +144,121 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
       {prompt.tipo === "foco" && <PromptFoco onEscolher={temporada.responderFoco} />}
       {prompt.tipo === "pontos" && <PromptDistribuicaoDePontos estado={prompt.estado} onConfirmar={temporada.responderDistribuicaoDePontos} />}
       {prompt.tipo === "cenario" && <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={temporada.responderCenario} />}
+    </div>
+  );
+}
+
+function PainelPartidaAoVivo({
+  partida,
+  clubePorId,
+  prompt,
+  onResponderChance,
+  onResponderEvento,
+}: {
+  partida: PartidaAoVivoEmAndamento;
+  clubePorId: Map<string, Club>;
+  prompt: Extract<PromptPendente, { tipo: "chance_ao_vivo" | "evento_ao_vivo" }> | undefined;
+  onResponderChance: (resultado: ResultadoDecisaoChance) => void;
+  onResponderEvento: (opcao: Opcao) => void;
+}) {
+  const mandanteNome = nomeDoClube(clubePorId, partida.mandanteId);
+  const visitanteNome = nomeDoClube(clubePorId, partida.visitanteId);
+  const listaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    listaRef.current?.scrollTo({ top: listaRef.current.scrollHeight, behavior: "smooth" });
+  }, [partida.eventos.length]);
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        Ao vivo — {partida.minutoAtual}'
+      </div>
+      <div className="flex items-center justify-center gap-4">
+        <span className="text-right flex-1 font-medium">{mandanteNome}</span>
+        <span className="tabular-nums text-2xl font-bold px-2">
+          {partida.golsCasa} x {partida.golsFora}
+        </span>
+        <span className="text-left flex-1 font-medium">{visitanteNome}</span>
+      </div>
+      <div ref={listaRef} className="flex flex-col gap-1 max-h-56 overflow-y-auto text-sm text-slate-300 border-t border-slate-800 pt-2">
+        {partida.eventos.length === 0 ? (
+          <p className="text-slate-500">Bola rolando...</p>
+        ) : (
+          partida.eventos.map((evento, indice) => <LinhaDeEvento key={indice} evento={evento} mandanteNome={mandanteNome} visitanteNome={visitanteNome} />)
+        )}
+      </div>
+      {prompt?.tipo === "chance_ao_vivo" && <DecisaoDeChance contexto={prompt.contexto} onEscolher={onResponderChance} />}
+      {prompt?.tipo === "evento_ao_vivo" && (
+        <div className="border-t border-slate-800 pt-3">
+          <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={onResponderEvento} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: EventoAoVivo; mandanteNome: string; visitanteNome: string }) {
+  switch (evento.tipo) {
+    case "chance_generica": {
+      const time = evento.lado === "casa" ? mandanteNome : visitanteNome;
+      return (
+        <p>
+          {evento.minuto}' {evento.gol ? <span className="text-emerald-400 font-medium">GOL do {time}!</span> : <>Chance perdida do {time}.</>}
+        </p>
+      );
+    }
+    case "chance_jogador": {
+      const rotulo = LABEL_SUBTIPO[evento.chance.subtipo];
+      const finalizacao = evento.chance.subtipo === "voleio" || evento.chance.subtipo === "cabeceio" || evento.chance.subtipo === "chute_de_fora" || evento.chance.subtipo === "jogada_individual";
+      let texto: string;
+      if (finalizacao) texto = evento.chance.sucesso ? `GOL SEU! (${rotulo})` : `Você não converteu (${rotulo}).`;
+      else if (evento.chance.subtipo === "passe_decisivo") texto = evento.chance.sucesso ? "Assistência sua!" : "Seu passe decisivo não deu certo.";
+      else texto = evento.chance.sucesso ? "Desarme decisivo seu!" : "Você não conseguiu desarmar dessa vez.";
+      return (
+        <p className={evento.chance.sucesso ? "text-emerald-400 font-medium" : ""}>
+          {evento.minuto}' {texto}
+        </p>
+      );
+    }
+    case "evento_de_contexto":
+      return (
+        <p>
+          {evento.minuto}' {evento.escolha.resultado.impacto.narrativa}
+        </p>
+      );
+    case "apito_final":
+      return (
+        <p className="font-medium">
+          Apito final: {mandanteNome} {evento.golsCasa} x {evento.golsFora} {visitanteNome}
+        </p>
+      );
+  }
+}
+
+function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoChance; onEscolher: (resultado: ResultadoDecisaoChance) => void }) {
+  return (
+    <div className="border-t border-slate-800 pt-3 flex flex-col gap-2">
+      <p className="text-sm font-medium">
+        {contexto.minuto}' — chance sua! ({LABEL_SUBTIPO[contexto.subtipo]})
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => onEscolher({ ajusteForcaJogador: 150, ajusteForcaDefensiva: 0 })}
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors text-sm"
+        >
+          Arriscar, ir com tudo
+        </button>
+        <button
+          type="button"
+          onClick={() => onEscolher({ ajusteForcaJogador: 60, ajusteForcaDefensiva: -60 })}
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors text-sm"
+        >
+          Ajeitar antes de bater, com mais categoria
+        </button>
+      </div>
     </div>
   );
 }
@@ -272,6 +431,16 @@ function EventoCard({ evento, clubePorId }: { evento: EventoDeFeed; clubePorId: 
           {resultado.chancesJogador.length > 0 && (
             <span className="text-slate-400"> — suas chances: {resultado.chancesJogador.length} ({resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)</span>
           )}
+        </Card>
+      );
+    }
+    case "partida_mata_mata": {
+      const { etapa, confronto } = evento.info.evento;
+      const decisao = confronto.decididoNosPenaltis ? " (nos pênaltis)" : "";
+      return (
+        <Card destaque>
+          [{etapa}] {nomeDoClube(clubePorId, confronto.timeA)} {confronto.golsA} x {confronto.golsB} {nomeDoClube(clubePorId, confronto.timeB)}
+          {decisao} — vencedor: {nomeDoClube(clubePorId, confronto.vencedor)}
         </Card>
       );
     }

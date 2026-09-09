@@ -2010,6 +2010,53 @@ distribuição de pontos, partidas, tabela e cenários.
   partidas → resumo → próxima temporada) pra confirmar a experiência
   ponta a ponta.
 
+### 5.20. Partida "ao vivo" narrada na tela de temporada web (implementado)
+
+Depois de testar a v1 (seção 5.19), o jogador reportou não ter visto
+nenhuma simulação de partida — causa raiz corrigida na seção anterior
+(o feed sumia da tela). Pedido seguinte: "quero que você crie a
+simulação dos jogos na UI" — não só o placar final numa lista, uma
+partida narrada de verdade, minuto a minuto.
+
+- **Reaproveita 100% o motor "ao vivo" que já existe pra CLI**
+  (`simulation/live-match.ts` `jogarPartidaAoVivo`, seção 5.7) — zero
+  mudança em `src/`. As partidas do PRÓPRIO clube do jogador (e só
+  essas — o resto da rodada continua instantâneo, sem UI própria)
+  passam a rodar em modo `"ao_vivo"` por padrão: `useTemporada.ts`
+  ganhou `escolherModoDePartida` (liga o modo ao vivo e inicializa o
+  painel), `decidirChanceAoVivo`/`decidirEventoDePartida` (pausam pra
+  decisão real — vira `promptPendente` igual a foco/pontos/cenário,
+  resolvido no clique) e `onEventoAoVivo` (atualiza minuto/placar
+  aproximado a cada evento — o placar aproximado é substituído pelo
+  oficial assim que o evento `apito_final` chega, então nunca fica
+  errado por muito tempo).
+- **Ritmo mais rápido que a CLI**: `MS_POR_MINUTO_AO_VIVO = 90` (contra
+  220 da CLI, ~20s/partida) — uma temporada web pode ter dezenas de
+  partidas do próprio clube pra assistir (Brasileirão sozinho já são
+  ~38), então cada partida passa em ~8s de bola rolando (fora o tempo
+  de decisão real do jogador).
+- **Toggle "assistir ao vivo"** no cabeçalho (padrão ligado) — desliga
+  e todas as partidas seguintes voltam a resolver instantâneo (mesmo
+  comportamento da v1). Implementado com um `useRef` espelhando o
+  `useState` (o hook `escolherModoDePartida` é capturado 1x por
+  temporada dentro do objeto de opções, então precisa ler o valor mais
+  recente do toggle via ref, não via closure do state).
+- **`web/src/features/temporada/TelaDeTemporada.tsx`** ganhou
+  `PainelPartidaAoVivo` (placar + minuto ao vivo, narração rolável
+  auto-scroll, decisão de chance — "arriscar" vs "ajeitar", mesmas 2
+  opções da CLI — e decisão de evento de contexto reaproveitando o
+  mesmo `PromptCenario` já usado pros cenários entre períodos).
+- **Corrige de quebra um buraco da v1**: `onPartidaMataMata` nunca
+  tinha sido plugado (só `onPartidaPontosCorridos`) — partidas de copa
+  do próprio clube não apareciam no feed nem limpavam o painel de
+  partida ao vivo (ficaria travado mostrando a última partida pra
+  sempre depois de uma partida de mata-mata). Corrigido junto.
+- **Validado**: `cd web && npx tsc -b --noEmit` e `npm run build`
+  limpos; `npm test`/`npx tsc --noEmit` na raiz continuam em 427
+  testes/limpos (zero mudança em `src/`). Não testado num navegador de
+  verdade nesta sessão (mesma ressalva da seção 5.19) — só validado que
+  compila/builda sem erro.
+
 ## 6. Pendências / próximos passos
 
 - **Dados de `rating_inicial`**: resolvida a parte que dava pra resolver —
