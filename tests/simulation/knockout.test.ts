@@ -7,6 +7,7 @@ import {
   simularMataMataComEtapas,
   simularMataMataDoFormato,
   simularMataMataSimples,
+  sortearConfrontosPorPotes,
   type EventoConfrontoMataMata,
 } from "../../src/simulation/knockout.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
@@ -225,5 +226,56 @@ describe("simularEtapasMataMataParcial", () => {
     const resultado = await simularEtapasMataMataParcial(etapas, ratings, () => Math.random(), participacao);
     const confrontoDoA = resultado.etapas[0].confrontos.find((c) => c.timeA === "a" || c.timeB === "a")!;
     expect(confrontoDoA.partidasDoJogador).toHaveLength(1);
+  });
+});
+
+describe("sortearConfrontosPorPotes", () => {
+  function gruposDeTeste(numGrupos: number): { nome: string; times: [string, string] }[] {
+    return Array.from({ length: numGrupos }, (_, i) => ({
+      nome: `Grupo ${String.fromCharCode(65 + i)}`,
+      times: [`grupo${i}_1o`, `grupo${i}_2o`],
+    }));
+  }
+
+  it.each([2, 4, 8])("nunca pareia 1º e 2º do mesmo grupo (N=%i grupos, 200 sorteios)", (numGrupos) => {
+    const grupos = gruposDeTeste(numGrupos);
+    const grupoDoTime = new Map(grupos.flatMap((g) => g.times.map((t) => [t, g.nome] as const)));
+
+    for (let tentativa = 0; tentativa < 200; tentativa++) {
+      const pares = sortearConfrontosPorPotes(grupos, Math.random);
+      expect(pares).toHaveLength(numGrupos);
+      for (const [primeiro, segundo] of pares) {
+        expect(grupoDoTime.get(segundo)).not.toBe(grupoDoTime.get(primeiro));
+      }
+    }
+  });
+
+  it("é determinístico dado o mesmo gerador de `random`", () => {
+    const grupos = gruposDeTeste(8);
+    const sequencia = [0.9, 0.1, 0.5, 0.3, 0.7, 0.2, 0.6, 0.4, 0.8, 0.05, 0.95, 0.15];
+
+    // gerador "de mentira": consome de uma cópia nova da mesma sequência fixa a cada chamada.
+    function criarRandomFixo(): () => number {
+      const fila = [...sequencia];
+      return () => fila.shift() ?? 0.5;
+    }
+
+    const paresA = sortearConfrontosPorPotes(grupos, criarRandomFixo());
+    const paresB = sortearConfrontosPorPotes(grupos, criarRandomFixo());
+    expect(paresA).toEqual(paresB);
+  });
+
+  it("cada 1º colocado aparece em exatamente 1 confronto, cada 2º colocado também", () => {
+    const grupos = gruposDeTeste(6);
+    const pares = sortearConfrontosPorPotes(grupos, Math.random);
+
+    const primeiros = grupos.map((g) => g.times[0]);
+    const segundos = grupos.map((g) => g.times[1]);
+    expect(pares.map(([p]) => p).sort()).toEqual([...primeiros].sort());
+    expect(pares.map(([, s]) => s).sort()).toEqual([...segundos].sort());
+  });
+
+  it("lança erro com menos de 2 grupos", () => {
+    expect(() => sortearConfrontosPorPotes(gruposDeTeste(1), Math.random)).toThrow(/pelo menos 2 grupos/);
   });
 });

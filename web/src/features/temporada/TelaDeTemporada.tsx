@@ -10,7 +10,7 @@ import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
 import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
-import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
+import type { AlocacaoDePontos, AoIniciarSemanaInfo, ChaveamentoDeMataMataNaTemporada, ContextoPartidaDoJogadorSemanal, SorteioDeGruposNaTemporada } from "@motor/career/career-loop.js";
 import { contrapropostaPadrao } from "@motor/market/negotiation.js";
 import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
 import { temporadaDeVencimento } from "@motor/schemas/contract.js";
@@ -119,6 +119,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
     partidaAoVivo,
     tabelaPorCampeonato,
     faseMataMataPorCampeonato,
+    grupoDoJogadorPorCampeonato,
     competicoesDoJogador,
     estatisticasCarreira,
     resultado,
@@ -132,7 +133,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   const promptDaPartidaAoVivo = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
   const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
   const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
-  const { resultadoDaRodada, animacaoDeEscolha } = temporada;
+  const { resultadoDaRodada, animacaoDeEscolha, sorteioPendente, chaveamentoPendente } = temporada;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
@@ -144,7 +145,15 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         nomePorCampeonato={nomePorCampeonato}
       />
       {competicoesDoJogador.length > 0 && (
-        <PainelDeCompeticoes competicoesDoJogador={competicoesDoJogador} tabelaPorCampeonato={tabelaPorCampeonato} faseMataMataPorCampeonato={faseMataMataPorCampeonato} clubeId={estadoAtual.clubeAtualId} nomePorCampeonato={nomePorCampeonato} />
+        <PainelDeCompeticoes
+          competicoesDoJogador={competicoesDoJogador}
+          tabelaPorCampeonato={tabelaPorCampeonato}
+          faseMataMataPorCampeonato={faseMataMataPorCampeonato}
+          grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
+          clubeId={estadoAtual.clubeAtualId}
+          clubePorId={clubePorId}
+          nomePorCampeonato={nomePorCampeonato}
+        />
       )}
       <div className="mx-auto max-w-3xl flex flex-col gap-4">
         <Cabecalho
@@ -165,6 +174,10 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           <PainelAnimacaoDeEscolha animacao={animacaoDeEscolha} onConcluir={temporada.concluirAnimacaoDeEscolha} />
         ) : resultadoDaRodada ? (
           <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
+        ) : sorteioPendente ? (
+          <PainelSorteio sorteio={sorteioPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharSorteioDeGrupos} />
+        ) : chaveamentoPendente ? (
+          <PainelChaveamento chaveamento={chaveamentoPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharChaveamento} />
         ) : (
           <>
             {promptSemana && (
@@ -270,34 +283,156 @@ function PainelDeCompeticoes({
   competicoesDoJogador,
   tabelaPorCampeonato,
   faseMataMataPorCampeonato,
+  grupoDoJogadorPorCampeonato,
   clubeId,
+  clubePorId,
   nomePorCampeonato,
 }: {
   competicoesDoJogador: string[];
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
   faseMataMataPorCampeonato: Map<string, { etapa: string; eliminado: boolean }>;
+  grupoDoJogadorPorCampeonato: Map<string, string>;
   clubeId: string;
+  clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
 }) {
+  const [classificacaoAberta, setClassificacaoAberta] = useState(false);
+
   return (
-    <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
-      <h2 className="font-semibold text-slate-400">Suas competições</h2>
-      {competicoesDoJogador.map((campeonatoId) => {
-        const posicao = posicaoNaTabela(tabelaPorCampeonato.get(campeonatoId), clubeId);
-        const fase = faseMataMataPorCampeonato.get(campeonatoId);
-        return (
-          <div key={campeonatoId} className="border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
-            <div className="font-medium text-slate-200">{nomeDoCampeonato(nomePorCampeonato, campeonatoId)}</div>
-            {fase ? (
-              <div className={fase.eliminado ? "text-slate-500" : "text-emerald-400"}>{fase.eliminado ? `Eliminado (${fase.etapa})` : fase.etapa}</div>
-            ) : posicao ? (
-              <div className="text-slate-400">{posicao}º colocado</div>
-            ) : (
-              <div className="text-slate-500">aguardando dados</div>
-            )}
-          </div>
-        );
-      })}
+    <>
+      <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-semibold text-slate-400">Suas competições</h2>
+          <button type="button" onClick={() => setClassificacaoAberta(true)} className="shrink-0 text-emerald-400 hover:text-emerald-300 transition-colors">
+            Classificação
+          </button>
+        </div>
+        {competicoesDoJogador.map((campeonatoId) => {
+          const posicao = posicaoNaTabela(tabelaPorCampeonato.get(campeonatoId), clubeId);
+          const fase = faseMataMataPorCampeonato.get(campeonatoId);
+          return (
+            <div key={campeonatoId} className="border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
+              <div className="font-medium text-slate-200">{nomeDoCampeonato(nomePorCampeonato, campeonatoId)}</div>
+              {fase ? (
+                <div className={fase.eliminado ? "text-slate-500" : "text-emerald-400"}>{fase.eliminado ? `Eliminado (${fase.etapa})` : fase.etapa}</div>
+              ) : posicao ? (
+                <div className="text-slate-400">{posicao}º colocado</div>
+              ) : (
+                <div className="text-slate-500">aguardando dados</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {classificacaoAberta && (
+        <PainelClassificacao
+          competicoesDoJogador={competicoesDoJogador}
+          tabelaPorCampeonato={tabelaPorCampeonato}
+          faseMataMataPorCampeonato={faseMataMataPorCampeonato}
+          grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
+          clubeId={clubeId}
+          clubePorId={clubePorId}
+          nomePorCampeonato={nomePorCampeonato}
+          onFechar={() => setClassificacaoAberta(false)}
+        />
+      )}
+    </>
+  );
+}
+
+/** Nome de grupo gerado por `simulation/groups.ts`/`incremental.ts` `nomeDoGrupo` ("Grupo A", "Grupo B", ...) — só nesse formato quando a fase tinha MAIS de um grupo; senão o nome capturado é o slug interno da fase (ex: "grupos", "regular"), que não faz sentido mostrar pro jogador. */
+const PADRAO_NOME_DE_GRUPO = /^Grupo [A-Z]$/;
+
+function PainelClassificacao({
+  competicoesDoJogador,
+  tabelaPorCampeonato,
+  faseMataMataPorCampeonato,
+  grupoDoJogadorPorCampeonato,
+  clubeId,
+  clubePorId,
+  nomePorCampeonato,
+  onFechar,
+}: {
+  competicoesDoJogador: string[];
+  tabelaPorCampeonato: Map<string, LinhaTabela[]>;
+  faseMataMataPorCampeonato: Map<string, { etapa: string; eliminado: boolean }>;
+  grupoDoJogadorPorCampeonato: Map<string, string>;
+  clubeId: string;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  onFechar: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-30 bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-4 sm:p-6" onClick={onFechar}>
+      <div className="mx-auto max-w-2xl mt-6 mb-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Classificação</h2>
+          <button type="button" onClick={onFechar} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
+            Fechar
+          </button>
+        </div>
+        {competicoesDoJogador.map((campeonatoId) => {
+          const grupo = grupoDoJogadorPorCampeonato.get(campeonatoId);
+          const mostrarGrupo = grupo && PADRAO_NOME_DE_GRUPO.test(grupo);
+          const fase = faseMataMataPorCampeonato.get(campeonatoId);
+          const tabela = tabelaPorCampeonato.get(campeonatoId);
+          return (
+            <div key={campeonatoId} className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold text-slate-200">
+                {nomeDoCampeonato(nomePorCampeonato, campeonatoId)}
+                {mostrarGrupo && <span className="text-slate-400 font-normal"> — {grupo}</span>}
+              </h3>
+              {fase ? (
+                <p className={`text-sm ${fase.eliminado ? "text-slate-500" : "text-emerald-400"}`}>{fase.eliminado ? `Eliminado(a) na fase: ${fase.etapa}` : `Fase atual: ${fase.etapa}`}</p>
+              ) : tabela ? (
+                <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} />
+              ) : (
+                <p className="text-sm text-slate-500">Aguardando dados.</p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TabelaCompleta({ tabela, clubeId, clubePorId }: { tabela: LinhaTabela[]; clubeId: string; clubePorId: Map<string, Club> }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-xs tabular-nums">
+        <thead>
+          <tr className="text-slate-400 text-left">
+            <th className="pr-2 py-1">Pos</th>
+            <th className="pr-2 py-1">Clube</th>
+            <th className="pr-2 py-1 text-right">Pts</th>
+            <th className="pr-2 py-1 text-right">J</th>
+            <th className="pr-2 py-1 text-right">V</th>
+            <th className="pr-2 py-1 text-right">E</th>
+            <th className="pr-2 py-1 text-right">D</th>
+            <th className="pr-2 py-1 text-right">SG</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tabela.map((linha, indice) => (
+            <tr key={linha.clubeId} className={`border-t border-slate-800 ${linha.clubeId === clubeId ? "bg-emerald-950/60 text-emerald-300 font-medium" : ""}`}>
+              <td className="pr-2 py-1">{indice + 1}</td>
+              <td className="pr-2 py-1">
+                <span className="flex items-center gap-1.5">
+                  <Escudo url={escudoDoClube(clubePorId, linha.clubeId)} alt="" tamanho={14} />
+                  {nomeDoClube(clubePorId, linha.clubeId)}
+                </span>
+              </td>
+              <td className="pr-2 py-1 text-right">{linha.pontos}</td>
+              <td className="pr-2 py-1 text-right">{linha.jogos}</td>
+              <td className="pr-2 py-1 text-right">{linha.vitorias}</td>
+              <td className="pr-2 py-1 text-right">{linha.empates}</td>
+              <td className="pr-2 py-1 text-right">{linha.derrotas}</td>
+              <td className="pr-2 py-1 text-right">{linha.saldoDeGols}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -1187,6 +1322,106 @@ function PainelResultadoDaRodada({
       )}
       <button type="button" onClick={onAvancar} className="self-start rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium text-sm">
         Avançar pra próxima semana
+      </button>
+    </div>
+  );
+}
+
+/** Tempo entre a revelação de cada grupo — o motor já sorteou tudo antes deste painel aparecer (ver `useTemporada.ts` `onSorteioDeGrupos`), isto é puro ritmo de apresentação. */
+const INTERVALO_REVELACAO_GRUPO_MS = 450;
+
+function PainelSorteio({
+  sorteio,
+  clubePorId,
+  nomePorCampeonato,
+  onContinuar,
+}: {
+  sorteio: SorteioDeGruposNaTemporada;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  onContinuar: () => void;
+}) {
+  const [gruposRevelados, setGruposRevelados] = useState(0);
+
+  useEffect(() => {
+    if (gruposRevelados >= sorteio.grupos.length) return;
+    const timer = setTimeout(() => setGruposRevelados((atual) => atual + 1), INTERVALO_REVELACAO_GRUPO_MS);
+    return () => clearTimeout(timer);
+  }, [gruposRevelados, sorteio.grupos.length]);
+
+  const concluido = gruposRevelados >= sorteio.grupos.length;
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+      <h2 className="text-lg font-semibold">Sorteio dos grupos — {nomeDoCampeonato(nomePorCampeonato, sorteio.campeonatoId)}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+        {sorteio.grupos.map((grupo, indice) => (
+          <div
+            key={grupo.nome}
+            className={`rounded-lg border px-3 py-2.5 text-left transition-opacity duration-300 ${
+              indice < gruposRevelados ? "opacity-100 bg-slate-800 border-emerald-700" : "opacity-40 bg-slate-800/40 border-slate-800"
+            }`}
+          >
+            <div className="text-xs font-semibold text-emerald-400 mb-1">{grupo.nome}</div>
+            {indice < gruposRevelados ? (
+              <ul className="text-xs text-slate-300 flex flex-col gap-0.5">
+                {grupo.times.map((clubeId) => (
+                  <li key={clubeId} className="flex items-center gap-1.5">
+                    <Escudo url={escudoDoClube(clubePorId, clubeId)} alt="" tamanho={14} />
+                    {nomeDoClube(clubePorId, clubeId)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-xs text-slate-600">sorteando...</div>
+            )}
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={onContinuar}
+        disabled={!concluido}
+        className="rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors px-4 py-2.5 font-medium text-sm"
+      >
+        Continuar
+      </button>
+    </div>
+  );
+}
+
+function PainelChaveamento({
+  chaveamento,
+  clubePorId,
+  nomePorCampeonato,
+  onContinuar,
+}: {
+  chaveamento: ChaveamentoDeMataMataNaTemporada;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  onContinuar: () => void;
+}) {
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+      <h2 className="text-lg font-semibold">Chaveamento definido — {nomeDoCampeonato(nomePorCampeonato, chaveamento.campeonatoId)}</h2>
+      <p className="text-sm text-slate-400 capitalize">{chaveamento.etapaNome.replaceAll("_", " ")}</p>
+      <div className="flex flex-col gap-1.5 w-full max-w-sm text-sm">
+        {chaveamento.pares.map(([mandanteId, visitanteId], indice) => (
+          <div key={indice} className="flex items-center justify-between rounded-lg px-3 py-1.5 bg-slate-800/60">
+            <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+              {nomeDoClube(clubePorId, mandanteId)}
+              <Escudo url={escudoDoClube(clubePorId, mandanteId)} alt="" tamanho={16} />
+            </span>
+            <span className="px-3 text-slate-500 text-xs shrink-0">x</span>
+            <span className="flex-1 flex items-center gap-1.5 truncate">
+              <Escudo url={escudoDoClube(clubePorId, visitanteId)} alt="" tamanho={16} />
+              {nomeDoClube(clubePorId, visitanteId)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <button type="button" onClick={onContinuar} className="rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium text-sm">
+        Continuar
       </button>
     </div>
   );

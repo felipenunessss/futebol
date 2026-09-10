@@ -52,6 +52,15 @@ const MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO = 90;
 
 export interface PartidaDoJogadorPontosCorridos {
   campeonatoId: string;
+  /**
+   * Nome do grupo desse confronto (`"Grupo A"`, etc., ou o próprio nome da
+   * fase quando ela tem um grupo só) — ver `simulation/incremental.ts`
+   * `HooksDeFase.aoSimularConfrontoPontosCorridos`. Só populado pelo motor
+   * incremental semanal (`jogarTemporadaSemanal`); o motor "em lote"
+   * (`jogarTemporada`, `simulation/engine.ts`) não modela grupo por
+   * confronto, então fica `undefined` nesse caminho.
+   */
+  grupoNome?: string;
   evento: EventoConfrontoPontosCorridos;
 }
 
@@ -816,6 +825,36 @@ export interface OpcoesJogarTemporadaSemanal extends Omit<OpcoesJogarTemporada, 
    * grupos) — pendência de UI, não um erro.
    */
   onResumoDePeriodoCampeonatoSeguido?: (campeonatoId: string, periodo: string, tabela: LinhaTabela[]) => void | Promise<void>;
+  /**
+   * Chamado uma vez, assim que uma competição do PRÓPRIO clube do jogador
+   * sorteia seus grupos (fase de rodadas com mais de 1 grupo — Copa do
+   * Brasil, Libertadores, Mineiro Módulo II, etc.) — dá pra UI mostrar uma
+   * revelação de sorteio antes da 1ª rodada daquele grupo rolar. O motor já
+   * decidiu tudo antes deste hook disparar (mesma ressalva de
+   * `onPartidaPontosCorridos`); pode ser assíncrono pra pausar de verdade.
+   */
+  onSorteioDeGrupos?: (info: SorteioDeGruposNaTemporada) => void | Promise<void>;
+  /**
+   * Chamado uma vez, quando o chaveamento da 1ª etapa de um mata-mata do
+   * PRÓPRIO clube do jogador é definido — sorteio real por potes (1º x 2º
+   * de outro grupo) quando a competição vem de uma fase de grupos com
+   * exatamente 2 classificados/grupo (ver `simulation/knockout.ts`
+   * `sortearConfrontosPorPotes`), senão o `emparelharPorForca` de sempre.
+   * Dispara mesmo quando não houve sorteio de verdade — é uma revelação do
+   * chaveamento definido, não uma garantia de aleatoriedade.
+   */
+  onChaveamentoDefinido?: (info: ChaveamentoDeMataMataNaTemporada) => void | Promise<void>;
+}
+
+export interface SorteioDeGruposNaTemporada {
+  campeonatoId: string;
+  grupos: { nome: string; times: string[] }[];
+}
+
+export interface ChaveamentoDeMataMataNaTemporada {
+  campeonatoId: string;
+  etapaNome: string;
+  pares: [string, string][];
 }
 
 /**
@@ -866,6 +905,8 @@ export async function jogarTemporadaSemanal(
     maxEventosDeContextoAoVivo,
     escolherCampeonatosParaSeguir,
     onResumoDePeriodoCampeonatoSeguido,
+    onSorteioDeGrupos,
+    onChaveamentoDefinido,
     random = Math.random,
   } = opcoes;
 
@@ -954,12 +995,12 @@ export async function jogarTemporadaSemanal(
   function hooksSeForDoJogador(campeonatoId: string): HooksDeFase | undefined {
     if (!idsDoJogador.has(campeonatoId)) return undefined;
     return {
-      aoSimularConfrontoPontosCorridos: async (_grupoNome, evento) => {
+      aoSimularConfrontoPontosCorridos: async (grupoNome, evento) => {
         if (evento.confronto.mandante === clubeNoInicioDaTemporada || evento.confronto.visitante === clubeNoInicioDaTemporada) {
           await registrarPartidaDoJogador(campeonatoId, evento.resultado);
-          await onPartidaPontosCorridos?.({ campeonatoId, evento });
+          await onPartidaPontosCorridos?.({ campeonatoId, grupoNome, evento });
         } else {
-          await onPartidaDaRodadaNaCompeticaoDoJogador?.({ campeonatoId, evento });
+          await onPartidaDaRodadaNaCompeticaoDoJogador?.({ campeonatoId, grupoNome, evento });
         }
       },
       aoResolverConfrontoMataMata: async (evento) => {
@@ -967,6 +1008,14 @@ export async function jogarTemporadaSemanal(
           for (const partida of evento.confronto.partidasDoJogador ?? []) await registrarPartidaDoJogador(campeonatoId, partida);
           await onPartidaMataMata?.({ campeonatoId, evento });
         }
+      },
+      aoIniciarFase: async (fase) => {
+        if (fase.tipo === "rodadas" && fase.grupos.length > 1) {
+          await onSorteioDeGrupos?.({ campeonatoId, grupos: fase.grupos.map((g) => ({ nome: g.nome, times: [...g.tabela.keys()] })) });
+        }
+      },
+      aoDefinirChaveamento: async (info) => {
+        await onChaveamentoDefinido?.({ campeonatoId, etapaNome: info.etapaNome, pares: info.pares });
       },
     };
   }

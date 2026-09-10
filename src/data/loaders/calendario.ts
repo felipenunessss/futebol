@@ -9,28 +9,76 @@ import type { CalendarioMestre, PeriodoCalendario } from "../../schemas/calendar
  * (`simulation/incremental.ts`) pra saber a janela de semanas de cada
  * competição — não muda nada do motor "em lote" existente.
  */
+/**
+ * TODOS os campeonatos estaduais (`src/data/estaduais/*.json`), menos
+ * `venezuela_segunda` (não é estadual brasileiro; fora do calendário de
+ * qualquer forma) e os 4 grandes de 1ª divisão (`paulistao_a1`,
+ * `carioca_a`, `mineiro_modulo_1`, `gauchao_a`), que já entravam nas
+ * janelas abaixo antes desta lista existir e continuam listados à parte
+ * por clareza. Sem essa lista, `criarCompeticoesIncrementaisDaTemporada`
+ * (`simulation/incremental.ts`) nunca instancia a competição do próprio
+ * clube pra quem joga fora de SP/RJ/MG/RS — o estadual simplesmente não
+ * aparecia pro jogador (bug, não falta de dado: os 35 estaduais já são
+ * carregados normalmente, só não tinham janela de semana). Mesma janela
+ * estimada de design das outras 4 — não há data real modelada pra nenhum
+ * estadual (ver comentário acima).
+ */
+const OUTROS_ESTADUAIS: string[] = [
+  "acreano_1",
+  "alagoano_1",
+  "amapaense_1",
+  "amazonense_1",
+  "baiano_a1",
+  "baiano_b",
+  "candangao_1",
+  "capixaba_1",
+  "carioca_a2",
+  "catarinense_1",
+  "cearense_1",
+  "gauchao_a2",
+  "goiano_1",
+  "maranhense_1",
+  "matogrossense_1",
+  "mineiro_modulo_2",
+  "paraense_1",
+  "paraibano_1",
+  "paranaense_1",
+  "paulistao_a2",
+  "paulistao_a3",
+  "paulistao_a4",
+  "pernambucano_a1",
+  "pernambucano_a2",
+  "piauiense_1",
+  "potiguar_1",
+  "rondoniense_1",
+  "roraimense_1",
+  "sergipano_1",
+  "sul_matogrossense_1",
+  "tocantinense_1",
+];
+
 const PERIODOS_PADRAO: PeriodoCalendario[] = [
   {
     periodo: "jan-1a_quinz",
-    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", "brasileirao_serie_a", "brasileirao_serie_b"],
+    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", ...OUTROS_ESTADUAIS, "brasileirao_serie_a", "brasileirao_serie_b"],
     semanaInicio: 1,
     semanaFim: 2,
   },
   {
     periodo: "fev",
-    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", "copa_do_brasil", "brasileirao_serie_a", "brasileirao_serie_b"],
+    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", ...OUTROS_ESTADUAIS, "copa_do_brasil", "brasileirao_serie_a", "brasileirao_serie_b"],
     semanaInicio: 3,
     semanaFim: 8,
   },
   {
     periodo: "mar",
-    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", "copa_do_brasil", "libertadores", "sulamericana"],
+    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", ...OUTROS_ESTADUAIS, "copa_do_brasil", "libertadores", "sulamericana"],
     semanaInicio: 9,
     semanaFim: 13,
   },
   {
     periodo: "abr",
-    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", "copa_do_brasil", "libertadores", "sulamericana"],
+    competicoes_ativas: ["paulistao_a1", "carioca_a", "mineiro_modulo_1", "gauchao_a", ...OUTROS_ESTADUAIS, "copa_do_brasil", "libertadores", "sulamericana"],
     semanaInicio: 14,
     semanaFim: 17,
   },

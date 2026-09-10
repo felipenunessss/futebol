@@ -17,6 +17,7 @@ import { dividirEmGruposPorForca, type Grupo } from "./groups.js";
 import {
   emparelharPorForca,
   resolverConfronto,
+  sortearConfrontosPorPotes,
   type EventoConfrontoMataMata,
   type ResultadoConfrontoMataMata,
   type ResultadoEtapaMataMata,
@@ -94,6 +95,14 @@ export interface FaseMataMata {
   resultados: ResultadoEtapaMataMata[];
   partidasDoJogador: ResultadoPartida[];
   concluida: boolean;
+  /**
+   * Presente só quando esta fase nasce de uma virada fase de grupos → mata-mata com exatamente 2
+   * classificados por grupo (ver `simulation/knockout.ts` `sortearConfrontosPorPotes`) — 1º/2º
+   * colocado de cada grupo, na ordem em que os grupos terminaram. Consumido e zerado por
+   * `avancarEtapa` na primeira etapa (usa sorteio real por potes em vez de `emparelharPorForca`);
+   * `undefined` em qualquer outro tipo de mata-mata (continua por força, como sempre).
+   */
+  gruposParaSorteioDaEtapaZero?: { nome: string; times: [string, string] }[];
 }
 
 /**
@@ -127,6 +136,22 @@ export type Fase = FaseRodadas | FaseMataMata | FaseRepechaje;
 export interface HooksDeFase {
   aoSimularConfrontoPontosCorridos?: (grupoNome: string, evento: EventoConfrontoPontosCorridos) => void | Promise<void>;
   aoResolverConfrontoMataMata?: (evento: EventoConfrontoMataMata) => void | Promise<void>;
+  /**
+   * Disparado uma vez, logo que uma fase nova é criada (rodadas, mata-mata
+   * ou repechaje) — antes de qualquer rodada/etapa dela ser resolvida.
+   * Barato de disparar sempre; quem consome decide se vale a pena mostrar
+   * algo (ex: só interessa como "sorteio de grupos" quando
+   * `fase.tipo === "rodadas" && fase.grupos.length > 1`).
+   */
+  aoIniciarFase?: (fase: Fase) => void | Promise<void>;
+  /**
+   * Disparado dentro da 1ª etapa de uma fase de mata-mata, logo depois do
+   * chaveamento dessa etapa ser decidido (sorteio real por potes quando
+   * `gruposParaSorteioDaEtapaZero` está presente, senão o
+   * `emparelharPorForca` de sempre) — "revela" o chaveamento definido,
+   * mesmo quando não veio de sorteio nenhum.
+   */
+  aoDefinirChaveamento?: (info: { etapaNome: string; pares: [string, string][] }) => void | Promise<void>;
 }
 
 /** Mesma matemática de `season.ts` `gerarConfrontosPontosCorridos` — pura, não depende de quem são os times, só de quantos são (por isso dá pra calcular o total de rodadas de uma fase futura ANTES de saber quem classifica pra ela). */
@@ -207,8 +232,8 @@ function criarFaseRodadasPorClassificacao(
   return { tipo: "rodadas", nome, grupos, classificamPorGrupo: 0, rodadaAtual: 1, totalRodadas, partidasDoJogador: [], concluida: totalRodadas === 0 };
 }
 
-function criarFaseMataMata(nome: string, etapas: EtapaMataMata[]): FaseMataMata {
-  return { tipo: "mata_mata", nome, etapas, indiceAtual: 0, vivos: [], resultados: [], partidasDoJogador: [], concluida: etapas.length === 0 };
+function criarFaseMataMata(nome: string, etapas: EtapaMataMata[], gruposParaSorteioDaEtapaZero?: { nome: string; times: [string, string] }[]): FaseMataMata {
+  return { tipo: "mata_mata", nome, etapas, indiceAtual: 0, vivos: [], resultados: [], partidasDoJogador: [], concluida: etapas.length === 0, gruposParaSorteioDaEtapaZero };
 }
 
 function criarFaseRepechaje(segundosSula: string[], terceirosLibertadores: string[]): FaseRepechaje {
@@ -266,6 +291,7 @@ async function avancarEtapa(
   hooks?: HooksDeFase,
 ): Promise<void> {
   const etapa = fase.etapas[fase.indiceAtual];
+  const ehPrimeiraEtapa = fase.indiceAtual === 0;
   fase.vivos = [...fase.vivos, ...(etapa.entrantes ?? [])];
 
   if (fase.vivos.length === 0) {
@@ -275,7 +301,9 @@ async function avancarEtapa(
     // etapa de 1 entrante só, modelando uma final_estadual como FaseMataMata de 1 etapa.
     fase.resultados.push({ nome: etapa.nome, confrontos: [], vencedores: [...fase.vivos] });
   } else {
-    const pares = emparelharPorForca(fase.vivos, ratings);
+    const pares = fase.gruposParaSorteioDaEtapaZero ? sortearConfrontosPorPotes(fase.gruposParaSorteioDaEtapaZero, random) : emparelharPorForca(fase.vivos, ratings);
+    fase.gruposParaSorteioDaEtapaZero = undefined;
+    if (ehPrimeiraEtapa) await hooks?.aoDefinirChaveamento?.({ etapaNome: etapa.nome, pares });
     const confrontos: ResultadoConfrontoMataMata[] = [];
     for (const [timeA, timeB] of pares) {
       const confronto = await resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador, resolverPartida);
@@ -942,6 +970,9 @@ function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Rec
       criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.classificados = classificadosDaFase(fase as FaseRodadas);
+        // 1º x 2º de outro grupo, nunca do mesmo — só faz sentido com exatamente 2 classificados/grupo.
+        ctx.gruposClassificados =
+          fg.classificam_por_grupo === 2 ? tabelasPorGrupo(fase as FaseRodadas).map((g) => ({ nome: g.nome, times: g.tabela.slice(0, 2).map((linha) => linha.clubeId) as [string, string] })) : undefined;
       },
     },
     {
@@ -950,6 +981,7 @@ function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Rec
         criarFaseMataMata(
           "mata_mata",
           mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.classificados as string[]) : undefined })),
+          ctx.gruposClassificados as { nome: string; times: [string, string] }[] | undefined,
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
@@ -1135,6 +1167,7 @@ export async function avancarSemana(
       if (!estado.faseAtual) {
         if (passo.estaPronta && !passo.estaPronta(estado.contexto)) break; // aguarda dependência externa (ex: repechaje aguardando Libertadores)
         estado.faseAtual = passo.criar(estado.contexto);
+        await hooks?.aoIniciarFase?.(estado.faseAtual);
       }
 
       if (!estado.faseAtual.concluida) {
@@ -1246,6 +1279,10 @@ function passosLibertadores(campeonato: CampeonatoSimulavel, ratings: Record<str
         const porGrupo = tabelasPorGrupo(fase as FaseRodadas);
         ctx.classificados = porGrupo.flatMap((g) => g.tabela.slice(0, 2).map((linha) => linha.clubeId));
         ctx.terceiros = porGrupo.map((g) => g.tabela[2].clubeId);
+        // 1º x 2º de outro grupo, nunca do mesmo — só vale pra oitavas (1ª etapa de etapasRestantes,
+        // ver checagem de `etapa.entrantes` abaixo: só some quando ela não mistura mais ninguém além
+        // dos classificados da fase de grupos).
+        ctx.gruposClassificados = etapasRestantes[0]?.entrantes ? undefined : porGrupo.map((g) => ({ nome: g.nome, times: g.tabela.slice(0, 2).map((linha) => linha.clubeId) as [string, string] }));
       },
     },
     {
@@ -1258,6 +1295,7 @@ function passosLibertadores(campeonato: CampeonatoSimulavel, ratings: Record<str
             ida_e_volta: etapa.ida_e_volta,
             entrantes: indice === 0 ? [...(ctx.classificados as string[]), ...(etapa.entrantes ?? [])] : etapa.entrantes,
           })),
+          ctx.gruposClassificados as { nome: string; times: [string, string] }[] | undefined,
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];

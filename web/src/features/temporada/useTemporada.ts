@@ -16,9 +16,11 @@ import {
   type NegociacaoResolvidaNaTemporada,
   type NivelAlcancadoNaTemporada,
   type OpcoesJogarTemporadaSemanal,
+  type ChaveamentoDeMataMataNaTemporada,
   type PartidaDoJogadorMataMata,
   type PartidaDoJogadorPontosCorridos,
   type ResultadoTemporadaDeCarreira,
+  type SorteioDeGruposNaTemporada,
   type StatusAtualizadoNaTemporada,
   type TreinoResolvidoNaTemporada,
 } from "@motor/career/career-loop.js";
@@ -176,6 +178,22 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [tabelaPorCampeonato, setTabelaPorCampeonato] = useState<Map<string, LinhaTabela[]>>(new Map());
   /** Fase mais recente conhecida de cada competição de mata-mata do jogador — alimentada por `onPartidaMataMata`. */
   const [faseMataMataPorCampeonato, setFaseMataMataPorCampeonato] = useState<Map<string, FaseMataMata>>(new Map());
+  /**
+   * Nome do grupo do PRÓPRIO clube em cada competição do jogador (ex:
+   * "Grupo B", ou o próprio nome da fase quando ela tem um grupo só) —
+   * capturado de `onPartidaPontosCorridos` (única fonte confiável: só
+   * dispara pro confronto do próprio clube, então o `grupoNome` ali é
+   * sempre o grupo dele). Usado tanto pra rotular a aba de Classificação
+   * quanto pra `atualizarTabela` (via `onPartidaDaRodadaNaCompeticaoDoJogador`)
+   * não sobrescrever a tabela do jogador com a de outro grupo da mesma
+   * competição (ver `career/career-loop.ts` `grupoNome`).
+   */
+  const [grupoDoJogadorPorCampeonato, setGrupoDoJogadorPorCampeonato] = useState<Map<string, string>>(new Map());
+  /** Espelha `grupoDoJogadorPorCampeonato` num ref — necessário porque `jogarTemporada()` roda a
+   * temporada inteira numa única clausura de longa duração (mesmo motivo de `semanaAtualRef`): o
+   * estado capturado ali ficaria congelado no valor de quando a Promise começou, sem refletir
+   * atualizações feitas por ela mesma no meio do caminho. */
+  const grupoDoJogadorPorCampeonatoRef = useRef<Map<string, string>>(new Map());
   /** Ids das competições do próprio clube — capturado do 1º `aoIniciarSemana` da temporada (o conjunto não muda semana a semana). */
   const [competicoesDoJogador, setCompeticoesDoJogador] = useState<string[]>([]);
   const [estatisticasCarreira, setEstatisticasCarreira] = useState<EstatisticasCarreira>(ESTATISTICAS_INICIAIS);
@@ -211,6 +229,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [focoAutomatico, setFocoAutomatico] = useState<FocoDeTreino>();
   const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
   const [animacaoDeEscolha, setAnimacaoDeEscolha] = useState<AnimacaoDeEscolhaPendente>();
+  /** Sorteio de grupos de uma competição do jogador, aguardando revelação — ver `onSorteioDeGrupos`. */
+  const [sorteioPendente, setSorteioPendente] = useState<SorteioDeGruposNaTemporada>();
+  /** Chaveamento definido da 1ª etapa de um mata-mata do jogador, aguardando revelação — ver `onChaveamentoDefinido`. */
+  const [chaveamentoPendente, setChaveamentoPendente] = useState<ChaveamentoDeMataMataNaTemporada>();
   /** Confrontos da rodada atual de cada competição, acumulados conforme os hooks disparam (ver `ResultadoDaRodadaExibido`). Reseta ao detectar que uma nova rodada começou. */
   const bufferRodadaRef = useRef<Map<string, { rodada: number; confrontos: ConfrontoResultado[] }>>(new Map());
   /**
@@ -273,6 +295,11 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setTabelaPorCampeonato((atual) => new Map(atual).set(campeonatoId, tabela));
   }
 
+  function registrarGrupoDoJogador(campeonatoId: string, grupoNome: string): void {
+    grupoDoJogadorPorCampeonatoRef.current = new Map(grupoDoJogadorPorCampeonatoRef.current).set(campeonatoId, grupoNome);
+    setGrupoDoJogadorPorCampeonato(grupoDoJogadorPorCampeonatoRef.current);
+  }
+
   function registrarConfrontoNoBufferDaRodada(campeonatoId: string, rodada: number, confronto: ConfrontoResultado): void {
     const atual = bufferRodadaRef.current.get(campeonatoId);
     if (!atual || atual.rodada !== rodada) {
@@ -284,6 +311,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function responderResultadoDaRodada(): void {
     setResultadoDaRodada(undefined);
+  }
+
+  /** Fecha o painel de sorteio de grupos — chamado pelo clique do jogador, não pelo motor (que já seguiu em frente, ver `onSorteioDeGrupos`). */
+  function fecharSorteioDeGrupos(): void {
+    setSorteioPendente(undefined);
+  }
+
+  /** Fecha o painel de chaveamento — mesma ideia de `fecharSorteioDeGrupos`. */
+  function fecharChaveamento(): void {
+    setChaveamentoPendente(undefined);
   }
 
   /** Chamado pela própria `PainelAnimacaoDeEscolha` quando o timer da animação termina (não é clique do jogador) — só então o resultado entra de fato no feed. */
@@ -416,6 +453,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         // a partida "ao vivo" já resolveu por completo antes deste hook disparar — some o painel
         // em andamento (o resultado final já vai pro feed permanente logo abaixo).
         setPartidaAoVivo(undefined);
+        if (info.grupoNome) registrarGrupoDoJogador(info.campeonatoId, info.grupoNome);
         atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_propria", info });
         const { confronto, resultado: resultadoDaPartida } = info.evento;
@@ -442,7 +480,13 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       },
       escolherCampeonatosParaSeguir,
       onPartidaDaRodadaNaCompeticaoDoJogador: (info) => {
-        atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
+        // Numa competição com >1 grupo, este hook também dispara pra confrontos de OUTROS grupos
+        // (não só o do jogador) — só atualiza a tabela exibida quando o grupo bate com o do
+        // jogador (ou quando ainda não se sabe qual é, caso ele ainda não tenha jogado nesta fase).
+        const grupoDoJogador = grupoDoJogadorPorCampeonatoRef.current.get(info.campeonatoId);
+        if (!info.grupoNome || !grupoDoJogador || grupoDoJogador === info.grupoNome) {
+          atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
+        }
         pushEvento({ tipo: "partida_rodada", info });
         registrarConfrontoNoBufferDaRodada(info.campeonatoId, info.evento.confronto.rodada, {
           mandanteId: info.evento.confronto.mandante,
@@ -478,6 +522,14 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       },
       onStatusAtualizado: (info) => pushEvento({ tipo: "status", info }),
       onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => pushEvento({ tipo: "tabela", campeonatoId, periodo, tabela }),
+      onSorteioDeGrupos: (info) => {
+        // motor já decidiu os grupos antes deste hook disparar — em janela automática (fast-forward)
+        // não pausa, mesmo padrão de `animacaoDeEscolha`/`resultadoDaRodada`.
+        if (!emJanelaAutomatica()) setSorteioPendente(info);
+      },
+      onChaveamentoDefinido: (info) => {
+        if (!emJanelaAutomatica()) setChaveamentoPendente(info);
+      },
     };
 
     const resultadoDaTemporada = await jogarTemporadaSemanal(estadoAtual, campeonatos, clubes, opcoes);
@@ -599,6 +651,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     partidaAoVivo,
     tabelaPorCampeonato,
     faseMataMataPorCampeonato,
+    grupoDoJogadorPorCampeonato,
     competicoesDoJogador,
     estatisticasCarreira,
     resultado,
@@ -620,6 +673,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderResultadoDaRodada,
     animacaoDeEscolha,
     concluirAnimacaoDeEscolha,
+    sorteioPendente,
+    fecharSorteioDeGrupos,
+    chaveamentoPendente,
+    fecharChaveamento,
     semanaAtual,
     jogoDaSemana,
   };

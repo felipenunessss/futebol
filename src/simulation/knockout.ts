@@ -62,6 +62,51 @@ export function emparelharPorForca(participantes: string[], ratings: Record<stri
   return pares;
 }
 
+/**
+ * Sorteio real (aleatório, não por força) da virada fase de grupos →
+ * mata-mata — critério padrão de Copa do Brasil/Libertadores/Sul-Americana
+ * de verdade: 1º colocado de um grupo enfrenta o 2º colocado de OUTRO
+ * grupo, nunca do mesmo grupo. Diferente de `emparelharPorForca` (usado nas
+ * demais rodadas do mata-mata, que não têm registro de sorteio real e
+ * continuam por rating) — aqui `random` decide de fato quem pega quem
+ * dentro dessa restrição.
+ *
+ * Só cobre o caso de exatamente 2 classificados por grupo (`times: [1º,
+ * 2º]`), o único padrão presente nos dados hoje — ver `simulation/
+ * incremental.ts` onde é chamada.
+ */
+export function sortearConfrontosPorPotes(gruposClassificados: { nome: string; times: [string, string] }[], random: () => number): [string, string][] {
+  if (gruposClassificados.length < 2) {
+    throw new Error(`sortearConfrontosPorPotes: precisa de pelo menos 2 grupos pra sortear (recebeu ${gruposClassificados.length})`);
+  }
+  const primeiros = gruposClassificados.map((g) => ({ time: g.times[0], grupo: g.nome }));
+  const segundos = gruposClassificados.map((g) => ({ time: g.times[1], grupo: g.nome }));
+
+  // Sorteia (Fisher-Yates com `random` injetado) e corrige localmente qualquer posição em que o
+  // sorteio caiu num confronto do mesmo grupo, tentando de novo do zero se a correção local não
+  // achar parceiro de troca válido (não deveria acontecer com N ≥ 2 grupos, mas um limite de
+  // tentativas evita loop infinito em vez de assumir a prova por escrito).
+  for (let tentativa = 0; tentativa < 200; tentativa++) {
+    const embaralhados = [...segundos];
+    for (let i = embaralhados.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [embaralhados[i], embaralhados[j]] = [embaralhados[j], embaralhados[i]];
+    }
+
+    for (let i = 0; i < embaralhados.length; i++) {
+      if (embaralhados[i].grupo !== primeiros[i].grupo) continue;
+      const j = embaralhados.findIndex((s, indice) => indice !== i && s.grupo !== primeiros[i].grupo && primeiros[indice].grupo !== embaralhados[i].grupo);
+      if (j !== -1) [embaralhados[i], embaralhados[j]] = [embaralhados[j], embaralhados[i]];
+    }
+
+    if (embaralhados.every((s, i) => s.grupo !== primeiros[i].grupo)) {
+      return primeiros.map((p, i) => [p.time, embaralhados[i].time] as [string, string]);
+    }
+  }
+
+  throw new Error("sortearConfrontosPorPotes: não conseguiu sortear um pareamento sem confronto do mesmo grupo em 200 tentativas");
+}
+
 function participacaoComoLado(participacao: ParticipacaoJogadorClube | undefined, lado: "casa" | "fora"): ParticipacaoJogador | undefined {
   return participacao ? { lado, jogador: participacao.jogador, estiloTecnico: participacao.estiloTecnico } : undefined;
 }

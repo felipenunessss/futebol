@@ -677,6 +677,44 @@ describe("jogarTemporadaSemanal", () => {
     expect(eventosDaRodada.length).toBeGreaterThan(0);
     expect(eventosDaRodada.every((e) => e.mandante !== "a" && e.visitante !== "a")).toBe(true);
   });
+
+  it("onSorteioDeGrupos e onChaveamentoDefinido disparam pra competição do próprio clube (fase de grupos -> mata-mata)", async () => {
+    const times = ["a", "b", "c", "d", "e", "f"];
+    // id "brasileirao_serie_a" só pra estar ativo no calendário padrão (data/loaders/calendario.ts)
+    // — o formato de verdade vem daqui, não do id.
+    const campeonatos: CampeonatoSimulavel[] = [
+      {
+        id: "brasileirao_serie_a",
+        formato: { fase_grupos: { num_grupos: 2, times_por_grupo: 3, ida_e_volta: false, classificam_por_grupo: 2 }, mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } },
+        times,
+      },
+    ];
+    const clubes = times.map((id) => clube(id));
+
+    const sorteios: { campeonatoId: string; grupos: { nome: string; times: string[] }[] }[] = [];
+    const chaveamentos: { campeonatoId: string; etapaNome: string; pares: [string, string][] }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatos, clubes, {
+      random: () => 0.5,
+      escolherModoDePartida: () => "rapida",
+      onSorteioDeGrupos: (info) => sorteios.push(info),
+      onChaveamentoDefinido: (info) => chaveamentos.push(info),
+    });
+
+    expect(sorteios).toHaveLength(1);
+    expect(sorteios[0].campeonatoId).toBe("brasileirao_serie_a");
+    expect(sorteios[0].grupos).toHaveLength(2);
+    expect(sorteios[0].grupos.flatMap((g) => g.times).sort()).toEqual([...times].sort());
+
+    expect(chaveamentos).toHaveLength(1);
+    expect(chaveamentos[0].etapaNome).toBe("semifinal");
+    expect(chaveamentos[0].pares).toHaveLength(2);
+    // 1º x 2º de outro grupo, nunca do mesmo (sorteio real por potes — ver simulation/knockout.ts)
+    const grupoDoTime = new Map(sorteios[0].grupos.flatMap((g) => g.times.map((t) => [t, g.nome] as const)));
+    for (const [a2, b2] of chaveamentos[0].pares) {
+      expect(grupoDoTime.get(a2)).not.toBe(grupoDoTime.get(b2));
+    }
+  });
 });
 
 describe("jogarCarreira", () => {

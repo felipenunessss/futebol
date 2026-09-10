@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { construirCalendarioPadrao } from "../../src/data/loaders/calendario.js";
+import { loadEstaduais } from "../../src/data/loaders/index.js";
 
 describe("calendario mestre", () => {
   it("gera um calendário padrão com períodos e competições ativas", () => {
@@ -60,5 +61,16 @@ describe("calendario mestre", () => {
     // só os períodos de treino de verdade contam (os 5 originais) — a janela nova não soma mais um.
     const pontosDeTreino = calendario.calendario.filter((p) => p.pontoDeTreino !== false);
     expect(pontosDeTreino).toHaveLength(5);
+  });
+
+  it("dá janela de semana pra TODO campeonato estadual, não só os 4 grandes (bug: estadual do próprio clube sumia pra quem jogava fora de SP/RJ/MG/RS)", () => {
+    const calendario = construirCalendarioPadrao(2027);
+    const idsAtivos = new Set(calendario.calendario.flatMap((p) => p.competicoes_ativas));
+    const idsDeEstaduais = loadEstaduais().map((c) => c.id);
+
+    expect(idsDeEstaduais.length).toBeGreaterThan(30);
+    for (const id of idsDeEstaduais) {
+      expect(idsAtivos.has(id)).toBe(true);
+    }
   });
 });

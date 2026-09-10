@@ -471,6 +471,32 @@ describe("criarCompeticaoIncrementalConjunta (Libertadores + Sul-Americana)", ()
     expect(conjunta.lib.campeao).toBe("lp1");
     expect(conjunta.lib.partidasDoJogador.length).toBeGreaterThan(0);
   });
+
+  it("nas oitavas da Libertadores, o sorteio real por potes nunca pareia 2 times do mesmo grupo", async () => {
+    const conjunta = criarCompeticaoIncrementalConjunta(libertadores, sulAmericana, ratingsLibertadores, ratingsSulAmericana, undefined, { semanaInicio: 1, semanaFim: 10 });
+    const grupoDoTime = new Map<string, string>();
+    let paresDasOitavas: [string, string][] | undefined;
+
+    for (let semana = 1; semana <= 10; semana++) {
+      await avancarSemana(conjunta.lib, semana, () => Math.random(), undefined, {
+        aoIniciarFase: (fase) => {
+          if (fase.tipo === "rodadas" && fase.grupos.length > 1) {
+            for (const grupo of fase.grupos) for (const time of grupo.tabela.keys()) grupoDoTime.set(time, grupo.nome);
+          }
+        },
+        aoDefinirChaveamento: (info) => {
+          if (info.etapaNome === "oitavas") paresDasOitavas = info.pares;
+        },
+      });
+      await avancarSemana(conjunta.sula, semana, () => Math.random());
+    }
+
+    expect(paresDasOitavas).toBeDefined();
+    for (const [a, b] of paresDasOitavas!) {
+      expect(grupoDoTime.get(a)).toBeDefined();
+      expect(grupoDoTime.get(a)).not.toBe(grupoDoTime.get(b));
+    }
+  });
 });
 
 describe("criarCompeticoesIncrementaisDaTemporada", () => {
