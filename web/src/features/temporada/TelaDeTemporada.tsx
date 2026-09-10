@@ -11,6 +11,9 @@ import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from
 import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
+import { contrapropostaPadrao } from "@motor/market/negotiation.js";
+import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
+import { temporadaDeVencimento } from "@motor/schemas/contract.js";
 import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type JogoDaSemana, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
@@ -392,6 +395,60 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
       {prompt.tipo === "foco" && <PromptFoco onEscolher={temporada.responderFoco} />}
       {prompt.tipo === "pontos" && <PromptDistribuicaoDePontos estado={prompt.estado} onConfirmar={temporada.responderDistribuicaoDePontos} />}
       {prompt.tipo === "cenario" && <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={temporada.responderCenario} />}
+      {prompt.tipo === "proposta_de_transferencia" && (
+        <PromptPropostaDeTransferencia proposta={prompt.proposta} estado={temporada.estadoAtual} clubePorId={temporada.clubePorId} onResponder={temporada.responderPropostaDeTransferencia} />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Só aparece durante a janela de transferência com interesse real de
+ * mercado (`career-loop.ts` `estaNaJanelaDeTransferencia`/`responderProposta`)
+ * — dá a decisão de verdade: negociar (contraproposta padrão) ou recusar
+ * e seguir cumprindo contrato no clube atual.
+ */
+function PromptPropostaDeTransferencia({
+  proposta,
+  estado,
+  clubePorId,
+  onResponder,
+}: {
+  proposta: PropostaTransferencia;
+  estado: EstadoDeCarreira;
+  clubePorId: Map<string, Club>;
+  onResponder: (resposta: TermosDeContrato | "recusar") => void;
+}) {
+  const termos = proposta.propostaInicial;
+  const nomeClubeOfertante = nomeDoClube(clubePorId, proposta.clubeOfertanteId);
+  const nomeClubeAtual = nomeDoClube(clubePorId, estado.clubeAtualId);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-lg font-semibold flex items-center gap-2">
+        <Escudo url={escudoDoClube(clubePorId, proposta.clubeOfertanteId)} alt={nomeClubeOfertante} tamanho={22} />
+        {nomeClubeOfertante} fez uma proposta
+      </h2>
+      <p className="text-sm text-slate-400">
+        Status oferecido: <span className="text-slate-200">{ROTULO_STATUS[proposta.statusOferecido]}</span> · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
+      </p>
+      {estado.contratoAtual && (
+        <p className="text-xs text-slate-500">
+          Seu contrato atual com {nomeClubeAtual} vale até a temporada {temporadaDeVencimento(estado.contratoAtual)}.
+        </p>
+      )}
+      <div className="grid gap-2">
+        <button
+          type="button"
+          onClick={() => onResponder(contrapropostaPadrao(proposta))}
+          className="rounded-lg bg-emerald-900/40 border border-emerald-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
+        >
+          Negociar (pedir mais salário e luvas)
+        </button>
+        <button type="button" onClick={() => onResponder("recusar")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
+          Recusar — continuar em {nomeClubeAtual}, cumprindo o contrato atual
+        </button>
+      </div>
     </div>
   );
 }
@@ -590,6 +647,13 @@ function PainelPrePartida({
         </button>
         <button
           type="button"
+          onClick={() => onEscolher("proximo_jogo")}
+          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+        >
+          Simular até o próximo jogo (não pergunta de novo até lá)
+        </button>
+        <button
+          type="button"
           onClick={() => onEscolher("ate_a_metade")}
           className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
         >
@@ -742,8 +806,8 @@ function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoCh
 function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino, manterAutomatico: boolean) => void }) {
   const focos: { foco: FocoDeTreino; descricao: string }[] = [
     { foco: "fisico", descricao: "velocidade, força, resistência, jogo aéreo, reflexos" },
-    { foco: "tecnico", descricao: "finalização, drible, passe, marcação, etc — depende da posição" },
-    { foco: "tatico", descricao: "visão de jogo, frieza, posicionamento, liderança" },
+    { foco: "tecnico", descricao: "finalização, drible, cruzamento, passe, cabeceio, etc — depende da posição" },
+    { foco: "tatico", descricao: "visão de jogo, frieza, marcação, desarme, posicionamento, liderança" },
     { foco: "descanso", descricao: "recupera moral, não gera XP" },
   ];
   const [treinoRapido, setTreinoRapido] = useState(false);
@@ -904,6 +968,13 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
     case "negociacao": {
       const { negociacao } = evento;
       const rotulo = negociacao.tipo === "venda_forcada" ? "Venda forçada" : "Proposta de transferência";
+      if (negociacao.contrapropostaJogador === "recusar" || !negociacao.resultado) {
+        return (
+          <Card>
+            [{rotulo}] {nomeDoClube(clubePorId, negociacao.clubeOfertanteId)} — recusada sem negociar, seguiu no clube atual
+          </Card>
+        );
+      }
       const desfecho = negociacao.resultado.aceito ? "ACEITA!" : "recusada";
       return (
         <Card destaque={negociacao.resultado.aceito}>

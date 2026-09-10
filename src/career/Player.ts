@@ -1,5 +1,5 @@
-import type { DesempenhoPartida } from "../progression/xp.js";
-import { calcularXpPartida, ganhoPorPonto, PONTOS_POR_NIVEL, xpParaProximoNivel } from "../progression/xp.js";
+import type { DesempenhoPartida, FocoDeTreino } from "../progression/xp.js";
+import { ATRIBUTOS_POR_FOCO, calcularXpPartida, GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO, ganhoPorPonto, PONTOS_POR_NIVEL, xpParaProximoNivel } from "../progression/xp.js";
 import { aplicarDeclinioPorIdade } from "../progression/aging.js";
 import type { ImpactoCarreira, Reputacao } from "../progression/scenarios.js";
 import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
@@ -252,6 +252,36 @@ export function investirPontos(estado: EstadoDeCarreira, atributo: Atributo, qua
     jogador: { ...estado.jogador, atributos: { ...estado.jogador.atributos, [atributo]: novoValor } },
     pontosDisponiveis: estado.pontosDisponiveis - quantidade,
   };
+}
+
+/**
+ * Aplica o ganho direto de atributo de uma sessão de treino com foco
+ * (`foco !== "descanso"`, ver `progression/xp.ts` `ATRIBUTOS_POR_FOCO`) —
+ * só nos atributos dessa categoria que também sejam relevantes pra
+ * posição do jogador (`ATRIBUTOS_POR_POSICAO`); é automático (não é
+ * escolha do jogador) e sempre nos mesmos atributos daquele foco, ao
+ * contrário de `investirPontos` (escolha livre, alimentada por
+ * `pontosDisponiveis`, que continua existindo e sendo alimentada
+ * igualmente pelos 3 focos — este ganho é complementar, não substitui).
+ * Sem interseção foco×posição (não deveria acontecer, todo foco cobre
+ * pelo menos 1 atributo de cada posição), não faz nada.
+ */
+export function aplicarGanhoDeTreino(estado: EstadoDeCarreira, foco: FocoDeTreino): EstadoDeCarreira {
+  if (foco === "descanso") return estado;
+
+  const atributosDaPosicao = ATRIBUTOS_POR_POSICAO[estado.jogador.posicao];
+  const atributosRelevantes = ATRIBUTOS_POR_FOCO[foco].filter((atributo) => atributosDaPosicao.includes(atributo));
+  if (atributosRelevantes.length === 0) return estado;
+
+  const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
+  let atributos = estado.jogador.atributos;
+  for (const atributo of atributosRelevantes) {
+    const valorAtual = atributos[atributo] ?? 1;
+    const ganho = GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios);
+    atributos = { ...atributos, [atributo]: Math.min(ATRIBUTO_MAXIMO, valorAtual + ganho) };
+  }
+
+  return { ...estado, jogador: { ...estado.jogador, atributos } };
 }
 
 /**

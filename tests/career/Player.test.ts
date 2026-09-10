@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   aplicarDesempenhoPartida,
+  aplicarGanhoDeTreino,
   aplicarImpactoDeCenario,
   assinarContrato,
   avancarTemporada,
@@ -230,6 +231,59 @@ describe("investirPontos", () => {
     investirPontos(comPontos, "finalizacao", 2);
     expect(comPontos.jogador.atributos.finalizacao).toBe(valorOriginal);
     expect(comPontos.pontosDisponiveis).toBe(5);
+  });
+});
+
+describe("aplicarGanhoDeTreino", () => {
+  // atacante/finalizador: prioritários = finalizacao, posicionamento_ofensivo, frieza.
+  // técnico ∩ atacante = finalizacao, drible, cabeceio, protecao_de_bola, cruzamento, passe_curto.
+  // físico ∩ atacante = velocidade, jogo_aereo, forca_fisica.
+
+  it("foco técnico só sobe atributos técnicos relevantes pra posição, não físicos/táticos", () => {
+    const estado = estadoBase();
+    const depois = aplicarGanhoDeTreino(estado, "tecnico");
+
+    expect(depois.jogador.atributos.finalizacao!).toBeGreaterThan(estado.jogador.atributos.finalizacao!);
+    expect(depois.jogador.atributos.drible!).toBeGreaterThan(estado.jogador.atributos.drible!);
+    expect(depois.jogador.atributos.velocidade).toBe(estado.jogador.atributos.velocidade);
+    expect(depois.jogador.atributos.visao_de_jogo).toBe(estado.jogador.atributos.visao_de_jogo);
+  });
+
+  it("foco físico só sobe atributos físicos relevantes pra posição, não técnicos/táticos", () => {
+    const estado = estadoBase();
+    const depois = aplicarGanhoDeTreino(estado, "fisico");
+
+    expect(depois.jogador.atributos.velocidade!).toBeGreaterThan(estado.jogador.atributos.velocidade!);
+    expect(depois.jogador.atributos.forca_fisica!).toBeGreaterThan(estado.jogador.atributos.forca_fisica!);
+    expect(depois.jogador.atributos.finalizacao).toBe(estado.jogador.atributos.finalizacao);
+  });
+
+  it("descanso não altera nenhum atributo", () => {
+    const estado = estadoBase();
+    const depois = aplicarGanhoDeTreino(estado, "descanso");
+    expect(depois).toEqual(estado);
+  });
+
+  it("atributo prioritário do arquétipo rende mais que um não-prioritário dentro do mesmo foco", () => {
+    const estado = estadoBase();
+    const depois = aplicarGanhoDeTreino(estado, "tecnico");
+    const ganhoFinalizacao = depois.jogador.atributos.finalizacao! - estado.jogador.atributos.finalizacao!; // prioritário
+    const ganhoDrible = depois.jogador.atributos.drible! - estado.jogador.atributos.drible!; // não-prioritário
+    expect(ganhoFinalizacao).toBeGreaterThan(ganhoDrible);
+  });
+
+  it("nunca ultrapassa 99", () => {
+    const quaseNoTeto = estadoBase();
+    quaseNoTeto.jogador = { ...quaseNoTeto.jogador, atributos: { ...quaseNoTeto.jogador.atributos, finalizacao: 98.8 } };
+    const depois = aplicarGanhoDeTreino(quaseNoTeto, "tecnico");
+    expect(depois.jogador.atributos.finalizacao).toBe(99);
+  });
+
+  it("não muta o estado original", () => {
+    const estado = estadoBase();
+    const valorOriginal = estado.jogador.atributos.finalizacao;
+    aplicarGanhoDeTreino(estado, "tecnico");
+    expect(estado.jogador.atributos.finalizacao).toBe(valorOriginal);
   });
 });
 

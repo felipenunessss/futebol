@@ -2279,9 +2279,18 @@ mostrando titular/reserva/etc — tudo "conectado com os eventos".
   impede de marcar mais opções de "buscar saída"/"aceitar venda" em
   cenários futuros); `precisaVender` é probabilidade pura, não uma
   simulação de fluxo de caixa (clube não fica "mais endividado" com o
-  tempo, a chance por temporada é sempre a mesma); não existe renovação
-  de contrato (jogador pode ficar anos além de `temporadaDeVencimento`
-  sem nada acontecer); ~~não existe sistema de minutagem que reduza o
+  tempo, a chance por temporada é sempre a mesma); ~~jogador só podia
+  contrapropor, nunca recusar de verdade uma oferta~~ **resolvida**:
+  `OpcoesJogarTemporada.responderProposta` pode devolver `"recusar"` (em
+  vez de sempre um `TermosDeContrato`) — `resolverNegociacaoDeTransferencia`
+  para a janela inteira ali, sem tentar os próximos interessados, e a web
+  (`useTemporada.ts` `responderProposta`) já pausa de verdade pra essa
+  escolha (negociar vs. continuar no clube atual cumprindo contrato)
+  sempre que há interesse real de mercado fora da janela automática de
+  "simular sem perguntar". Continua sem existir renovação de contrato de
+  verdade (jogador pode ficar anos além de `temporadaDeVencimento` sem
+  nada acontecer, e recusar uma oferta não estende/renegocia o contrato
+  atual, só mantém o que já tinha); ~~não existe sistema de minutagem que reduza o
   interesse de mercado de um jogador que não joga~~ **resolvida**: status
   no elenco (seção 5.6) cumpre esse papel — `multiplicadorDeValorizacaoPorStatus`
   reduz valor de mercado/teto de rating alcançável pra quem não é

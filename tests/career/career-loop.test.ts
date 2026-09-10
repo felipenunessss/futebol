@@ -261,6 +261,28 @@ describe("jogarTemporada — negociação de transferência", () => {
     expect(resultado.estado.contratoAtual).toBeUndefined();
   });
 
+  it("responderProposta pode devolver 'recusar' — para a negociação inteira (sem tentar outros interessados), sem mudar de clube", async () => {
+    const clubes: Club[] = [
+      { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "b", nome: "b", pais: "BR", cidade: "Cidade", estado: "RJ", rating_inicial: 1800, forca_financeira: "muito_alta" },
+      { id: "c", nome: "c", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+      { id: "d", nome: "d", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },
+    ];
+    const campeonatos = campeonatoDeTeste(clubes.map((c) => c.id));
+
+    // random 0 favorece confiança máxima do clube (aceitaria se negociasse de verdade) — o teste
+    // confirma que "recusar" tem prioridade sobre isso, nenhuma negociação de verdade é tentada.
+    const resultado = await jogarTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, campeonatos, clubes, {
+      random: () => 0,
+      responderProposta: () => "recusar",
+    });
+
+    expect(resultado.negociacoesResolvidas.length).toBeGreaterThan(0);
+    expect(resultado.negociacoesResolvidas.every((n) => n.contrapropostaJogador === "recusar" && n.resultado === undefined)).toBe(true);
+    expect(resultado.estado.clubeAtualId).toBe("a");
+    expect(resultado.estado.contratoAtual).toBeUndefined();
+  });
+
   it("com interesse real de mercado, o cenário do período de pré-temporada é um cenário de transferência (unificação cenário/mercado)", async () => {
     const clubes: Club[] = [
       { id: "a", nome: "a", pais: "BR", cidade: "Cidade", estado: "SP", rating_inicial: 1600, forca_financeira: "baixa" },

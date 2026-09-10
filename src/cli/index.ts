@@ -403,9 +403,13 @@ async function simularCarreiraLoopCli(): Promise<void> {
     }
 
     for (const negociacao of temporada.negociacoesResolvidas) {
+      const rotulo = negociacao.tipo === "venda_forcada" ? "venda forçada" : "transferência";
+      if (negociacao.contrapropostaJogador === "recusar" || !negociacao.resultado) {
+        console.log(`  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)}: recusada sem negociar — seguiu no clube atual.`);
+        continue;
+      }
       const termos = negociacao.contrapropostaJogador;
       const desfecho = negociacao.resultado.aceito ? "ACEITA" : "recusada";
-      const rotulo = negociacao.tipo === "venda_forcada" ? "venda forçada" : "transferência";
       console.log(
         `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)}: status oferecido ${negociacao.proposta.statusOferecido} | contraproposta R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos → ${desfecho} (confiança ${negociacao.resultado.confianca})`,
       );
@@ -668,8 +672,8 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
 
   const FOCOS_DE_TREINO: { foco: FocoDeTreino; rotulo: string }[] = [
     { foco: "fisico", rotulo: "Físico (velocidade, força, resistência, jogo aéreo, reflexos)" },
-    { foco: "tecnico", rotulo: "Técnico (finalização, drible, passe, marcação, etc — depende da posição)" },
-    { foco: "tatico", rotulo: "Tático (visão de jogo, frieza, posicionamento, liderança)" },
+    { foco: "tecnico", rotulo: "Técnico (finalização, drible, cruzamento, passe, cabeceio, etc — depende da posição)" },
+    { foco: "tatico", rotulo: "Tático (visão de jogo, frieza, marcação, desarme, posicionamento, liderança)" },
     { foco: "descanso", rotulo: "Descanso (recupera moral, não treina atributo)" },
   ];
 
@@ -732,9 +736,13 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   };
 
   const onNegociacaoResolvida = (negociacao: NegociacaoResolvidaNaTemporada): void => {
+    const rotulo = negociacao.tipo === "venda_forcada" ? "Venda forçada" : "Proposta de transferência";
+    if (negociacao.contrapropostaJogador === "recusar" || !negociacao.resultado) {
+      console.log(`  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)} — recusada sem negociar, seguiu no clube atual.`);
+      return;
+    }
     const termos = negociacao.contrapropostaJogador;
     const desfecho = negociacao.resultado.aceito ? "ACEITA!" : "recusada.";
-    const rotulo = negociacao.tipo === "venda_forcada" ? "Venda forçada" : "Proposta de transferência";
     console.log(
       `  [${rotulo}] ${nomeDoClube(negociacao.clubeOfertanteId)} — status oferecido: ${negociacao.proposta.statusOferecido} | contraproposta automática: R$${termos.salarioMensal}/mês + R$${termos.luvas} luvas, ${termos.anos} anos -> ${desfecho}`,
     );

@@ -34,7 +34,7 @@ import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressado
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
 import { evoluirStatus, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
-import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
+import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
@@ -73,8 +73,9 @@ export interface NegociacaoResolvidaNaTemporada {
   tipo: "compra" | "venda_forcada";
   clubeOfertanteId: string;
   proposta: PropostaTransferencia;
-  contrapropostaJogador: TermosDeContrato;
-  resultado: ResultadoNegociacao;
+  /** `"recusar"` quando o jogador optou por não negociar com esse clube (ver `OpcoesJogarTemporada.responderProposta`) — nesse caso `resultado` fica ausente, nenhuma negociação de verdade foi tentada. */
+  contrapropostaJogador: TermosDeContrato | "recusar";
+  resultado?: ResultadoNegociacao;
 }
 
 export interface ResumoCompeticaoNaTemporada {
@@ -174,8 +175,17 @@ export interface OpcoesJogarTemporada {
    * `jogarCarreira` são `async` justamente pra suportar isso.
    */
   escolherOpcao?: (cenario: Cenario) => Opcao | Promise<Opcao>;
-  /** Como o jogador contrapropõe uma oferta de transferência recebida — por padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais salário/luvas que a proposta inicial). Injete pra plugar outra estratégia (também pode ser assíncrona). */
-  responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
+  /**
+   * Como o jogador reage a uma oferta de transferência recebida — por
+   * padrão, `market/negotiation.ts` `contrapropostaPadrao` (pede mais
+   * salário/luvas que a proposta inicial, sempre tenta negociar). Injete
+   * pra plugar outra estratégia (também pode ser assíncrona), ou devolva
+   * `"recusar"` pra recusar esse clube sem contrapropor — nesse caso
+   * `resolverNegociacaoDeTransferencia` para a janela inteira ali (não
+   * tenta os próximos clubes interessados), tratando como "prefiro
+   * continuar no meu clube atual".
+   */
+  responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">;
   /**
    * Como decidir o foco de treino de cada período — por padrão, sempre
    * `"tecnico"` (escolha arbitrária, mesmo espírito do padrão de
@@ -273,7 +283,11 @@ export interface OpcoesJogarTemporada {
  * forçada, mesma mecânica pro comprador — o que muda entre os dois casos
  * é só quem entra na lista de `interessados`, ver `selecionarClubesInteressados`
  * `exigirUpgrade`), parando no primeiro que aceitar. Registra toda
- * tentativa (aceita ou não) em `negociacoesResolvidas`.
+ * tentativa (aceita, recusada ou "recusada sem negociar") em
+ * `negociacoesResolvidas`. Se `responderProposta` devolver `"recusar"`
+ * pra algum clube, para a janela inteira ali (não tenta os próximos
+ * interessados) — o jogador escolheu continuar no clube atual, não só
+ * recusar esse clube específico.
  */
 async function resolverNegociacaoDeTransferencia(
   estado: EstadoDeCarreira,
@@ -282,7 +296,7 @@ async function resolverNegociacaoDeTransferencia(
   ratingClubeAtual: number,
   tipo: NegociacaoResolvidaNaTemporada["tipo"],
   periodo: string,
-  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>,
+  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">,
   random: () => number,
   negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>,
@@ -292,6 +306,14 @@ async function resolverNegociacaoDeTransferencia(
   for (const clube of interessados) {
     const proposta = gerarProposta(clube, valorDeMercado, estadoAtual.statusNoClube, estadoAtual.jogador.idade, ratingClubeAtual, random);
     const contraproposta = await responderProposta(proposta);
+
+    if (contraproposta === "recusar") {
+      const negociacao: NegociacaoResolvidaNaTemporada = { periodo, tipo, clubeOfertanteId: clube.id, proposta, contrapropostaJogador: "recusar" };
+      negociacoesResolvidas.push(negociacao);
+      await onNegociacaoResolvida?.(negociacao);
+      return { estado: estadoAtual, aceita: false };
+    }
+
     const fatoresConfianca: FatoresConfianca = {
       overall: overallAtual(estadoAtual),
       reputacaoNacional: estadoAtual.reputacao.nacional,
@@ -320,7 +342,7 @@ interface ContextoResolucaoDePeriodo {
   escolherDistribuicaoDePontos?: (estado: EstadoDeCarreira) => AlocacaoDePontos[] | Promise<AlocacaoDePontos[]>;
   onNivelAlcancado?: (info: NivelAlcancadoNaTemporada) => void | Promise<void>;
   escolherOpcao: (cenario: Cenario) => Opcao | Promise<Opcao>;
-  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | Promise<TermosDeContrato>;
+  responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">;
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
   onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
   random: () => number;
@@ -391,6 +413,7 @@ async function resolverPeriodoDaCarreira(
     estadoAtual = aplicarImpactoDeCenario(estadoAtual, { moral: MORAL_RECUPERADA_NO_DESCANSO, narrativa: "" }, regiaoParaDescanso);
   } else {
     estadoAtual = await ganharXpComNotificacao(estadoAtual, xpDeSessaoDeTreino(foco), onNivelAlcancado);
+    estadoAtual = aplicarGanhoDeTreino(estadoAtual, foco);
   }
 
   const treinoResolvido: TreinoResolvidoNaTemporada = {

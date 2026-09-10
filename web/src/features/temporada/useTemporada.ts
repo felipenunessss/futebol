@@ -22,6 +22,8 @@ import {
   type TreinoResolvidoNaTemporada,
 } from "@motor/career/career-loop.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
+import { contrapropostaPadrao } from "@motor/market/negotiation.js";
+import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
 
 /** ms de espera real por minuto simulado — mais rápido que o padrão da CLI (220ms, ~20s/partida)
  * porque uma temporada web pode ter dezenas de partidas do próprio clube pra assistir. */
@@ -59,8 +61,14 @@ type EventoDeFeedVariante =
 
 export type EventoDeFeed = EventoDeFeedVariante & { id: string };
 
-/** Escolha na tela pré-jogo — espelha o menu de 4 opções de `src/cli/index.ts` `escolherModoDePartidaInterativo`. */
-export type EscolhaDePrePartida = "rapida" | "ate_a_metade" | "ate_o_final" | "ao_vivo";
+/**
+ * Escolha na tela pré-jogo — as 3 primeiras espelham o menu de `src/cli/index.ts`
+ * `escolherModoDePartidaInterativo`; `proximo_jogo` é exclusiva da web: pula tudo que não é
+ * partida (semana, treino, pontos, cenário, resultado da rodada) só até a PRÓXIMA partida do
+ * clube, onde volta a perguntar — ao contrário de `ate_a_metade`/`ate_o_final`, que valem por um
+ * número fixo de semanas.
+ */
+export type EscolhaDePrePartida = "rapida" | "proximo_jogo" | "ate_a_metade" | "ate_o_final" | "ao_vivo";
 
 export type PromptPendente =
   | { tipo: "foco"; resolve: (foco: FocoDeTreino) => void }
@@ -70,7 +78,8 @@ export type PromptPendente =
   | { tipo: "evento_ao_vivo"; cenario: Cenario; resolve: (opcao: Opcao) => void }
   | { tipo: "semana"; info: AoIniciarSemanaInfo; resolve: () => void }
   | { tipo: "pre_partida"; contexto: ContextoPartidaDoJogadorSemanal; resolve: (modo: ModoDePartida) => void }
-  | { tipo: "seguir_campeonatos"; idsAtivos: string[]; resolve: (ids: string[]) => void };
+  | { tipo: "seguir_campeonatos"; idsAtivos: string[]; resolve: (ids: string[]) => void }
+  | { tipo: "proposta_de_transferencia"; proposta: PropostaTransferencia; resolve: (resposta: TermosDeContrato | "recusar") => void };
 
 export type FaseDaTemporada = "jogando" | "resumo";
 
@@ -172,6 +181,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    */
   const modoAutoAteSemanaRef = useRef<number | undefined>(undefined);
   /**
+   * "Simular até o próximo jogo" — pula tudo que não é partida (semana,
+   * treino, pontos, cenário, resultado da rodada) até a PRÓXIMA vez que
+   * `escolherModoDePartida` for chamado, onde volta a perguntar (o próprio
+   * `escolherModoDePartida` desliga essa flag ao chegar lá — ver mais
+   * abaixo). Ao contrário de `modoAutoAteSemanaRef`, não é por número de
+   * semana: é "só até a próxima partida", não importa quantas semanas isso
+   * leve.
+   */
+  const pularAteProximoJogoRef = useRef(false);
+  /**
    * Foco de treino automático ("treino rápido") — quando definido, pula o
    * `PromptFoco` e resolve direto com esse foco, sem perguntar de novo.
    * Ref por causa da mesma clausura de `jogarTemporada()` que já explica
@@ -194,8 +213,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [semanaAtual, setSemanaAtual] = useState(1);
   const [jogoDaSemana, setJogoDaSemana] = useState<JogoDaSemana>();
 
-  /** Janela "não perguntar de novo" (ver `modoAutoAteSemanaRef`) — quando ativa, os demais prompts da semana (treino, distribuição de pontos, cenário, resultado da rodada) também se resolvem sozinhos com um padrão sensato, em vez de pausar, pra "simular até a metade/final" ser de verdade sem clique nenhum. */
+  /**
+   * Janela "não perguntar de novo" (ver `modoAutoAteSemanaRef`/
+   * `pularAteProximoJogoRef`) — quando ativa (por número de semana OU por
+   * "até o próximo jogo"), os demais prompts da semana (treino,
+   * distribuição de pontos, cenário, resultado da rodada) também se
+   * resolvem sozinhos com um padrão sensato, em vez de pausar, pra
+   * "simular até a metade/final/próximo jogo" ser de verdade sem clique
+   * nenhum.
+   */
   function emJanelaAutomatica(): boolean {
+    if (pularAteProximoJogoRef.current) return true;
     return modoAutoAteSemanaRef.current !== undefined && semanaAtualRef.current <= modoAutoAteSemanaRef.current;
   }
 
@@ -263,14 +291,35 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   }
 
   /**
+   * Só chamado dentro da janela de transferência (`career-loop.ts`
+   * `estaNaJanelaDeTransferencia`) e com interesse real de mercado — dá ao
+   * jogador a decisão de verdade: negociar (contraproposta padrão, pede
+   * mais que a oferta inicial) ou recusar e seguir cumprindo contrato no
+   * clube atual (`"recusar"` para a negociação inteira nesse período, não
+   * tenta os próximos interessados — ver `career-loop.ts`
+   * `resolverNegociacaoDeTransferencia`). Durante a janela automática
+   * (`emJanelaAutomatica`), usa `contrapropostaPadrao` sozinho, sem
+   * pausar — mesmo padrão do motor quando ninguém decide.
+   */
+  function responderProposta(proposta: PropostaTransferencia): Promise<TermosDeContrato | "recusar"> {
+    if (emJanelaAutomatica()) return Promise.resolve(contrapropostaPadrao(proposta));
+    return new Promise((resolve) => setPromptPendente({ tipo: "proposta_de_transferencia", proposta, resolve }));
+  }
+
+  /**
    * Pausa antes de cada partida do jogador com a tela pré-jogo (Parte C) —
    * EXCETO durante uma janela de "não perguntar de novo" ativada por
    * "até a metade"/"até o final" no próprio menu pré-jogo
    * (`modoAutoAteSemanaRef`), quando resolve direto com "rapida" sem
-   * mostrar nada (mesmo comportamento de `src/cli/index.ts`).
+   * mostrar nada (mesmo comportamento de `src/cli/index.ts`). "Até o
+   * próximo jogo" (`pularAteProximoJogoRef`) é diferente: essa flag só vale
+   * pra pular o que vem ANTES desta partida — ao CHEGAR aqui, o "próximo
+   * jogo" já é este, então ela é desligada e o menu pré-jogo aparece
+   * normalmente de novo (não auto-resolve).
    */
   function escolherModoDePartida(contexto: ContextoPartidaDoJogadorSemanal): Promise<ModoDePartida> {
     setJogoDaSemana({ campeonatoId: contexto.campeonatoId, semana: contexto.semana, mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId });
+    pularAteProximoJogoRef.current = false;
     if (modoAutoAteSemanaRef.current !== undefined) {
       if (contexto.semana <= modoAutoAteSemanaRef.current) return Promise.resolve("rapida");
       modoAutoAteSemanaRef.current = undefined; // passou da janela automática, volta a perguntar
@@ -329,6 +378,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       onCenarioResolvido: (resolvido) =>
         pushEvento({ tipo: "cenario", cenario: resolvido.cenario, opcao: resolvido.escolha.opcao, narrativa: resolvido.escolha.resultado.impacto.narrativa }),
       onNegociacaoResolvida: (negociacao) => pushEvento({ tipo: "negociacao", negociacao }),
+      responderProposta,
       aoIniciarSemana,
       escolherModoDePartida,
       decidirChanceAoVivo,
@@ -476,12 +526,13 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setPromptPendente(undefined);
   }
 
-  /** Resolve o menu pré-jogo — ver `EscolhaDePrePartida` (mesmas 4 opções do menu da CLI). */
+  /** Resolve o menu pré-jogo — ver `EscolhaDePrePartida`. */
   function responderPrePartida(escolha: EscolhaDePrePartida): void {
     if (promptPendente?.tipo !== "pre_partida") return;
     const { contexto, resolve } = promptPendente;
     setPromptPendente(undefined);
 
+    if (escolha === "proximo_jogo") pularAteProximoJogoRef.current = true;
     if (escolha === "ate_a_metade") modoAutoAteSemanaRef.current = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
     if (escolha === "ate_o_final") modoAutoAteSemanaRef.current = ULTIMA_SEMANA_DA_TEMPORADA;
 
@@ -496,6 +547,13 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   function responderSeguirCampeonatos(idsEscolhidos: string[]): void {
     if (promptPendente?.tipo !== "seguir_campeonatos") return;
     promptPendente.resolve(idsEscolhidos);
+    setPromptPendente(undefined);
+  }
+
+  /** `resposta === "recusar"` = continuar no clube atual cumprindo contrato; senão, negocia com esses termos (ver `responderProposta`). */
+  function responderPropostaDeTransferencia(resposta: TermosDeContrato | "recusar"): void {
+    if (promptPendente?.tipo !== "proposta_de_transferencia") return;
+    promptPendente.resolve(resposta);
     setPromptPendente(undefined);
   }
 
@@ -521,6 +579,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderSemana,
     responderPrePartida,
     responderSeguirCampeonatos,
+    responderPropostaDeTransferencia,
     focoAutomatico,
     desligarTreinoAutomatico,
     resultadoDaRodada,

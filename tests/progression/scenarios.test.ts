@@ -16,12 +16,15 @@ import {
 
 describe("catálogo de cenários", () => {
   it("tem uma quantidade grande e diversa de cenários (todo id único)", () => {
-    expect(CENARIOS.length).toBeGreaterThanOrEqual(200);
+    // Baixou de 200+ pra 180+ depois da limpeza que moveu ~16 cenários de contexto de
+    // partida (pênalti decisivo, cartão duvidoso, VAR, etc) pro catálogo de match-events.ts,
+    // que é o que de fato sorteia durante uma partida ao vivo — ver docs/motor-de-partida.md.
+    expect(CENARIOS.length).toBeGreaterThanOrEqual(180);
     expect(new Set(CENARIOS.map((c) => c.id)).size).toBe(CENARIOS.length);
   });
 
   it("uma quantidade razoável de cenários já tem gatilho de elegibilidade definido", () => {
-    expect(CENARIOS.filter((c) => c.gatilho).length).toBeGreaterThanOrEqual(140);
+    expect(CENARIOS.filter((c) => c.gatilho).length).toBeGreaterThanOrEqual(125);
   });
 
   it("todo cenário tem entre 2 e 3 opções", () => {

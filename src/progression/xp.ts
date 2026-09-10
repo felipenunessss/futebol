@@ -113,14 +113,44 @@ export function ganhoPorPonto(atributo: Atributo, atributosPrioritarios: Atribut
 
 /**
  * Sessões de treino com escolha de foco — ver `docs/game-design.md` seção
- * 5.2. Desde a seção 5.16, o foco não filtra mais QUAL atributo cresce
- * (isso virou escolha manual em `investirPontos`) — só decide se a sessão
- * gera XP (`fisico`/`tecnico`/`tatico`, todas equivalentes em XP hoje) ou
- * recupera moral sem gerar XP (`descanso`, `MORAL_RECUPERADA_NO_DESCANSO`).
- * Mantido como 4 opções (não só "treinar"/"descansar") pela variedade
- * narrativa na CLI, mesmo mecanicamente equivalentes entre si agora.
+ * 5.2. A seção 5.16 tinha desligado o foco de qualquer atributo específico
+ * (só decidia gerar XP de nível ou recuperar moral, com a escolha de ONDE
+ * investir totalmente livre em `investirPontos`) — decisão revertida: o
+ * foco volta a ter efeito direto e específico sobre os atributos da sua
+ * categoria (`ATRIBUTOS_POR_FOCO` abaixo, ver `career/Player.ts`
+ * `aplicarGanhoDeTreino`), sem tirar o sistema de nível/pontos livres (que
+ * continua alimentado igualmente pelos 3 focos — esse ganho direto é
+ * complementar, não substitui). `descanso` continua sem gerar XP nem
+ * ganho direto, só recupera moral.
  */
 export type FocoDeTreino = "fisico" | "tecnico" | "tatico" | "descanso";
+
+/**
+ * Quais atributos cada foco de treino desenvolve diretamente
+ * (`career/Player.ts` `aplicarGanhoDeTreino`) — cobre os 24 atributos sem
+ * sobreposição, agrupados por natureza física/técnica/tática (goleiro
+ * incluído: reflexos/jogo_aereo/forca_fisica no físico, saida_de_gol/
+ * distribuicao no técnico, posicionamento_goleiro no tático). Uma sessão
+ * só afeta, dentro dessa lista, os atributos que também estejam em
+ * `schemas/player.ts` `ATRIBUTOS_POR_POSICAO` da posição do jogador — o
+ * foco nunca cria valor num atributo que a posição não usa.
+ */
+export const ATRIBUTOS_POR_FOCO: Record<Exclude<FocoDeTreino, "descanso">, Atributo[]> = {
+  fisico: ["velocidade", "forca_fisica", "resistencia", "jogo_aereo", "reflexos"],
+  tecnico: ["finalizacao", "drible", "cruzamento", "passe_curto", "passe_longo", "cabeceio", "protecao_de_bola", "saida_de_gol", "distribuicao"],
+  tatico: ["desarme", "interceptacao", "marcacao", "visao_de_jogo", "frieza", "posicionamento_ofensivo", "posicionamento_defensivo", "movimentacao", "lideranca", "posicionamento_goleiro"],
+};
+
+/**
+ * Ganho direto (fora do sistema de pontos/nível) aplicado a cada atributo
+ * relevante numa sessão de treino com foco — mais se for prioritário do
+ * arquétipo (mesmo multiplicador de `ganhoPorPonto`). Pequeno de
+ * propósito: uma sessão toca vários atributos de uma vez (todos os da
+ * categoria relevantes pra posição), então o total por sessão já soma
+ * mais que um ponto manual isolado — não deveria dominar sozinho o
+ * crescimento da temporada.
+ */
+export const GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO = 0.5;
 
 /** XP de uma sessão de treino — estimativa de design (mesma ressalva das demais constantes do jogo): rende mais que uma fração do XP de partida, mas 5 sessões (uma por período) não dominam a progressão da temporada sozinhas. */
 const XP_POR_SESSAO_DE_TREINO = 250;

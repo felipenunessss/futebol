@@ -622,53 +622,6 @@ export const CENARIOS: Cenario[] = [
     ],
   },
   {
-    id: "pressao_para_cobrar_penalti",
-    titulo: "A cobrança é sua?",
-    descricao: "Pênalti nos acréscimos de um jogo decisivo. O grupo olha pra você esperando que assuma a cobrança.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "aceitar_cobrar",
-        texto: "Assumir a cobrança",
-        resultados: [
-          { probabilidade: 0.6, impacto: { atributos: { frieza: 3 }, moral: 15, reputacaoRegional: 15, narrativa: "Você bate com categoria e vira herói da torcida." } },
-          { probabilidade: 0.4, impacto: { atributos: { frieza: -2 }, moral: -20, reputacaoRegional: -15, narrativa: "A cobrança sai errada e o silêncio toma conta do estádio." } },
-        ],
-      },
-      {
-        id: "passar_a_responsabilidade",
-        texto: "Passar a cobrança pra outro batedor",
-        resultados: [
-          { probabilidade: 0.7, impacto: { relacoesInternas: 3, narrativa: "O colega converte, e ninguém questiona sua decisão." } },
-          { probabilidade: 0.3, impacto: { moral: -8, narrativa: "O colega perde, e uma parte da torcida cobra por que você não bateu." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "reagir_a_cartao_duvidoso",
-    titulo: "Cartão duvidoso do árbitro",
-    descricao: "O árbitro te mostra um cartão amarelo que você considera injusto, no meio de uma partida tensa.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "reclamar_com_o_arbitro",
-        texto: "Reclamar abertamente com o árbitro",
-        resultados: [
-          { probabilidade: 0.35, impacto: { atributos: { frieza: 2 }, reputacaoRegional: 5, narrativa: "A reclamação é firme mas respeitosa — a torcida aprova a atitude." } },
-          { probabilidade: 0.65, impacto: { atributos: { frieza: -3 }, moral: -10, narrativa: "O árbitro não gosta da insistência e o clima do jogo piora pra você." } },
-        ],
-      },
-      {
-        id: "manter_a_calma",
-        texto: "Manter a calma e seguir jogando",
-        resultados: [
-          { probabilidade: 1, impacto: { atributos: { frieza: 2 }, narrativa: "Você engole a injustiça e mantém o foco no jogo." } },
-        ],
-      },
-    ],
-  },
-  {
     id: "reserva_insatisfeito",
     titulo: "Parado no banco",
     descricao: "Você está há semanas no banco de reservas sem entender bem o motivo.",
@@ -1047,29 +1000,6 @@ export const CENARIOS: Cenario[] = [
     ],
   },
   {
-    id: "rixa_com_torcida_visitante",
-    titulo: "Provocação da torcida visitante",
-    descricao: "Jogando fora de casa, a torcida do adversário te provoca durante o aquecimento.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "responder_com_gesto",
-        texto: "Responder com um gesto pra torcida",
-        resultados: [
-          { probabilidade: 0.4, impacto: { reputacao: 5, atributos: { frieza: 2 }, narrativa: "O gesto viraliza como sinal de personalidade e sangue-frio." } },
-          { probabilidade: 0.6, impacto: { reputacao: -8, narrativa: "O gesto é mal interpretado e vira munição pra críticas na imprensa adversária." } },
-        ],
-      },
-      {
-        id: "ignorar_completamente",
-        texto: "Ignorar completamente e focar no aquecimento",
-        resultados: [
-          { probabilidade: 1, impacto: { atributos: { frieza: 2 }, narrativa: "A provocação não tira seu foco do jogo." } },
-        ],
-      },
-    ],
-  },
-  {
     id: "crise_financeira_pessoal",
     titulo: "Proposta de investimento suspeita",
     descricao: "Um conhecido oferece uma oportunidade de investimento pessoal com retorno alto demais pra ser verdade.",
@@ -1294,29 +1224,6 @@ export const CENARIOS: Cenario[] = [
         resultados: [
           { probabilidade: 0.5, impacto: { relacoesInternas: 3, narrativa: "O técnico ouve e ajusta o plano, respeitando seu pedido." } },
           { probabilidade: 0.5, impacto: { relacoesInternas: -8, narrativa: "O pedido é visto como falta de flexibilidade num momento importante." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "tirado_no_intervalo",
-    titulo: "Substituído no intervalo",
-    descricao: "O técnico decide te tirar de campo logo no intervalo, sem uma explicação clara.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "cobrar_explicacao_no_vestiario",
-        texto: "Cobrar uma explicação ainda no vestiário",
-        resultados: [
-          { probabilidade: 0.4, impacto: { relacoesInternas: 5, narrativa: "A conversa franca esclarece o mal-entendido e fortalece a relação." } },
-          { probabilidade: 0.6, impacto: { relacoesInternas: -15, moral: -10, narrativa: "A cobrança no calor do momento gera um atrito sério com o técnico." } },
-        ],
-      },
-      {
-        id: "engolir_e_conversar_depois",
-        texto: "Engolir a decisão e conversar com calma depois",
-        resultados: [
-          { probabilidade: 1, impacto: { relacoesInternas: 4, moral: -3, narrativa: "A postura profissional é notada, mesmo com o desconforto do momento." } },
         ],
       },
     ],
@@ -2100,121 +2007,6 @@ export const CENARIOS: Cenario[] = [
     ],
   },
   {
-    id: "quase_expulsao",
-    titulo: "Quase expulso em jogo tenso",
-    descricao: "Numa partida de clima muito tenso, você chega perto de ser expulso após um lance polêmico.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "se_conter_no_limite",
-        texto: "Se conter no limite e seguir jogando",
-        resultados: [
-          { probabilidade: 0.7, impacto: { atributos: { frieza: 3 }, narrativa: "O autocontrole no limite evita o pior e você segue em campo." } },
-          { probabilidade: 0.3, impacto: { atributos: { frieza: -2 }, moral: -10, narrativa: "O árbitro decide expulsar você mesmo com a contenção." } },
-        ],
-      },
-      {
-        id: "pedir_substituicao_preventiva",
-        texto: "Pedir pra sair antes de piorar",
-        resultados: [
-          { probabilidade: 1, impacto: { relacoesInternas: 3, narrativa: "A saída preventiva é vista como madura pela comissão técnica." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "assumir_cobranca_de_falta_decisiva",
-    titulo: "Cobrança de falta decisiva",
-    descricao: "Falta na entrada da área, no fim de um jogo empatado — alguém precisa bater.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "bater_a_falta",
-        texto: "Bater a falta você mesmo",
-        resultados: [
-          { probabilidade: 0.45, impacto: { atributos: { frieza: 3, finalizacao: 2 }, moral: 15, reputacaoRegional: 12, narrativa: "A bola encobre a barreira e entra — momento inesquecível." } },
-          { probabilidade: 0.55, impacto: { moral: -8, narrativa: "A cobrança sai por cima do travessão, sem susto pro goleiro." } },
-        ],
-      },
-      {
-        id: "ceder_a_cobranca",
-        texto: "Ceder a cobrança pro especialista do time",
-        resultados: [
-          { probabilidade: 1, impacto: { relacoesInternas: 2, narrativa: "A decisão tática é respeitada por todos, seja qual for o resultado da falta." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "gol_contra",
-    titulo: "Gol contra num momento crucial",
-    descricao: "Um desvio infeliz seu resulta num gol contra em um momento crucial da partida.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "pedir_a_bola_de_novo_rapido",
-        texto: "Pedir a bola de novo o mais rápido possível",
-        resultados: [
-          { probabilidade: 0.5, impacto: { atributos: { frieza: 2 }, moral: 5, narrativa: "A reação rápida vira redenção instantânea aos olhos da torcida." } },
-          { probabilidade: 0.5, impacto: { moral: -15, narrativa: "O peso do erro te acompanha pelo resto da partida." } },
-        ],
-      },
-      {
-        id: "pedir_um_momento_para_se_recompor",
-        texto: "Pedir um momento pra se recompor mentalmente",
-        resultados: [
-          { probabilidade: 1, impacto: { moral: -5, narrativa: "Você segue o jogo com a cabeça mais tranquila, mesmo abalado." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "comemoracao_polemica",
-    titulo: "Comemoração polêmica de gol",
-    descricao: "Depois de marcar um gol importante, você pensa numa comemoração que pode ser vista como provocação.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "fazer_a_comemoracao_provocativa",
-        texto: "Fazer a comemoração provocativa mesmo assim",
-        resultados: [
-          { probabilidade: 0.45, impacto: { reputacaoRegional: 15, narrativa: "A torcida ama a ousadia e a comemoração vira ícone da rivalidade." } },
-          { probabilidade: 0.55, impacto: { reputacao: -10, narrativa: "A comemoração rende punição da federação e crítica generalizada." } },
-        ],
-      },
-      {
-        id: "comemorar_de_forma_neutra",
-        texto: "Comemorar de forma neutra",
-        resultados: [
-          { probabilidade: 1, impacto: { reputacao: 2, narrativa: "A comemoração discreta não gera nenhuma polêmica." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "discussao_com_colega_durante_o_jogo",
-    titulo: "Discussão com colega em campo",
-    descricao: "No calor do jogo, uma falha de entrosamento gera uma discussão acalorada com um companheiro em campo.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "resolver_ali_mesmo",
-        texto: "Resolver ali mesmo, em campo",
-        resultados: [
-          { probabilidade: 0.6, impacto: { relacoesInternas: 5, narrativa: "A conversa rápida acalma os ânimos e o time volta a se entender em campo." } },
-          { probabilidade: 0.4, impacto: { relacoesInternas: -10, moral: -5, narrativa: "A discussão piora e vira imagem repetida nas transmissões." } },
-        ],
-      },
-      {
-        id: "deixar_para_o_vestiario",
-        texto: "Deixar a discussão pro vestiário",
-        resultados: [
-          { probabilidade: 1, impacto: { relacoesInternas: 2, narrativa: "A postura profissional evita imagem ruim em campo." } },
-        ],
-      },
-    ],
-  },
-  {
     id: "atraso_a_treino",
     titulo: "Atraso a um treino",
     descricao: "Um imprevisto pessoal te deixa atrasado pra um treino importante.",
@@ -2575,29 +2367,6 @@ export const CENARIOS: Cenario[] = [
     ],
   },
   {
-    id: "entrevista_ao_vivo_no_intervalo",
-    titulo: "Entrevista ao vivo no intervalo",
-    descricao: "Você é chamado pra uma entrevista ao vivo bem no intervalo de um jogo apertado.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "falar_com_intensidade",
-        texto: "Falar com intensidade sobre o momento do time",
-        resultados: [
-          { probabilidade: 0.55, impacto: { reputacaoRegional: 10, narrativa: "A intensidade da fala contagia a torcida no segundo tempo." } },
-          { probabilidade: 0.45, impacto: { reputacaoRegional: -6, narrativa: "A fala soa arrogante fora de contexto e rende críticas." } },
-        ],
-      },
-      {
-        id: "falar_de_forma_serena",
-        texto: "Falar de forma serena e ponderada",
-        resultados: [
-          { probabilidade: 1, impacto: { reputacaoRegional: 3, narrativa: "A serenidade transmite confiança sem grandes riscos." } },
-        ],
-      },
-    ],
-  },
-  {
     id: "torcida_rival_invade_hotel_da_delegacao",
     titulo: "Torcida rival cerca o hotel da delegação",
     descricao: "Em viagem, torcedores do time rival cercam o hotel da delegação na véspera do jogo.",
@@ -2783,29 +2552,6 @@ export const CENARIOS: Cenario[] = [
     ],
   },
   {
-    id: "gesto_de_fair_play",
-    titulo: "Oportunidade de um gesto de fair play",
-    descricao: "Num lance de jogo, você percebe que poderia se aproveitar de um erro do árbitro em seu favor.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "avisar_o_arbitro_do_erro",
-        texto: "Avisar o árbitro sobre o próprio erro",
-        resultados: [
-          { probabilidade: 0.85, impacto: { reputacao: 15, narrativa: "O gesto de fair play repercute muito bem e vira referência de esportividade." } },
-          { probabilidade: 0.15, impacto: { relacoesInternas: -5, narrativa: "Parte do próprio elenco não gosta de abrir mão de uma vantagem." } },
-        ],
-      },
-      {
-        id: "aceitar_a_vantagem",
-        texto: "Aceitar a vantagem gerada pelo erro",
-        resultados: [
-          { probabilidade: 1, impacto: { reputacao: -3, narrativa: "A vantagem ajuda no resultado, mas incomoda quem valoriza o espírito esportivo." } },
-        ],
-      },
-    ],
-  },
-  {
     id: "campanha_publicitaria_polemica",
     titulo: "Campanha publicitária polêmica",
     descricao: "Uma marca propõe uma campanha publicitária de tom mais ousado, que pode dividir opiniões.",
@@ -2890,30 +2636,6 @@ export const CENARIOS: Cenario[] = [
         resultados: [
           { probabilidade: 0.5, impacto: { relacoesInternas: 8, narrativa: "O amigo decide ficar, e a dupla segue fazendo história junto." } },
           { probabilidade: 0.5, impacto: { relacoesInternas: -5, narrativa: "O amigo sai mesmo assim, e um certo ressentimento fica no ar." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "crise_de_ansiedade_pre_jogo",
-    titulo: "Crise de ansiedade antes de um jogo",
-    descricao: "Momentos antes de entrar em campo, uma crise de ansiedade forte te pega de surpresa.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "buscar_o_psicologo_do_clube",
-        texto: "Buscar o psicólogo do clube imediatamente",
-        resultados: [
-          { probabilidade: 0.8, impacto: { atributos: { frieza: 2 }, moral: 5, narrativa: "O apoio imediato ajuda a controlar a crise a tempo do jogo." } },
-          { probabilidade: 0.2, impacto: { moral: -10, narrativa: "Mesmo com ajuda, a ansiedade afeta bastante sua atuação nesse jogo." } },
-        ],
-      },
-      {
-        id: "tentar_respirar_e_entrar_em_campo",
-        texto: "Tentar controlar sozinho e entrar em campo",
-        resultados: [
-          { probabilidade: 0.4, impacto: { atributos: { frieza: 1 }, narrativa: "Você consegue se acalmar sozinho a tempo." } },
-          { probabilidade: 0.6, impacto: { moral: -12, narrativa: "A crise não controlada compromete bastante sua atuação." } },
         ],
       },
     ],
@@ -3503,76 +3225,6 @@ export const CENARIOS: Cenario[] = [
         resultados: [
           { probabilidade: 0.5, impacto: { narrativa: "O estilo habitual funciona razoavelmente, apesar das condições." } },
           { probabilidade: 0.5, impacto: { moral: -8, narrativa: "O estilo habitual não se adapta bem ao gramado encharcado." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "calor_extremo_durante_a_partida",
-    titulo: "Calor extremo durante a partida",
-    descricao: "Uma partida acontece sob calor extremo, exigindo cuidado redobrado com hidratação e ritmo.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "gerenciar_o_ritmo_com_cuidado",
-        texto: "Gerenciar o ritmo com cuidado ao longo do jogo",
-        resultados: [
-          { probabilidade: 0.7, impacto: { atributos: { resistencia: 2 }, narrativa: "O gerenciamento inteligente evita desgaste excessivo." } },
-          { probabilidade: 0.3, impacto: { moral: -3, narrativa: "Mesmo com cuidado, o calor extremo cobra seu preço no fim do jogo." } },
-        ],
-      },
-      {
-        id: "jogar_no_ritmo_normal_no_calor",
-        texto: "Jogar no ritmo normal, ignorando o calor",
-        resultados: [
-          { probabilidade: 0.4, impacto: { narrativa: "Você aguenta bem o ritmo normal, apesar do calor." } },
-          { probabilidade: 0.6, impacto: { atributos: { resistencia: -3 }, moral: -8, narrativa: "A exaustão pelo calor extremo compromete o fim da sua partida." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "arbitro_pede_desculpas_por_erro",
-    titulo: "Árbitro pede desculpas por um erro",
-    descricao: "Depois de um erro claro de arbitragem contra você, o árbitro procura pra se desculpar em particular.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "aceitar_as_desculpas_do_arbitro",
-        texto: "Aceitar as desculpas com tranquilidade",
-        resultados: [
-          { probabilidade: 1, impacto: { atributos: { frieza: 2 }, narrativa: "A maturidade no momento é notada e respeitada por todos." } },
-        ],
-      },
-      {
-        id: "cobrar_publicamente_mesmo_apos_desculpas",
-        texto: "Cobrar publicamente mesmo depois das desculpas",
-        resultados: [
-          { probabilidade: 0.5, impacto: { reputacao: 5, narrativa: "A cobrança pública reforça a necessidade de mais rigor na arbitragem." } },
-          { probabilidade: 0.5, impacto: { reputacao: -5, narrativa: "A cobrança soa desnecessária depois que o árbitro já reconheceu o erro." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "var_anula_gol_polemico",
-    titulo: "VAR anula um gol polêmico",
-    descricao: "Um gol seu é anulado pelo VAR numa decisão bastante controversa.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "reclamar_com_o_var",
-        texto: "Reclamar veementemente da decisão",
-        resultados: [
-          { probabilidade: 0.35, impacto: { atributos: { frieza: -2 }, reputacaoRegional: 8, narrativa: "A reclamação inflamada agrada a torcida, mesmo sem mudar o resultado." } },
-          { probabilidade: 0.65, impacto: { atributos: { frieza: -3 }, moral: -10, narrativa: "A reclamação rende cartão amarelo e desgasta ainda mais seu momento." } },
-        ],
-      },
-      {
-        id: "aceitar_a_decisao_do_var",
-        texto: "Aceitar a decisão e seguir o jogo",
-        resultados: [
-          { probabilidade: 1, impacto: { atributos: { frieza: 2 }, narrativa: "A serenidade ajuda a manter o foco no restante da partida." } },
         ],
       },
     ],
@@ -4877,29 +4529,6 @@ export const CENARIOS: Cenario[] = [
         texto: "Deixar a decisão pra depois, durante a pausa da temporada",
         resultados: [
           { probabilidade: 1, impacto: { narrativa: "A decisão fica pra ser anunciada com calma, fora do calor do último jogo." } },
-        ],
-      },
-    ],
-  },
-  {
-    id: "goleiro_avanca_para_escanteio_decisivo",
-    titulo: "Goleiro avança pro escanteio decisivo",
-    descricao: "Nos acréscimos de um jogo que seu time precisa vencer, a comissão sinaliza pro goleiro subir pro escanteio ofensivo.",
-    gatilho: { momentos: ["temporada_regular", "reta_final"] },
-    opcoes: [
-      {
-        id: "apoiar_a_subida_do_goleiro",
-        texto: "Apoiar a subida arriscada do goleiro",
-        resultados: [
-          { probabilidade: 0.35, impacto: { moral: 15, reputacaoRegional: 12, narrativa: "A jogada arriscada dá certo, e o gol nos acréscimos vira história." } },
-          { probabilidade: 0.65, impacto: { moral: -10, narrativa: "A jogada não funciona, e o time ainda sofre um contra-ataque perigoso no fim." } },
-        ],
-      },
-      {
-        id: "sugerir_manter_o_goleiro_atras",
-        texto: "Sugerir manter o goleiro atrás por segurança",
-        resultados: [
-          { probabilidade: 1, impacto: { relacoesInternas: 2, narrativa: "A cautela é respeitada, ainda que o empate se mantenha até o fim." } },
         ],
       },
     ],
