@@ -517,13 +517,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       },
       escolherCampeonatosParaSeguir,
       onPartidaDaRodadaNaCompeticaoDoJogador: (info) => {
-        // Numa competição com >1 grupo, este hook também dispara pra confrontos de OUTROS grupos
-        // (não só o do jogador) — só atualiza a tabela exibida quando o grupo bate com o do
-        // jogador (ou quando ainda não se sabe qual é, caso ele ainda não tenha jogado nesta fase).
+        // Numa competição com >1 grupo, este hook dispara pra TODO confronto da fase, de QUALQUER
+        // grupo — não só o do jogador (só `onPartidaPontosCorridos`, que só dispara pra partida do
+        // próprio clube, sabe de antemão que é do grupo certo). Sem filtrar aqui, os grupos alheios
+        // se misturavam com o do jogador na tabela, no feed e no resumo da rodada (parecia "jogo por
+        // rodada errado"/número de jogos desbalanceado, mesmo sem nenhum time jogando duas vezes de
+        // verdade — eram só confrontos de OUTRO grupo entrando junto). Só quando ainda não se sabe o
+        // grupo do jogador nesta fase (ele ainda não jogou) deixa passar, igual antes.
         const grupoDoJogador = grupoDoJogadorPorCampeonatoRef.current.get(info.campeonatoId);
-        if (!info.grupoNome || !grupoDoJogador || grupoDoJogador === info.grupoNome) {
-          atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
-        }
+        const ehDoGrupoDoJogador = !info.grupoNome || !grupoDoJogador || grupoDoJogador === info.grupoNome;
+        if (!ehDoGrupoDoJogador) return;
+
+        atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_rodada", info });
         registrarConfrontoNoBufferDaRodada(info.campeonatoId, info.evento.confronto.rodada, {
           mandanteId: info.evento.confronto.mandante,
