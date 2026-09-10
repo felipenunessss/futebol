@@ -17,7 +17,7 @@ const TEMPORADA_INICIAL = 2027;
 /** Id provisório só pra identificar o jogador dentro do estado — a carreira em si não tem conta/usuário ainda. */
 const ID_DO_JOGADOR = "jogador_web";
 
-export type PassoDeCriacao = "nome" | "nacionalidade" | "posicao" | "arquetipo" | "numero" | "proposta" | "resumo";
+export type PassoDeCriacao = "nome" | "nacionalidade" | "posicao" | "arquetipo" | "numero" | "pe" | "proposta" | "resumo";
 
 export function useCriacaoDeCarreira() {
   const [passo, setPasso] = useState<PassoDeCriacao>("nome");
@@ -25,6 +25,7 @@ export function useCriacaoDeCarreira() {
   const [nacionalidade, setNacionalidade] = useState<string>();
   const [posicao, setPosicao] = useState<Posicao>();
   const [arquetipoId, setArquetipoId] = useState<string>();
+  const [numero, setNumero] = useState<number>();
   const [estadoProvisorio, setEstadoProvisorio] = useState<EstadoDeCarreira>();
   const [propostas, setPropostas] = useState<PropostaTransferencia[]>([]);
   const [estadoFinal, setEstadoFinal] = useState<EstadoDeCarreira>();
@@ -66,7 +67,12 @@ export function useCriacaoDeCarreira() {
     setPasso("numero");
   }
 
-  function confirmarNumero(numero: number): void {
+  function confirmarNumero(valor: number): void {
+    setNumero(valor);
+    setPasso("pe");
+  }
+
+  function escolherPeDominante(peDominante: "destro" | "canhoto"): void {
     if (!posicao || !arquetipoId) return;
 
     const estado = criarEstadoInicial({
@@ -78,6 +84,7 @@ export function useCriacaoDeCarreira() {
       temporadaInicial: TEMPORADA_INICIAL,
       nacionalidade,
       numero,
+      peDominante,
     });
     setEstadoProvisorio(estado);
 
@@ -131,6 +138,7 @@ export function useCriacaoDeCarreira() {
     escolherPosicao,
     escolherArquetipo,
     confirmarNumero,
+    escolherPeDominante,
     aceitarProposta,
     escolherClubeManualmente,
   };

@@ -117,6 +117,8 @@ export interface Jogador {
   nacionalidade?: string;
   /** Número de camisa (1-99) — sem checar unicidade contra o resto do elenco, o motor não modela elenco completo como objetos `Jogador`. */
   numero?: number;
+  /** Pé dominante — puramente decorativo por enquanto (mostrado na ficha do jogador), o motor de simulação não distingue canhoto/destro em nenhum cálculo. */
+  pe_dominante?: "destro" | "canhoto";
   atributos: Atributos;
   /** Potencial de desenvolvimento oculto (`progression/potencial.ts`) — nunca mostrado direto na UI, só a "avaliação de olheiros" (`career/Player.ts` `EstadoDeCarreira.avaliacaoDeOlheiros`). Ausente = tratado como "regular" (`multiplicadorDePotencial`) — mantém compatível quem monta um `Jogador` na mão (comum em teste) sem passar por `criarEstadoInicial`. */
   potencial?: NivelDePotencial;

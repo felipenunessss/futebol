@@ -208,6 +208,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * de um ref pra ler o valor mais recente mesmo dentro dessa clausura.
    */
   const modoAutoAteSemanaRef = useRef<number | undefined>(undefined);
+  /** Espelha `modoAutoAteSemanaRef` em estado só pra UI mostrar um aviso/botão de "parar" enquanto a janela automática de semanas está ativa (ver `pararSimulacaoAutomatica`). */
+  const [simulandoAutomaticamente, setSimulandoAutomaticamente] = useState(false);
+  /** Setado por `pararSimulacaoAutomatica` — consumido e limpo no próximo `aoIniciarSemana` (não dá pra interromper no meio de uma semana já em andamento, só no próximo limite natural). Existe porque, ao contrário de `pularAteProximoJogoRef` (que sempre se limpa sozinho ao achar a próxima partida), `modoAutoAteSemanaRef` pode ficar até a semana 52 ("até o final") sem NENHUM ponto de saída natural dentro da mesma temporada — sem isso, quem clica "até o final" fica preso no automático até o fim da temporada inteira. */
+  const cancelarAutoRef = useRef(false);
   /**
    * "Simular até o próximo jogo" — pula tudo que não é partida (semana,
    * treino, pontos, cenário, resultado da rodada) até a PRÓXIMA vez que
@@ -332,6 +336,12 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   }
 
   function aoIniciarSemana(info: AoIniciarSemanaInfo): Promise<void> {
+    if (cancelarAutoRef.current) {
+      cancelarAutoRef.current = false;
+      modoAutoAteSemanaRef.current = undefined;
+      pularAteProximoJogoRef.current = false;
+      setSimulandoAutomaticamente(false);
+    }
     setCompeticoesDoJogador(info.competicoesDoJogador);
     semanaAtualRef.current = info.semana;
     setSemanaAtual(info.semana);
@@ -379,6 +389,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     if (modoAutoAteSemanaRef.current !== undefined) {
       if (contexto.semana <= modoAutoAteSemanaRef.current) return Promise.resolve("rapida");
       modoAutoAteSemanaRef.current = undefined; // passou da janela automática, volta a perguntar
+      setSimulandoAutomaticamente(false);
     }
     return new Promise((resolve) => setPromptPendente({ tipo: "pre_partida", contexto, resolve }));
   }
@@ -421,6 +432,32 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setFase("jogando");
     setFeed([]);
     setResultado(undefined);
+    // Toda temporada nova cria competições incrementais do zero (`criarCompeticoesIncrementaisDaTemporada`,
+    // ver `career-loop.ts`), então nenhum estado derivado da temporada ANTERIOR deveria sobreviver até
+    // aqui — sem isso, a tela da temporada 2+ começava mostrando tabela/fase/grupo da temporada 1 (até
+    // ser sobrescrito aos poucos pelos primeiros eventos), e o filtro de grupo em
+    // `onPartidaDaRodadaNaCompeticaoDoJogador` comparava contra o grupo da temporada passada, mascarando
+    // atualizações de tabela da rodada atual (parecia "jogo por rodada errado"/time duplicado).
+    setTabelaPorCampeonato(new Map());
+    setFaseMataMataPorCampeonato(new Map());
+    grupoDoJogadorPorCampeonatoRef.current = new Map();
+    setGrupoDoJogadorPorCampeonato(new Map());
+    bufferRodadaRef.current = new Map();
+    setJogoDaSemana(undefined);
+    setResultadoDaRodada(undefined);
+    setAnimacaoDeEscolha(undefined);
+    setSorteioPendente(undefined);
+    setChaveamentoPendente(undefined);
+    // Crítico: sem isso, "simular até o final" na temporada 1 deixava `modoAutoAteSemanaRef` em 52 —
+    // como `semanaAtualRef` volta pra 1 (linha abaixo) mas o alvo continuava 52, `emJanelaAutomatica()`
+    // ficava verdadeiro DESDE A SEMANA 1 da temporada 2 (1 <= 52), simulando a temporada inteira sozinha
+    // sem nenhuma pausa — exatamente o "a temporada 2 não parece a primeira" reportado.
+    modoAutoAteSemanaRef.current = undefined;
+    pularAteProximoJogoRef.current = false;
+    cancelarAutoRef.current = false;
+    setSimulandoAutomaticamente(false);
+    semanaAtualRef.current = 1;
+    setSemanaAtual(1);
 
     const opcoes: OpcoesJogarTemporadaSemanal = {
       escolherFocoDeTreino,
@@ -575,6 +612,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setFocoAutomatico(undefined);
   }
 
+  /**
+   * Pede pra interromper "simular até a metade/final da temporada" — não
+   * corta na hora (a semana em andamento termina normalmente), só marca
+   * `cancelarAutoRef` pro próximo `aoIniciarSemana` desligar o modo
+   * automático e voltar a pausar semana a semana, como antes de escolher
+   * "até a metade/final".
+   */
+  function pararSimulacaoAutomatica(): void {
+    cancelarAutoRef.current = true;
+  }
+
   function responderDistribuicaoDePontos(alocacoes: AlocacaoDePontos[]): void {
     if (promptPendente?.tipo !== "pontos") return;
     promptPendente.resolve(alocacoes);
@@ -619,8 +667,14 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     const { contexto, resolve } = promptPendente;
     setPromptPendente(undefined);
 
-    if (escolha === "ate_a_metade") modoAutoAteSemanaRef.current = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
-    if (escolha === "ate_o_final") modoAutoAteSemanaRef.current = ULTIMA_SEMANA_DA_TEMPORADA;
+    if (escolha === "ate_a_metade") {
+      modoAutoAteSemanaRef.current = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
+      setSimulandoAutomaticamente(true);
+    }
+    if (escolha === "ate_o_final") {
+      modoAutoAteSemanaRef.current = ULTIMA_SEMANA_DA_TEMPORADA;
+      setSimulandoAutomaticamente(true);
+    }
 
     if (escolha === "ao_vivo") {
       setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
@@ -669,6 +723,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderPropostaDeTransferencia,
     focoAutomatico,
     desligarTreinoAutomatico,
+    simulandoAutomaticamente,
+    pararSimulacaoAutomatica,
     resultadoDaRodada,
     responderResultadoDaRodada,
     animacaoDeEscolha,

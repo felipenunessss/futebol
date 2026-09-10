@@ -19,7 +19,12 @@ const ROTULO_POSICAO: Record<Posicao, string> = {
   atacante: "Atacante",
 };
 
-const PASSOS_EM_ORDEM = ["nome", "nacionalidade", "posicao", "arquetipo", "numero", "proposta", "resumo"] as const;
+const PASSOS_EM_ORDEM = ["nome", "nacionalidade", "posicao", "arquetipo", "numero", "pe", "proposta", "resumo"] as const;
+
+const ROTULO_PE_DOMINANTE: Record<"destro" | "canhoto", string> = {
+  destro: "Destro",
+  canhoto: "Canhoto",
+};
 
 function nomeDoClube(clube: { nome: string; nome_popular?: string } | undefined, id: string): string {
   return clube?.nome_popular ?? clube?.nome ?? id;
@@ -50,6 +55,7 @@ export function CriacaoDeCarreira({ onCarreiraCriada }: { onCarreiraCriada?: (es
           {criacao.passo === "posicao" && <PassoPosicao onEscolher={criacao.escolherPosicao} />}
           {criacao.passo === "arquetipo" && criacao.posicao && <PassoArquetipo posicao={criacao.posicao} onEscolher={criacao.escolherArquetipo} />}
           {criacao.passo === "numero" && <PassoNumero onConfirmar={criacao.confirmarNumero} />}
+          {criacao.passo === "pe" && <PassoPeDominante onEscolher={criacao.escolherPeDominante} />}
           {criacao.passo === "proposta" && (
             <PassoProposta
               propostas={criacao.propostas}
@@ -173,6 +179,26 @@ function PassoNumero({ onConfirmar }: { onConfirmar: (numero: number) => void })
   );
 }
 
+function PassoPeDominante({ onEscolher }: { onEscolher: (peDominante: "destro" | "canhoto") => void }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold">Qual seu pé dominante?</h2>
+      <div className="grid grid-cols-2 gap-3">
+        {(["destro", "canhoto"] as const).map((pe) => (
+          <button
+            key={pe}
+            type="button"
+            onClick={() => onEscolher(pe)}
+            className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-3 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+          >
+            {ROTULO_PE_DOMINANTE[pe]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PassoPosicao({ onEscolher }: { onEscolher: (posicao: Posicao) => void }) {
   return (
     <div className="flex flex-col gap-4">
@@ -237,36 +263,15 @@ function PassoProposta({
   onAceitar: (proposta: PropostaTransferencia) => void;
   onEscolherManualmente: (clubeId: string) => void;
 }) {
-  const [busca, setBusca] = useState("");
+  const [buscaManualAberta, setBuscaManualAberta] = useState(false);
 
-  if (propostas.length === 0) {
-    const clubesFiltrados = busca.trim() ? clubes.filter((c) => nomeDoClube(c, c.id).toLowerCase().includes(busca.toLowerCase())).slice(0, 20) : clubes.slice(0, 20);
-
+  if (propostas.length === 0 || buscaManualAberta) {
     return (
-      <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">Nenhuma proposta chegou ainda</h2>
-        <p className="text-sm text-slate-400">Escolha um clube pra tentar a sorte.</p>
-        <input
-          value={busca}
-          onChange={(evento) => setBusca(evento.target.value)}
-          placeholder="Buscar clube..."
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 outline-none focus:border-emerald-500"
-        />
-        <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
-          {clubesFiltrados.map((clube) => (
-            <button
-              key={clube.id}
-              type="button"
-              onClick={() => onEscolherManualmente(clube.id)}
-              className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
-            >
-              {bandeiraDoPais(clube.pais) && <span className="mr-1.5">{bandeiraDoPais(clube.pais)}</span>}
-              <Escudo url={clube.escudo_url} alt="" tamanho={18} />
-              <span className="ml-1.5">{nomeDoClube(clube, clube.id)}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <ListaDeClubesParaEscolherManualmente
+        clubes={clubes}
+        onEscolher={onEscolherManualmente}
+        onVoltar={propostas.length > 0 ? () => setBuscaManualAberta(false) : undefined}
+      />
     );
   }
 
@@ -307,6 +312,55 @@ function PassoProposta({
           );
         })}
       </div>
+      <button type="button" onClick={() => setBuscaManualAberta(true)} className="self-start text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
+        ou escolher um clube diretamente
+      </button>
+    </div>
+  );
+}
+
+function ListaDeClubesParaEscolherManualmente({
+  clubes,
+  onEscolher,
+  onVoltar,
+}: {
+  clubes: Club[];
+  onEscolher: (clubeId: string) => void;
+  onVoltar: (() => void) | undefined;
+}) {
+  const [busca, setBusca] = useState("");
+  const clubesFiltrados = busca.trim() ? clubes.filter((c) => nomeDoClube(c, c.id).toLowerCase().includes(busca.toLowerCase())).slice(0, 20) : clubes.slice(0, 20);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h2 className="text-xl font-semibold">{onVoltar ? "Escolher um clube diretamente" : "Nenhuma proposta chegou ainda"}</h2>
+      <p className="text-sm text-slate-400">Escolha um clube pra tentar a sorte.</p>
+      <input
+        autoFocus
+        value={busca}
+        onChange={(evento) => setBusca(evento.target.value)}
+        placeholder="Buscar clube..."
+        className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 outline-none focus:border-emerald-500"
+      />
+      <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
+        {clubesFiltrados.map((clube) => (
+          <button
+            key={clube.id}
+            type="button"
+            onClick={() => onEscolher(clube.id)}
+            className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
+          >
+            {bandeiraDoPais(clube.pais) && <span className="mr-1.5">{bandeiraDoPais(clube.pais)}</span>}
+            <Escudo url={clube.escudo_url} alt="" tamanho={18} />
+            <span className="ml-1.5">{nomeDoClube(clube, clube.id)}</span>
+          </button>
+        ))}
+      </div>
+      {onVoltar && (
+        <button type="button" onClick={onVoltar} className="self-start text-sm text-slate-400 hover:text-slate-200 transition-colors">
+          ← voltar pras propostas
+        </button>
+      )}
     </div>
   );
 }
@@ -339,6 +393,12 @@ function PassoResumo({
         </dd>
         <dt className="text-slate-400">Posição</dt>
         <dd>{ROTULO_POSICAO[estado.jogador.posicao]}</dd>
+        {estado.jogador.pe_dominante && (
+          <>
+            <dt className="text-slate-400">Pé dominante</dt>
+            <dd>{ROTULO_PE_DOMINANTE[estado.jogador.pe_dominante]}</dd>
+          </>
+        )}
         <dt className="text-slate-400">Clube</dt>
         <dd className="flex items-center gap-1.5">
           <Escudo url={escudoClube} alt="" tamanho={18} />

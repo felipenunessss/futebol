@@ -26,6 +26,7 @@ import {
   type ResultadoDaRodadaExibido,
 } from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
+import { corDeTextoContrastante } from "../../lib/contraste.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
@@ -134,9 +135,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
   const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
   const { resultadoDaRodada, animacaoDeEscolha, sorteioPendente, chaveamentoPendente } = temporada;
+  const corDeFundo = clubePorId.get(estadoAtual.clubeAtualId)?.cor_primaria;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+    <div
+      className="min-h-screen p-6 transition-colors"
+      style={{ backgroundColor: corDeFundo ?? "#020617", color: corDeFundo ? corDeTextoContrastante(corDeFundo) : "#f1f5f9" }}
+    >
       <CalendarioSemanalLateral
         temporada={estadoAtual.temporada}
         semanaAtual={temporada.semanaAtual}
@@ -144,6 +149,14 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         clubePorId={clubePorId}
         nomePorCampeonato={nomePorCampeonato}
       />
+      {temporada.simulandoAutomaticamente && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 rounded-full bg-slate-900/95 border border-slate-800 shadow-xl px-4 py-2 text-xs backdrop-blur">
+          <span className="text-slate-300">Simulando semanas automaticamente…</span>
+          <button type="button" onClick={temporada.pararSimulacaoAutomatica} className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+            Parar e voltar ao normal
+          </button>
+        </div>
+      )}
       {competicoesDoJogador.length > 0 && (
         <PainelDeCompeticoes
           competicoesDoJogador={competicoesDoJogador}
@@ -214,7 +227,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
             )}
             {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
             {fase === "resumo" && resultado && (
-              <ResumoDeTemporada resultado={resultado} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onJogarProxima={() => void temporada.jogarTemporada()} />
+              <ResumoDeTemporada
+                resultado={resultado}
+                clubePorId={clubePorId}
+                nomePorCampeonato={nomePorCampeonato}
+                estatisticasCarreira={estatisticasCarreira}
+                onJogarProxima={() => void temporada.jogarTemporada()}
+              />
             )}
           </>
         )}
@@ -1504,11 +1523,13 @@ function ResumoDeTemporada({
   resultado,
   clubePorId,
   nomePorCampeonato,
+  estatisticasCarreira,
   onJogarProxima,
 }: {
   resultado: NonNullable<ReturnType<typeof useTemporada>["resultado"]>;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  estatisticasCarreira: EstatisticasCarreira;
   onJogarProxima: () => void;
 }) {
   return (
@@ -1545,6 +1566,10 @@ function ResumoDeTemporada({
           Status no elenco: {resultado.statusAtualizado.statusAnterior} → {resultado.statusAtualizado.statusNovo} (nota média {resultado.statusAtualizado.notaMedia.toFixed(1)})
         </p>
       )}
+
+      <div className="border-t border-slate-800 pt-3">
+        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />
+      </div>
 
       <button type="button" onClick={onJogarProxima} className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
         Jogar próxima temporada

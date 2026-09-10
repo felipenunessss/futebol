@@ -66,6 +66,8 @@ export interface OpcoesEstadoInicial {
   nacionalidade?: string;
   /** Ver `schemas/player.ts` `Jogador.numero` — opcional, sem valor default. */
   numero?: number;
+  /** Ver `schemas/player.ts` `Jogador.pe_dominante` — opcional, sem valor default, puramente decorativo. */
+  peDominante?: "destro" | "canhoto";
   /** Injetável pra determinismo em teste — mesmo padrão do resto do jogo. Decide a amplitude dos atributos iniciais e o potencial de desenvolvimento oculto sorteados aqui. */
   random?: () => number;
 }
@@ -153,6 +155,7 @@ export function criarEstadoInicial(opcoes: OpcoesEstadoInicial): EstadoDeCarreir
       idade: opcoes.idadeInicial ?? IDADE_INICIAL_PADRAO,
       nacionalidade: opcoes.nacionalidade,
       numero: opcoes.numero,
+      pe_dominante: opcoes.peDominante,
       atributos,
       potencial,
     },
