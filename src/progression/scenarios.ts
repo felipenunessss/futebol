@@ -644,11 +644,11 @@ export const CENARIOS: Cenario[] = [
         ],
       },
       {
-        id: "pedir_transferencia",
-        texto: "Pedir pra ser negociado",
+        id: "desabafar_publicamente",
+        texto: "Desabafar publicamente sobre a falta de oportunidades",
         resultados: [
-          { probabilidade: 0.5, impacto: { relacoesInternas: -10, reputacao: 5, narrativa: "O pedido choca o clube, mas mostra que você quer jogar — sua reputação de competitivo cresce." } },
-          { probabilidade: 0.5, impacto: { relacoesInternas: -20, moral: -10, narrativa: "O pedido é mal recebido e você vira alvo de críticas internas por falta de compromisso." } },
+          { probabilidade: 0.5, impacto: { relacoesInternas: -10, reputacao: 5, narrativa: "O desabafo choca o clube, mas mostra que você quer jogar — sua reputação de competitivo cresce." } },
+          { probabilidade: 0.5, impacto: { relacoesInternas: -20, moral: -10, narrativa: "O desabafo é mal recebido e você vira alvo de críticas internas por falta de compromisso." } },
         ],
       },
     ],
@@ -1571,7 +1571,8 @@ export const CENARIOS: Cenario[] = [
   {
     id: "agente_troca_de_empresario",
     titulo: "Troca de empresário",
-    descricao: "Você considera trocar de empresário no meio da carreira, em busca de melhores oportunidades.",
+    descricao: "Na janela, você considera trocar de empresário em busca de melhores oportunidades de mercado.",
+    gatilho: { momentos: ["pre_temporada"] },
     opcoes: [
       {
         id: "trocar_de_empresario",

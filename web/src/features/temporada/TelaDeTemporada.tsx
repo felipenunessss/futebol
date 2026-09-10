@@ -14,7 +14,17 @@ import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSem
 import { contrapropostaPadrao } from "@motor/market/negotiation.js";
 import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
 import { temporadaDeVencimento } from "@motor/schemas/contract.js";
-import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type JogoDaSemana, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
+import {
+  useTemporada,
+  type AnimacaoDeEscolhaPendente,
+  type EscolhaDePrePartida,
+  type EstatisticasCarreira,
+  type EventoDeFeed,
+  type JogoDaSemana,
+  type PartidaAoVivoEmAndamento,
+  type PromptPendente,
+  type ResultadoDaRodadaExibido,
+} from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
@@ -84,6 +94,21 @@ function formatarImpactoResumido(impacto: ImpactoCarreira): string {
   return partes.length > 0 ? partes.join(", ") : "sem impacto numérico";
 }
 
+/**
+ * "35% sim · 65% não" — todo `Opcao.resultados` do catálogo hoje tem 1 ou 2
+ * itens (nunca 3+, ver `scenarios.ts`/`match-events.ts`), e por convenção
+ * (mesma de `career-loop.ts` `resolverNegociacaoDeTransferencia`) o
+ * `resultados[0]` é sempre o desfecho favorável, o resto é desfavorável —
+ * daí dar pra resumir qualquer opção como um binário sim/não. `undefined`
+ * quando só há 1 resultado (100%, sem risco — não faz sentido "sim/não").
+ */
+function formatarProbabilidadeSimNao(resultados: { probabilidade: number }[]): string | undefined {
+  if (resultados.length < 2) return undefined;
+  const probabilidadeSim = resultados[0].probabilidade;
+  const probabilidadeNao = 1 - probabilidadeSim;
+  return `${Math.round(probabilidadeSim * 100)}% sim · ${Math.round(probabilidadeNao * 100)}% não`;
+}
+
 export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarreira }) {
   const temporada = useTemporada(estadoInicial);
   const {
@@ -107,7 +132,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   const promptDaPartidaAoVivo = promptPendente?.tipo === "chance_ao_vivo" || promptPendente?.tipo === "evento_ao_vivo" ? promptPendente : undefined;
   const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
   const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
-  const { resultadoDaRodada } = temporada;
+  const { resultadoDaRodada, animacaoDeEscolha } = temporada;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
@@ -133,10 +158,12 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           onDesligarTreinoAutomatico={temporada.desligarTreinoAutomatico}
         />
 
-        {/* Enquanto a tela de resultados da rodada está aberta, nenhum outro prompt aparece —
-            o motor já resolveu tudo (não está pausado por causa disso), é só a UI que espera o
-            clique em "avançar" antes de revelar o que já está pendente (ver `useTemporada.ts`). */}
-        {resultadoDaRodada ? (
+        {/* Enquanto a animação de escolha ou a tela de resultados da rodada estão abertas, nenhum
+            outro prompt aparece — o motor já resolveu tudo (não está pausado por causa disso), é só
+            a UI que segura a revelação (ver `useTemporada.ts`). */}
+        {animacaoDeEscolha ? (
+          <PainelAnimacaoDeEscolha animacao={animacaoDeEscolha} onConcluir={temporada.concluirAnimacaoDeEscolha} />
+        ) : resultadoDaRodada ? (
           <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
         ) : (
           <>
@@ -523,7 +550,7 @@ function PainelSemana({
   info: AoIniciarSemanaInfo;
   temporada: number;
   nomePorCampeonato: Map<string, string>;
-  onContinuar: () => void;
+  onContinuar: (pularAteProximoJogo?: boolean) => void;
 }) {
   const { inicio, fim } = intervaloDeSemana(temporada, info.semana);
   const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
@@ -539,9 +566,18 @@ function PainelSemana({
         <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
       )}
       <CalendarioDaTemporada periodos={periodos} semanaAtual={info.semana} competicoesDoJogador={info.competicoesDoJogador} nomePorCampeonato={nomePorCampeonato} />
-      <button type="button" onClick={onContinuar} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
-        Continuar
-      </button>
+      <div className="flex gap-2">
+        <button type="button" onClick={() => onContinuar()} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
+          Continuar
+        </button>
+        <button
+          type="button"
+          onClick={() => onContinuar(true)}
+          className="mt-1 rounded-lg bg-slate-800 border border-slate-700 hover:border-emerald-500 hover:bg-slate-800/70 transition-colors px-4 py-2.5 font-medium self-start text-sm"
+        >
+          Simular até o próximo jogo
+        </button>
+      </div>
     </div>
   );
 }
@@ -644,13 +680,6 @@ function PainelPrePartida({
       <div className="grid gap-2">
         <button type="button" onClick={() => onEscolher("rapida")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
           Simulação rápida (direto pro resultado)
-        </button>
-        <button
-          type="button"
-          onClick={() => onEscolher("proximo_jogo")}
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
-        >
-          Simular até o próximo jogo (não pergunta de novo até lá)
         </button>
         <button
           type="button"
@@ -910,10 +939,11 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
             className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
           >
             <div className="font-medium">{opcao.texto}</div>
+            {formatarProbabilidadeSimNao(opcao.resultados) && <div className="mt-1 text-xs font-medium text-emerald-400">{formatarProbabilidadeSimNao(opcao.resultados)}</div>}
             <div className="mt-1 flex flex-col gap-0.5">
               {opcao.resultados.map((resultado, indice) => (
                 <span key={indice} className="text-xs text-slate-400">
-                  {Math.round(resultado.probabilidade * 100)}% — {formatarImpactoResumido(resultado.impacto)}
+                  {formatarImpactoResumido(resultado.impacto)}
                 </span>
               ))}
             </div>
@@ -1020,6 +1050,71 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
     case "tabela":
       return <TabelaCard campeonatoId={evento.campeonatoId} periodo={evento.periodo} tabela={evento.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />;
   }
+}
+
+/** Alterna a cada tanto tempo (ver `INTERVALO_TROCA_MS`) até completar `DURACAO_ANIMACAO_MS`, então "para" no `indiceResultado` de verdade — só então chama `onConcluir` (com um pequeno atraso extra pro jogador ver onde parou antes da tela sumir e o resultado entrar no feed). */
+const DURACAO_ANIMACAO_MS = 1400;
+const INTERVALO_TROCA_MS = 130;
+const PAUSA_APOS_PARAR_MS = 550;
+
+function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoDeEscolhaPendente; onConcluir: () => void }) {
+  const { cenarioResolvido, indiceResultado } = animacao;
+  const { cenario, escolha } = cenarioResolvido;
+  const { opcao } = escolha;
+  const [indiceAtual, setIndiceAtual] = useState(0);
+  const [parou, setParou] = useState(false);
+
+  useEffect(() => {
+    let cancelado = false;
+    const inicio = Date.now();
+    let indice = 0;
+    let timer: ReturnType<typeof setTimeout>;
+
+    function tick(): void {
+      if (cancelado) return;
+      if (Date.now() - inicio >= DURACAO_ANIMACAO_MS) {
+        setIndiceAtual(indiceResultado);
+        setParou(true);
+        timer = setTimeout(() => {
+          if (!cancelado) onConcluir();
+        }, PAUSA_APOS_PARAR_MS);
+        return;
+      }
+      indice = (indice + 1) % opcao.resultados.length;
+      setIndiceAtual(indice);
+      timer = setTimeout(tick, INTERVALO_TROCA_MS);
+    }
+
+    timer = setTimeout(tick, INTERVALO_TROCA_MS);
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+    };
+    // Roda 1x por montagem (o painel só existe enquanto há uma animação pendente — uma nova
+    // animação sempre remonta o componente do zero, ver o `animacaoDeEscolha ?` no render principal).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+      <h2 className="text-lg font-semibold">{cenario.titulo}</h2>
+      <p className="text-sm text-slate-400">{opcao.texto}</p>
+      <div className="flex flex-col gap-2 w-full max-w-sm">
+        {opcao.resultados.map((resultado, indice) => (
+          <div
+            key={indice}
+            className={`rounded-lg border px-4 py-3 transition-colors ${
+              indice !== indiceAtual ? "bg-slate-800/40 border-slate-800 opacity-50" : parou ? "bg-emerald-950/60 border-emerald-500" : "bg-slate-800 border-emerald-600"
+            }`}
+          >
+            <div className="text-sm font-medium">{Math.round(resultado.probabilidade * 100)}%</div>
+            <div className="text-xs text-slate-400 mt-0.5">{formatarImpactoResumido(resultado.impacto)}</div>
+          </div>
+        ))}
+      </div>
+      {parou && <p className="text-xs text-emerald-400">{escolha.resultado.impacto.narrativa}</p>}
+    </div>
+  );
 }
 
 function PainelResultadoDaRodada({

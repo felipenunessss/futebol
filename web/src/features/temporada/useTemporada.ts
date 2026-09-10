@@ -10,6 +10,7 @@ import {
   jogarTemporadaSemanal,
   type AlocacaoDePontos,
   type AoIniciarSemanaInfo,
+  type CenarioResolvidoNaTemporada,
   type ContextoPartidaDoJogadorSemanal,
   type ModoDePartida,
   type NegociacaoResolvidaNaTemporada,
@@ -61,14 +62,8 @@ type EventoDeFeedVariante =
 
 export type EventoDeFeed = EventoDeFeedVariante & { id: string };
 
-/**
- * Escolha na tela pré-jogo — as 3 primeiras espelham o menu de `src/cli/index.ts`
- * `escolherModoDePartidaInterativo`; `proximo_jogo` é exclusiva da web: pula tudo que não é
- * partida (semana, treino, pontos, cenário, resultado da rodada) só até a PRÓXIMA partida do
- * clube, onde volta a perguntar — ao contrário de `ate_a_metade`/`ate_o_final`, que valem por um
- * número fixo de semanas.
- */
-export type EscolhaDePrePartida = "rapida" | "proximo_jogo" | "ate_a_metade" | "ate_o_final" | "ao_vivo";
+/** Escolha na tela pré-jogo — espelha o menu de 4 opções de `src/cli/index.ts` `escolherModoDePartidaInterativo`. */
+export type EscolhaDePrePartida = "rapida" | "ate_a_metade" | "ate_o_final" | "ao_vivo";
 
 export type PromptPendente =
   | { tipo: "foco"; resolve: (foco: FocoDeTreino) => void }
@@ -123,6 +118,21 @@ interface ConfrontoResultado {
 export type ResultadoDaRodadaExibido =
   | { tipo: "pontos_corridos"; campeonatoId: string; rodada: number; confrontos: ConfrontoResultado[]; tabela: LinhaTabela[] | undefined }
   | { tipo: "mata_mata"; campeonatoId: string; etapa: string; confrontoDoJogador: ConfrontoResultado; eliminado: boolean };
+
+/**
+ * Cenário de carreira já resolvido (o motor já sabe o desfecho — ver
+ * `career-loop.ts` `resolverPeriodoDaCarreira`), mas represado aqui pra UI
+ * tocar uma pequena animação alternando entre as opções possíveis antes de
+ * revelar em qual o resultado realmente parou (`indiceResultado`, o índice
+ * em `escolha.opcao.resultados` — a `PainelAnimacaoDeEscolha` usa isso pra
+ * saber onde "parar de girar"). Só existe fora da janela automática e só
+ * quando a opção escolhida tinha mais de 1 resultado possível (sem risco
+ * real não tem o que animar) — ver `emJanelaAutomatica`.
+ */
+export interface AnimacaoDeEscolhaPendente {
+  cenarioResolvido: CenarioResolvidoNaTemporada;
+  indiceResultado: number;
+}
 
 /** Jogo do próprio clube "desta semana" pro calendário lateral — criado quando o menu pré-jogo chega (`escolherModoDePartida`) e completado com o placar quando o resultado sai (`onPartidaPontosCorridos`/`onPartidaMataMata`). `undefined` = sem jogo do clube nesta semana (ou ainda não se sabe). */
 export interface JogoDaSemana {
@@ -200,6 +210,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const focoAutomaticoRef = useRef<FocoDeTreino | undefined>(undefined);
   const [focoAutomatico, setFocoAutomatico] = useState<FocoDeTreino>();
   const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
+  const [animacaoDeEscolha, setAnimacaoDeEscolha] = useState<AnimacaoDeEscolhaPendente>();
   /** Confrontos da rodada atual de cada competição, acumulados conforme os hooks disparam (ver `ResultadoDaRodadaExibido`). Reseta ao detectar que uma nova rodada começou. */
   const bufferRodadaRef = useRef<Map<string, { rodada: number; confrontos: ConfrontoResultado[] }>>(new Map());
   /**
@@ -273,6 +284,14 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function responderResultadoDaRodada(): void {
     setResultadoDaRodada(undefined);
+  }
+
+  /** Chamado pela própria `PainelAnimacaoDeEscolha` quando o timer da animação termina (não é clique do jogador) — só então o resultado entra de fato no feed. */
+  function concluirAnimacaoDeEscolha(): void {
+    if (!animacaoDeEscolha) return;
+    const { cenarioResolvido } = animacaoDeEscolha;
+    pushEvento({ tipo: "cenario", cenario: cenarioResolvido.cenario, opcao: cenarioResolvido.escolha.opcao, narrativa: cenarioResolvido.escolha.resultado.impacto.narrativa });
+    setAnimacaoDeEscolha(undefined);
   }
 
   function aoIniciarSemana(info: AoIniciarSemanaInfo): Promise<void> {
@@ -375,8 +394,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         pushEvento({ tipo: "nivel", info });
       },
       escolherOpcao,
-      onCenarioResolvido: (resolvido) =>
-        pushEvento({ tipo: "cenario", cenario: resolvido.cenario, opcao: resolvido.escolha.opcao, narrativa: resolvido.escolha.resultado.impacto.narrativa }),
+      onCenarioResolvido: (resolvido) => {
+        const indiceResultado = resolvido.escolha.opcao.resultados.indexOf(resolvido.escolha.resultado);
+        // Sem risco real (1 resultado só) ou em janela automática (fast-forward): revela direto,
+        // sem pausa nenhuma — a animação só faz sentido quando havia mais de 1 desfecho possível.
+        if (resolvido.escolha.opcao.resultados.length < 2 || emJanelaAutomatica()) {
+          pushEvento({ tipo: "cenario", cenario: resolvido.cenario, opcao: resolvido.escolha.opcao, narrativa: resolvido.escolha.resultado.impacto.narrativa });
+          return;
+        }
+        setAnimacaoDeEscolha({ cenarioResolvido: resolvido, indiceResultado });
+      },
       onNegociacaoResolvida: (negociacao) => pushEvento({ tipo: "negociacao", negociacao }),
       responderProposta,
       aoIniciarSemana,
@@ -520,8 +547,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setPromptPendente(undefined);
   }
 
-  function responderSemana(): void {
+  /**
+   * `pularAteProximoJogo` = true liga o "simular até o próximo jogo"
+   * (`pularAteProximoJogoRef`) — fica nesta tela (não na pré-partida)
+   * porque é aqui que o jogador vê "essa semana não tem jogo do seu
+   * clube" e decide se quer pular as semanas sem partida até a próxima
+   * que tiver, em vez de clicar "Continuar" uma a uma.
+   */
+  function responderSemana(pularAteProximoJogo = false): void {
     if (promptPendente?.tipo !== "semana") return;
+    if (pularAteProximoJogo) pularAteProximoJogoRef.current = true;
     promptPendente.resolve();
     setPromptPendente(undefined);
   }
@@ -532,7 +567,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     const { contexto, resolve } = promptPendente;
     setPromptPendente(undefined);
 
-    if (escolha === "proximo_jogo") pularAteProximoJogoRef.current = true;
     if (escolha === "ate_a_metade") modoAutoAteSemanaRef.current = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
     if (escolha === "ate_o_final") modoAutoAteSemanaRef.current = ULTIMA_SEMANA_DA_TEMPORADA;
 
@@ -584,6 +618,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     desligarTreinoAutomatico,
     resultadoDaRodada,
     responderResultadoDaRodada,
+    animacaoDeEscolha,
+    concluirAnimacaoDeEscolha,
     semanaAtual,
     jogoDaSemana,
   };
