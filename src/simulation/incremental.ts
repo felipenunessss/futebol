@@ -301,7 +301,22 @@ async function avancarEtapa(
     // etapa de 1 entrante só, modelando uma final_estadual como FaseMataMata de 1 etapa.
     fase.resultados.push({ nome: etapa.nome, confrontos: [], vencedores: [...fase.vivos] });
   } else {
-    const pares = fase.gruposParaSorteioDaEtapaZero ? sortearConfrontosPorPotes(fase.gruposParaSorteioDaEtapaZero, random) : emparelharPorForca(fase.vivos, ratings);
+    const ehUltimaEtapa = fase.indiceAtual === fase.etapas.length - 1;
+    // Bye automático pro melhor colocado quando sobra um número ímpar de sobreviventes e ainda há
+    // rodada seguinte pra ele entrar direto — convenção real de chaveamento (mesma semântica de
+    // `EtapaMataMata.entrantes`, "bye direto"), não uma regra inventada. NUNCA na última etapa (não
+    // faz sentido dar o título de bandeja sem jogar a final — se sobra ímpar ali, o dado do
+    // campeonato precisa de revisão, ver `docs/dados-a-verificar.md`) nem quando o sorteio por
+    // potes já decidiu os pares (que já garante contagem par por construção).
+    let comBye: string | undefined;
+    let participantes = fase.vivos;
+    if (!fase.gruposParaSorteioDaEtapaZero && !ehUltimaEtapa && fase.vivos.length % 2 !== 0) {
+      const ordenados = ordenarPorForca(fase.vivos, ratings);
+      comBye = ordenados[0];
+      participantes = ordenados.slice(1);
+    }
+
+    const pares = fase.gruposParaSorteioDaEtapaZero ? sortearConfrontosPorPotes(fase.gruposParaSorteioDaEtapaZero, random) : emparelharPorForca(participantes, ratings);
     fase.gruposParaSorteioDaEtapaZero = undefined;
     if (ehPrimeiraEtapa) await hooks?.aoDefinirChaveamento?.({ etapaNome: etapa.nome, pares });
     const confrontos: ResultadoConfrontoMataMata[] = [];
@@ -311,7 +326,7 @@ async function avancarEtapa(
       confrontos.push(confronto);
       if (confronto.partidasDoJogador) fase.partidasDoJogador.push(...confronto.partidasDoJogador);
     }
-    fase.vivos = confrontos.map((c) => c.vencedor);
+    fase.vivos = comBye ? [comBye, ...confrontos.map((c) => c.vencedor)] : confrontos.map((c) => c.vencedor);
     fase.resultados.push({ nome: etapa.nome, confrontos, vencedores: fase.vivos });
   }
 
@@ -427,6 +442,43 @@ function passosPontosCorridosComLiguilla(campeonato: CampeonatoSimulavel): Passo
       criar: (ctx) =>
         criarFaseMataMata(
           "liguilla",
+          mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.classificados as string[]) : undefined })),
+        ),
+      aoConcluir: (fase, ctx) => {
+        ctx.campeao = (fase as FaseMataMata).vivos[0];
+      },
+    },
+  ];
+}
+
+/**
+ * `mata_mata` + `turno` (só um turno, sem returno — ex: Carioca Série A2,
+ * "Taça Santos Dumont") — mesmo espírito de `passosPontosCorridosComLiguilla`,
+ * só que a fase de tabela usa o bloco `turno` (`FaseUnica`, com nome
+ * próprio) em vez de `pontos_corridos`. Deriva `quantidadeClassificados`
+ * de `2^(nº de fases do mata_mata)` (não confia em
+ * `turno.classificam_proxima_fase` do dado, mesmo motivo documentado ali —
+ * garante que o mata-mata sempre feche certo, mesmo que o dado declare um
+ * número que não é potência de 2).
+ */
+function passosTurnoEMataMata(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
+  const turno = campeonato.formato.turno!;
+  const mataMata = campeonato.formato.mata_mata!;
+  const quantidadeClassificados = Math.pow(2, mataMata.fases.length);
+
+  return [
+    {
+      unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
+      criar: () => criarFaseRodadas(turno.nome ?? "turno", [campeonato.times], turno.ida_e_volta, quantidadeClassificados),
+      aoConcluir: (fase, ctx) => {
+        ctx.classificados = classificadosDaFase(fase as FaseRodadas);
+      },
+    },
+    {
+      unidades: mataMata.fases.length,
+      criar: (ctx) =>
+        criarFaseMataMata(
+          "mata_mata",
           mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.classificados as string[]) : undefined })),
         ),
       aoConcluir: (fase, ctx) => {
@@ -970,9 +1022,12 @@ function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Rec
       criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.classificados = classificadosDaFase(fase as FaseRodadas);
-        // 1º x 2º de outro grupo, nunca do mesmo — só faz sentido com exatamente 2 classificados/grupo.
+        // 1º x 2º de outro grupo, nunca do mesmo — só faz sentido com >1 grupo (com 1 grupo só, os 2
+        // classificados vão direto pra uma final/semifinal única, não há "outro grupo" pra sortear contra).
         ctx.gruposClassificados =
-          fg.classificam_por_grupo === 2 ? tabelasPorGrupo(fase as FaseRodadas).map((g) => ({ nome: g.nome, times: g.tabela.slice(0, 2).map((linha) => linha.clubeId) as [string, string] })) : undefined;
+          fg.num_grupos > 1 && fg.classificam_por_grupo === 2
+            ? tabelasPorGrupo(fase as FaseRodadas).map((g) => ({ nome: g.nome, times: g.tabela.slice(0, 2).map((linha) => linha.clubeId) as [string, string] }))
+            : undefined;
       },
     },
     {
@@ -1070,6 +1125,8 @@ function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string
       return passosTurnoRetornoSomado(campeonato);
     case "mata_mata,pontos_corridos":
       return passosPontosCorridosComLiguilla(campeonato);
+    case "mata_mata,turno":
+      return passosTurnoEMataMata(campeonato);
     case "fase_final_por_classificacao,pontos_corridos":
       return passosPontosCorridosComFaseFinalPorClassificacao(campeonato);
     case "fase_quadrangular,final_estadual,returno,turno":

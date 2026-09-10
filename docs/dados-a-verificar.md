@@ -155,7 +155,17 @@ resultado final bate mas o mecanismo intermediário não é representado:
 - **Catarinense**: rebaixamento real é um quadrangular especial com bônus de
   1 ponto pro 5º colocado de uma das chaves — não representado.
 - **Cearense**: 2ª fase de reclassificação (top 3 de cada grupo formam
-  novos grupos) simplificada pra `fase_grupos` direto a `mata_mata`.
+  novos grupos) simplificada pra `fase_grupos` direto a `mata_mata` — **e essa
+  simplificação está QUEBRADA hoje, não é só imprecisa**: `classificam_por_grupo: 3`
+  em 2 grupos manda 6 times direto pro mata-mata `["semifinal", "final"]`,
+  e a semifinal (6→3) sempre sobra um número ímpar de sobreviventes pra
+  final — sem a fase de reclassificação real de verdade (que reduziria 6
+  pra 4 antes do mata-mata), a competição não conclui (erro isolado,
+  "não simulada" no resumo de temporada; confirmado com
+  `criarCompeticoesIncrementaisDaTemporada` rodando a temporada inteira).
+  Correção pendente: implementar a 2ª fase de reclassificação de verdade
+  (precisa confirmar a fonte de como os "novos grupos" são formados a
+  partir do top 3 de cada grupo original antes de codar).
 - **Goiano**: playoff condicional 10º×11º (só se diferença de pontos ≤ 6)
   não representado, só `rebaixamento_proxima_divisao: 2`.
 - **Argentina 1ª divisão**: zonas internas de cada torneio (Apertura/

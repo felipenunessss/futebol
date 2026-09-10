@@ -108,6 +108,51 @@ describe("criarCompeticaoIncremental — fase_suica + mata_mata (Paulistão/Gauc
   });
 });
 
+describe("avancarEtapa — bye automático quando o mata-mata sobra número ímpar de sobreviventes", () => {
+  it("dá bye pro melhor colocado numa etapa do MEIO (não a última) e conclui normalmente — mesmo formato de matogrossense_1 (6 classificados, 3 fases)", async () => {
+    const times = Array.from({ length: 10 }, (_, i) => `t${i + 1}`);
+    const ratings = Object.fromEntries(times.map((t, i) => [t, 1600 + (10 - i)])); // t1 é o mais forte
+    const campeonato: CampeonatoSimulavel = {
+      id: "estadual_teste_bye",
+      formato: {
+        fase_grupos: { num_grupos: 1, times_por_grupo: 10, ida_e_volta: false, classificam_por_grupo: 6 },
+        mata_mata: { fases: ["quartas", "semifinal", "final"], ida_e_volta: false },
+      },
+      times,
+    };
+
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 17 }, () => Math.random());
+    for (let semana = 1; semana <= 17; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+
+    expect(estado.erro).toBeUndefined();
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.campeao);
+  });
+
+  it("continua lançando erro claro quando sobra ímpar na ÚLTIMA etapa (bye não pode decidir campeão sem jogar a final) — mesmo formato de cearense_1", async () => {
+    const times = Array.from({ length: 10 }, (_, i) => `t${i + 1}`);
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+    const campeonato: CampeonatoSimulavel = {
+      id: "estadual_teste_sem_bye_na_final",
+      formato: {
+        fase_grupos: { num_grupos: 2, times_por_grupo: 5, ida_e_volta: false, classificam_por_grupo: 3 },
+        mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false },
+      },
+      times,
+    };
+
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 13 }, () => Math.random());
+    for (let semana = 1; semana <= 13; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+
+    expect(estado.erro).toMatch(/número ímpar de participantes/);
+    expect(estado.concluida).toBe(true); // falha isolada marca concluída sem campeão, não trava a temporada
+  });
+});
+
 describe("criarCompeticaoIncremental — mata_mata isolado com etapas (Copa do Brasil)", () => {
   const times = ["a", "b", "c", "d", "e", "f", "g", "h"];
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
