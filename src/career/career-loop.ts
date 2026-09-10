@@ -166,6 +166,10 @@ export interface ResultadoTemporadaDeCarreira {
 
 export interface OpcoesJogarTemporada {
   estiloTecnico?: EstiloTecnico;
+  /** Ver `ContextoResolucaoDePeriodo.desativarNegociacaoNarrativa` — desliga a negociação de
+   * transferência real espalhada pela pré-temporada, pra quem substitui isso por uma tela dedicada de
+   * fim de temporada. Padrão `false`. */
+  desativarNegociacaoNarrativa?: boolean;
   /**
    * UF/região do clube atual — decide onde deltas de reputação regional
    * caem (ver `progression/scenarios.ts` `aplicarImpacto`) e filtra
@@ -354,6 +358,13 @@ interface ContextoResolucaoDePeriodo {
   responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">;
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
   onCenarioResolvido?: (resolvido: CenarioResolvidoNaTemporada) => void | Promise<void>;
+  /** Desliga a negociação de transferência real espalhada pela pré-temporada (`estaNaJanelaDeTransferencia`)
+   * — usado por quem substitui esse mecanismo por uma tela dedicada de fim de temporada (ver
+   * `career/fim-de-temporada.ts`), pra não oferecer a mesma proposta duas vezes. Cenários narrativos
+   * gerais da pré-temporada (não ligados a transferência) continuam elegíveis normalmente; só o
+   * interesse real de compra/venda forçada some. Padrão `false` — não muda o comportamento de
+   * `jogarTemporada`/quem não passar essa opção. */
+  desativarNegociacaoNarrativa?: boolean;
   random: () => number;
 }
 
@@ -409,7 +420,7 @@ async function resolverPeriodoDaCarreira(
   ctx: ContextoResolucaoDePeriodo,
   negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
 ): Promise<{ estado: EstadoDeCarreira; treino: TreinoResolvidoNaTemporada; cenario: CenarioResolvidoNaTemporada }> {
-  const { clubes, clubePorId, regiaoAtualPadrao, escolherFocoDeTreino, onTreinoResolvido, escolherDistribuicaoDePontos, onNivelAlcancado, escolherOpcao, responderProposta, onNegociacaoResolvida, onCenarioResolvido, random } = ctx;
+  const { clubes, clubePorId, regiaoAtualPadrao, escolherFocoDeTreino, onTreinoResolvido, escolherDistribuicaoDePontos, onNivelAlcancado, escolherOpcao, responderProposta, onNegociacaoResolvida, onCenarioResolvido, desativarNegociacaoNarrativa, random } = ctx;
   let estadoAtual = estadoInicial;
   const momento = momentoDoPeriodo(periodo.periodo);
 
@@ -446,7 +457,7 @@ async function resolverPeriodoDaCarreira(
   let valorDeMercado = 0;
   let ratingClubeAtual = 0;
 
-  if (estaNaJanelaDeTransferencia(momento)) {
+  if (estaNaJanelaDeTransferencia(momento) && !desativarNegociacaoNarrativa) {
     const clubeAtualObj = clubePorId.get(estadoAtual.clubeAtualId);
     ratingClubeAtual = clubeAtualObj ? obterRating(clubeAtualObj) : 0;
 
@@ -587,6 +598,7 @@ export async function jogarTemporada(
   const {
     estiloTecnico = "equilibrado",
     regiaoAtual: regiaoAtualPadrao,
+    desativarNegociacaoNarrativa,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
     escolherFocoDeTreino = () => "tecnico" as const,
@@ -740,6 +752,7 @@ export async function jogarTemporada(
     responderProposta,
     onNegociacaoResolvida,
     onCenarioResolvido,
+    desativarNegociacaoNarrativa,
     random,
   };
 
@@ -883,6 +896,7 @@ export async function jogarTemporadaSemanal(
   const {
     estiloTecnico = "equilibrado",
     regiaoAtual: regiaoAtualPadrao,
+    desativarNegociacaoNarrativa,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
     escolherFocoDeTreino = () => "tecnico" as const,
@@ -1060,6 +1074,7 @@ export async function jogarTemporadaSemanal(
     responderProposta,
     onNegociacaoResolvida,
     onCenarioResolvido,
+    desativarNegociacaoNarrativa,
     random,
   };
 

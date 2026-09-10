@@ -25,8 +25,7 @@ import {
   type TreinoResolvidoNaTemporada,
 } from "@motor/career/career-loop.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
-import { contrapropostaPadrao } from "@motor/market/negotiation.js";
-import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
+import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type EscolhaDeFimDeTemporada, type PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
 
 /** ms de espera real por minuto simulado — mais rápido que o padrão da CLI (220ms, ~20s/partida)
  * porque uma temporada web pode ter dezenas de partidas do próprio clube pra assistir. */
@@ -79,10 +78,9 @@ export type PromptPendente =
   | { tipo: "evento_ao_vivo"; cenario: Cenario; resolve: (opcao: Opcao) => void }
   | { tipo: "semana"; info: AoIniciarSemanaInfo; resolve: () => void }
   | { tipo: "pre_partida"; contexto: ContextoPartidaDoJogadorSemanal; resolve: (modo: ModoDePartida) => void }
-  | { tipo: "seguir_campeonatos"; idsAtivos: string[]; resolve: (ids: string[]) => void }
-  | { tipo: "proposta_de_transferencia"; proposta: PropostaTransferencia; resolve: (resposta: TermosDeContrato | "recusar") => void };
+  | { tipo: "seguir_campeonatos"; idsAtivos: string[]; resolve: (ids: string[]) => void };
 
-export type FaseDaTemporada = "jogando" | "resumo";
+export type FaseDaTemporada = "jogando" | "resumo" | "propostas";
 
 /** Snapshot em andamento de uma partida sendo simulada "ao vivo" — some quando o apito final chega
  * e o resultado final já entrou no feed permanente (ver `onPartidaPontosCorridos`). */
@@ -180,6 +178,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [feed, setFeed] = useState<EventoDeFeed[]>([]);
   const [promptPendente, setPromptPendente] = useState<PromptPendente>();
   const [resultado, setResultado] = useState<ResultadoTemporadaDeCarreira>();
+  /** Propostas de transferência/renovação de fim de temporada (ver `career/fim-de-temporada.ts`) —
+   * geradas ao sair do resumo (`verPropostasFimDeTemporada`), resolvidas em `responderFimDeTemporada`
+   * antes de iniciar a próxima temporada. */
+  const [propostasFimDeTemporada, setPropostasFimDeTemporada] = useState<PropostasDeFimDeTemporada>();
   const [partidaAoVivo, setPartidaAoVivo] = useState<PartidaAoVivoEmAndamento>();
   /** Última tabela conhecida de cada competição — alimentada por `tabelaDepois` de qualquer partida
    * observada (própria ou da rodada, ver `atualizarTabela`), só pra mostrar posição na tela
@@ -368,22 +370,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   }
 
   /**
-   * Só chamado dentro da janela de transferência (`career-loop.ts`
-   * `estaNaJanelaDeTransferencia`) e com interesse real de mercado — dá ao
-   * jogador a decisão de verdade: negociar (contraproposta padrão, pede
-   * mais que a oferta inicial) ou recusar e seguir cumprindo contrato no
-   * clube atual (`"recusar"` para a negociação inteira nesse período, não
-   * tenta os próximos interessados — ver `career-loop.ts`
-   * `resolverNegociacaoDeTransferencia`). Durante a janela automática
-   * (`emJanelaAutomatica`), usa `contrapropostaPadrao` sozinho, sem
-   * pausar — mesmo padrão do motor quando ninguém decide.
-   */
-  function responderProposta(proposta: PropostaTransferencia): Promise<TermosDeContrato | "recusar"> {
-    if (emJanelaAutomatica()) return Promise.resolve(contrapropostaPadrao(proposta));
-    return new Promise((resolve) => setPromptPendente({ tipo: "proposta_de_transferencia", proposta, resolve }));
-  }
-
-  /**
    * Pausa antes de cada partida do jogador com a tela pré-jogo (Parte C) —
    * EXCETO durante uma janela de "não perguntar de novo" ativada por
    * "até a metade"/"até o final" no próprio menu pré-jogo
@@ -453,7 +439,14 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     }
   }
 
-  async function jogarTemporada(): Promise<void> {
+  /** `estadoParaComecar` permite iniciar a temporada a partir de um estado diferente do `estadoAtual`
+   * já renderizado — necessário pra tela de fim de temporada (`responderFimDeTemporada`), que assina um
+   * contrato novo (`aplicarEscolhaDeFimDeTemporada`) e precisa que a temporada comece JÁ com o clube
+   * atualizado, sem esperar o próximo render pra `estadoAtual` refletir isso (React `setState` é
+   * assíncrono — usar `estadoAtual` direto aqui pegaria o clube ANTIGO). */
+  async function jogarTemporada(estadoParaComecar?: EstadoDeCarreira): Promise<void> {
+    const estadoInicialDaTemporada = estadoParaComecar ?? estadoAtual;
+    setEstadoAtual(estadoInicialDaTemporada);
     setFase("jogando");
     setFeed([]);
     setResultado(undefined);
@@ -485,6 +478,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setSemanaAtual(1);
 
     const opcoes: OpcoesJogarTemporadaSemanal = {
+      // A tela de fim de temporada (`responderFimDeTemporada`) já resolveu transferência/renovação
+      // antes de chegar aqui — sem isso, o jogador podia receber a MESMA proposta de novo, narrada
+      // durante a pré-temporada, um mecanismo antigo que essa tela substitui.
+      desativarNegociacaoNarrativa: true,
       escolherFocoDeTreino,
       onTreinoResolvido: (treino) => pushEvento({ tipo: "treino", treino }),
       escolherDistribuicaoDePontos,
@@ -504,7 +501,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         setAnimacaoDeEscolha({ cenarioResolvido: resolvido, indiceResultado });
       },
       onNegociacaoResolvida: (negociacao) => pushEvento({ tipo: "negociacao", negociacao }),
-      responderProposta,
       aoIniciarSemana,
       escolherModoDePartida,
       decidirChanceAoVivo,
@@ -599,7 +595,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       },
     };
 
-    const resultadoDaTemporada = await jogarTemporadaSemanal(estadoAtual, campeonatos, clubes, opcoes);
+    const resultadoDaTemporada = await jogarTemporadaSemanal(estadoInicialDaTemporada, campeonatos, clubes, opcoes);
     setResultado(resultadoDaTemporada);
     setEstadoAtual(resultadoDaTemporada.estado);
     setFase("resumo");
@@ -720,11 +716,23 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setPromptPendente(undefined);
   }
 
-  /** `resposta === "recusar"` = continuar no clube atual cumprindo contrato; senão, negocia com esses termos (ver `responderProposta`). */
-  function responderPropostaDeTransferencia(resposta: TermosDeContrato | "recusar"): void {
-    if (promptPendente?.tipo !== "proposta_de_transferencia") return;
-    promptPendente.resolve(resposta);
-    setPromptPendente(undefined);
+  /** Chamado pelo botão do resumo de fim de temporada — gera as propostas (transferência +
+   * renovação do clube atual, ver `career/fim-de-temporada.ts`) e abre a tela dedicada
+   * (`fase: "propostas"`), sem ainda iniciar a próxima temporada (isso só acontece depois que o
+   * jogador responder, ver `responderFimDeTemporada`). */
+  function verPropostasFimDeTemporada(): void {
+    setPropostasFimDeTemporada(gerarPropostasDeFimDeTemporada(estadoAtual, clubes));
+    setFase("propostas");
+  }
+
+  /** Aplica a escolha do jogador (renovar/transferir/ficar sem assinar nada) e já inicia a próxima
+   * temporada a partir do estado atualizado — ver `jogarTemporada` (`estadoParaComecar`), necessário
+   * porque o clube pode ter mudado nesta mesma chamada. */
+  function responderFimDeTemporada(escolha: EscolhaDeFimDeTemporada): void {
+    if (!propostasFimDeTemporada) return;
+    const estadoComContrato = aplicarEscolhaDeFimDeTemporada(estadoAtual, propostasFimDeTemporada, escolha);
+    setPropostasFimDeTemporada(undefined);
+    void jogarTemporada(estadoComContrato);
   }
 
   return {
@@ -742,6 +750,9 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     clubePorId,
     nomePorCampeonato,
     jogarTemporada,
+    propostasFimDeTemporada,
+    verPropostasFimDeTemporada,
+    responderFimDeTemporada,
     responderFoco,
     responderDistribuicaoDePontos,
     responderCenario,
@@ -750,7 +761,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderSemana,
     responderPrePartida,
     responderSeguirCampeonatos,
-    responderPropostaDeTransferencia,
     focoAutomatico,
     desligarTreinoAutomatico,
     simulandoAutomaticamente,

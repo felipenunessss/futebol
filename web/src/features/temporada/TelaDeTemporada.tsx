@@ -11,9 +11,8 @@ import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from
 import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ChaveamentoDeMataMataNaTemporada, ContextoPartidaDoJogadorSemanal, SorteioDeGruposNaTemporada } from "@motor/career/career-loop.js";
-import { contrapropostaPadrao } from "@motor/market/negotiation.js";
-import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/transfers.js";
-import { temporadaDeVencimento } from "@motor/schemas/contract.js";
+import type { PropostaTransferencia } from "@motor/market/transfers.js";
+import type { EscolhaDeFimDeTemporada, PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
 import {
   useTemporada,
   type AnimacaoDeEscolhaPendente,
@@ -150,7 +149,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         nomePorCampeonato={nomePorCampeonato}
       />
       {temporada.simulandoAutomaticamente && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 rounded-full bg-slate-900/95 border border-slate-800 shadow-xl px-4 py-2 text-xs backdrop-blur">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 rounded-full bg-slate-900/95 border border-slate-800 shadow-xl px-4 py-2 text-xs backdrop-blur text-slate-100">
           <span className="text-slate-300">Simulando semanas automaticamente…</span>
           <button type="button" onClick={temporada.pararSimulacaoAutomatica} className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
             Parar e voltar ao normal
@@ -240,7 +239,16 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
                 clubePorId={clubePorId}
                 nomePorCampeonato={nomePorCampeonato}
                 estatisticasCarreira={estatisticasCarreira}
-                onJogarProxima={() => void temporada.jogarTemporada()}
+                onVerPropostas={temporada.verPropostasFimDeTemporada}
+              />
+            )}
+            {fase === "propostas" && temporada.propostasFimDeTemporada && (
+              <PainelPropostasFimDeTemporada
+                propostas={temporada.propostasFimDeTemporada}
+                clubePorId={clubePorId}
+                nomePorCampeonato={nomePorCampeonato}
+                nomeClubeAtual={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
+                onResponder={temporada.responderFimDeTemporada}
               />
             )}
           </>
@@ -283,7 +291,7 @@ function CalendarioSemanalLateral({
   const { inicio } = intervaloDeSemana(temporada, semanaAtual);
 
   return (
-    <div className="fixed top-4 left-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
+    <div className="fixed top-4 left-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
       <h2 className="font-semibold text-slate-400">Semana {semanaAtual}</h2>
       <div className="flex flex-col gap-1">
         {ROTULOS_DIA_SEMANA.map((rotulo, indice) => {
@@ -333,7 +341,7 @@ function PainelDeCompeticoes({
 
   return (
     <>
-      <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
+      <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold text-slate-400">Suas competições</h2>
           <button type="button" onClick={() => setClassificacaoAberta(true)} className="shrink-0 text-emerald-400 hover:text-emerald-300 transition-colors">
@@ -397,7 +405,7 @@ function PainelClassificacao({
 }) {
   return (
     <div className="fixed inset-0 z-30 bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-4 sm:p-6" onClick={onFechar}>
-      <div className="mx-auto max-w-2xl mt-6 mb-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-5" onClick={(e) => e.stopPropagation()}>
+      <div className="mx-auto max-w-2xl mt-6 mb-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-5 text-slate-100" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Classificação</h2>
           <button type="button" onClick={onFechar} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
@@ -495,7 +503,7 @@ function Cabecalho({
   const [mostrarAtributos, setMostrarAtributos] = useState(false);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3">
+    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
       <div className="flex items-baseline justify-between flex-wrap gap-x-4 gap-y-1">
         <h1 className="text-xl font-semibold">
           {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {nomeDaNacionalidade}
@@ -586,64 +594,10 @@ function Stat({ rotulo, valor, destaque }: { rotulo: string; valor: string | num
 
 function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; temporada: ReturnType<typeof useTemporada> }) {
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 text-slate-100">
       {prompt.tipo === "foco" && <PromptFoco onEscolher={temporada.responderFoco} />}
       {prompt.tipo === "pontos" && <PromptDistribuicaoDePontos estado={prompt.estado} onConfirmar={temporada.responderDistribuicaoDePontos} />}
       {prompt.tipo === "cenario" && <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={temporada.responderCenario} />}
-      {prompt.tipo === "proposta_de_transferencia" && (
-        <PromptPropostaDeTransferencia proposta={prompt.proposta} estado={temporada.estadoAtual} clubePorId={temporada.clubePorId} onResponder={temporada.responderPropostaDeTransferencia} />
-      )}
-    </div>
-  );
-}
-
-/**
- * Só aparece durante a janela de transferência com interesse real de
- * mercado (`career-loop.ts` `estaNaJanelaDeTransferencia`/`responderProposta`)
- * — dá a decisão de verdade: negociar (contraproposta padrão) ou recusar
- * e seguir cumprindo contrato no clube atual.
- */
-function PromptPropostaDeTransferencia({
-  proposta,
-  estado,
-  clubePorId,
-  onResponder,
-}: {
-  proposta: PropostaTransferencia;
-  estado: EstadoDeCarreira;
-  clubePorId: Map<string, Club>;
-  onResponder: (resposta: TermosDeContrato | "recusar") => void;
-}) {
-  const termos = proposta.propostaInicial;
-  const nomeClubeOfertante = nomeDoClube(clubePorId, proposta.clubeOfertanteId);
-  const nomeClubeAtual = nomeDoClube(clubePorId, estado.clubeAtualId);
-
-  return (
-    <div className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
-        <Escudo url={escudoDoClube(clubePorId, proposta.clubeOfertanteId)} alt={nomeClubeOfertante} tamanho={22} />
-        {nomeClubeOfertante} fez uma proposta
-      </h2>
-      <p className="text-sm text-slate-400">
-        Status oferecido: <span className="text-slate-200">{ROTULO_STATUS[proposta.statusOferecido]}</span> · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
-      </p>
-      {estado.contratoAtual && (
-        <p className="text-xs text-slate-500">
-          Seu contrato atual com {nomeClubeAtual} vale até a temporada {temporadaDeVencimento(estado.contratoAtual)}.
-        </p>
-      )}
-      <div className="grid gap-2">
-        <button
-          type="button"
-          onClick={() => onResponder(contrapropostaPadrao(proposta))}
-          className="rounded-lg bg-emerald-900/40 border border-emerald-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors"
-        >
-          Negociar (pedir mais salário e luvas)
-        </button>
-        <button type="button" onClick={() => onResponder("recusar")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
-          Recusar — continuar em {nomeClubeAtual}, cumprindo o contrato atual
-        </button>
-      </div>
     </div>
   );
 }
@@ -724,7 +678,7 @@ function PainelSemana({
   const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
       <h2 className="text-lg font-semibold">
         Semana {info.semana} — {formatarData(inicio)} a {formatarData(fim)}
       </h2>
@@ -771,7 +725,7 @@ function PainelSeguirCampeonatos({
   }
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
       <h2 className="text-lg font-semibold">Outras competições ativas nesta temporada</h2>
       <p className="text-sm text-slate-400">Escolha quais você quer acompanhar com resumo de tabela a cada período (nenhuma é obrigatória).</p>
       <div className="grid gap-2 max-h-72 overflow-y-auto pr-1">
@@ -820,7 +774,7 @@ function PainelPrePartida({
   const posicaoVisitante = posicaoNaTabela(tabela, contexto.visitanteId);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       <div className="text-xs uppercase tracking-wide text-emerald-400">
         {nomeDoCampeonato(nomePorCampeonato, contexto.campeonatoId)} — semana {contexto.semana}
       </div>
@@ -893,7 +847,7 @@ function PainelPartidaAoVivo({
   }, [partida.eventos.length]);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-4 flex flex-col gap-3">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-4 flex flex-col gap-3 text-slate-100">
       <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
         Ao vivo — {partida.minutoAtual}'
@@ -1130,7 +1084,7 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
 
 function Feed({ eventos, clubePorId, nomePorCampeonato }: { eventos: EventoDeFeed[]; clubePorId: Map<string, Club>; nomePorCampeonato: Map<string, string> }) {
   return (
-    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-4 flex flex-col gap-2">
+    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-4 flex flex-col gap-2 text-slate-100">
       <h2 className="text-sm font-semibold text-slate-400 px-1">Partidas e eventos da temporada</h2>
       <div className="flex flex-col gap-2 max-h-[28rem] overflow-y-auto pr-1">
         {eventos.length === 0 ? (
@@ -1270,7 +1224,7 @@ function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoD
   }, []);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center text-slate-100">
       <h2 className="text-lg font-semibold">{cenario.titulo}</h2>
       <p className="text-sm text-slate-400">{opcao.texto}</p>
       <div className="flex flex-col gap-2 w-full max-w-sm">
@@ -1303,7 +1257,7 @@ function PainelResultadoDaRodada({
   onAvancar: () => void;
 }) {
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       {resultadoDaRodada.tipo === "pontos_corridos" ? (
         <>
           <h2 className="text-lg font-semibold">
@@ -1391,7 +1345,7 @@ function PainelSorteio({
   const concluido = gruposRevelados >= sorteio.grupos.length;
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center text-slate-100">
       <h2 className="text-lg font-semibold">Sorteio dos grupos — {nomeDoCampeonato(nomePorCampeonato, sorteio.campeonatoId)}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
         {sorteio.grupos.map((grupo, indice) => (
@@ -1441,7 +1395,7 @@ function PainelChaveamento({
   onContinuar: () => void;
 }) {
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center">
+    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center text-slate-100">
       <h2 className="text-lg font-semibold">Chaveamento definido — {nomeDoCampeonato(nomePorCampeonato, chaveamento.campeonatoId)}</h2>
       <p className="text-sm text-slate-400 capitalize">{chaveamento.etapaNome.replaceAll("_", " ")}</p>
       <div className="flex flex-col gap-1.5 w-full max-w-sm text-sm">
@@ -1480,7 +1434,7 @@ function TabelaCard({
   nomePorCampeonato: Map<string, string>;
 }) {
   return (
-    <div className="rounded-xl bg-slate-900 border border-slate-800 p-4">
+    <div className="rounded-xl bg-slate-900 border border-slate-800 p-4 text-slate-100">
       <div className="text-sm font-medium mb-2">
         {nomeDoCampeonato(nomePorCampeonato, campeonatoId)} — resumo do período {periodo}
       </div>
@@ -1538,16 +1492,16 @@ function ResumoDeTemporada({
   clubePorId,
   nomePorCampeonato,
   estatisticasCarreira,
-  onJogarProxima,
+  onVerPropostas,
 }: {
   resultado: NonNullable<ReturnType<typeof useTemporada>["resultado"]>;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
   estatisticasCarreira: EstatisticasCarreira;
-  onJogarProxima: () => void;
+  onVerPropostas: () => void;
 }) {
   return (
-    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-4">
+    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       <h2 className="text-xl font-semibold">Fim da temporada {resultado.resultadoTemporada.temporada}</h2>
       <p className="text-sm text-slate-400">
         Overall {resultado.resumoPartidas.overallAntes} → {resultado.resumoPartidas.overallDepois}
@@ -1585,8 +1539,93 @@ function ResumoDeTemporada({
         <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />
       </div>
 
-      <button type="button" onClick={onJogarProxima} className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
-        Jogar próxima temporada
+      <button type="button" onClick={onVerPropostas} className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">
+        Ver propostas
+      </button>
+    </div>
+  );
+}
+
+function PainelPropostasFimDeTemporada({
+  propostas,
+  clubePorId,
+  nomeClubeAtual,
+  onResponder,
+}: {
+  propostas: PropostasDeFimDeTemporada;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  nomeClubeAtual: string;
+  onResponder: (escolha: EscolhaDeFimDeTemporada) => void;
+}) {
+  return (
+    <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
+      <h2 className="text-xl font-semibold">Propostas de fim de temporada</h2>
+      <p className="text-sm text-slate-400">Escolha renovar com {nomeClubeAtual} ou aceitar a proposta de outro clube antes de seguir pra próxima temporada.</p>
+
+      {propostas.renovacao && (
+        <CardDePropostaFimDeTemporada
+          titulo={`Renovar com ${nomeClubeAtual}`}
+          proposta={propostas.renovacao}
+          clubePorId={clubePorId}
+          destaque
+          onAceitar={() => onResponder({ tipo: "renovar" })}
+        />
+      )}
+
+      {propostas.propostas.length > 0 && (
+        <div className="flex flex-col gap-3 border-t border-slate-800 pt-4">
+          <h3 className="text-sm font-semibold text-slate-300">Propostas de outros clubes</h3>
+          {propostas.propostas.map((proposta) => (
+            <CardDePropostaFimDeTemporada
+              key={proposta.clubeOfertanteId}
+              titulo={nomeDoClube(clubePorId, proposta.clubeOfertanteId)}
+              proposta={proposta}
+              clubePorId={clubePorId}
+              onAceitar={() => onResponder({ tipo: "transferir", clubeOfertanteId: proposta.clubeOfertanteId })}
+            />
+          ))}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => onResponder({ tipo: "ficar_sem_assinar" })}
+        className="mt-2 rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-sm hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
+      >
+        Recusar tudo e continuar em {nomeClubeAtual}
+      </button>
+    </div>
+  );
+}
+
+function CardDePropostaFimDeTemporada({
+  titulo,
+  proposta,
+  clubePorId,
+  destaque,
+  onAceitar,
+}: {
+  titulo: string;
+  proposta: PropostaTransferencia;
+  clubePorId: Map<string, Club>;
+  destaque?: boolean;
+  onAceitar: () => void;
+}) {
+  const termos = proposta.propostaInicial;
+  return (
+    <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${destaque ? "bg-emerald-950/40 border-emerald-700" : "bg-slate-800/60 border-slate-700"}`}>
+      <div className="flex items-center gap-2 min-w-0">
+        <Escudo url={escudoDoClube(clubePorId, proposta.clubeOfertanteId)} alt={titulo} tamanho={22} />
+        <div className="min-w-0">
+          <div className="font-medium truncate">{titulo}</div>
+          <div className="text-xs text-slate-400">
+            {ROTULO_STATUS[proposta.statusOferecido]} · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
+          </div>
+        </div>
+      </div>
+      <button type="button" onClick={onAceitar} className="shrink-0 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-3 py-1.5 text-sm font-medium">
+        Aceitar
       </button>
     </div>
   );
