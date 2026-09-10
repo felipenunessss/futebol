@@ -52,6 +52,15 @@ export interface EstadoDeCarreira {
   pontosDisponiveis: number;
   /** Memória narrativa persistente entre cenários (ex: `"lesionado"`) — ver `progression/scenarios.ts` `Gatilho.requerBandeiras`/`excluiSeBandeiras` e `ImpactoCarreira.ativarBandeiras`/`desativarBandeiras`. */
   bandeirasNarrativas: string[];
+  /**
+   * Suspensão (cartão vermelho) ou lesão sofrida numa partida — ver `simulation/match.ts`/
+   * `simulation/live-match.ts` `IncidenteDeJogador`. Enquanto `partidasRestantes > 0`, o jogador não
+   * participa das partidas do clube atual (nenhuma chance/decisão pessoal — a partida roda como se
+   * fosse de qualquer outro clube, só com o placar valendo); `career/career-loop.ts` decrementa 1 a
+   * cada partida do clube que se passa (jogada ou não), até zerar. Ausente = nenhuma pendência.
+   * Sobrescreve (não soma) uma pendência anterior — uma nova lesão/suspensão substitui a anterior.
+   */
+  foraDeCombate?: { motivo: "suspensao" | "lesao"; partidasRestantes: number };
 }
 
 export interface OpcoesEstadoInicial {
@@ -326,7 +335,20 @@ export function aplicarImpactoDeCenario(
     reputacao: atualizado.reputacao,
     relacoesInternas: atualizado.relacoesInternas,
     bandeirasNarrativas: atualizado.bandeirasNarrativas,
+    foraDeCombate: impacto.foraDeCombate ?? estado.foraDeCombate,
   };
+}
+
+/**
+ * Consome 1 partida da suspensão/lesão ativa (`EstadoDeCarreira.foraDeCombate`) — chamado por
+ * `career/career-loop.ts` a cada partida do clube atual que se passa, jogada ou não pelo jogador (uma
+ * suspensão/lesão vale por partida do clube, não por partida assistida ao vivo). Sem pendência ativa,
+ * não faz nada; ao chegar a 0, remove a pendência (jogador liberado).
+ */
+export function consumirPartidaForaDeCombate(estado: EstadoDeCarreira): EstadoDeCarreira {
+  if (!estado.foraDeCombate) return estado;
+  const partidasRestantes = estado.foraDeCombate.partidasRestantes - 1;
+  return { ...estado, foraDeCombate: partidasRestantes > 0 ? { ...estado.foraDeCombate, partidasRestantes } : undefined };
 }
 
 /** Move o jogador pra outro clube sem negociação (`contratoAtual` não muda) — pra movimentações puramente narrativas. Pra uma transferência com contrato de verdade, ver `assinarContrato`. */

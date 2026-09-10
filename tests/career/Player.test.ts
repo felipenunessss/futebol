@@ -5,6 +5,7 @@ import {
   aplicarImpactoDeCenario,
   assinarContrato,
   avancarTemporada,
+  consumirPartidaForaDeCombate,
   criarEstadoInicial,
   ganharXp,
   investirPontos,
@@ -347,6 +348,45 @@ describe("aplicarImpactoDeCenario", () => {
 
     const recuperado = aplicarImpactoDeCenario(lesionado, { desativarBandeiras: ["lesionado"], narrativa: "x" });
     expect(recuperado.bandeirasNarrativas).toEqual([]);
+  });
+
+  it("aplica foraDeCombate a partir do impacto (suspensão/lesão de incidente de partida)", () => {
+    const estado = estadoBase();
+    expect(estado.foraDeCombate).toBeUndefined();
+
+    const suspenso = aplicarImpactoDeCenario(estado, { foraDeCombate: { motivo: "suspensao", partidasRestantes: 1 }, narrativa: "x" });
+    expect(suspenso.foraDeCombate).toEqual({ motivo: "suspensao", partidasRestantes: 1 });
+  });
+
+  it("sem foraDeCombate no impacto, preserva a pendência já existente (não some sozinha)", () => {
+    const estado = { ...estadoBase(), foraDeCombate: { motivo: "lesao" as const, partidasRestantes: 3 } };
+    const depois = aplicarImpactoDeCenario(estado, { moral: 1, narrativa: "x" });
+    expect(depois.foraDeCombate).toEqual({ motivo: "lesao", partidasRestantes: 3 });
+  });
+
+  it("um novo foraDeCombate SOBRESCREVE o anterior, não soma", () => {
+    const estado = { ...estadoBase(), foraDeCombate: { motivo: "lesao" as const, partidasRestantes: 5 } };
+    const depois = aplicarImpactoDeCenario(estado, { foraDeCombate: { motivo: "suspensao", partidasRestantes: 1 }, narrativa: "x" });
+    expect(depois.foraDeCombate).toEqual({ motivo: "suspensao", partidasRestantes: 1 });
+  });
+});
+
+describe("consumirPartidaForaDeCombate", () => {
+  it("sem pendência ativa, não faz nada", () => {
+    const estado = estadoBase();
+    expect(consumirPartidaForaDeCombate(estado)).toBe(estado);
+  });
+
+  it("decrementa 1 partida da pendência ativa", () => {
+    const estado = { ...estadoBase(), foraDeCombate: { motivo: "suspensao" as const, partidasRestantes: 2 } };
+    const depois = consumirPartidaForaDeCombate(estado);
+    expect(depois.foraDeCombate).toEqual({ motivo: "suspensao", partidasRestantes: 1 });
+  });
+
+  it("ao chegar a 0, remove a pendência (jogador liberado)", () => {
+    const estado = { ...estadoBase(), foraDeCombate: { motivo: "suspensao" as const, partidasRestantes: 1 } };
+    const depois = consumirPartidaForaDeCombate(estado);
+    expect(depois.foraDeCombate).toBeUndefined();
   });
 });
 

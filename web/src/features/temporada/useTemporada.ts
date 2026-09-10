@@ -32,9 +32,13 @@ import type { PropostaTransferencia, TermosDeContrato } from "@motor/market/tran
  * porque uma temporada web pode ter dezenas de partidas do próprio clube pra assistir. */
 const MS_POR_MINUTO_AO_VIVO = 90;
 
-/** Mesmos subtipos de finalização de `progression/xp.ts` (não exportado de lá) — os únicos que
- * viram gol quando bem-sucedidos; os demais (passe/desarme decisivo) são assistência/desarme. */
-const SUBTIPOS_DE_GOL = new Set<SubtipoChance>(["voleio", "cabeceio", "chute_de_fora", "jogada_individual"]);
+/** TODOS os subtipos de chance do jogador viram gol quando `sucesso` — o motor (`match.ts`/
+ * `live-match.ts`) incrementa o placar incondicionalmente em qualquer chance bem-sucedida, sem
+ * distinguir subtipo (uma assistência ou um desarme decisivo bem-sucedidos são, mecanicamente, tão
+ * gol quanto um voleio). Faltava "passe_decisivo"/"desarme_decisivo" aqui antes, e o placar ao vivo
+ * ficava sem contar esse gol até o apito final corrigir — mesmo a narração já dizendo "Assistência
+ * sua!"/"Desarme decisivo seu!" no momento. */
+const SUBTIPOS_DE_GOL = new Set<SubtipoChance>(["voleio", "cabeceio", "chute_de_fora", "jogada_individual", "passe_decisivo", "desarme_decisivo"]);
 
 /**
  * Orquestra a temporada jogada semana a semana — espelha o fluxo de
@@ -134,6 +138,11 @@ export type ResultadoDaRodadaExibido =
 export interface AnimacaoDeEscolhaPendente {
   cenarioResolvido: CenarioResolvidoNaTemporada;
   indiceResultado: number;
+  /** "cenario" = cenário de carreira fora de campo (resultado vai pro feed geral ao concluir, ver
+   * `concluirAnimacaoDeEscolha`); "incidente" = incidente de partida ao vivo (cartão/lesão) — já foi
+   * narrado direto em `partidaAoVivo.eventos` quando aconteceu, então concluir só fecha a animação,
+   * sem duplicar no feed geral. Padrão "cenario" (mantém o comportamento já existente). */
+  origem?: "cenario" | "incidente";
 }
 
 /** Jogo do próprio clube "desta semana" pro calendário lateral — criado quando o menu pré-jogo chega (`escolherModoDePartida`) e completado com o placar quando o resultado sai (`onPartidaPontosCorridos`/`onPartidaMataMata`). `undefined` = sem jogo do clube nesta semana (ou ainda não se sabe). */
@@ -330,8 +339,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Chamado pela própria `PainelAnimacaoDeEscolha` quando o timer da animação termina (não é clique do jogador) — só então o resultado entra de fato no feed. */
   function concluirAnimacaoDeEscolha(): void {
     if (!animacaoDeEscolha) return;
-    const { cenarioResolvido } = animacaoDeEscolha;
-    pushEvento({ tipo: "cenario", cenario: cenarioResolvido.cenario, opcao: cenarioResolvido.escolha.opcao, narrativa: cenarioResolvido.escolha.resultado.impacto.narrativa });
+    const { cenarioResolvido, origem } = animacaoDeEscolha;
+    if (origem !== "incidente") {
+      pushEvento({ tipo: "cenario", cenario: cenarioResolvido.cenario, opcao: cenarioResolvido.escolha.opcao, narrativa: cenarioResolvido.escolha.resultado.impacto.narrativa });
+    }
     setAnimacaoDeEscolha(undefined);
   }
 
@@ -420,12 +431,26 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           golsFora: atual.golsFora + (fezGol && atual.ladoDoJogador === "fora" ? 1 : 0),
         };
       }
-      if (evento.tipo === "evento_de_contexto") {
+      if (evento.tipo === "evento_de_contexto" || evento.tipo === "incidente_jogador") {
         return { ...atual, eventos, minutoAtual: evento.minuto };
       }
       // apito_final — placar oficial substitui qualquer contagem aproximada feita ao vivo.
       return { ...atual, eventos, minutoAtual: 90, golsCasa: evento.golsCasa, golsFora: evento.golsFora };
     });
+
+    // Reaproveita a mesma animação de "spin" dos cenários de carreira fora de campo (`onCenarioResolvido`
+    // abaixo) pra revelar cartão/lesão — diferente de `evento_de_contexto` (uma escolha interativa do
+    // jogador, sem suspense de resultado), aqui o desfecho já é 100% automático/sorteado, então faz
+    // sentido girar entre as possibilidades antes de mostrar qual aconteceu de verdade.
+    if (evento.tipo === "incidente_jogador") {
+      const cenario: Cenario = { id: "incidente_de_jogo", titulo: "Lance de jogo", descricao: "", opcoes: [evento.escolha.opcao] };
+      const indiceResultado = evento.escolha.opcao.resultados.indexOf(evento.escolha.resultado);
+      setAnimacaoDeEscolha({
+        cenarioResolvido: { periodo: "", momento: "temporada_regular", cenario, escolha: evento.escolha },
+        indiceResultado,
+        origem: "incidente",
+      });
+    }
   }
 
   async function jogarTemporada(): Promise<void> {

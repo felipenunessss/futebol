@@ -717,6 +717,52 @@ describe("jogarTemporadaSemanal", () => {
   });
 });
 
+describe("suspensão/lesão de partida (foraDeCombate)", () => {
+  it("cartão vermelho ao vivo tira o jogador da(s) próxima(s) partida(s) do clube — escolherModoDePartida não é chamado pra elas", async () => {
+    const times = ["a", "b", "c", "d"];
+    const numerosDePartida: number[] = [];
+    const tiposDeIncidente: string[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      // Sempre no topo da faixa — força cartão vermelho toda vez que o jogador de fato participa (ver
+      // simulation/match.ts sortearIncidenteDeJogador: random alto = incidente, nunca "nada aconteceu").
+      random: () => 0.999,
+      msPorMinutoAoVivo: 0,
+      escolherModoDePartida: (contexto) => {
+        numerosDePartida.push(contexto.numeroDaPartida);
+        return "ao_vivo";
+      },
+      onEventoAoVivo: (evento) => {
+        if (evento.tipo === "incidente_jogador") tiposDeIncidente.push(evento.incidente.tipo);
+      },
+    });
+
+    expect(tiposDeIncidente.length).toBeGreaterThan(0);
+    expect(tiposDeIncidente[0]).toBe("cartao_vermelho");
+    // campeonatoDeTeste tem 6 rodadas — sem suspensão, escolherModoDePartida seria chamado 1x por
+    // rodada (6x). Com suspensão funcionando (1 partida de fora a cada vermelho, e vermelho sempre
+    // acontece de novo assim que ele volta), pelo menos 1 rodada é pulada silenciosamente (nenhuma
+    // chamada), então o total fica visivelmente menor que 6.
+    expect(numerosDePartida.length).toBeLessThan(6);
+  });
+
+  it("sem incidente (random baixo), o jogador nunca fica de fora — escolherModoDePartida é chamado em toda rodada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const numerosDePartida: number[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      msPorMinutoAoVivo: 0,
+      escolherModoDePartida: (contexto) => {
+        numerosDePartida.push(contexto.numeroDaPartida);
+        return "ao_vivo";
+      },
+    });
+
+    expect(numerosDePartida.length).toBe(6);
+  });
+});
+
 describe("jogarCarreira", () => {
   it("encadeia N temporadas, uma alimentando a próxima", async () => {
     const times = ["a", "b", "c", "d"];

@@ -66,6 +66,82 @@ export interface ChanceJogador {
   atributoUsado: Atributo;
 }
 
+/**
+ * Um incidente sério com o jogador durante a partida — cartão (amarelo é só narrativo, sem
+ * consequência real; vermelho tira o jogador de campo e rende suspensão) ou lesão (também tira o
+ * jogador de campo, com tempo de recuperação variando por gravidade). Ver `career/Player.ts`
+ * `EstadoDeCarreira.foraDeCombate` pra como isso vira uma pendência real de partidas fora.
+ */
+export type IncidenteDeJogador =
+  | { tipo: "cartao_amarelo" }
+  | { tipo: "cartao_vermelho" }
+  | { tipo: "lesao"; gravidade: "leve" | "media" | "grave"; partidasFora: number };
+
+/** Cartão vermelho e lesão tiram o jogador do resto da partida (ver `IncidenteDeJogador`) — usado por
+ * `simularPartida`/`live-match.ts` pra saber se um incidente encerra a participação dele. */
+export function incidenteEncerraParticipacao(incidente: IncidenteDeJogador): boolean {
+  return incidente.tipo === "cartao_vermelho" || incidente.tipo === "lesao";
+}
+
+/** Suspensão de cartão vermelho é sempre 1 partida (regra fixa) — lesão varia por gravidade. */
+const PARTIDAS_DE_SUSPENSAO_CARTAO_VERMELHO = 1;
+
+/** Probabilidade de CADA incidente, por partida em que o jogador participa (checado uma vez por
+ * partida, não por chance) — estimativas de design: cartão amarelo comum o bastante pra aparecer de
+ * vez em quando sem virar rotina; vermelho e lesão bem mais raros, já que ambos tiram o jogador de
+ * partidas futuras (consequência real, não só narrativa). Mutuamente exclusivos entre si (um só
+ * incidente por partida, o mais grave prevalece no sorteio). */
+export const PROBABILIDADE_CARTAO_VERMELHO = 0.015;
+export const PROBABILIDADE_LESAO = 0.02;
+export const PROBABILIDADE_CARTAO_AMARELO = 0.12;
+
+/** Faixas de gravidade de lesão — pesos relativos (não precisam somar 1) e intervalo de partidas fora
+ * (inclusivo) por faixa. A maioria das lesões é leve; grave é raro de propósito. */
+const FAIXAS_DE_GRAVIDADE_DE_LESAO: { gravidade: "leve" | "media" | "grave"; peso: number; min: number; max: number }[] = [
+  { gravidade: "leve", peso: 0.6, min: 1, max: 3 },
+  { gravidade: "media", peso: 0.3, min: 4, max: 8 },
+  { gravidade: "grave", peso: 0.1, min: 9, max: 16 },
+];
+
+function sortearGravidadeDeLesao(random: () => number): { gravidade: "leve" | "media" | "grave"; partidasFora: number } {
+  const totalPeso = FAIXAS_DE_GRAVIDADE_DE_LESAO.reduce((soma, faixa) => soma + faixa.peso, 0);
+  let alvo = random() * totalPeso;
+  for (const faixa of FAIXAS_DE_GRAVIDADE_DE_LESAO) {
+    if (alvo < faixa.peso) return { gravidade: faixa.gravidade, partidasFora: faixa.min + Math.floor(random() * (faixa.max - faixa.min + 1)) };
+    alvo -= faixa.peso;
+  }
+  const ultima = FAIXAS_DE_GRAVIDADE_DE_LESAO[FAIXAS_DE_GRAVIDADE_DE_LESAO.length - 1];
+  return { gravidade: ultima.gravidade, partidasFora: ultima.min };
+}
+
+/**
+ * Sorteia se ALGUM incidente acontece com o jogador nesta partida — chamado no máximo 1 vez por
+ * partida (não por chance), só quando o jogador está participando. `undefined` é o caso comum (nenhum
+ * incidente). Cartão vermelho e lesão competem entre si (o sorteio resolve os dois num intervalo só,
+ * como fatias mutuamente exclusivas) antes de cartão amarelo, mas a ORDEM não importa pra quem chama —
+ * só o resultado final, com no máximo 1 incidente por partida.
+ *
+ * De propósito, `random()` BAIXO (perto de 0) sempre cai em "nada aconteceu" — mesma convenção do
+ * resto do motor (`resolverDuelo`: `random()` baixo favorece o lado "A"/sucesso), inclusive em vários
+ * testes que usam `() => 0` como "sempre dá certo, sem surpresa". Só valores ALTOS (perto de 1) caem
+ * nos incidentes de verdade, do mais raro (vermelho) ao mais comum (amarelo).
+ */
+export function sortearIncidenteDeJogador(random: () => number = Math.random): IncidenteDeJogador | undefined {
+  const r = random();
+  if (r >= 1 - PROBABILIDADE_CARTAO_VERMELHO) return { tipo: "cartao_vermelho" };
+  if (r >= 1 - PROBABILIDADE_CARTAO_VERMELHO - PROBABILIDADE_LESAO) return { tipo: "lesao", ...sortearGravidadeDeLesao(random) };
+  if (r >= 1 - PROBABILIDADE_CARTAO_VERMELHO - PROBABILIDADE_LESAO - PROBABILIDADE_CARTAO_AMARELO) return { tipo: "cartao_amarelo" };
+  return undefined;
+}
+
+/** Converte um `IncidenteDeJogador` na pendência de `career/Player.ts` `EstadoDeCarreira.foraDeCombate`
+ * — `undefined` pra cartão amarelo (sem consequência real, só narrativo). */
+export function foraDeCombatePorIncidente(incidente: IncidenteDeJogador): { motivo: "suspensao" | "lesao"; partidasRestantes: number } | undefined {
+  if (incidente.tipo === "cartao_vermelho") return { motivo: "suspensao", partidasRestantes: PARTIDAS_DE_SUSPENSAO_CARTAO_VERMELHO };
+  if (incidente.tipo === "lesao") return { motivo: "lesao", partidasRestantes: incidente.partidasFora };
+  return undefined;
+}
+
 /** Converte um atributo (0-99) numa força comparável à escala de rating dos times (~1000-2000). Exportado pra `simulation/live-match.ts` reaproveitar. */
 export function forcaDoAtributo(valor: number): number {
   return 1000 + valor * 10;
@@ -149,6 +225,8 @@ export interface ResultadoPartida {
   chancesFora: number;
   /** Só as chances de ataque resolvidas individualmente pelo jogador (vazio se `participacaoJogador` não foi passado, ou nenhuma chance caiu pra ele). */
   chancesJogador: ChanceJogador[];
+  /** Incidente sorteado com o jogador nesta partida (ver `sortearIncidenteDeJogador`) — `undefined` no caso comum (nada aconteceu), sempre `undefined` se `participacaoJogador` não foi passado. */
+  incidenteJogador?: IncidenteDeJogador;
 }
 
 /**
@@ -180,13 +258,28 @@ export function simularPartida(
   const chancesFora = totalChances - chancesCasa;
   const chancesJogador: ChanceJogador[] = [];
 
+  // Incidente (cartão/lesão) sorteado no máximo 1 vez por partida, só quando o jogador participa —
+  // cartão vermelho/lesão escolhem um índice aleatório (dentre as chances do lado dele) a partir do
+  // qual ele já não recebe mais chance pessoal nenhuma (saiu de campo); as chances daquele ponto em
+  // diante do time dele voltam a ser resolvidas de forma anônima, como se fosse qualquer outro clube.
+  let incidenteJogador: IncidenteDeJogador | undefined;
+  let indiceDeSaidaDoJogador: number | undefined;
+  if (participacaoJogador) {
+    incidenteJogador = sortearIncidenteDeJogador(random);
+    if (incidenteJogador && incidenteEncerraParticipacao(incidenteJogador)) {
+      const quantidadeDoLado = participacaoJogador.lado === "casa" ? chancesCasa : chancesFora;
+      indiceDeSaidaDoJogador = Math.floor(random() * quantidadeDoLado);
+    }
+  }
+
   function resolverChancesDoTime(quantidade: number, perfilAtacante: PerfilTime, perfilDefensor: PerfilTime, lado: "casa" | "fora"): number {
-    const pesoJogador =
-      participacaoJogador?.lado === lado ? PESO_ENVOLVIMENTO_ATAQUE[participacaoJogador.jogador.posicao] : 0;
+    const ehLadoDoJogador = participacaoJogador?.lado === lado;
+    const pesoJogador = ehLadoDoJogador ? PESO_ENVOLVIMENTO_ATAQUE[participacaoJogador!.jogador.posicao] : 0;
 
     let gols = 0;
     for (let i = 0; i < quantidade; i++) {
-      if (pesoJogador > 0 && random() < pesoJogador) {
+      const aindaEmCampo = !ehLadoDoJogador || indiceDeSaidaDoJogador === undefined || i < indiceDeSaidaDoJogador;
+      if (pesoJogador > 0 && aindaEmCampo && random() < pesoJogador) {
         const chance = resolverChanceJogador(participacaoJogador!.jogador, participacaoJogador!.estiloTecnico, perfilDefensor.defesa, random);
         chancesJogador.push(chance);
         if (chance.sucesso) gols++;
@@ -200,7 +293,7 @@ export function simularPartida(
   const golsCasa = resolverChancesDoTime(chancesCasa, perfilCasa, perfilFora, "casa");
   const golsFora = resolverChancesDoTime(chancesFora, perfilFora, perfilCasa, "fora");
 
-  return { golsCasa, golsFora, chancesCasa, chancesFora, chancesJogador };
+  return { golsCasa, golsFora, chancesCasa, chancesFora, chancesJogador, incidenteJogador };
 }
 
 /**

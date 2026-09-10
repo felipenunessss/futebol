@@ -5,7 +5,7 @@ import { construirCalendarioPadrao } from "../data/loaders/calendario.js";
 import { simularTemporada, type CampeonatoSimulavel, type EventosSimulacaoTemporada, type ResultadoTemporada } from "../simulation/engine.js";
 import type { EventoConfrontoMataMata } from "../simulation/knockout.js";
 import type { EventoConfrontoPontosCorridos, LinhaTabela } from "../simulation/season.js";
-import { resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "../simulation/match.js";
+import { foraDeCombatePorIncidente, resolverPartidaPadrao, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "../simulation/match.js";
 import { jogarPartidaAoVivo, type ContextoDecisaoChance, type EventoAoVivo, type ResultadoDecisaoChance } from "../simulation/live-match.js";
 import type { EstiloTecnico } from "../simulation/tactics.js";
 import { obterRating } from "../simulation/rating.js";
@@ -34,7 +34,7 @@ import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressado
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
 import { evoluirStatus, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
-import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
+import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, consumirPartidaForaDeCombate, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
@@ -941,15 +941,35 @@ export async function jogarTemporadaSemanal(
     partidasComNota++;
   }
 
+  /** Aplica o `incidenteJogador` (cartão vermelho/lesão — ver `simulation/match.ts`) de uma partida
+   * recém-resolvida direto em `estadoAtual`, sem esperar o lote de `impactosDePartidaAoVivo` no fim da
+   * função — precisa valer JÁ pra próxima partida do clube (`resolverPartida` abaixo checa
+   * `estadoAtual.foraDeCombate` a cada chamada), diferente dos impactos narrativos de
+   * `progression/match-events.ts` (moral/relações), que não têm essa urgência. */
+  function aplicarIncidenteAoEstado(resultado: ResultadoPartida): void {
+    if (!resultado.incidenteJogador) return;
+    const foraDeCombate = foraDeCombatePorIncidente(resultado.incidenteJogador);
+    if (foraDeCombate) estadoAtual = { ...estadoAtual, foraDeCombate };
+  }
+
   const resolverPartida: ResolverPartida = async (perfilCasa, perfilFora, randomDaPartida, participacao, contexto) => {
-    if (!participacao || !escolherModoDePartida) {
-      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
+    // Suspensão/lesão ativa consome 1 partida do clube SEMPRE que ele joga (jogada ou não pelo
+    // jogador, assistida ao vivo ou simulada rápido) — enquanto ativa, o jogador fica de fora (nenhuma
+    // chance/decisão pessoal nessa partida, ela roda como se fosse de qualquer outro clube).
+    const estavaForaDeCombate = participacao !== undefined && (estadoAtual.foraDeCombate?.partidasRestantes ?? 0) > 0;
+    if (participacao) estadoAtual = consumirPartidaForaDeCombate(estadoAtual);
+    const participacaoEfetiva = estavaForaDeCombate ? undefined : participacao;
+
+    if (!participacaoEfetiva || !escolherModoDePartida) {
+      const resultado = await resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacaoEfetiva);
+      aplicarIncidenteAoEstado(resultado);
+      return resultado;
     }
 
     numeroDaPartidaDoJogador++;
     const modo = await escolherModoDePartida({
       numeroDaPartida: numeroDaPartidaDoJogador,
-      lado: participacao.lado,
+      lado: participacaoEfetiva.lado,
       mandanteId: contexto?.mandanteId ?? "",
       visitanteId: contexto?.visitanteId ?? "",
       semana: semanaAtualParaContexto,
@@ -957,10 +977,12 @@ export async function jogarTemporadaSemanal(
     });
 
     if (modo !== "ao_vivo") {
-      return resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacao);
+      const resultado = await resolverPartidaPadrao(perfilCasa, perfilFora, randomDaPartida, participacaoEfetiva);
+      aplicarIncidenteAoEstado(resultado);
+      return resultado;
     }
 
-    const { resultado, impactosDeContexto } = await jogarPartidaAoVivo(perfilCasa, perfilFora, randomDaPartida, participacao, {
+    const { resultado, impactosDeContexto } = await jogarPartidaAoVivo(perfilCasa, perfilFora, randomDaPartida, participacaoEfetiva, {
       decidirChance: decidirChanceAoVivo,
       decidirEventoDeContexto: decidirEventoDePartida,
       onEvento: onEventoAoVivo,
@@ -968,6 +990,7 @@ export async function jogarTemporadaSemanal(
       maxEventosDeContexto: maxEventosDeContextoAoVivo,
     });
     impactosDePartidaAoVivo.push(...impactosDeContexto);
+    aplicarIncidenteAoEstado(resultado);
     return resultado;
   };
 

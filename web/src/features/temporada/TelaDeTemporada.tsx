@@ -157,6 +157,14 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           </button>
         </div>
       )}
+      {estadoAtual.foraDeCombate && (
+        <div className="fixed top-4 right-4 z-20 flex items-center gap-2 rounded-full bg-red-950/95 border border-red-800 shadow-xl px-4 py-2 text-xs backdrop-blur">
+          <span className="text-red-300 font-medium">
+            {estadoAtual.foraDeCombate.motivo === "suspensao" ? "Suspenso" : "Lesionado"} —{" "}
+            {estadoAtual.foraDeCombate.partidasRestantes > 1 ? `faltam ${estadoAtual.foraDeCombate.partidasRestantes} partidas` : "falta 1 partida"} do clube
+          </span>
+        </div>
+      )}
       {competicoesDoJogador.length > 0 && (
         <PainelDeCompeticoes
           competicoesDoJogador={competicoesDoJogador}
@@ -949,6 +957,12 @@ function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: Evento
     case "evento_de_contexto":
       return (
         <p>
+          {evento.minuto}' {evento.escolha.resultado.impacto.narrativa}
+        </p>
+      );
+    case "incidente_jogador":
+      return (
+        <p className={evento.incidente.tipo === "cartao_vermelho" || evento.incidente.tipo === "lesao" ? "text-red-400 font-medium" : ""}>
           {evento.minuto}' {evento.escolha.resultado.impacto.narrativa}
         </p>
       );

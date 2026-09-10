@@ -7,14 +7,18 @@ import {
   PESO_ENVOLVIMENTO_ATAQUE,
   VANTAGEM_MAXIMA_DE_MEIO,
   forcaDoAtributo,
+  incidenteEncerraParticipacao,
   probabilidadeDeDuelo,
   probabilidadeDeVencer,
   resolverDuelo,
+  sortearIncidenteDeJogador,
   type ChanceJogador,
+  type IncidenteDeJogador,
   type ParticipacaoJogador,
   type PerfilTime,
   type ResultadoPartida,
 } from "./match.js";
+import { escolhaResolvidaDoIncidente } from "./incidente-de-jogador.js";
 
 /**
  * Motor de partida "ao vivo" — mesma matemática de `simulation/match.ts`
@@ -64,6 +68,7 @@ export type EventoAoVivo =
   | { tipo: "chance_generica"; minuto: number; lado: "casa" | "fora"; gol: boolean; probabilidade: number }
   | { tipo: "chance_jogador"; minuto: number; chance: ChanceJogador; probabilidade: number }
   | { tipo: "evento_de_contexto"; minuto: number; cenario: Cenario; escolha: EscolhaResolvida }
+  | { tipo: "incidente_jogador"; minuto: number; incidente: IncidenteDeJogador; escolha: EscolhaResolvida }
   | { tipo: "apito_final"; golsCasa: number; golsFora: number };
 
 export interface OpcoesPartidaAoVivo {
@@ -97,9 +102,9 @@ export interface OpcoesPartidaAoVivo {
 }
 
 export interface ResultadoPartidaAoVivo {
-  /** Mesmo formato de `simularPartida` — pra quem orquestra o confronto (`simulation/season.ts`/`knockout.ts`) não precisar saber que essa partida foi ao vivo. */
+  /** Mesmo formato de `simularPartida` — pra quem orquestra o confronto (`simulation/season.ts`/`knockout.ts`) não precisar saber que essa partida foi ao vivo. Inclui `incidenteJogador` (ver `simulation/match.ts`) quando aplicável. */
   resultado: ResultadoPartida;
-  /** Impacto de cada evento de contexto resolvido durante a partida, na ordem em que aconteceram — o motor de partida não tem acesso ao estado de carreira (moral/relações internas), então quem chama (`career/career-loop.ts`) aplica isso no estado depois. */
+  /** Impacto de cada evento de contexto resolvido durante a partida, na ordem em que aconteceram — o motor de partida não tem acesso ao estado de carreira (moral/relações internas), então quem chama (`career/career-loop.ts`) aplica isso no estado depois. NÃO inclui o impacto do incidente de jogador (cartão/lesão) — esse já vem embutido em `resultado.incidenteJogador`, aplicado separadamente por quem chama via `foraDeCombatePorIncidente`. */
   impactosDeContexto: ImpactoCarreira[];
 }
 
@@ -116,7 +121,11 @@ interface SlotDeEvento {
   tipo: "evento";
   minuto: number;
 }
-type Slot = SlotDeChance | SlotDeEvento;
+interface SlotDeIncidente {
+  tipo: "incidente";
+  minuto: number;
+}
+type Slot = SlotDeChance | SlotDeEvento | SlotDeIncidente;
 
 /** Teto de eventos de contexto candidatos por partida (não é a quantidade real — ver `PROBABILIDADE_DE_EVENTO_DE_CONTEXTO`). Um pouco mais alto que "quantidade típica" de propósito, pra deixar espaço pra partidas raras e mais eventadas. */
 const MAX_EVENTOS_DE_CONTEXTO_PADRAO = 3;
@@ -159,12 +168,25 @@ export async function jogarPartidaAoVivo(
     }
   }
 
+  // No máximo 1 slot de incidente (cartão/lesão) por partida, só quando o jogador participa — a
+  // probabilidade de algo REALMENTE acontecer já está embutida em `sortearIncidenteDeJogador` (a
+  // maioria das vezes não acontece nada, e nesse caso nem narra); o slot só marca ONDE na linha do
+  // tempo o sorteio acontece.
+  if (participacaoJogador) {
+    slots.push({ tipo: "incidente", minuto: 1 + Math.floor(random() * MINUTOS_NA_PARTIDA) });
+  }
+
   slots.sort((a, b) => a.minuto - b.minuto);
 
   let golsCasa = 0;
   let golsFora = 0;
   const chancesJogador: ChanceJogador[] = [];
   const impactosDeContexto: ImpactoCarreira[] = [];
+  let incidenteJogador: IncidenteDeJogador | undefined;
+  // Vira `false` assim que um incidente que encerra a participação (cartão vermelho/lesão) acontece —
+  // a partir daí, as chances que cairiam pro jogador voltam a ser resolvidas de forma anônima, como se
+  // fosse qualquer outro clube (ele já saiu de campo).
+  let jogadorAindaEmCampo = true;
   let minutoAnterior = 0;
 
   for (const slot of slots) {
@@ -180,10 +202,22 @@ export async function jogarPartidaAoVivo(
       continue;
     }
 
+    if (slot.tipo === "incidente") {
+      if (!jogadorAindaEmCampo) continue; // já saiu de campo antes — não pode ter 2º incidente na mesma partida
+      const incidente = sortearIncidenteDeJogador(random);
+      if (!incidente) continue; // caso comum: nada aconteceu, não narra nada
+      incidenteJogador = incidente;
+      if (incidenteEncerraParticipacao(incidente)) jogadorAindaEmCampo = false;
+      const escolha = escolhaResolvidaDoIncidente(incidente);
+      await onEvento?.({ tipo: "incidente_jogador", minuto: slot.minuto, incidente, escolha });
+      continue;
+    }
+
     const { lado } = slot;
     const perfilAtacante = lado === "casa" ? perfilCasa : perfilFora;
     const perfilDefensor = lado === "casa" ? perfilFora : perfilCasa;
-    const pesoJogador = participacaoJogador?.lado === lado ? PESO_ENVOLVIMENTO_ATAQUE[participacaoJogador.jogador.posicao] : 0;
+    const ehLadoDoJogador = participacaoJogador?.lado === lado && jogadorAindaEmCampo;
+    const pesoJogador = ehLadoDoJogador ? PESO_ENVOLVIMENTO_ATAQUE[participacaoJogador!.jogador.posicao] : 0;
     const ehDoJogador = pesoJogador > 0 && random() < pesoJogador;
 
     if (ehDoJogador) {
@@ -223,7 +257,7 @@ export async function jogarPartidaAoVivo(
   await onEvento?.({ tipo: "apito_final", golsCasa, golsFora });
 
   return {
-    resultado: { golsCasa, golsFora, chancesCasa, chancesFora, chancesJogador },
+    resultado: { golsCasa, golsFora, chancesCasa, chancesFora, chancesJogador, incidenteJogador },
     impactosDeContexto,
   };
 }

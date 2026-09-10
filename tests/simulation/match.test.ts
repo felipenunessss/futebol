@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import {
+  foraDeCombatePorIncidente,
   gerarPerfilTime,
+  incidenteEncerraParticipacao,
   probabilidadeDeVencer,
   resolverChanceJogador,
   simularPartida,
+  sortearIncidenteDeJogador,
   type ParticipacaoJogador,
   type PerfilTime,
 } from "../../src/simulation/match.js";
@@ -117,6 +120,96 @@ describe("simularPartida", () => {
 
     expect(resultado.chancesJogador).toHaveLength(resultado.chancesFora);
     expect(resultado.golsFora).toBe(resultado.chancesFora);
+  });
+
+  it("cartão vermelho logo no início da partida tira o jogador do resto do jogo (nenhuma chance pessoal)", () => {
+    const finalizador = buscarArquetipo("finalizador");
+    const artilheiro: Jogador = {
+      id: "j1",
+      nome: "Artilheiro Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 24,
+      atributos: { finalizacao: 90, frieza: 80, posicionamento_ofensivo: 80 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador: artilheiro, estiloTecnico: "equilibrado" };
+
+    let chamada = 0;
+    // 1ª chamada (sorteio de incidente) força cartão vermelho (random alto); a 2ª (índice de saída)
+    // e todas as seguintes (resolução de duelo) ficam no mínimo — jogador sai antes da 1ª chance dele.
+    const random = () => (chamada++ === 0 ? 0.999 : 0);
+
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, random, participacao);
+
+    expect(resultado.incidenteJogador).toEqual({ tipo: "cartao_vermelho" });
+    expect(resultado.chancesJogador).toEqual([]);
+  });
+
+  it("sem incidente (random baixo), o jogador continua recebendo chances normalmente", () => {
+    const finalizador = buscarArquetipo("finalizador");
+    const artilheiro: Jogador = {
+      id: "j1",
+      nome: "Artilheiro Teste",
+      posicao: "atacante",
+      arquetipo_id: finalizador.id,
+      idade: 24,
+      atributos: { finalizacao: 90, frieza: 80, posicionamento_ofensivo: 80 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador: artilheiro, estiloTecnico: "equilibrado" };
+
+    const resultado = simularPartida(perfilNeutro, perfilNeutro, () => 0, participacao);
+
+    expect(resultado.incidenteJogador).toBeUndefined();
+    expect(resultado.chancesJogador).toHaveLength(resultado.chancesCasa);
+  });
+});
+
+describe("sortearIncidenteDeJogador", () => {
+  it("random baixo (perto de 0) nunca gera incidente", () => {
+    expect(sortearIncidenteDeJogador(() => 0)).toBeUndefined();
+    expect(sortearIncidenteDeJogador(() => 0.5)).toBeUndefined();
+  });
+
+  it("random bem alto gera cartão vermelho", () => {
+    expect(sortearIncidenteDeJogador(() => 0.999)).toEqual({ tipo: "cartao_vermelho" });
+  });
+
+  it("faixa intermediária alta gera lesão, com gravidade e partidasFora dentro do esperado", () => {
+    let chamada = 0;
+    const random = () => (chamada++ === 0 ? 0.97 : 0.05); // cai na faixa de lesão; 2ª chamada sorteia a gravidade (baixa = leve)
+    const incidente = sortearIncidenteDeJogador(random);
+    expect(incidente?.tipo).toBe("lesao");
+    if (incidente?.tipo === "lesao") {
+      expect(incidente.gravidade).toBe("leve");
+      expect(incidente.partidasFora).toBeGreaterThanOrEqual(1);
+      expect(incidente.partidasFora).toBeLessThanOrEqual(3);
+    }
+  });
+
+  it("faixa mais alta, mas fora das de vermelho/lesão, gera cartão amarelo", () => {
+    expect(sortearIncidenteDeJogador(() => 0.9)).toEqual({ tipo: "cartao_amarelo" });
+  });
+});
+
+describe("incidenteEncerraParticipacao", () => {
+  it("cartão vermelho e lesão encerram participação; cartão amarelo não", () => {
+    expect(incidenteEncerraParticipacao({ tipo: "cartao_vermelho" })).toBe(true);
+    expect(incidenteEncerraParticipacao({ tipo: "lesao", gravidade: "leve", partidasFora: 2 })).toBe(true);
+    expect(incidenteEncerraParticipacao({ tipo: "cartao_amarelo" })).toBe(false);
+  });
+});
+
+describe("foraDeCombatePorIncidente", () => {
+  it("cartão vermelho sempre vira 1 partida de suspensão", () => {
+    expect(foraDeCombatePorIncidente({ tipo: "cartao_vermelho" })).toEqual({ motivo: "suspensao", partidasRestantes: 1 });
+  });
+
+  it("lesão vira partidasRestantes igual ao que foi sorteado", () => {
+    expect(foraDeCombatePorIncidente({ tipo: "lesao", gravidade: "grave", partidasFora: 12 })).toEqual({ motivo: "lesao", partidasRestantes: 12 });
+  });
+
+  it("cartão amarelo não gera nenhuma pendência", () => {
+    expect(foraDeCombatePorIncidente({ tipo: "cartao_amarelo" })).toBeUndefined();
   });
 });
 

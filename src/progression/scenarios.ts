@@ -39,6 +39,13 @@ export interface ImpactoCarreira {
   ativarBandeiras?: string[];
   /** Desliga bandeiras narrativas — ver `ativarBandeiras`. Idempotente. */
   desativarBandeiras?: string[];
+  /**
+   * Coloca o jogador fora de combate por N partidas (suspensão de cartão vermelho ou lesão) — ver
+   * `career/Player.ts` `EstadoDeCarreira.foraDeCombate`. Usado pelos incidentes automáticos de partida
+   * (`simulation/match.ts`/`simulation/live-match.ts` `IncidenteDeJogador`), não pelo catálogo geral de
+   * cenários fora de campo. Sobrescreve (não soma) uma pendência anterior.
+   */
+  foraDeCombate?: { motivo: "suspensao" | "lesao"; partidasRestantes: number };
   /** Texto livre descrevendo o desfecho, pra mostrar ao jogador. */
   narrativa: string;
 }
