@@ -167,17 +167,23 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           onDesligarTreinoAutomatico={temporada.desligarTreinoAutomatico}
         />
 
-        {/* Enquanto a animação de escolha ou a tela de resultados da rodada estão abertas, nenhum
-            outro prompt aparece — o motor já resolveu tudo (não está pausado por causa disso), é só
-            a UI que segura a revelação (ver `useTemporada.ts`). */}
+        {/* Enquanto a animação de escolha, o sorteio/chaveamento ou a tela de resultados da rodada
+            estão abertos, nenhum outro prompt aparece — o motor já resolveu tudo (não está pausado
+            por causa disso), é só a UI que segura a revelação (ver `useTemporada.ts`).
+            IMPORTANTE: sorteio/chaveamento vêm ANTES de resultadoDaRodada de propósito — a 1ª
+            rodada/etapa de uma fase recém-criada já roda (e já pode resolver a partida do próprio
+            clube, setando resultadoDaRodada) na MESMA janela de execução em que o sorteio/
+            chaveamento acabou de ser decidido, então se resultadoDaRodada tivesse prioridade mais
+            alta aqui o sorteio nunca apareceria (sempre mascarado pelo resultado que vem logo
+            depois, no mesmo tick) — ver reporte do usuário "não apareceu nenhum sorteio". */}
         {animacaoDeEscolha ? (
           <PainelAnimacaoDeEscolha animacao={animacaoDeEscolha} onConcluir={temporada.concluirAnimacaoDeEscolha} />
-        ) : resultadoDaRodada ? (
-          <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
         ) : sorteioPendente ? (
           <PainelSorteio sorteio={sorteioPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharSorteioDeGrupos} />
         ) : chaveamentoPendente ? (
           <PainelChaveamento chaveamento={chaveamentoPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharChaveamento} />
+        ) : resultadoDaRodada ? (
+          <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
         ) : (
           <>
             {promptSemana && (
