@@ -12,23 +12,84 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["primeira_fase", "repescagem", "oitavas", "quartas", "semifinal", "final"],
+      "fases": [
+        "primeira_fase",
+        "repescagem",
+        "oitavas",
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true,
       "etapas": [
         {
           "nome": "primeira_fase",
           "ida_e_volta": false,
-          "entrantes": ["independiente_petrolero", "guabira", "blooming", "san_antonio_bulo_bulo", "palestino", "universidad_de_chile", "audax_italiano", "cobresal", "millonarios", "atletico_nacional", "america_de_cali", "atletico_bucaramanga", "deportivo_cuenca", "libertad_ec", "macara", "orense", "recoleta_paraguai", "nacional_paraguai", "olimpia", "trinidense", "alianza_atletico", "deportivo_garcilaso", "cienciano", "melgar", "montevideo_city_torque", "defensor_sporting", "boston_river", "racing_uy", "academia_puerto_cabello", "monagas", "caracas_fc", "metropolitanos"]
+          "entrantes": [
+            "independiente_petrolero",
+            "guabira",
+            "blooming",
+            "san_antonio_bulo_bulo",
+            "palestino",
+            "universidad_de_chile",
+            "audax_italiano",
+            "cobresal",
+            "millonarios",
+            "atletico_nacional",
+            "america_de_cali",
+            "atletico_bucaramanga",
+            "deportivo_cuenca",
+            "libertad_ec",
+            "macara",
+            "orense",
+            "recoleta_paraguai",
+            "nacional_paraguai",
+            "olimpia",
+            "trinidense",
+            "alianza_atletico",
+            "deportivo_garcilaso",
+            "cienciano",
+            "melgar",
+            "montevideo_city_torque",
+            "defensor_sporting",
+            "boston_river",
+            "racing_uy",
+            "academia_puerto_cabello",
+            "monagas",
+            "caracas_fc",
+            "metropolitanos"
+          ]
         },
         {
           "nome": "repescagem",
           "ida_e_volta": true,
-          "entrantes": ["independiente_medellin", "nacional_uy", "bolivar", "boca_juniors", "santa_fe_co", "sporting_cristal", "lanus", "universidad_central_venezuela"]
+          "entrantes": [
+            "independiente_medellin",
+            "nacional_uy",
+            "bolivar",
+            "boca_juniors",
+            "santa_fe_co",
+            "sporting_cristal",
+            "lanus",
+            "universidad_central_venezuela"
+          ]
         },
-        { "nome": "oitavas", "ida_e_volta": true },
-        { "nome": "quartas", "ida_e_volta": true },
-        { "nome": "semifinal", "ida_e_volta": true },
-        { "nome": "final", "ida_e_volta": false }
+        {
+          "nome": "oitavas",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "quartas",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "semifinal",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "final",
+          "ida_e_volta": false
+        }
       ]
     }
   },
@@ -91,5 +152,6 @@
     "universidad_central_venezuela",
     "carabobo",
     "academia_puerto_cabello"
-  ]
+  ],
+  "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e4/Conmebol_Sudamericana_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
 }

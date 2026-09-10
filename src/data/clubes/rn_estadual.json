@@ -23,7 +23,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Am%C3%A9rica_Futebol_Clube_%28Natal%29_logo_%282023%29.png/500px-Am%C3%A9rica_Futebol_Clube_%28Natal%29_logo_%282023%29.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "globo_fc",
@@ -80,6 +81,7 @@
     "nome_popular": "Santa Cruz-RN",
     "pais": "BR",
     "estado": "RN",
-    "cidade": "Natal"
+    "cidade": "Natal",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Santa_Cruz_Futebol_Clube_RN_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

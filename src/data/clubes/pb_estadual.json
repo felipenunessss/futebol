@@ -18,7 +18,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1583
+    "rating_inicial": 1583,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/BotafogoPB_logo.png/500px-BotafogoPB_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "campinense",
@@ -50,7 +51,8 @@
     "nome_popular": "Nacional de Patos",
     "pais": "BR",
     "estado": "PB",
-    "cidade": "Patos"
+    "cidade": "Patos",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/32/NacionalPatos.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "pombal",
@@ -94,6 +96,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Treze_Futebol_Clube_logo.svg/500px-Treze_Futebol_Clube_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   }
 ]

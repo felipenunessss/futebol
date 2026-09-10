@@ -12,7 +12,11 @@
       "classificam_por_grupo": 8
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -35,5 +39,6 @@
     "ec_sao_bernardo",
     "uniao_suzano",
     "xv_de_jau"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Paulist%C3%A3o_Sicredi_A3_2025.png/500px-Paulist%C3%A3o_Sicredi_A3_2025.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

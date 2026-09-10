@@ -5,7 +5,8 @@
     "nome_popular": "Oeirense",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Oeiras"
+    "cidade": "Oeiras",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/7/7e/AAOeirense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "fluminense_pi",
@@ -41,7 +42,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/df/Associa%C3%A7%C3%A3o_Atl%C3%A9tica_de_Altos.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "corisabba",
@@ -49,7 +51,8 @@
     "nome_popular": "Corisabbá",
     "pais": "BR",
     "estado": "PI",
-    "cidade": "Floriano"
+    "cidade": "Floriano",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/2f/AACoriSabba.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "teresina_ec",
@@ -70,7 +73,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/3e/ParnahybaSportClub.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "cap_pi",

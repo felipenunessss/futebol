@@ -113,7 +113,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1360
+    "rating_inicial": 1360,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/7/7e/Monagas_Sport_Club-VEN.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "portuguesa_venezuela",
@@ -125,7 +126,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1403
+    "rating_inicial": 1403,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Associa%C3%A7%C3%A3o_Portuguesa_de_Desportos.svg/500px-Associa%C3%A7%C3%A3o_Portuguesa_de_Desportos.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "rayo_zuliano",
@@ -137,7 +139,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1309
+    "rating_inicial": 1309,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/c2/Deportivo_Rayo_Zuliano.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "trujillanos",
@@ -149,7 +152,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1200
+    "rating_inicial": 1200,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Trujillanos_F.C.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "universidad_central_venezuela",
@@ -209,7 +213,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Emblem_bolivar.png/500px-Emblem_bolivar.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "deportivo_miranda",
@@ -221,7 +226,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/df/Deportivo_Miranda_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "dynamo_puerto",
@@ -245,7 +251,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/9b/Logo-CSM_menu.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "mineros_de_guayana",
@@ -257,7 +264,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Escudo_Mineros_De_Guayana_2025.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "monagas_b",
@@ -269,7 +277,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/7/7e/Monagas_Sport_Club-VEN.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "academia_puerto_cabello_b",
@@ -281,7 +290,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/a/a7/Academia_Puerto_Cabello.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "atletico_barinas",
@@ -329,7 +339,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/8/8d/DeportivoLara.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "real_frontera",

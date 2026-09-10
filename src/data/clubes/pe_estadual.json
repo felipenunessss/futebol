@@ -10,7 +10,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/10/AA_Maguari.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "jaguar",
@@ -33,7 +34,8 @@
       "pais": "BR",
       "nivel": 4
     },
-    "rating_inicial": 1519
+    "rating_inicial": 1519,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/4b/Retr%C3%B4_FC_Brasil-PE_%28BRA%29.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "decisao",
@@ -55,7 +57,8 @@
     "pais": "BR",
     "estado": "PE",
     "cidade": "Vitória de Santo Antão",
-    "estadio": "Arena Pernambuco"
+    "estadio": "Arena Pernambuco",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/1e/AADVitoriaT.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "aguia_cumaru",
@@ -63,7 +66,8 @@
     "nome_popular": "Águia",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Cumaru"
+    "cidade": "Cumaru",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/3d/%C3%81guia_de_Marab%C3%A1.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "america_pe",
@@ -79,7 +83,8 @@
     "nome_popular": "Belo Jardim",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Belo Jardim"
+    "cidade": "Belo Jardim",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Logo_bjfc-1.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "caruaru_city",
@@ -87,7 +92,8 @@
     "nome_popular": "Caruaru City",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Caruaru"
+    "cidade": "Caruaru",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/a/a7/Escudo_Caruaru_City.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "centro_limoeirense",
@@ -95,7 +101,8 @@
     "nome_popular": "Centro Limoeirense",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Limoeiro"
+    "cidade": "Limoeiro",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e6/CentroLimoeirenseF.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ipojuca",
@@ -103,7 +110,8 @@
     "nome_popular": "Ipojuca",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Ipojuca"
+    "cidade": "Ipojuca",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/d7/IpojucaAC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "porto_caruaru",
@@ -131,7 +139,8 @@
     "nome_popular": "Ypiranga-PE",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Santa Cruz do Capibaribe"
+    "cidade": "Santa Cruz do Capibaribe",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/2/25/Sociedade_Esportiva_Ypiranga_Futebol_Clube_Escudo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "central_pe",

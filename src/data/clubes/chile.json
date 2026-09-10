@@ -9,7 +9,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1673
+    "rating_inicial": 1673,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e8/Colo-Colo_Futbol_Club.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "universidad_de_chile",
@@ -33,7 +34,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1638
+    "rating_inicial": 1638,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/500px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "audax_italiano",
@@ -45,7 +47,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1556
+    "rating_inicial": 1556,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Audax_Italiano_Escudo.png/500px-Audax_Italiano_Escudo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "cobresal",
@@ -57,7 +60,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1470
+    "rating_inicial": 1470,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/ce/Cobresal.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "coquimbo_unido",
@@ -69,7 +73,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1627
+    "rating_inicial": 1627,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/30/CoquimboUnido.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "deportes_concepcion",
@@ -163,7 +168,8 @@
       "pais": "CL",
       "nivel": 1
     },
-    "rating_inicial": 1569
+    "rating_inicial": 1569,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/a/a8/OHigginsFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "palestino",

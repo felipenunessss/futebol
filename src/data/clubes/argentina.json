@@ -38,7 +38,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1623
+    "rating_inicial": 1623,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Escudo_San_Lorenzo_2026.svg/500px-Escudo_San_Lorenzo_2026.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "deportivo_riestra",
@@ -179,7 +180,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1659
+    "rating_inicial": 1659,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Escudo_del_Club_Lan%C3%BAs.png/500px-Escudo_del_Club_Lan%C3%BAs.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "central_cordoba_sde",
@@ -205,7 +207,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1618
+    "rating_inicial": 1618,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/EscudoDefensayjustica.png/500px-EscudoDefensayjustica.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "river_plate",
@@ -218,7 +221,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1707
+    "rating_inicial": 1707,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Club_Atl%C3%A9tico_River_Plate_logo.svg/500px-Club_Atl%C3%A9tico_River_Plate_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "racing_club",
@@ -231,7 +235,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1699
+    "rating_inicial": 1699,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/56/Escudo_de_Racing_Club_%282014%29.svg/500px-Escudo_de_Racing_Club_%282014%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "huracan",
@@ -244,7 +249,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1656
+    "rating_inicial": 1656,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg/500px-Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "barracas_central",
@@ -257,7 +263,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1603
+    "rating_inicial": 1603,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Barracas_central_logo.svg/500px-Barracas_central_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "belgrano_cordoba",
@@ -270,7 +277,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1675
+    "rating_inicial": 1675,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Escudo_del_Club_Atl%C3%A9tico_Belgrano.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Belgrano.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "estudiantes_rio_cuarto",
@@ -283,7 +291,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1539
+    "rating_inicial": 1539,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/20/Escudo_Asociacion_Atl%C3%A9tica_Estudiantes_de_R%C3%ADo_Cuarto.svg/500px-Escudo_Asociacion_Atl%C3%A9tica_Estudiantes_de_R%C3%ADo_Cuarto.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "independiente_rivadavia",
@@ -296,7 +305,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1714
+    "rating_inicial": 1714,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/500px-Escudo_del_Club_Independiente_Rivadavia.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "gimnasia_la_plata",
@@ -309,7 +319,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1654
+    "rating_inicial": 1654,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/CGE_Logo_2026_v1.svg/500px-CGE_Logo_2026_v1.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "tigre",
@@ -322,7 +333,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1646
+    "rating_inicial": 1646,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Escudo_del_Club_Atl%C3%A9tico_Tigre_-_2019.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Tigre_-_2019.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "argentinos_juniors",
@@ -335,7 +347,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1727
+    "rating_inicial": 1727,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Asociacion_Atletica_Argentinos_Juniors.svg/500px-Asociacion_Atletica_Argentinos_Juniors.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "sarmiento_junin",
@@ -348,7 +361,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1589
+    "rating_inicial": 1589,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Escudo_del_Club_Atl%C3%A9tico_Sarmiento_de_Jun%C3%ADn.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Sarmiento_de_Jun%C3%ADn.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "rosario_central",
@@ -361,7 +375,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1708
+    "rating_inicial": 1708,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/ec/Club_Atl%C3%A9tico_Ros%C3%A1rio_Central.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "banfield",
@@ -374,7 +389,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1579
+    "rating_inicial": 1579,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/CA_Banfield_%282014%29.svg/500px-CA_Banfield_%282014%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "atletico_tucuman",
@@ -387,7 +403,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1620
+    "rating_inicial": 1620,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Atletico_tucuman_nuevo2.svg/500px-Atletico_tucuman_nuevo2.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "aldosivi",
@@ -400,7 +417,8 @@
       "pais": "AR",
       "nivel": 1
     },
-    "rating_inicial": 1536
+    "rating_inicial": 1536,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e4/CAAldosivi.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "acassuso",
@@ -414,7 +432,8 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1450
+    "rating_inicial": 1450,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Club_acassuso_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "agropecuario",
@@ -548,7 +567,8 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1528
+    "rating_inicial": 1528,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Chaco_For_Ever-ARG.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ciudad_de_bolivar",
@@ -877,7 +897,8 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1584
+    "rating_inicial": 1584,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/San_Martin_deTucuman.png/500px-San_Martin_deTucuman.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "san_miguel",
@@ -905,7 +926,8 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1495
+    "rating_inicial": 1495,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Club_santelmo_logo.png/500px-Club_santelmo_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "temperley",
@@ -919,7 +941,8 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1608
+    "rating_inicial": 1608,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Club-Atl%C3%A9tico-Temperley.png/500px-Club-Atl%C3%A9tico-Temperley.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "tristan_suarez",
@@ -933,6 +956,7 @@
       "pais": "AR",
       "nivel": 2
     },
-    "rating_inicial": 1610
+    "rating_inicial": 1610,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Escudo_Final_TS_PNG.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

@@ -11,7 +11,10 @@
       "classificam_proxima_fase": 4
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -31,5 +34,6 @@
     "petropolis",
     "resende",
     "sao_goncalo_ec"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Bandeira_do_estado_do_Rio_de_Janeiro.svg/500px-Bandeira_do_estado_do_Rio_de_Janeiro.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

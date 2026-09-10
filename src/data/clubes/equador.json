@@ -141,7 +141,8 @@
       "pais": "EC",
       "nivel": 1
     },
-    "rating_inicial": 1566
+    "rating_inicial": 1566,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Club_Libertad.png/500px-Club_Libertad.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "macara",
@@ -178,7 +179,8 @@
       "pais": "EC",
       "nivel": 1
     },
-    "rating_inicial": 1559
+    "rating_inicial": 1559,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/39/Mushuc_Runa_SC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "orense",
@@ -190,7 +192,8 @@
       "pais": "EC",
       "nivel": 1
     },
-    "rating_inicial": 1534
+    "rating_inicial": 1534,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/96/Orense_SC_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "tecnico_universitario",
@@ -202,7 +205,8 @@
       "pais": "EC",
       "nivel": 1
     },
-    "rating_inicial": 1487
+    "rating_inicial": 1487,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Rodillo_Rojo_TU.svg/500px-Rodillo_Rojo_TU.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "universidad_catolica_ec",
@@ -214,7 +218,8 @@
       "pais": "EC",
       "nivel": 1
     },
-    "rating_inicial": 1659
+    "rating_inicial": 1659,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/500px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "de_julio_22",
@@ -236,7 +241,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/9_de_Octubre_FC_escudo.png/500px-9_de_Octubre_FC_escudo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "atletico_rojiblanco",
@@ -258,7 +264,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/JJM2bNUs_400x400_%281%29_Background_Removed.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "cumbaya_fc",
@@ -280,7 +287,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Escudo_Gualaceo_Sporting_Club.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "independiente_juniors_ec",
@@ -291,7 +299,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Logo_Independiente_Juniors.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "liga_portoviejo",
@@ -303,7 +312,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/9/93/Logo_LDUP_Oficial.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "san_antonio_ec",
@@ -314,7 +324,8 @@
     "divisao_nacional": {
       "pais": "EC",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/c8/CD_San_Antonio_Bulo_Bulo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "santo_domingo_ec",
@@ -337,6 +348,7 @@
       "pais": "EC",
       "nivel": 2
     },
-    "rating_inicial": 1498
+    "rating_inicial": 1498,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Vinotinto.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

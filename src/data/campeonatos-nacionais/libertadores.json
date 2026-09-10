@@ -12,24 +12,68 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["primeira_fase", "segunda_fase", "terceira_fase", "oitavas", "quartas", "semifinal", "final"],
+      "fases": [
+        "primeira_fase",
+        "segunda_fase",
+        "terceira_fase",
+        "oitavas",
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true,
       "etapas": [
         {
           "nome": "primeira_fase",
           "ida_e_volta": true,
-          "entrantes": ["alianza_lima", "deportivo_tachira", "universidad_catolica_ec", "sportivo_2_de_mayo", "juventud", "the_strongest"]
+          "entrantes": [
+            "alianza_lima",
+            "deportivo_tachira",
+            "universidad_catolica_ec",
+            "sportivo_2_de_mayo",
+            "juventud",
+            "the_strongest"
+          ]
         },
         {
           "nome": "segunda_fase",
           "ida_e_volta": true,
-          "entrantes": ["botafogo", "bahia", "huachipato", "ohiggins", "independiente_medellin", "deportes_tolima", "argentinos_juniors", "nacional_potosi", "barcelona_sc", "guarani_paraguai", "sporting_cristal", "liverpool_uy", "carabobo"]
+          "entrantes": [
+            "botafogo",
+            "bahia",
+            "huachipato",
+            "ohiggins",
+            "independiente_medellin",
+            "deportes_tolima",
+            "argentinos_juniors",
+            "nacional_potosi",
+            "barcelona_sc",
+            "guarani_paraguai",
+            "sporting_cristal",
+            "liverpool_uy",
+            "carabobo"
+          ]
         },
-        { "nome": "terceira_fase", "ida_e_volta": true },
-        { "nome": "oitavas", "ida_e_volta": true },
-        { "nome": "quartas", "ida_e_volta": true },
-        { "nome": "semifinal", "ida_e_volta": true },
-        { "nome": "final", "ida_e_volta": false }
+        {
+          "nome": "terceira_fase",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "oitavas",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "quartas",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "semifinal",
+          "ida_e_volta": true
+        },
+        {
+          "nome": "final",
+          "ida_e_volta": false
+        }
       ]
     }
   },
@@ -83,5 +127,6 @@
     "deportivo_la_guaira",
     "carabobo",
     "deportivo_tachira"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/9/95/Conmebol_Libertadores_logo.svg/500px-Conmebol_Libertadores_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

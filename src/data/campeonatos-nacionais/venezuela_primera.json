@@ -5,12 +5,37 @@
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
-    "turno": { "nome": "Torneo Apertura", "ida_e_volta": false, "classificam_proxima_fase": 8, "rodadas": 13 },
-    "returno": { "nome": "Torneo Clausura", "ida_e_volta": false, "classificam_proxima_fase": 8, "rodadas": 13 },
-    "fase_grupos": { "num_grupos": 2, "times_por_grupo": 4, "ida_e_volta": true, "classificam_por_grupo": 1 },
-    "mata_mata": { "fases": ["final_do_apertura_ou_clausura"], "ida_e_volta": false },
-    "tabela_acumulada": { "criterio": "soma_das_fases_regulares_define_vagas_internacionais_e_rebaixamento" },
-    "final_estadual": { "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura_ou_campeao_absoluto_automatico_se_o_mesmo_time_vencer_os_dois_torneios", "ida_e_volta": true }
+    "turno": {
+      "nome": "Torneo Apertura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 8,
+      "rodadas": 13
+    },
+    "returno": {
+      "nome": "Torneo Clausura",
+      "ida_e_volta": false,
+      "classificam_proxima_fase": 8,
+      "rodadas": 13
+    },
+    "fase_grupos": {
+      "num_grupos": 2,
+      "times_por_grupo": 4,
+      "ida_e_volta": true,
+      "classificam_por_grupo": 1
+    },
+    "mata_mata": {
+      "fases": [
+        "final_do_apertura_ou_clausura"
+      ],
+      "ida_e_volta": false
+    },
+    "tabela_acumulada": {
+      "criterio": "soma_das_fases_regulares_define_vagas_internacionais_e_rebaixamento"
+    },
+    "final_estadual": {
+      "criterio": "final_unica_entre_campeoes_do_apertura_e_clausura_ou_campeao_absoluto_automatico_se_o_mesmo_time_vencer_os_dois_torneios",
+      "ida_e_volta": true
+    }
   },
   "premiacao": {
     "vaga_libertadores": 4,
@@ -20,8 +45,34 @@
     "rebaixamento_proxima_divisao": 1
   },
   "classicos": [
-    { "time_a": "caracas_fc", "time_b": "deportivo_tachira", "nome": "Clásico del Fútbol Venezolano", "peso_midia": 5 },
-    { "time_a": "portuguesa_venezuela", "time_b": "estudiantes_merida", "nome": "Clásico Añejo", "peso_midia": 3 }
+    {
+      "time_a": "caracas_fc",
+      "time_b": "deportivo_tachira",
+      "nome": "Clásico del Fútbol Venezolano",
+      "peso_midia": 5
+    },
+    {
+      "time_a": "portuguesa_venezuela",
+      "time_b": "estudiantes_merida",
+      "nome": "Clásico Añejo",
+      "peso_midia": 3
+    }
   ],
-  "times": ["academia_puerto_cabello", "anzoategui", "caracas_fc", "carabobo", "deportivo_la_guaira", "deportivo_tachira", "estudiantes_merida", "metropolitanos", "monagas", "portuguesa_venezuela", "rayo_zuliano", "trujillanos", "universidad_central_venezuela", "zamora_venezuela"]
+  "times": [
+    "academia_puerto_cabello",
+    "anzoategui",
+    "caracas_fc",
+    "carabobo",
+    "deportivo_la_guaira",
+    "deportivo_tachira",
+    "estudiantes_merida",
+    "metropolitanos",
+    "monagas",
+    "portuguesa_venezuela",
+    "rayo_zuliano",
+    "trujillanos",
+    "universidad_central_venezuela",
+    "zamora_venezuela"
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Flag-map_of_Venezuela.svg/500px-Flag-map_of_Venezuela.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

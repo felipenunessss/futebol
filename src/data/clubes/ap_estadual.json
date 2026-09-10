@@ -41,7 +41,8 @@
     "nome_popular": "Independente-AP",
     "pais": "BR",
     "estado": "AP",
-    "cidade": "Santana"
+    "cidade": "Santana",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/f/ff/Logo_Independente-AP.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ypiranga_ap",
@@ -49,7 +50,8 @@
     "nome_popular": "Ypiranga-AP",
     "pais": "BR",
     "estado": "AP",
-    "cidade": "Macapá"
+    "cidade": "Macapá",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/6/62/Ypiranga_Clube_-_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "santos_ap",

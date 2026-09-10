@@ -27,7 +27,8 @@
     "nome_popular": "Cruzeiro-AL",
     "pais": "BR",
     "estado": "AL",
-    "cidade": "Arapiraca"
+    "cidade": "Arapiraca",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/6/6a/Escudo_do_Cruzeiro_de_Arapiraca.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "cse",

@@ -12,7 +12,11 @@
       "classificam_por_grupo": 4
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -33,5 +37,6 @@
     "valeriodoce",
     "villa_nova",
     "ipatinga_fc"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/Bandeira_de_Minas_Gerais.svg/500px-Bandeira_de_Minas_Gerais.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

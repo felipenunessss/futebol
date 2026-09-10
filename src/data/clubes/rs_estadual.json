@@ -20,7 +20,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1510
+    "rating_inicial": 1510,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Escudo_Oficial_da_Sociedade_Esportiva_e_Recreativa_Caxias_do_Sul.svg/500px-Escudo_Oficial_da_Sociedade_Esportiva_e_Recreativa_Caxias_do_Sul.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "guarany_bage",
@@ -33,7 +34,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Guarany_Futebol_Clube.svg/500px-Guarany_Futebol_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "inter_santa_maria",
@@ -50,7 +52,8 @@
     "nome_popular": "Monsoon",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Capão da Canoa"
+    "cidade": "Capão da Canoa",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Monsoon.png/500px-Monsoon.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "novo_hamburgo",
@@ -59,7 +62,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Novo Hamburgo",
-    "estadio": "Do Vale"
+    "estadio": "Do Vale",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Esporte_Clube_Novo_Hamburgo.svg/500px-Esporte_Clube_Novo_Hamburgo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "ypiranga_rs",
@@ -73,7 +77,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1489
+    "rating_inicial": 1489,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Ypiranga_FC_%28Erechim%29_%28Logo%29.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "aimore",
@@ -100,7 +105,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Bagé",
-    "estadio": "Pedra Moura"
+    "estadio": "Pedra Moura",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/GE_Bage.svg/500px-GE_Bage.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "brasil_pelotas",
@@ -157,7 +163,8 @@
     "nome_popular": "Gramadense",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Gramado"
+    "cidade": "Gramado",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/CEGramadense.svg/500px-CEGramadense.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "guarani_va",
@@ -174,7 +181,8 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Lajeado",
-    "estadio": "Arena Alviazul"
+    "estadio": "Arena Alviazul",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/CE_Lejaedense_%28RS%29.svg/500px-CE_Lejaedense_%28RS%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "passo_fundo",
@@ -212,7 +220,8 @@
     "nome_popular": "União Frederiquense",
     "pais": "BR",
     "estado": "RS",
-    "cidade": "Frederico Westphalen"
+    "cidade": "Frederico Westphalen",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/ec/Uni%C3%A3o_Frederiquense_de_Futebol.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "veranopolis",
@@ -221,6 +230,7 @@
     "pais": "BR",
     "estado": "RS",
     "cidade": "Veranópolis",
-    "estadio": "Antônio David Farina"
+    "estadio": "Antônio David Farina",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/40/Safe_image.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

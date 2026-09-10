@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "MT",
     "cidade": "Várzea Grande",
-    "estadio": "Dito Souza"
+    "estadio": "Dito Souza",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/23/V%C3%A1rzeaGrandeEC2025.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "luverdense",
@@ -50,7 +51,8 @@
     "pais": "BR",
     "estado": "MT",
     "cidade": "Sinop",
-    "estadio": "Gigante do Norte"
+    "estadio": "Gigante do Norte",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/0/0d/Escudo_do_Sport_Sinop.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "chapada_fc",

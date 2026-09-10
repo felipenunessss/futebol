@@ -61,7 +61,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1709
+    "rating_inicial": 1709,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Atletico_Nacional_Logo.svg/500px-Atletico_Nacional_Logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "boyaca_chico",
@@ -125,7 +126,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1511
+    "rating_inicial": 1511,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Escudo_Deportivo_Pasto_2026.png/500px-Escudo_Deportivo_Pasto_2026.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "deportivo_pereira",
@@ -137,7 +139,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1484
+    "rating_inicial": 1484,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/EscudoDP.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "fortaleza_cf",
@@ -184,7 +187,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1437
+    "rating_inicial": 1437,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/9c/JaguaresDeCordoba.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "junior_barranquilla",
@@ -196,7 +200,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1607
+    "rating_inicial": 1607,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Junior_Barranquilla_logo.svg/500px-Junior_Barranquilla_logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "llaneros",
@@ -220,7 +225,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1619
+    "rating_inicial": 1619,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Millonarios_F%C3%BAtbol_Club_logo.png/500px-Millonarios_F%C3%BAtbol_Club_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "once_caldas",
@@ -232,7 +238,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1623
+    "rating_inicial": 1623,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Once_Caldas_logo-svg.svg/500px-Once_Caldas_logo-svg.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "santa_fe_co",
@@ -244,7 +251,8 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1645
+    "rating_inicial": 1645,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Escudo_de_Independiente_Santa_Fe.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "atletico_fc_co",
@@ -268,7 +276,8 @@
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/EscudoBquillaFC-1-200x233.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "boca_juniors_cali",
@@ -280,7 +289,8 @@
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Escudo_Boca_Juniors_de_Cali.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "bogota_fc",
@@ -291,7 +301,8 @@
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Bogot%C3%A1_F%C3%BAtbol_Club.png/500px-Bogot%C3%A1_F%C3%BAtbol_Club.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "deportes_quindio",
@@ -303,7 +314,8 @@
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/d/d9/DQ_Escudo_2021.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "envigado_fc",
@@ -316,7 +328,8 @@
       "pais": "CO",
       "nivel": 2
     },
-    "rating_inicial": 1475
+    "rating_inicial": 1475,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/4e/Envigado_FC_logo_2018.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "independiente_valle_cauca",

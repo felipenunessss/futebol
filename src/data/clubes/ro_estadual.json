@@ -36,7 +36,8 @@
     "nome_popular": "Barcelona-RO",
     "pais": "BR",
     "estado": "RO",
-    "cidade": "Porto Velho"
+    "cidade": "Porto Velho",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/1c/BarcelonaFCVilhena.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ji_parana",
@@ -44,7 +45,8 @@
     "nome_popular": "Ji-Paraná",
     "pais": "BR",
     "estado": "RO",
-    "cidade": "Ji-Paraná"
+    "cidade": "Ji-Paraná",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/5/54/Ji-Paran%C3%A1FutebolClube.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "uniao_cacoalense",
@@ -52,7 +54,8 @@
     "nome_popular": "União Cacoalense",
     "pais": "BR",
     "estado": "RO",
-    "cidade": "Cacoal"
+    "cidade": "Cacoal",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e1/SEUniaoCacoalense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "guapore_fc",
@@ -65,6 +68,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/b/b1/Guapor%C3%A9_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

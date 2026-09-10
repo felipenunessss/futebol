@@ -12,7 +12,10 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["semifinal", "final"],
+      "fases": [
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -31,5 +34,6 @@
     "vera_cruz_pe",
     "vitoria_tabocas",
     "ypiranga_pe"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/59/Bandeira_de_Pernambuco.svg/500px-Bandeira_de_Pernambuco.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

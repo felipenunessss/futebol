@@ -10,7 +10,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1594
+    "rating_inicial": 1594,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/S%C3%A3o_Bernardo_FC_2020_crest.png/500px-S%C3%A3o_Bernardo_FC_2020_crest.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "portuguesa",
@@ -22,7 +23,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Associa%C3%A7%C3%A3o_Portuguesa_de_Desportos.svg/500px-Associa%C3%A7%C3%A3o_Portuguesa_de_Desportos.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "botafogo_sp",
@@ -35,7 +37,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1568
+    "rating_inicial": 1568,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Botafogo_Futebol_Clube.svg/500px-Botafogo_Futebol_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "primavera",
@@ -43,7 +46,8 @@
     "nome_popular": "Primavera",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Indaiatuba"
+    "cidade": "Indaiatuba",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/0/0c/Esporte_Clube_Primavera_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "capivariano",
@@ -51,7 +55,8 @@
     "nome_popular": "Capivariano",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Capivari"
+    "cidade": "Capivari",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Capivariano_FC.png/500px-Capivariano_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "agua_santa",
@@ -63,7 +68,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/b/b8/Ecaguasanta.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ferroviaria",
@@ -76,7 +82,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1563
+    "rating_inicial": 1563,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Escudo_Associa%C3%A7%C3%A3o_Ferrovi%C3%A1ria_de_Esportes.png/500px-Escudo_Associa%C3%A7%C3%A3o_Ferrovi%C3%A1ria_de_Esportes.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "gremio_prudente",
@@ -84,7 +91,8 @@
     "nome_popular": "Grêmio Prudente",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Presidente Prudente"
+    "cidade": "Presidente Prudente",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/41/Gr%C3%AAmio_Prudente2019.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "inter_de_limeira",
@@ -97,7 +105,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1534
+    "rating_inicial": 1534,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Inter_de_Limeira.svg/500px-Inter_de_Limeira.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "ituano",
@@ -110,7 +119,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1490
+    "rating_inicial": 1490,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Ituano_Futebol_Clube_logo.svg/500px-Ituano_Futebol_Clube_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "juventus_sp",
@@ -118,7 +128,8 @@
     "nome_popular": "Juventus",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São Paulo"
+    "cidade": "São Paulo",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Juventus_da_Mooca.svg/500px-Juventus_da_Mooca.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "linense",
@@ -134,7 +145,8 @@
     "nome_popular": "Monte Azul",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Monte Azul Paulista"
+    "cidade": "Monte Azul Paulista",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/b/b1/Atl%C3%A9tico_Monte_Azul_logo.svg/500px-Atl%C3%A9tico_Monte_Azul_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "osasco_sporting",
@@ -142,7 +154,8 @@
     "nome_popular": "Osasco Sporting",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Osasco"
+    "cidade": "Osasco",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/Osasco_Sporting.svg/500px-Osasco_Sporting.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "santo_andre",
@@ -150,7 +163,8 @@
     "nome_popular": "Santo André",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Santo André"
+    "cidade": "Santo André",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/5/50/Santo_Andre_escudo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "sao_bento",
@@ -158,7 +172,8 @@
     "nome_popular": "São Bento",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Sorocaba"
+    "cidade": "Sorocaba",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/S%C3%A3o_Bento.svg/500px-S%C3%A3o_Bento.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "sao_jose_sp",
@@ -175,7 +190,8 @@
     "nome_popular": "Sertãozinho",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Sertãozinho"
+    "cidade": "Sertãozinho",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Sert%C3%A3ozinho_Futebol_Clube.svg/500px-Sert%C3%A3ozinho_Futebol_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "taubate",
@@ -201,7 +217,8 @@
     "nome_popular": "Bandeirante",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Birigui"
+    "cidade": "Birigui",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Escudo-OFICIAL.png/500px-Escudo-OFICIAL.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "catanduva",
@@ -209,7 +226,8 @@
     "nome_popular": "Catanduva",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Catanduva"
+    "cidade": "Catanduva",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/22/CatanduvaFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "desportivo_brasil",
@@ -217,7 +235,8 @@
     "nome_popular": "Desportivo Brasil",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Porto Feliz"
+    "cidade": "Porto Feliz",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Desportivo_Brasil.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "francana",
@@ -295,7 +314,8 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Santa Bárbara d'Oeste",
-    "estadio": "Antônio Lins Ribeiro Guimarães"
+    "estadio": "Antônio Lins Ribeiro Guimarães",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Uniao_Barbarense_FC.png/500px-Uniao_Barbarense_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "uniao_sao_joao",
@@ -323,7 +343,8 @@
     "pais": "BR",
     "estado": "SP",
     "cidade": "Suzano",
-    "estadio": "Francisco Marques Figueira"
+    "estadio": "Francisco Marques Figueira",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f4/ECUS_logo.svg/500px-ECUS_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "xv_de_jau",
@@ -341,7 +362,8 @@
     "nome_popular": "Inter de Bebedouro",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Bebedouro"
+    "cidade": "Bebedouro",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/ef/Escudo_Inter_de_Bebedouro.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "sao_caetano",
@@ -358,7 +380,8 @@
     "nome_popular": "Penapolense",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Penápolis"
+    "cidade": "Penápolis",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Clube_Atl%C3%A9tico_Penapolense_logo.png/500px-Clube_Atl%C3%A9tico_Penapolense_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "sao_carlense",
@@ -366,7 +389,8 @@
     "nome_popular": "São-Carlense",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São Carlos"
+    "cidade": "São Carlos",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/4c/GDS%C3%A3ocarlense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "barretos",
@@ -382,7 +406,8 @@
     "nome_popular": "Taquaritinga",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Taquaritinga"
+    "cidade": "Taquaritinga",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Clube_Atl%C3%A9tico_Taquaritinga_logo.svg/500px-Clube_Atl%C3%A9tico_Taquaritinga_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "jacarei",
@@ -390,7 +415,8 @@
     "nome_popular": "Jacareí",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Jacareí"
+    "cidade": "Jacareí",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Jacare%C3%ADFC.svg/500px-Jacare%C3%ADFC.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "lemense",
@@ -398,7 +424,8 @@
     "nome_popular": "Lemense",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Leme"
+    "cidade": "Leme",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/92/EC_Lemense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ecus",
@@ -424,7 +451,8 @@
     "nome_popular": "Tanabi",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Tanabi"
+    "cidade": "Tanabi",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Tanabi_Esporte_Clube.svg/500px-Tanabi_Esporte_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "jabaquara",
@@ -432,7 +460,8 @@
     "nome_popular": "Jabaquara",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "São Paulo"
+    "cidade": "São Paulo",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Jabaquara_Atl%C3%A9tico_Clube.svg/500px-Jabaquara_Atl%C3%A9tico_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "vocem",
@@ -449,7 +478,8 @@
     "nome_popular": "Colorado Caieiras",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Caieiras"
+    "cidade": "Caieiras",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/6/6f/Escudo_do_Colorado_Caieiras.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "nacional_catanduva",
@@ -465,6 +495,7 @@
     "nome_popular": "Araçatuba",
     "pais": "BR",
     "estado": "SP",
-    "cidade": "Araçatuba"
+    "cidade": "Araçatuba",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/Associacao_esportiva_aracatuba_26.svg/500px-Associacao_esportiva_aracatuba_26.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   }
 ]

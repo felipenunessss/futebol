@@ -12,7 +12,9 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["final"],
+      "fases": [
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -35,5 +37,6 @@
     "colorado_caieiras",
     "nacional_catanduva",
     "aracatuba"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/8/88/Paulista_S%C3%A9rie_A4_2024.png/500px-Paulista_S%C3%A9rie_A4_2024.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

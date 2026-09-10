@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/9c/AraguainaFR.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "bela_vista_to",
@@ -42,7 +43,8 @@
     "nome_popular": "Gurupi",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Gurupi"
+    "cidade": "Gurupi",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/d5/Gurupi_Esporte_Clube.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "palmas_fc",
@@ -50,7 +52,8 @@
     "nome_popular": "Palmas",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Palmas"
+    "cidade": "Palmas",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/8/83/PalmasFutebolRegatas.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "tocantinopolis",
@@ -62,7 +65,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Tocantinopolis_EC.svg/500px-Tocantinopolis_EC.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "uniao_to",
@@ -70,6 +74,7 @@
     "nome_popular": "União-TO",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Araguaína"
+    "cidade": "Araguaína",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/93/Uni%C3%A3o_Atl%C3%A9tico_Clube_%28Tocantins%29.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

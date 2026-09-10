@@ -5,7 +5,8 @@
     "nome_popular": "Desportiva Ferroviária",
     "pais": "BR",
     "estado": "ES",
-    "cidade": "Cariacica"
+    "cidade": "Cariacica",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/EscudoDesportivaFerrovi%C3%A1ria.png/500px-EscudoDesportivaFerrovi%C3%A1ria.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "porto_vitoria",
@@ -13,7 +14,8 @@
     "nome_popular": "Porto Vitória",
     "pais": "BR",
     "estado": "ES",
-    "cidade": "Serra"
+    "cidade": "Serra",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/f/fa/Escudo_Porto_Vit%C3%B3ria.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "real_noroeste",
@@ -25,7 +27,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/c8/RealNoroesteCFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "rio_branco_vn",
@@ -33,7 +36,8 @@
     "nome_popular": "Rio Branco-VN",
     "pais": "BR",
     "estado": "ES",
-    "cidade": "Venda Nova do Imigrante"
+    "cidade": "Venda Nova do Imigrante",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Rio-branco-futebol-clube-de-venda-nova-es.png/500px-Rio-branco-futebol-clube-de-venda-nova-es.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "vilavelhense",

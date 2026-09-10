@@ -310,6 +310,38 @@ Reexecutar o script é seguro (idempotente, só atualiza o que a busca achar
 de novo); útil pra tentar cobrir os que ainda faltam se a API atualizar seu
 catálogo.
 
+Segunda fonte, pra quem o TheSportsDB não achou: `scripts/buscar-escudos-wikipedia.ts`
+(busca de imagem principal de artigo na Wikipédia pt/es, ver o comentário do
+próprio arquivo pro histórico de falsos positivos já encontrados e corrigidos
+em rodadas anteriores). Resultado atualizado depois de uma rodada aplicada
+(clubes/competições que o TheSportsDB não tinha): **567/678 clubes** e
+**42/62 competições** com escudo.
+
+**Limitação conhecida, não fechada no código**: um clube pequeno com apelido
+genérico (uma ou duas palavras, sem cidade/estado no nome popular) pode
+"perder" pra um clube homônimo bem mais famoso em outro país/estado — a busca
+da Wikipédia rankeia por relevância/notoriedade, então o artigo mais
+importante com aquele nome aparece primeiro, e nenhuma checagem atual detecta
+isso (o artigo batido É de um clube de futebol de verdade, só que o errado).
+11 casos assim foram encontrados por auditoria manual (amostragem + busca
+dirigida por nomes de clubes famosos) e excluídos manualmente antes de
+aplicar o resto — ficaram de fora, sem `escudo_url`:
+`montevideo_wanderers` (bateu com Wolverhampton Wanderers-ING),
+`barcelona_ilheus` (Futbol Club Barcelona-ESP), `internacional_de_bogota`
+(Sport Club Internacional-BRA), `river_rr` (River Plate-ARG),
+`ferroviario_ce` (Ferroviário do Paraná, estado errado), `san_lorenzo_paraguai`
+(San Lorenzo-ARG), `racing_uy` (Racing Club-ARG), `nacional_uy` (Atlético
+Nacional-COL), `pirata_fc` (foto de um estádio, não de um clube),
+`america_propria` (logo da Copa Libertadores, não de um clube),
+`barquisimeto_sc` (bandeira da cidade, não de um clube) — mais 2 competições:
+`piauiense_1` (bateu com o escudo de um clube, "Clube Atlético Piauiense", não
+da competição em si) e `argentina_segunda` (foto de estádio). Não há garantia
+de que a lista dos 567/42 restantes esteja 100% livre desse mesmo problema —
+foi feita auditoria por amostragem grande + busca dirigida, não verificação
+individual de cada um. Se notar outro escudo claramente errado no jogo,
+documente aqui e reverta esse registro específico (`escudo_url` removido,
+não precisa reverter o resto).
+
 ## Como resolver
 
 Cada item acima deveria ser confirmado contra a fonte primária (site da

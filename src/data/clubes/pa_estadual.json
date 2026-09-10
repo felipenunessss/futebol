@@ -5,7 +5,8 @@
     "nome_popular": "Bragantino-PA",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Bragança"
+    "cidade": "Bragança",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/96/BragantinoCP2018.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "castanhal",
@@ -84,7 +85,8 @@
     "nome_popular": "São Raimundo-PA",
     "pais": "BR",
     "estado": "PA",
-    "cidade": "Santarém"
+    "cidade": "Santarém",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/29/SaoRaimundoPA.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "amazonia_pa",

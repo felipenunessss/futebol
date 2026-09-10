@@ -20,7 +20,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Esporte_Clube_Democrata_logo.svg/500px-Esporte_Clube_Democrata_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "north_ec",
@@ -111,7 +112,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Uberaba",
-    "estadio": "Municipal João Guido"
+    "estadio": "Municipal João Guido",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/a/a7/Uberaba_SC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "coimbra_ec",
@@ -129,7 +131,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Sete Lagoas",
-    "estadio": "Joaquim Henrique Nogueira"
+    "estadio": "Joaquim Henrique Nogueira",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Democrata_de_Sete_Lagoas.svg/500px-Democrata_de_Sete_Lagoas.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "aymores",
@@ -137,7 +140,8 @@
     "nome_popular": "Aymorés",
     "pais": "BR",
     "estado": "MG",
-    "cidade": "Ubá"
+    "cidade": "Ubá",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Sport_Club_Aymor%C3%A9s_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "valeriodoce",
@@ -155,7 +159,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Nova Lima",
-    "estadio": "Castor Cifuentes"
+    "estadio": "Castor Cifuentes",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Villa_Nova_AC_%28Estr%29_-_MG.svg/500px-Villa_Nova_AC_%28Estr%29_-_MG.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "ipatinga_fc",
@@ -164,6 +169,7 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Ipatinga",
-    "estadio": "João Lamego Netto"
+    "estadio": "João Lamego Netto",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/95/IpatingaFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

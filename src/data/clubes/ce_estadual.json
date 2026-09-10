@@ -37,7 +37,8 @@
     "nome_popular": "Quixadá",
     "pais": "BR",
     "estado": "CE",
-    "cidade": "Quixadá"
+    "cidade": "Quixadá",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/d8/Quixada_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "floresta",
@@ -62,7 +63,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/29/Associa%C3%A7%C3%A3o_Desportiva_Iguatu.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "tirol",
@@ -82,7 +84,8 @@
     "nome_popular": "Maranguape",
     "pais": "BR",
     "estado": "CE",
-    "cidade": "Maranguape"
+    "cidade": "Maranguape",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Escudo_do_Maranguape_com_Estrelas.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "atletico_cearense",
@@ -95,6 +98,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/2d/FCAtl%C3%A9ticoCearense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

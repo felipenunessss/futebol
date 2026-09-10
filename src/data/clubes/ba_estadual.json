@@ -28,7 +28,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Feira de Santana",
-    "estadio": "Arena Cajueiro"
+    "estadio": "Arena Cajueiro",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Associa%C3%A7%C3%A3o_Desportiva_Bahia_de_Feira.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "jacuipense",
@@ -41,7 +42,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/3/3d/ECJacuipense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "jequie",
@@ -50,7 +52,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Jequié",
-    "estadio": "Waldomirão"
+    "estadio": "Waldomirão",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Jequi%C3%A9Futebol.png/500px-Jequi%C3%A9Futebol.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "juazeirense",
@@ -63,7 +66,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/6/61/Sociedade_Desportiva_Juazeirense_2026.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "porto_ba",
@@ -76,7 +80,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/c5/F.C._Porto_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "barcelona_ilheus",
@@ -94,7 +99,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Salvador",
-    "estadio": "Edgar Santos"
+    "estadio": "Edgar Santos",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/6/66/ADLe%C3%B4nico.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "barreiras_fc",
@@ -103,7 +109,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Barreiras",
-    "estadio": "Geraldão"
+    "estadio": "Geraldão",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Escudo_do_Barreiras_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "camacari",
@@ -112,7 +119,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Camaçari",
-    "estadio": "Armando Oliveira"
+    "estadio": "Armando Oliveira",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/1d/Escudo_do_Cama%C3%A7a.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ecpp_vitoria_conquista",
@@ -128,7 +136,8 @@
     "nome_popular": "Feira FC",
     "pais": "BR",
     "estado": "BA",
-    "cidade": "Feira de Santana"
+    "cidade": "Feira de Santana",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Escudo_Feira_FC.png/500px-Escudo_Feira_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "fluminense_de_feira",
@@ -136,7 +145,8 @@
     "nome_popular": "Fluminense de Feira",
     "pais": "BR",
     "estado": "BA",
-    "cidade": "Feira de Santana"
+    "cidade": "Feira de Santana",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Fluminense_de_Feira.svg/500px-Fluminense_de_Feira.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "grapiuna",
@@ -145,7 +155,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Itabuna",
-    "estadio": "Luiz Viana Filho"
+    "estadio": "Luiz Viana Filho",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/43/Grapi%C3%BAnaAC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "jacobina",
@@ -171,6 +182,7 @@
     "nome_popular": "SSA FC",
     "pais": "BR",
     "estado": "BA",
-    "cidade": "Salvador"
+    "cidade": "Salvador",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/SSAFC.png/500px-SSAFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   }
 ]

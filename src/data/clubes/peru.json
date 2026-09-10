@@ -307,7 +307,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/CAMannucciOficial.png/500px-CAMannucciOficial.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "comerciantes_fc",
@@ -319,7 +320,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Comerciantes_FC_2025_logo.png/500px-Comerciantes_FC_2025_logo.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "deportivo_binacional",
@@ -391,7 +393,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Santos_Futebol_Clube_logo_%28with_stars_and_crown%29.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "sport_huancayo_b",
@@ -414,7 +417,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b8/Union_Comercio.svg/500px-Union_Comercio.svg.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "union_minas",
@@ -426,7 +430,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/Union_Minas_Centromin_Logo.png?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "universidad_cesar_vallejo",
@@ -438,7 +443,8 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Escudo_UCV.png/500px-Escudo_UCV.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "universidad_san_martin",
@@ -450,6 +456,7 @@
     "divisao_nacional": {
       "pais": "PE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Club_USMP.png/500px-Club_USMP.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   }
 ]

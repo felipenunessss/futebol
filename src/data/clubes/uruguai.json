@@ -9,7 +9,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1670
+    "rating_inicial": 1670,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Escudo_del_Club_Atl%C3%A9tico_Pe%C3%B1arol.svg/500px-Escudo_del_Club_Atl%C3%A9tico_Pe%C3%B1arol.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "nacional_uy",
@@ -33,7 +34,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1487
+    "rating_inicial": 1487,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/d4/Danubio_F%C3%BAtbol_Club.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "defensor_sporting",
@@ -45,7 +47,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1508
+    "rating_inicial": 1508,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/5/5d/Defensor_Sporting.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "boston_river",
@@ -57,7 +60,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1513
+    "rating_inicial": 1513,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Bostonriversad-alta.png/500px-Bostonriversad-alta.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "cerro_largo",
@@ -69,7 +73,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1515
+    "rating_inicial": 1515,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/0/0f/CerroLargoFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "racing_uy",

@@ -80,7 +80,8 @@
     "nome_popular": "Araruama",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Araruama"
+    "cidade": "Araruama",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/0/0c/Araruama_FC.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "audax_rio",
@@ -97,7 +98,8 @@
     "nome_popular": "Duque de Caxias",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Duque de Caxias"
+    "cidade": "Duque de Caxias",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e3/Duque_de_Caxias_Futebol_Clube.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "olaria",
@@ -123,7 +125,8 @@
     "nome_popular": "Petrópolis",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "Petrópolis"
+    "cidade": "Petrópolis",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/6/6f/Petr%C3%B3polis_Futebol_Clube_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "resende",
@@ -140,6 +143,7 @@
     "nome_popular": "São Gonçalo EC",
     "pais": "BR",
     "estado": "RJ",
-    "cidade": "São Gonçalo"
+    "cidade": "São Gonçalo",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/4/41/S%C3%A3o_Gon%C3%A7alo_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

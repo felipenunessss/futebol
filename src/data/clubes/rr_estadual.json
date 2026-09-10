@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Monte_Roraima_Futebol.png/500px-Monte_Roraima_Futebol.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "bare",
@@ -29,7 +30,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/1b/Escudo_do_S%C3%A3o_Raimundo-RR.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "rio_negro_rr",
@@ -37,7 +39,8 @@
     "nome_popular": "Rio Negro",
     "pais": "BR",
     "estado": "RR",
-    "cidade": "Boa Vista"
+    "cidade": "Boa Vista",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/A._Rio_Negro_C..png/500px-A._Rio_Negro_C..png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "atletico_roraima",
@@ -65,7 +68,8 @@
     "nome_popular": "Náutico-RR",
     "pais": "BR",
     "estado": "RR",
-    "cidade": "Boa Vista"
+    "cidade": "Boa Vista",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/NauticoRR.png/500px-NauticoRR.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "progresso",

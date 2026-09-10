@@ -225,7 +225,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1706
+    "rating_inicial": 1706,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2c/Esporte_Clube_Bahia_logo.svg/500px-Esporte_Clube_Bahia_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "fortaleza",
@@ -255,7 +256,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1710
+    "rating_inicial": 1710,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Athletico_Paranaense_%28Logo_2019%29.svg/500px-Athletico_Paranaense_%28Logo_2019%29.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "red_bull_bragantino",
@@ -270,7 +272,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1674
+    "rating_inicial": 1674,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/9/9e/RedBullBragantino.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "cuiaba",
@@ -285,7 +288,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1636
+    "rating_inicial": 1636,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Cuiab%C3%A1_EC_crest.png/500px-Cuiab%C3%A1_EC_crest.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "vitoria",
@@ -300,7 +304,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1639
+    "rating_inicial": 1639,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/b/b3/VitoriaGuimaraes.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "criciuma",
@@ -315,7 +320,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1673
+    "rating_inicial": 1673,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Crici%C3%BAma_EC_2025_crest.svg/500px-Crici%C3%BAma_EC_2025_crest.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "juventude",
@@ -330,7 +336,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1668
+    "rating_inicial": 1668,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Juventude_crest.png/500px-Juventude_crest.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "sport_recife",
@@ -360,7 +367,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1644
+    "rating_inicial": 1644,
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/de/Simbolo-escudo-nautico.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "santa_cruz",
@@ -375,7 +383,8 @@
       "nivel": 3
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1505
+    "rating_inicial": 1505,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Santa_Cruz_Futebol_Clube_logo.svg/500px-Santa_Cruz_Futebol_Clube_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "ceara",
@@ -390,7 +399,8 @@
       "nivel": 2
     },
     "forca_financeira": "media",
-    "rating_inicial": 1628
+    "rating_inicial": 1628,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Bandeira_do_Cear%C3%A1.svg/500px-Bandeira_do_Cear%C3%A1.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "crb",
@@ -420,7 +430,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1643
+    "rating_inicial": 1643,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bd/Coritiba_Foot_Ball_Club_logo.svg/500px-Coritiba_Foot_Ball_Club_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "avai",
@@ -435,7 +446,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1591
+    "rating_inicial": 1591,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Ava%C3%AD_Futebol_Clube_logo.svg/500px-Ava%C3%AD_Futebol_Clube_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "chapecoense",
@@ -450,7 +462,8 @@
       "nivel": 1
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1563
+    "rating_inicial": 1563,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Logo_Associa%C3%A7%C3%A3o_Chapecoense_de_Futebol.svg/500px-Logo_Associa%C3%A7%C3%A3o_Chapecoense_de_Futebol.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "goias",
@@ -495,7 +508,8 @@
       "nivel": 3
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1547
+    "rating_inicial": 1547,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Guarani_Futebol_Clube_logo.svg/500px-Guarani_Futebol_Clube_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "ponte_preta",
@@ -558,7 +572,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1544
+    "rating_inicial": 1544,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Escudo_oficial_do_Am%C3%A9rica_Futebol_Clube.svg/500px-Escudo_oficial_do_Am%C3%A9rica_Futebol_Clube.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "tombense",
@@ -716,7 +731,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Logo_Rio_Branco.svg/500px-Logo_Rio_Branco.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "vitoria_es",
@@ -728,7 +744,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/e/e7/Vit%C3%B3riaFCES.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "uberlandia_ec",
@@ -825,7 +842,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Associa%C3%A7%C3%A3o_Atl%C3%A9tica_Portuguesa-RJ.png/500px-Associa%C3%A7%C3%A3o_Atl%C3%A9tica_Portuguesa-RJ.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "sampaio_correa_rj",
@@ -838,7 +856,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Sampaio_Corr%C3%AAa_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "america_rj",
@@ -850,7 +869,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/America_Football_Club_%28Rio_de_Janeiro%2C_Brazil%29_logo.svg/500px-America_Football_Club_%28Rio_de_Janeiro%2C_Brazil%29_logo.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "velo_clube",
@@ -915,7 +935,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Oper%C3%A1rio_Varzea-grandense.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "primavera_ac",
@@ -928,7 +949,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/0/0c/Esporte_Clube_Primavera_logo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "uniao_rondonopolis",
@@ -966,6 +988,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/EscudoBlumenauEC.svg/500px-EscudoBlumenauEC.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   }
 ]

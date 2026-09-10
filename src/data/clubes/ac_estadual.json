@@ -18,7 +18,8 @@
     "nome_popular": "Santa Cruz-AC",
     "pais": "BR",
     "estado": "AC",
-    "cidade": "Rio Branco"
+    "cidade": "Rio Branco",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/5/5a/Santa_Cruz-AC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "galvez",
@@ -78,6 +79,7 @@
     "nome_popular": "Rio Branco-AC",
     "pais": "BR",
     "estado": "AC",
-    "cidade": "Rio Branco"
+    "cidade": "Rio Branco",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/5/55/Escudorbfc.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

@@ -13,7 +13,8 @@
     "nome_popular": "Águia Negra",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Rio Brilhante"
+    "cidade": "Rio Brilhante",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/19/ECAguiaNegra.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "corumbaense",
@@ -21,7 +22,8 @@
     "nome_popular": "Corumbaense",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Corumbá"
+    "cidade": "Corumbá",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Escudo_do_Corumbaense_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "costa_rica_ms",
@@ -45,7 +47,8 @@
     "nome_popular": "Bataguassu",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Bataguassu"
+    "cidade": "Bataguassu",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/2/24/Bataguassu-MS.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "naviraiense",
@@ -53,7 +56,8 @@
     "nome_popular": "Naviraiense",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Naviraí"
+    "cidade": "Naviraí",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/1/18/CE_Naviraiense_escudo.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   },
   {
     "id": "dourados_ac",
@@ -73,6 +77,7 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/cb/IvinhemaFC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]

@@ -12,7 +12,11 @@
       "classificam_por_grupo": 2
     },
     "mata_mata": {
-      "fases": ["quartas", "semifinal", "final"],
+      "fases": [
+        "quartas",
+        "semifinal",
+        "final"
+      ],
       "ida_e_volta": true
     }
   },
@@ -37,5 +41,6 @@
     "santa_cruz_rs",
     "uniao_frederiquense",
     "veranopolis"
-  ]
+  ],
+  "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Bandeira_do_Rio_Grande_do_Sul.svg/500px-Bandeira_do_Rio_Grande_do_Sul.svg.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
 }

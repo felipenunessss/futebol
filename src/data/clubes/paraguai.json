@@ -61,7 +61,8 @@
       "pais": "PY",
       "nivel": 1
     },
-    "rating_inicial": 1577
+    "rating_inicial": 1577,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Club_Libertad.png/500px-Club_Libertad.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "nacional_paraguai",
@@ -85,7 +86,8 @@
       "pais": "PY",
       "nivel": 1
     },
-    "rating_inicial": 1621
+    "rating_inicial": 1621,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Logo_de_Olimpia_2022_PNG_HD.png/500px-Logo_de_Olimpia_2022_PNG_HD.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
   },
   {
     "id": "recoleta_paraguai",
@@ -357,6 +359,7 @@
     "divisao_nacional": {
       "pais": "PY",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Tacuary_-_FBC_-_1923.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
   }
 ]
