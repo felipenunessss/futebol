@@ -11,7 +11,7 @@ import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from
 import { probabilidadeDeDuelo } from "@motor/simulation/match.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { AlocacaoDePontos, AoIniciarSemanaInfo, ContextoPartidaDoJogadorSemanal } from "@motor/career/career-loop.js";
-import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
+import { useTemporada, type EscolhaDePrePartida, type EstatisticasCarreira, type EventoDeFeed, type JogoDaSemana, type PartidaAoVivoEmAndamento, type PromptPendente, type ResultadoDaRodadaExibido } from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
@@ -108,6 +108,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+      <CalendarioSemanalLateral
+        temporada={estadoAtual.temporada}
+        semanaAtual={temporada.semanaAtual}
+        jogoDaSemana={temporada.jogoDaSemana}
+        clubePorId={clubePorId}
+        nomePorCampeonato={nomePorCampeonato}
+      />
       {competicoesDoJogador.length > 0 && (
         <PainelDeCompeticoes competicoesDoJogador={competicoesDoJogador} tabelaPorCampeonato={tabelaPorCampeonato} faseMataMataPorCampeonato={faseMataMataPorCampeonato} clubeId={estadoAtual.clubeAtualId} nomePorCampeonato={nomePorCampeonato} />
       )}
@@ -166,6 +173,64 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
             placares das suas partidas aparecem conforme a temporada avança. */}
         <Feed eventos={feed} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />
+      </div>
+    </div>
+  );
+}
+
+const ROTULOS_DIA_SEMANA = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+/**
+ * O motor não marca em que DIA da semana cai treino/jogo (só a semana como
+ * um todo, ver `AoIniciarSemanaInfo`/`ContextoPartidaDoJogadorSemanal`) —
+ * fixamos convencionalmente treino na 3ª posição (meio de semana) e jogo na
+ * 6ª (fim de semana), só pra dar "corpo de calendário" ao que se sabe por
+ * semana. Não é uma previsão exata de dia do motor.
+ */
+const INDICE_DIA_TREINO = 2;
+const INDICE_DIA_JOGO = 5;
+
+function CalendarioSemanalLateral({
+  temporada,
+  semanaAtual,
+  jogoDaSemana,
+  clubePorId,
+  nomePorCampeonato,
+}: {
+  temporada: number;
+  semanaAtual: number;
+  jogoDaSemana: JogoDaSemana | undefined;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+}) {
+  const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
+  const temTreino = periodos.some((p) => p.semanaInicio === semanaAtual && p.pontoDeTreino !== false);
+  const { inicio } = intervaloDeSemana(temporada, semanaAtual);
+
+  return (
+    <div className="fixed top-4 left-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur">
+      <h2 className="font-semibold text-slate-400">Semana {semanaAtual}</h2>
+      <div className="flex flex-col gap-1">
+        {ROTULOS_DIA_SEMANA.map((rotulo, indice) => {
+          const data = new Date(inicio);
+          data.setUTCDate(data.getUTCDate() + indice);
+          const ehTreino = indice === INDICE_DIA_TREINO && temTreino;
+          const ehJogo = indice === INDICE_DIA_JOGO && !!jogoDaSemana;
+
+          return (
+            <div key={rotulo} className={`flex items-center gap-2 rounded-lg px-2 py-1 ${ehJogo ? "bg-emerald-950/60 border border-emerald-800" : ""}`}>
+              <span className="w-14 shrink-0 text-slate-400">
+                {rotulo} {formatarData(data)}
+              </span>
+              {ehJogo && jogoDaSemana && (
+                <span className="text-emerald-400 truncate" title={`${nomeDoClube(clubePorId, jogoDaSemana.mandanteId)} x ${nomeDoClube(clubePorId, jogoDaSemana.visitanteId)}`}>
+                  ⚽ {nomeDoCampeonato(nomePorCampeonato, jogoDaSemana.campeonatoId)}
+                  {jogoDaSemana.resultado && ` (${jogoDaSemana.resultado.golsCasa}-${jogoDaSemana.resultado.golsFora})`}
+                </span>
+              )}
+              {ehTreino && !ehJogo && <span className="text-slate-500">🏋️ treino</span>}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

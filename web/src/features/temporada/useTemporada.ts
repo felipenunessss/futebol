@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FocoDeTreino } from "@motor/progression/xp.js";
+import { buscarArquetipo } from "@motor/schemas/player.js";
 import type { Cenario, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
@@ -114,6 +115,15 @@ export type ResultadoDaRodadaExibido =
   | { tipo: "pontos_corridos"; campeonatoId: string; rodada: number; confrontos: ConfrontoResultado[]; tabela: LinhaTabela[] | undefined }
   | { tipo: "mata_mata"; campeonatoId: string; etapa: string; confrontoDoJogador: ConfrontoResultado; eliminado: boolean };
 
+/** Jogo do próprio clube "desta semana" pro calendário lateral — criado quando o menu pré-jogo chega (`escolherModoDePartida`) e completado com o placar quando o resultado sai (`onPartidaPontosCorridos`/`onPartidaMataMata`). `undefined` = sem jogo do clube nesta semana (ou ainda não se sabe). */
+export interface JogoDaSemana {
+  campeonatoId: string;
+  semana: number;
+  mandanteId: string;
+  visitanteId: string;
+  resultado?: { golsCasa: number; golsFora: number };
+}
+
 export interface TituloDeCarreira {
   campeonatoId: string;
   temporada: number;
@@ -173,6 +183,21 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
   /** Confrontos da rodada atual de cada competição, acumulados conforme os hooks disparam (ver `ResultadoDaRodadaExibido`). Reseta ao detectar que uma nova rodada começou. */
   const bufferRodadaRef = useRef<Map<string, { rodada: number; confrontos: ConfrontoResultado[] }>>(new Map());
+  /**
+   * Semana atual — ref (fonte de verdade dentro das clausuras de
+   * `jogarTemporada`, mesmo motivo de `modoAutoAteSemanaRef`) + estado
+   * espelhado só pra UI (calendário lateral) reagir. Atualizado 1x por
+   * semana em `aoIniciarSemana`, mesmo durante a janela automática (que só
+   * pula a PAUSA, não para de contar semana).
+   */
+  const semanaAtualRef = useRef(1);
+  const [semanaAtual, setSemanaAtual] = useState(1);
+  const [jogoDaSemana, setJogoDaSemana] = useState<JogoDaSemana>();
+
+  /** Janela "não perguntar de novo" (ver `modoAutoAteSemanaRef`) — quando ativa, os demais prompts da semana (treino, distribuição de pontos, cenário, resultado da rodada) também se resolvem sozinhos com um padrão sensato, em vez de pausar, pra "simular até a metade/final" ser de verdade sem clique nenhum. */
+  function emJanelaAutomatica(): boolean {
+    return modoAutoAteSemanaRef.current !== undefined && semanaAtualRef.current <= modoAutoAteSemanaRef.current;
+  }
 
   const clubes = useMemo(() => loadClubes(), []);
   const clubePorId = useMemo(() => new Map(clubes.map((c) => [c.id, c])), [clubes]);
@@ -187,15 +212,21 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   function escolherFocoDeTreino(estado: EstadoDeCarreira): Promise<FocoDeTreino> {
     setEstadoAtual(estado);
     if (focoAutomaticoRef.current !== undefined) return Promise.resolve(focoAutomaticoRef.current);
+    if (emJanelaAutomatica()) return Promise.resolve("tecnico"); // mesmo padrão do motor quando ninguém escolhe (ver career-loop.ts)
     return new Promise((resolve) => setPromptPendente({ tipo: "foco", resolve }));
   }
 
   function escolherDistribuicaoDePontos(estado: EstadoDeCarreira): Promise<AlocacaoDePontos[]> {
     setEstadoAtual(estado);
+    if (emJanelaAutomatica()) {
+      // Mesmo padrão do motor quando ninguém escolhe: tudo no 1º atributo prioritário do arquétipo (ver career-loop.ts investirPontosDisponiveis).
+      return Promise.resolve([{ atributo: buscarArquetipo(estado.jogador.arquetipo_id).atributos_prioritarios[0], quantidade: estado.pontosDisponiveis }]);
+    }
     return new Promise((resolve) => setPromptPendente({ tipo: "pontos", estado, resolve }));
   }
 
   function escolherOpcao(cenario: Cenario): Promise<Opcao> {
+    if (emJanelaAutomatica()) return Promise.resolve(cenario.opcoes[0]); // mesmo padrão do motor quando ninguém escolhe
     return new Promise((resolve) => setPromptPendente({ tipo: "cenario", cenario, resolve }));
   }
 
@@ -218,11 +249,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function aoIniciarSemana(info: AoIniciarSemanaInfo): Promise<void> {
     setCompeticoesDoJogador(info.competicoesDoJogador);
+    semanaAtualRef.current = info.semana;
+    setSemanaAtual(info.semana);
+    setJogoDaSemana(undefined); // novo jogo (se houver) só é conhecido quando escolherModoDePartida chamar pra essa semana
+    if (emJanelaAutomatica()) return Promise.resolve();
     return new Promise((resolve) => setPromptPendente({ tipo: "semana", info, resolve }));
   }
 
   function escolherCampeonatosParaSeguir(idsAtivos: string[]): Promise<string[]> {
     if (idsAtivos.length === 0) return Promise.resolve([]);
+    if (emJanelaAutomatica()) return Promise.resolve([]); // padrão: não acompanhar nenhuma outra competição além da(s) do próprio clube
     return new Promise((resolve) => setPromptPendente({ tipo: "seguir_campeonatos", idsAtivos, resolve }));
   }
 
@@ -234,6 +270,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * mostrar nada (mesmo comportamento de `src/cli/index.ts`).
    */
   function escolherModoDePartida(contexto: ContextoPartidaDoJogadorSemanal): Promise<ModoDePartida> {
+    setJogoDaSemana({ campeonatoId: contexto.campeonatoId, semana: contexto.semana, mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId });
     if (modoAutoAteSemanaRef.current !== undefined) {
       if (contexto.semana <= modoAutoAteSemanaRef.current) return Promise.resolve("rapida");
       modoAutoAteSemanaRef.current = undefined; // passou da janela automática, volta a perguntar
@@ -312,14 +349,19 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           golsFora: resultadoDaPartida.golsFora,
           ehDoJogador: true,
         });
-        const bufferDaRodada = bufferRodadaRef.current.get(info.campeonatoId);
-        setResultadoDaRodada({
-          tipo: "pontos_corridos",
-          campeonatoId: info.campeonatoId,
-          rodada: confronto.rodada,
-          confrontos: bufferDaRodada ? [...bufferDaRodada.confrontos] : [],
-          tabela: info.evento.tabelaDepois,
-        });
+        setJogoDaSemana((atual) =>
+          atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: resultadoDaPartida.golsCasa, golsFora: resultadoDaPartida.golsFora } } : atual,
+        );
+        if (!emJanelaAutomatica()) {
+          const bufferDaRodada = bufferRodadaRef.current.get(info.campeonatoId);
+          setResultadoDaRodada({
+            tipo: "pontos_corridos",
+            campeonatoId: info.campeonatoId,
+            rodada: confronto.rodada,
+            confrontos: bufferDaRodada ? [...bufferDaRodada.confrontos] : [],
+            tabela: info.evento.tabelaDepois,
+          });
+        }
       },
       escolherCampeonatosParaSeguir,
       onPartidaDaRodadaNaCompeticaoDoJogador: (info) => {
@@ -338,19 +380,24 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         const eliminado = info.evento.confronto.vencedor !== estadoAtual.clubeAtualId;
         setFaseMataMataPorCampeonato((atual) => new Map(atual).set(info.campeonatoId, { etapa: info.evento.etapa, eliminado }));
         pushEvento({ tipo: "partida_mata_mata", info });
-        setResultadoDaRodada({
-          tipo: "mata_mata",
-          campeonatoId: info.campeonatoId,
-          etapa: info.evento.etapa,
-          confrontoDoJogador: {
-            mandanteId: info.evento.confronto.timeA,
-            visitanteId: info.evento.confronto.timeB,
-            golsCasa: info.evento.confronto.golsA,
-            golsFora: info.evento.confronto.golsB,
-            ehDoJogador: true,
-          },
-          eliminado,
-        });
+        setJogoDaSemana((atual) =>
+          atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: info.evento.confronto.golsA, golsFora: info.evento.confronto.golsB } } : atual,
+        );
+        if (!emJanelaAutomatica()) {
+          setResultadoDaRodada({
+            tipo: "mata_mata",
+            campeonatoId: info.campeonatoId,
+            etapa: info.evento.etapa,
+            confrontoDoJogador: {
+              mandanteId: info.evento.confronto.timeA,
+              visitanteId: info.evento.confronto.timeB,
+              golsCasa: info.evento.confronto.golsA,
+              golsFora: info.evento.confronto.golsB,
+              ehDoJogador: true,
+            },
+            eliminado,
+          });
+        }
       },
       onStatusAtualizado: (info) => pushEvento({ tipo: "status", info }),
       onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => pushEvento({ tipo: "tabela", campeonatoId, periodo, tabela }),
@@ -478,5 +525,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     desligarTreinoAutomatico,
     resultadoDaRodada,
     responderResultadoDaRodada,
+    semanaAtual,
+    jogoDaSemana,
   };
 }
