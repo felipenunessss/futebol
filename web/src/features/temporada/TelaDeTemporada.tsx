@@ -246,7 +246,6 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
               <PainelPropostasFimDeTemporada
                 propostas={temporada.propostasFimDeTemporada}
                 clubePorId={clubePorId}
-                nomePorCampeonato={nomePorCampeonato}
                 nomeClubeAtual={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
                 onResponder={temporada.responderFimDeTemporada}
               />
@@ -1554,7 +1553,6 @@ function PainelPropostasFimDeTemporada({
 }: {
   propostas: PropostasDeFimDeTemporada;
   clubePorId: Map<string, Club>;
-  nomePorCampeonato: Map<string, string>;
   nomeClubeAtual: string;
   onResponder: (escolha: EscolhaDeFimDeTemporada) => void;
 }) {
