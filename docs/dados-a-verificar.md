@@ -5,7 +5,7 @@ aplicado: só entra na base um clube/fato confirmado por pelo menos uma fonte
 razoável; qualquer coisa duvidosa fica de fora dos arquivos de dados e
 listada aqui até ser resolvida. Itens já resolvidos/confirmados foram
 removidos deste arquivo (histórico completo no `git log` de cada arquivo de
-dado, se precisar recuperar o raciocínio).
+dado e deste próprio arquivo, se precisar recuperar o raciocínio).
 
 ## Divisões não modeladas / listas incompletas
 
@@ -91,17 +91,6 @@ dado, se precisar recuperar o raciocínio).
   vaga, melhor colocado sem competição nacional) em vez de critério
   pesquisado — vale revisar, especialmente São Paulo, que provavelmente tem
   mais de 1 vaga por ser estado grande.
-- ~~Peru (1ª divisão): se a semifinal/final da Liguilla são jogo único ou
-  ida e volta não foi especificado~~ **resolvida**: confirmado (ESPN/
-  América TV/RPP) que semifinal e final são **ida e volta**. Também
-  corrigido o `final_estadual.criterio`: a condição extra que o dado
-  tinha ("campeões precisam estar entre os 7 primeiros do acumulado")
-  não se confirmou numa fonte mais recente — a regra real é só "os 2
-  campeões de torneio + os 2 melhores do acumulado geral, excluindo quem
-  já é campeão de torneio". Receita implementada em
-  `simulation/engine.ts` `receitaPeruPrimeira`. Fontes: [Liga 1 anunció
-  formato (ESPN)](https://www.espn.com.pe/futbol/peru/nota/_/id/16206894/formato-para-definir-al-campeon-de-la-liga-1-de-peru-2026),
-  [Liga1 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Liga1_2025_(Per%C3%BA)).
 - **Paraguai (2ª divisão, División Intermedia)**: a tabela anota "Ascienden
   a Primera División" no plural ao lado do 1º colocado, sugerindo mais de um
   acesso, mas não achamos confirmação explícita de que o 2º sobe direto ou
@@ -109,27 +98,24 @@ dado, se precisar recuperar o raciocínio).
 - **Copas regionais (Nordeste, Verde, Sul-Sudeste)**: campeão vs. vice não
   distinguido na maioria das vagas (exceto MG/PR/SC na Copa Sul-Sudeste);
   se as 3 copas dão vaga direta de Sul-Americana/Libertadores ao campeão
-  (além da vaga já confirmada na Copa do Brasil) não é 100% certo.
-  **Achado ao pesquisar formato pós-fase-de-grupos** (ainda pendente de
-  implementar receita): a Copa do Nordeste 2025 (confirmado via
-  Olympics.com/CBF) usa 16 times em 2 grupos de 8 (com jogos DENTRO do
-  próprio grupo, não só cruzados como antes de 2025), top 4 de cada grupo
-  em cruzamento olímpico pras quartas (jogo único), semifinal (jogo
-  único), final (ida e volta) — **mas o dado atual do projeto modela
-  `fase_suica` (4 potes de 5 = 20 times)**, uma contagem/estrutura
-  DIFERENTE da confirmada aqui. Não sabemos se o formato mudou entre a
-  edição modelada e 2025, ou se o dado atual já era uma aproximação —
-  não implementamos a receita nem corrigimos o dado até reconfirmar a
-  contagem exata de times/grupos da edição que o projeto pretende
-  modelar. A estrutura pós-grupos (quartas/semi jogo único, final ida e
-  volta) está bem confirmada e reaproveitável assim que a contagem for
-  resolvida. A Copa Verde também muda de formato a partir de **2026**
-  (vira uma "supercopa": 24 clubes em 2 blocos de 12 — Copa Norte e Copa
-  Centro-Oeste —, cada bloco decidindo seu próprio campeão antes da final
-  entre os 2, o que bate estruturalmente com `dupla_chave_regional` já
-  modelado), mas o formato EXATO de cada bloco (quantas fases dentro dos
-  12 times) não foi confirmado. Fontes: [Olympics.com — Copa do Nordeste
-  2025 formato](https://www.olympics.com/pt/noticias/copa-do-nordeste-2025-formato-classificados-datas),
+  (além da vaga já confirmada na Copa do Brasil) não é 100% certo. A Copa do
+  Nordeste real (2025, confirmado via Olympics.com/CBF) usa 16 times em 2
+  grupos de 8 com jogos DENTRO do próprio grupo, top 4 de cada grupo em
+  cruzamento olímpico pras quartas (jogo único), semifinal (jogo único),
+  final (ida e volta) — mas o dado atual do projeto modela `fase_suica` (4
+  potes de 5 = 20 times), uma contagem/estrutura DIFERENTE da confirmada.
+  Não sabemos se o formato mudou entre a edição modelada e 2025, ou se o
+  dado atual já era uma aproximação — não implementamos a receita nem
+  corrigimos o dado até reconfirmar a contagem exata de times/grupos da
+  edição que o projeto pretende modelar. A estrutura pós-grupos (quartas/
+  semi jogo único, final ida e volta) está bem confirmada e reaproveitável
+  assim que a contagem for resolvida. A Copa Verde também muda de formato a
+  partir de **2026** (vira uma "supercopa": 24 clubes em 2 blocos de 12 —
+  Copa Norte e Copa Centro-Oeste —, cada bloco decidindo seu próprio
+  campeão antes da final entre os 2, o que bate estruturalmente com
+  `dupla_chave_regional` já modelado), mas o formato EXATO de cada bloco
+  (quantas fases dentro dos 12 times) não foi confirmado. Fontes:
+  [Olympics.com — Copa do Nordeste 2025 formato](https://www.olympics.com/pt/noticias/copa-do-nordeste-2025-formato-classificados-datas),
   [ecbahia — formato Nordestão 2025](https://www.ecbahia.com/nordestao/formato-da-copa-do-nordeste-2025),
   [CBF — Copa Verde em novo formato 2026](https://www.cbf.com.br/futebol-brasileiro/noticias/supercopa/sub20/copa-verde-em-novo-formato-tem-inicio-nesta-terca-24),
   [Band — Copa Verde/Supercopa](https://www.band.com.br/esportes/futebol/noticias/copa-verde-supercopa-copa-norte-copa-centro-oeste-202510011247).
@@ -137,52 +123,6 @@ dado, se precisar recuperar o raciocínio).
   campo do schema cobre vaga direta na Copa Intercontinental FIFA/Recopa/
   Mundial de Clubes (campeão da Libertadores) nem a vaga do campeão da
   Sul-Americana na Libertadores seguinte — fica só documentado aqui.
-- **Bug real corrigido — fase suíça jogava dentro do próprio pote** (reportado
-  pelo usuário: "Paulistão A1 mostra 16 times num grupo só" e "Cruzeiro com 3
-  jogos, Itabirito com 0 no Mineiro Módulo I"): confirmado via Wikipédia/CNN
-  Brasil/Lance que Paulistão A1, Mineiro, Gauchão e Paraense (2025) usam
-  pote/chave só pra DEFINIR quem enfrenta quem — cada time joga contra TODOS
-  os times de fora do próprio pote, NUNCA contra os do próprio pote
-  (`gerarConfrontosFaseSuica`, `simulation/swiss.ts`, jogava rodízio dentro
-  do pote + parte cruzada, o oposto do real). Corrigido: novo algoritmo de
-  emparelhamento máximo por backtracking (fecha sempre no número mínimo de
-  rodadas = `jogos_por_time`) só gera jogo cruzado. Também corrigida a
-  classificação: Paulistão real classifica os 2 melhores de CADA grupo (não
-  top-8 da tabela geral simples); Mineiro/Gauchão reais classificam o líder
-  de cada grupo + o melhor 2º colocado geral — novo campo opcional
-  `classificacao_por_pote` (`schemas/championship.ts` `FaseSuica`) modela
-  isso, aplicado em `swiss.ts`/`incremental.ts`. Dados corrigidos:
-  `paulistao_a1` (`jogos_por_time` 9→12, 4 potes de 4), `gauchao_1`
-  (2 potes de 6→3 potes de 4, `jogos_por_time` 6→8, `classificam_mata_mata`
-  8→4, mata-mata vira só semifinal+final — líderes/melhor 2º avançam DIRETO,
-  sem quartas), `paraense_1` (2 potes de 6→3 potes de 4, `jogos_por_time`
-  6→8, mantém top-8 geral simples — confirmado que essa é a regra real do
-  Paraense). `mineiro_1` já tinha a contagem de potes/jogos certa, só a
-  regra de classificação mudou. **Ainda não modelado**: Troféu Farroupilha
-  do Gauchão (5º-8º colocados disputam um mini-torneio à parte por vaga na
-  Copa do Brasil, à parte do mata-mata principal) — fora de escopo desta
-  correção, fica como pendência. Fontes: [2025 Campeonato Paulista
-  (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Paulista),
-  [Paulistão 2025 formato (CNN Brasil)](https://www.cnnbrasil.com.br/esportes/futebol/campeonato-paulista/paulistao-2025-veja-datas-do-mata-mata-e-formato/),
-  [Campeonato Mineiro de Futebol de 2025 - Módulo I (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Mineiro_de_Futebol_de_2025_-_M%C3%B3dulo_I),
-  [2025 Campeonato Gaúcho (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Ga%C3%BAcho),
-  [Campeonato Paraense de Futebol de 2025 - Série A (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Paraense_de_Futebol_de_2025_-_S%C3%A9rie_A).
-- **Bug real corrigido — Catarinense/Goiano/Paranaense modelados como fase
-  suíça, mas o formato real é pontos corridos puro**: confirmado (Wikipedia/
-  NSC Total/Lance) que essas 3 competições NÃO usam pote/chave nenhum — é
-  turno único todos-contra-todos (12 times, 11 rodadas), top-8 pro mata-mata
-  (quartas/semifinal/final). `paranaense_1` também tinha `classificam_mata_mata: 4`
-  (só semifinal+final) — real é top-8 igual Catarinense/Goiano, corrigido
-  pra 3 fases de mata-mata. Dado trocado de `formato.fase_suica` pra
-  `formato.pontos_corridos` (`ida_e_volta: false, rodadas: 11`) + `mata_mata`
-  (já existia receita genérica pra essa combinação, `receitaPontosCorridosComLiguilla`).
-  As sub-mecânicas especiais dessas 3 competições continuam não modeladas
-  (ver entradas mais abaixo: "Torneio da Morte" do Paranaense, quadrangular
-  de rebaixamento do Catarinense, playoff 10º×11º do Goiano) — só a fase
-  principal (pontos corridos → top-8 → mata-mata) foi corrigida agora.
-  Fontes: [Campeonato Catarinense de Futebol de 2025 - Série A (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Catarinense_de_Futebol_de_2025_-_S%C3%A9rie_A),
-  [Campeonato Goiano: regulamento, formato e times (Lance)](https://www.lance.com.br/lancepedia/campeonato-goiano.html),
-  [2025 Campeonato Paranaense (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Paranaense).
 
 ## Formatos que o schema não representa bem (decisão de arquitetura)
 
@@ -196,6 +136,9 @@ resultado final bate mas o mecanismo intermediário não é representado:
   3º-6º disputam quartas — perde-se a passagem direta. Além disso, a
   **fusão A1+A2 num campeonato de 31 clubes a partir de outubro/2026** ainda
   não foi modelada.
+- **Gauchão**: Troféu Farroupilha (5º-8º colocados disputam um mini-torneio
+  à parte, fora do mata-mata principal, por vaga na Copa do Brasil) não
+  modelado.
 - **Paranaense**: "Torneio da Morte" (grupo de 4 à parte da fase principal)
   não representado, só o resultado final (2 rebaixados).
 - **Catarinense**: rebaixamento real é um quadrangular especial com bônus de
@@ -217,51 +160,6 @@ resultado final bate mas o mecanismo intermediário não é representado:
 - **Argentina 1ª divisão**: zonas internas de cada torneio (Apertura/
   Clausura) e tamanho exato do chaveamento de playoff não modelados
   (`classificam_proxima_fase: 16` é estimativa).
-- ~~Argentina 2ª divisão: chaveamento exato dos 15 times do "Reduzido" não
-  fechado (torneio real ainda em andamento)~~ **resolvida**: o Reduzido
-  2025 já foi disputado com formato fechado (LA NACION/ESPN/todojujuy) —
-  não é mais indefinido. 1º de cada zona disputa uma final direta pelo 1º
-  ascenso; os 2º-8º de cada zona (14 times) entram no Reduzido (jogo
-  único, 14→7); o PERDEDOR da final direta se soma aos 7 vencedores
-  (8 times) pras quartas/semifinal/final, todas ida e volta, decidindo o
-  2º ascenso. Receita implementada em `simulation/engine.ts`
-  `receitaArgentinaSegunda`. Fontes: [LA NACION — Reduzido 2025
-  fechado](https://www.lanacion.com.ar/deportes/futbol/asi-quedo-el-reducido-de-la-primera-nacional-2025-nid05102025/),
-  [ESPN — como se joga o Reduzido](https://www.espn.com.ar/futbol/argentina/nota/_/id/15780960/asi-se-juega-el-torneo-reducido-de-la-primera-nacional),
-  [todojujuy — cruzamentos das quartas](https://www.todojujuy.com/deportes/cuartos-final-del-reducido-la-primera-nacional-como-seran-los-cruces-n260288).
-- ~~Uruguai 1ª divisão: schema não amarra explicitamente qual fase
-  alimenta qual etapa do mata-mata final~~ **resolvida** (confirmado via
-  Wikipedia/AUF): "Torneo Intermedio" é uma competição À PARTE, só de vaga
-  internacional, sem relação com o título — removido do formato (não
-  modelado, ver `simulation/engine.ts` `receitaUruguaiPrimeira`). O título
-  ("Campeón Uruguayo") é: campeão automático se o mesmo clube vencer
-  Apertura e Clausura; senão, semifinal entre os 2 campeões de torneio; se
-  o líder da Tabla Anual (soma Apertura+Clausura) for um dos 2
-  semifinalistas, quem vencer a semifinal já é campeão; senão, o vencedor
-  ainda enfrenta o líder numa final. Fonte: [Campeonato Uruguayo de
-  Primera División 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Campeonato_Uruguayo_de_Primera_Divisi%C3%B3n_2025).
-- ~~Uruguai 2ª divisão: não representa como o Torneo Competencia se soma
-  à fase regular, nem a condicional "vaga garantida"~~ **parcialmente
-  resolvida**: confirmado que o campeão da divisão é sempre o líder da
-  fase regular (`pontos_corridos`), não do Torneo Competencia — este roda
-  à parte (`receitaUruguaiSegunda`). A condicional exata do playoff pelo
-  3º acesso (só inclui o campeão do Torneo Competencia se ele não estiver
-  já em zona de acesso direto nem de descenso) continua **não
-  representada** — a receita usa sempre as posições 3ª-6ª da tabela
-  regular, sem essa condicional (não afeta quem é campeão, só o detalhe
-  de quem disputa a vaga extra). Fonte: [Campeonato Uruguayo de Segunda
-  División 2025 (Wikipedia)](https://es.wikipedia.org/wiki/Campeonato_Uruguayo_de_Segunda_Divisi%C3%B3n_2025).
-- ~~Colômbia 1ª divisão: Apertura usa playoff direto e Finalización usa
-  cuadrangulares — modelados de forma uniforme, perdendo a diferença~~
-  **confirmada e mantida como estimativa deliberada**: pesquisa (Wikipedia/
-  ESPN) confirma que isso é real, mas **só em 2026, exceção pontual por
-  causa da Copa do Mundo** — em anos "típicos" (2025 confirmado) os 2
-  torneios usam cuadrangulares igual. Como uma carreira roda várias
-  temporadas simuladas (não uma réplica literal de 2026), mantido
-  cuadrangulares nos 2 torneios de propósito — ver
-  `simulation/engine.ts` `receitaTurnoRetornoComQuadrangularEFinal`.
-  Fontes: [Torneo Apertura 2026 (Wikipedia)](https://es.wikipedia.org/wiki/Torneo_Apertura_2026_(Colombia)),
-  [8 clasificados a cuadrangulares Finalización 2026 (ESPN)](https://www.espn.com.ar/futbol/colombia/nota/_/id/16591952/torneo-betplay-dimayor-2026-asi-quedaron-8-clasificados-cuadrangulares).
 - **Colômbia 2ª divisão**: acesso condicional (2 campeões semestrais sobem
   direto só se estiverem nas 2 primeiras posições da tabela anual, senão
   repechaje) não representado — a receita (mesma de Colômbia 1ª) resolve
@@ -271,64 +169,22 @@ resultado final bate mas o mecanismo intermediário não é representado:
   confirmado.
 - **Chile 2ª divisão**: bye do 2º colocado na liguilla de acesso (só
   3º-8º jogam quartas) não representável.
-- ~~Equador 1ª e 2ª divisão: sem bloco pra "grupos de tamanhos/propósitos
-  diferentes por classificação"~~ **resolvida**: novo bloco de schema
-  `FaseFinalPorClassificacao` (`schemas/championship.ts`) — grupos em
-  ordem (do melhor colocado ao pior), com `pontos_carregados` opcional
-  (soma os pontos da fase anterior em vez de zerar). **Achado
-  adicional**: o dado antigo de `equador_segunda` (2 grupos de 6 desde o
-  início) não batia com o formato real 2025 — corrigido pra
-  `pontos_corridos` único de 12 times (22 rodadas) seguido de 2
-  hexagonais (ascenso 1º-6º, descenso 7º-12º) por classificação, pontos
-  carregados. `equador_primera`: 3 grupos por classificação (hexagonal do
-  título 1º-6º, quadrangular internacional 7º-10º, hexagonal de
-  rebaixamento 11º-16º), pontos carregados. Fontes: [¿Cómo se jugará la
-  LigaPro 2025?](https://www.primicias.ec/deportes/nuevo-formato-sistema-campeonato-ligapro2025-85954/),
-  [2025 LigaPro Serie A (Wikipedia)](https://en.wikipedia.org/wiki/2025_LigaPro_Serie_A),
-  [¿Cómo será la Serie B de Ecuador de 2025?](https://www.primicias.ec/deportes/serie-b-ecuador-equipos-formato-ascenso-descenso-clubes-calendario-partidos-91404/),
-  [2025 Ecuadorian Serie B (Wikipedia)](https://en.wikipedia.org/wiki/2025_Ecuadorian_Serie_B).
-- ~~Venezuela 1ª/2ª divisão: estrutura em 2 níveis não confirmada~~
-  **resolvida**: confirmado (Wikipedia/El Universal) que cada torneio
-  (Apertura/Clausura) tem sua própria mini-competição interna — os
-  classificados do turno/returno entram numa `fase_grupos` própria
-  daquele torneio (cuadrangulares), que alimenta um `mata_mata` que
-  decide o "campeão daquele torneio"; só depois os 2 campeões de torneio
-  se enfrentam no `final_estadual` da temporada (mesmo clube campeão dos
-  dois = campeão automático). Ver `simulation/engine.ts`
-  `receitaTurnoRetornoComGrupoEMataMataEFinal`. **Bug de dado corrigido**:
-  `venezuela_primera.json` tinha `final_estadual.ida_e_volta: false`,
-  deveria ser `true` (final 2025 foi ida e volta, UCV 3-1 sobre Carabobo
-  no agregado). Pra Venezuela 2ª divisão especificamente, os grupos reais
-  continuam assimétricos (8 Oriental + 9 Occidental, aqui modelado como
-  2×8 por aproximação) e não foi possível confirmar se a Final Absoluta é
-  jogo único ou ida e volta (mantido ida e volta, plausível mas não
-  confirmado) — a última fase do `mata_mata` (`quartas`/`semifinal`/
-  jogo único na final) também precisaria de `etapas` com `ida_e_volta`
-  por etapa em vez do campo único atual, não fizemos essa correção ainda.
-  Fontes: [Primera División de Venezuela 2025](https://es.wikipedia.org/wiki/Primera_Divisi%C3%B3n_de_Venezuela_2025),
-  [UCV FC campeón Liga FUTVE 2025 (El Universal)](https://www.eluniversal.com/deportes/221884/ucv-fc-se-consagra-como-campeon-la-liga-futve-2025),
-  [Segunda División de Venezuela 2025](https://es.wikipedia.org/wiki/Segunda_Divisi%C3%B3n_de_Venezuela_2025).
+- **Uruguai 2ª divisão**: condicional exata do playoff pelo 3º acesso (só
+  inclui o campeão do Torneo Competencia se ele não estiver já em zona de
+  acesso direto nem de descenso) não representada — a receita
+  (`receitaUruguaiSegunda`) usa sempre as posições 3ª-6ª da tabela regular,
+  sem essa condicional (não afeta quem é campeão, só o detalhe de quem
+  disputa a vaga extra).
+- **Venezuela 2ª divisão**: os grupos reais são assimétricos (8 Oriental +
+  9 Occidental), aqui modelado como 2×8 por aproximação; não foi possível
+  confirmar se a Final Absoluta é jogo único ou ida e volta (mantido ida e
+  volta, plausível mas não confirmado); a última fase do `mata_mata`
+  (quartas/semifinal/final) usa um único campo `ida_e_volta` pra todas as
+  etapas quando precisaria de `ida_e_volta` por etapa — não implementado.
 - **Peru 2ª divisão (Liga 2)**: a mais elaborada de todas — 2 grupos
   regionais de 9 → 3 "Grupos Campeonato" de 4 com pontos de bônus
   carregados → playoffs de 3 etapas. Modelado só o corpo principal (2
   grupos de 9) + mata-mata genérico como placeholder.
-- ~~Copa Sul-Americana: mecanismo cross-competição com a Libertadores não
-  modelado~~ **resolvida**: confirmado via CONMEBOL/imprensa (LA NACION,
-  Infobae, Wikipedia) que 1º/2º de cada grupo da Libertadores avançam
-  direto às oitavas dela, o 3º cai pra Sul-Americana — na Sul-Americana,
-  1º de cada grupo avança direto, o 2º disputa o repechaje (ida e volta)
-  contra os 3º colocados da Libertadores. Implementado em
-  `simulation/engine.ts` `receitaLibertadoresESulAmericanaConjunta` (as
-  duas competições resolvidas juntas, único jeito de representar essa
-  dependência — ver `docs/motor-de-partida.md` seção 5.10). Continua
-  perdida a distinção "só o 1º de cada grupo avança direto às oitavas, o
-  2º vai pra repescagem" dentro da PRÓPRIA Sul-Americana antes do
-  cruzamento — isso já está corretamente representado agora, então essa
-  parte específica da pendência original também foi resolvida. Fontes:
-  [LA NACION — clasificados a octavos Libertadores/repechaje Sudamericana](https://www.lanacion.com.ar/deportes/futbol/clasificados-a-octavos-de-final-de-la-copa-libertadores-2025-los-que-avanzaron-y-los-que-jugaran-nid30052025/),
-  [Infobae — clasificados octavos y playoffs Sudamericana](https://www.infobae.com/peru/deportes/2025/05/27/los-equipos-clasificados-a-octavos-y-play-offs-de-la-copa-sudamericana-2025-tras-culminar-la-fase-de-grupos/),
-  [beIN Sports — playoffs Sudamericana ida/vuelta](https://www.beinsports.com/es-us/football/conmebol-sudamericana/articles/playoffs-de-la-copa-sudamericana-cu%C3%A1ndo-donde-equipos-llaves-fechas-y-horarios-de-los-partidos-de-esta-fase-2025-07-15),
-  [Wikipedia ES — eliminatoria de octavos Sudamericana 2025](https://es.wikipedia.org/wiki/Anexo:Eliminatoria_de_octavos_de_final_de_la_Copa_Sudamericana_2025).
 
 ## Clássicos não pesquisados (baixa prioridade — só imersão)
 
@@ -341,80 +197,28 @@ fonte boa o suficiente.
 
 ## Escudos e cores de clube/competição (`escudo_url`/`cor_primaria`/`cor_secundaria`)
 
-Populado por `scripts/buscar-escudos.ts` (busca na API pública TheSportsDB,
-chave de teste gratuita — só grava a URL externa retornada, nunca baixa a
-imagem). Resultado da rodada mais recente: **340/678 clubes** com escudo
-(a maioria dos clubes de estaduais pequenos/menos conhecidos não está
-catalogada na API — esperado, dado o tamanho da base) e **6/62
-competições** (o endpoint de busca de ligas da chave de teste limita a
-poucos resultados por país, então a maior parte dos estaduais/copas
-nacionais não é encontrável assim — precisaria de uma chave paga da
-TheSportsDB ou de outra fonte pra fechar essa lacuna). Cores (`cor_primaria`/
-`cor_secundaria`) só vêm junto quando o clube tem essa informação cadastrada
-na API — bem mais rara que o escudo em si, mesmo entre os clubes achados.
-Reexecutar o script é seguro (idempotente, só atualiza o que a busca achar
-de novo); útil pra tentar cobrir os que ainda faltam se a API atualizar seu
-catálogo.
+Populado por `scripts/buscar-escudos.ts` (API pública TheSportsDB) +
+`scripts/buscar-escudos-wikipedia.ts` (imagem principal de artigo na
+Wikipédia pt/es, pra quem o TheSportsDB não achou). Cobertura atual:
+**567/678 clubes** e **42/62 competições** com escudo; cores (`cor_primaria`/
+`cor_secundaria`) só vêm quando a fonte trazia essa informação junto — bem
+mais raro que o escudo em si. Reexecutar os scripts é seguro (idempotente,
+só atualiza o que a busca achar de novo).
 
-Segunda fonte, pra quem o TheSportsDB não achou: `scripts/buscar-escudos-wikipedia.ts`
-(busca de imagem principal de artigo na Wikipédia pt/es, ver o comentário do
-próprio arquivo pro histórico de falsos positivos já encontrados e corrigidos
-em rodadas anteriores). Resultado atualizado depois de uma rodada aplicada
-(clubes/competições que o TheSportsDB não tinha): **567/678 clubes** e
-**42/62 competições** com escudo.
-
-**Limitação conhecida, não fechada no código**: um clube pequeno com apelido
-genérico (uma ou duas palavras, sem cidade/estado no nome popular) pode
-"perder" pra um clube homônimo bem mais famoso em outro país/estado — a busca
-da Wikipédia rankeia por relevância/notoriedade, então o artigo mais
-importante com aquele nome aparece primeiro, e nenhuma checagem atual detecta
-isso (o artigo batido É de um clube de futebol de verdade, só que o errado).
-11 casos assim foram encontrados por auditoria manual (amostragem + busca
-dirigida por nomes de clubes famosos) e excluídos manualmente antes de
-aplicar o resto — ficaram de fora, sem `escudo_url`:
-`montevideo_wanderers` (bateu com Wolverhampton Wanderers-ING),
-`barcelona_ilheus` (Futbol Club Barcelona-ESP), `internacional_de_bogota`
-(Sport Club Internacional-BRA), `river_rr` (River Plate-ARG),
-`ferroviario_ce` (Ferroviário do Paraná, estado errado), `san_lorenzo_paraguai`
-(San Lorenzo-ARG), `racing_uy` (Racing Club-ARG), `nacional_uy` (Atlético
-Nacional-COL), `pirata_fc` (foto de um estádio, não de um clube),
-`america_propria` (logo da Copa Libertadores, não de um clube),
-`barquisimeto_sc` (bandeira da cidade, não de um clube) — mais 2 competições:
-`piauiense_1` (bateu com o escudo de um clube, "Clube Atlético Piauiense", não
-da competição em si) e `argentina_segunda` (foto de estádio). Não há garantia
-de que a lista dos 567/42 restantes esteja 100% livre desse mesmo problema —
-foi feita auditoria por amostragem grande + busca dirigida, não verificação
-individual de cada um. Se notar outro escudo claramente errado no jogo,
-documente aqui e reverta esse registro específico (`escudo_url` removido,
-não precisa reverter o resto).
-
-**2ª rodada de auditoria (dirigida pelo usuário, focada em nomes genéricos:
-"atletico, porto, internacional, vitoria")**: verificação visual de todos os
-clubes com "porto"/"vitória"/"atlético"/"internacional" no nome (qualquer
-fonte, TheSportsDB ou Wikipédia) mais uma amostra ampla de outros apelidos
-curtos (santos, sport, central, independiente, nacional...). Confirmados
-errados e removidos (`escudo_url`, e cor quando veio junto):
-`porto_ba` (bateu com F.C. Porto-POR, mesmo problema em 2 clubes brasileiros
-diferentes chamados "Porto" — `porto_caruaru`, que também tinha
-`cor_primaria`/`cor_secundaria` puxadas do mesmo escudo errado, azul/branco
-do FC Porto), `vitoria` (Esporte Clube Vitória-BA bateu com Vitória SC
-Guimarães-POR), `santos_fc_pe` (o pequeno Santos FC do Peru bateu com o
-Santos FC brasileiro, mesmo nome só que em país diferente — não precisa nem
-ser outro país pro problema acontecer), `central_pe` (Central Sport
-Club-Caruaru/PE bateu com Central FC de Trinidad e Tobago, apelido "The
-Sharks" — daria pra notar pelo desenho de tubarão/torre de petróleo no
-escudo, sem relação nenhuma com o clube brasileiro), `independiente_fbc`
-(Independiente Football Club-PY bateu com um escudo de um clube chamado
-"Caravel", nome completamente diferente — falha mais grosseira que as
-outras, mera coincidência de busca). Todos os outros clubes com esses
-apelidos genéricos checados nesta rodada (`internacional`, `porto_velho_ec`,
-`alianza_atletico`, `atletico_grau`, `atletico_gloriense`,
-`atletico_rafaela`, `central_norte_salta`, `el_nacional`,
-`comercial_ribeirao_preto`, `itz_sport`, `sport_huancayo`, `sport_boys`,
-`central_espanol`) foram conferidos visualmente e batem com o escudo real do
-próprio clube — não é motivo pra desconfiar de todo clube com nome
-genérico, só reforça que a checagem tem que ser visual, não por
-palavra-chave.
+**Risco aberto, não fechado no código**: um clube com apelido genérico (uma
+ou duas palavras, sem cidade/estado no nome popular) pode "perder" pra um
+clube homônimo mais famoso — a busca rankeia por relevância/notoriedade, e
+nenhuma checagem automática detecta isso (o resultado batido É um clube de
+futebol de verdade, só que o errado). Já foram feitas 2 rodadas de auditoria
+manual (amostragem + busca dirigida por nomes de clubes famosos, depois uma
+rodada extra dirigida especificamente a apelidos genéricos como "porto",
+"vitória", "atlético", "internacional", "santos", "sport", "central",
+"independente", "nacional") e todos os casos encontrados foram corrigidos
+(`escudo_url` removido, junto com cor quando veio da mesma fonte errada),
+mas não há garantia de cobertura 100% — a auditoria foi por amostragem +
+busca dirigida, não verificação individual de cada um dos 567 clubes/42
+competições. Se notar outro escudo claramente errado no jogo, documente
+aqui e remova só esse registro específico (não precisa reverter o resto).
 
 ## Como resolver
 
