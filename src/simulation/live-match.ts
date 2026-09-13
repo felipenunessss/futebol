@@ -139,6 +139,29 @@ type Slot = SlotDeChance | SlotDeEvento | SlotDeIncidente;
 const MAX_EVENTOS_DE_CONTEXTO_PADRAO = 3;
 /** Chance de CADA slot candidato (até `maxEventosDeContexto`) virar um evento de contexto de verdade — estimativa de design, calibrada pra "acontece de vez em quando, não toda partida, e não sempre a mesma quantidade". */
 const PROBABILIDADE_DE_EVENTO_DE_CONTEXTO = 0.25;
+
+/** Janelas de minuto por `Cenario.janelaDePartida` — "acréscimos"/"fim de jogo decisivo" não faz
+ * sentido no minuto 20, "início do jogo" não faz sentido no minuto 80 (ver `Cenario.janelaDePartida`). */
+function elegivelNoMinuto(janela: Cenario["janelaDePartida"], minuto: number): boolean {
+  switch (janela) {
+    case "inicio":
+      return minuto <= 15;
+    case "intervalo":
+      return minuto >= 40 && minuto <= 50;
+    case "fim":
+      return minuto >= 75;
+    default:
+      return true;
+  }
+}
+
+/** Subconjunto de `EVENTOS_DE_PARTIDA` que faz sentido sortear agora — filtra por minuto
+ * (`Cenario.janelaDePartida`) e por se o jogador já marcou um gol nesta partida
+ * (`Cenario.requerGolDoJogadorAntes`, ex: "comemoração polêmica de gol"). Sempre sobra pelo menos
+ * os cenários sem nenhuma das 2 restrições, então nunca fica vazio. */
+export function cenariosElegiveis(minuto: number, jogadorMarcouGol: boolean): Cenario[] {
+  return EVENTOS_DE_PARTIDA.filter((cenario) => elegivelNoMinuto(cenario.janelaDePartida, minuto) && (!cenario.requerGolDoJogadorAntes || jogadorMarcouGol));
+}
 /** Fração das chances do próprio jogador que realmente pausam pra decisão — o resto flui automático (sem ajuste), só narrado. Estimativa de design: interrupção frequente demais cansa, rara demais não parece dar controle nenhum. */
 const PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR = 0.6;
 
@@ -197,6 +220,10 @@ export async function jogarPartidaAoVivo(
   // a partir daí, as chances que cairiam pro jogador voltam a ser resolvidas de forma anônima, como se
   // fosse qualquer outro clube (ele já saiu de campo).
   let jogadorAindaEmCampo = true;
+  // Usado só pra elegibilidade de cenários que reagem a um gol já marcado nesta partida (ver
+  // `Cenario.requerGolDoJogadorAntes`) — mesmo critério de "sucesso conta como gol" já usado pra
+  // decidir o placar (`sucesso` abaixo), não uma contagem de gols separada.
+  let jogadorMarcouGolNestaPartida = false;
   let minutoAnterior = 0;
 
   for (const slot of slots) {
@@ -212,10 +239,18 @@ export async function jogarPartidaAoVivo(
     minutoAnterior = slot.minuto;
 
     if (slot.tipo === "evento") {
-      const cenario = sortearCenario(EVENTOS_DE_PARTIDA, random);
+      const cenario = sortearCenario(cenariosElegiveis(slot.minuto, jogadorMarcouGolNestaPartida), random);
       const opcaoEscolhida = decidirEventoDeContexto ? await decidirEventoDeContexto(cenario) : cenario.opcoes[0];
       const escolha = resolverEscolha(opcaoEscolhida, random);
       impactosDeContexto.push(escolha.resultado.impacto);
+      // Alguns cenários de contexto representam um gol de verdade acontecendo (pênalti convertido,
+      // gol contra, falta decisiva) — sem isso, a narrativa dizia "você fez o gol" e o placar ficava
+      // parado (bug relatado pelo usuário: "pênalti e não é gol", "gol contra e placar 0-0").
+      if (participacaoJogador && escolha.resultado.impacto.efeitoDeGol) {
+        const ladoQueMarcou = escolha.resultado.impacto.efeitoDeGol === "a_favor" ? participacaoJogador.lado : participacaoJogador.lado === "casa" ? "fora" : "casa";
+        if (ladoQueMarcou === "casa") golsCasa++;
+        else golsFora++;
+      }
       await onEvento?.({ tipo: "evento_de_contexto", minuto: slot.minuto, cenario, escolha });
       continue;
     }
@@ -259,6 +294,7 @@ export async function jogarPartidaAoVivo(
       if (sucesso) {
         if (lado === "casa") golsCasa++;
         else golsFora++;
+        jogadorMarcouGolNestaPartida = true;
       }
       await onEvento?.({ tipo: "chance_jogador", minuto: slot.minuto, chance, probabilidade });
     } else {

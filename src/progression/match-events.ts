@@ -90,6 +90,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "caibra_no_fim_do_jogo",
     titulo: "Cãibra no fim do jogo",
     descricao: "Faltando minutos, uma cãibra aperta — a comissão técnica pergunta se você aguenta terminar.",
+    janelaDePartida: "fim",
     opcoes: [
       {
         id: "insistir_em_ficar",
@@ -110,12 +111,13 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "pressao_para_cobrar_penalti",
     titulo: "A cobrança é sua?",
     descricao: "Pênalti nos acréscimos de um jogo decisivo. O grupo olha pra você esperando que assuma a cobrança.",
+    janelaDePartida: "fim",
     opcoes: [
       {
         id: "aceitar_cobrar",
         texto: "Assumir a cobrança",
         resultados: [
-          { probabilidade: 0.6, impacto: { moral: 20, narrativa: "Você bate com categoria e vira herói da torcida." } },
+          { probabilidade: 0.6, impacto: { moral: 20, efeitoDeGol: "a_favor", narrativa: "Você bate com categoria e vira herói da torcida." } },
           { probabilidade: 0.4, impacto: { moral: -25, narrativa: "A cobrança sai errada e o silêncio toma conta do estádio." } },
         ],
       },
@@ -123,7 +125,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
         id: "passar_a_responsabilidade",
         texto: "Passar a cobrança pra outro batedor",
         resultados: [
-          { probabilidade: 0.7, impacto: { relacoesInternas: 3, narrativa: "O colega converte, e ninguém questiona sua decisão." } },
+          { probabilidade: 0.7, impacto: { relacoesInternas: 3, efeitoDeGol: "a_favor", narrativa: "O colega converte, e ninguém questiona sua decisão." } },
           { probabilidade: 0.3, impacto: { moral: -8, narrativa: "O colega perde, e uma parte da torcida cobra por que você não bateu." } },
         ],
       },
@@ -133,12 +135,13 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "assumir_cobranca_de_falta_decisiva",
     titulo: "Cobrança de falta decisiva",
     descricao: "Falta na entrada da área, no fim de um jogo empatado — alguém precisa bater.",
+    janelaDePartida: "fim",
     opcoes: [
       {
         id: "bater_a_falta",
         texto: "Bater a falta você mesmo",
         resultados: [
-          { probabilidade: 0.45, impacto: { moral: 20, narrativa: "A bola encobre a barreira e entra — momento inesquecível." } },
+          { probabilidade: 0.45, impacto: { moral: 20, efeitoDeGol: "a_favor", narrativa: "A bola encobre a barreira e entra — momento inesquecível." } },
           { probabilidade: 0.55, impacto: { moral: -8, narrativa: "A cobrança sai por cima do travessão, sem susto pro goleiro." } },
         ],
       },
@@ -158,14 +161,14 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
         id: "pedir_a_bola_de_novo_rapido",
         texto: "Pedir a bola de novo o mais rápido possível",
         resultados: [
-          { probabilidade: 0.5, impacto: { moral: 7, narrativa: "A reação rápida vira redenção instantânea aos olhos da torcida." } },
-          { probabilidade: 0.5, impacto: { moral: -15, narrativa: "O peso do erro te acompanha pelo resto da partida." } },
+          { probabilidade: 0.5, impacto: { moral: 7, efeitoDeGol: "contra", narrativa: "A reação rápida vira redenção instantânea aos olhos da torcida." } },
+          { probabilidade: 0.5, impacto: { moral: -15, efeitoDeGol: "contra", narrativa: "O peso do erro te acompanha pelo resto da partida." } },
         ],
       },
       {
         id: "pedir_um_momento_para_se_recompor",
         texto: "Pedir um momento pra se recompor mentalmente",
-        resultados: [{ probabilidade: 1, impacto: { moral: -5, narrativa: "Você segue o jogo com a cabeça mais tranquila, mesmo abalado." } }],
+        resultados: [{ probabilidade: 1, impacto: { moral: -5, efeitoDeGol: "contra", narrativa: "Você segue o jogo com a cabeça mais tranquila, mesmo abalado." } }],
       },
     ],
   },
@@ -173,6 +176,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "comemoracao_polemica",
     titulo: "Comemoração polêmica de gol",
     descricao: "Depois de marcar um gol importante, você pensa numa comemoração que pode ser vista como provocação.",
+    requerGolDoJogadorAntes: true,
     opcoes: [
       {
         id: "fazer_a_comemoracao_provocativa",
@@ -233,6 +237,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "tirado_no_intervalo",
     titulo: "Substituído no intervalo",
     descricao: "O técnico decide te tirar de campo logo no intervalo, sem uma explicação clara.",
+    janelaDePartida: "intervalo",
     opcoes: [
       {
         id: "cobrar_explicacao_no_vestiario",
@@ -316,12 +321,13 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "goleiro_avanca_para_escanteio_decisivo",
     titulo: "Goleiro avança pro escanteio decisivo",
     descricao: "Nos acréscimos de um jogo que seu time precisa vencer, a comissão sinaliza pro goleiro subir pro escanteio ofensivo.",
+    janelaDePartida: "fim",
     opcoes: [
       {
         id: "apoiar_a_subida_do_goleiro",
         texto: "Apoiar a subida arriscada do goleiro",
         resultados: [
-          { probabilidade: 0.35, impacto: { moral: 20, narrativa: "A jogada arriscada dá certo, e o gol nos acréscimos vira história." } },
+          { probabilidade: 0.35, impacto: { moral: 20, efeitoDeGol: "a_favor", narrativa: "A jogada arriscada dá certo, e o gol nos acréscimos vira história." } },
           { probabilidade: 0.65, impacto: { moral: -10, narrativa: "A jogada não funciona, e o time ainda sofre um contra-ataque perigoso no fim." } },
         ],
       },
@@ -336,6 +342,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "entrevista_ao_vivo_no_intervalo",
     titulo: "Entrevista ao vivo no intervalo",
     descricao: "Você é chamado pra uma entrevista ao vivo bem no intervalo de um jogo apertado.",
+    janelaDePartida: "intervalo",
     opcoes: [
       {
         id: "falar_com_intensidade",
@@ -356,6 +363,7 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
     id: "crise_de_ansiedade_pre_jogo",
     titulo: "Crise de ansiedade no início do jogo",
     descricao: "Nos primeiros minutos da partida, uma crise de ansiedade forte te pega de surpresa.",
+    janelaDePartida: "inicio",
     opcoes: [
       {
         id: "buscar_o_psicologo_do_clube",

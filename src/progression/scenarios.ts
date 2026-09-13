@@ -46,6 +46,16 @@ export interface ImpactoCarreira {
    * cenários fora de campo. Sobrescreve (não soma) uma pendência anterior.
    */
   foraDeCombate?: { motivo: "suspensao" | "lesao"; partidasRestantes: number };
+  /**
+   * Efeito direto no placar da partida — só usado pelos eventos de contexto de `progression/
+   * match-events.ts` que representam um gol de verdade acontecendo (pênalti, falta decisiva, gol
+   * contra), nunca pelo catálogo geral de cenários fora de campo. `"a_favor"` soma 1 gol pro lado
+   * do jogador (`ParticipacaoJogador.lado`, ver `simulation/live-match.ts`); `"contra"` soma 1 pro
+   * lado adversário. Sem isso, um cenário podia narrar "você fez o gol da cobrança" sem o placar
+   * da partida mudar nada — bug relatado pelo usuário ("pênalti e não é gol", "gol contra e
+   * placar 0-0").
+   */
+  efeitoDeGol?: "a_favor" | "contra";
   /** Texto livre descrevendo o desfecho, pra mostrar ao jogador. */
   narrativa: string;
 }
@@ -96,6 +106,22 @@ export interface Cenario {
   opcoes: Opcao[];
   /** Condições sob as quais o cenário faz sentido acontecer. Omitido = elegível a qualquer momento (era o comportamento único antes deste campo existir). */
   gatilho?: Gatilho;
+  /**
+   * Só usado pelo catálogo de "durante a partida" (`progression/match-events.ts`) — o motor de
+   * partida (`simulation/live-match.ts`) não tem o `Gatilho` de carreira disponível (sem acesso a
+   * idade/reputação/momento da temporada), mas TEM o estado da própria partida em andamento
+   * (minuto atual). Filtra o sorteio pra não soar fora de hora (ex: "crise de ansiedade no início
+   * do jogo" sorteada aos 80', "goleiro sobe pro escanteio nos acréscimos" aos 20' — bug relatado
+   * pelo usuário: "vários cenários não condizem com o que está refletido no placar/tempo").
+   * Omitido = elegível em qualquer minuto.
+   */
+  janelaDePartida?: "inicio" | "intervalo" | "fim";
+  /**
+   * Só usado pelo catálogo de "durante a partida" — cenário cuja premissa é uma reação a um gol
+   * que o JOGADOR já marcou antes nesta mesma partida (ex: "comemoração polêmica de gol"). Sem
+   * isso, o cenário podia ser sorteado numa partida em que o jogador nunca balançou as redes.
+   */
+  requerGolDoJogadorAntes?: boolean;
 }
 
 /**

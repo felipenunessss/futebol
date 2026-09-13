@@ -19,6 +19,7 @@ import {
   type EscolhaDePrePartida,
   type EstatisticasCarreira,
   type EventoDeFeed,
+  type FaixasDeDestaqueDaTabela,
   type JogoDaSemana,
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
@@ -224,6 +225,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           clubeId={estadoAtual.clubeAtualId}
           clubePorId={clubePorId}
           nomePorCampeonato={nomePorCampeonato}
+          faixasPorCampeonato={temporada.faixasPorCampeonato}
         />
       )}
       <div className="relative z-[1] mx-auto max-w-3xl flex flex-col gap-4">
@@ -254,7 +256,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         ) : chaveamentoPendente ? (
           <PainelChaveamento chaveamento={chaveamentoPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharChaveamento} />
         ) : resultadoDaRodada ? (
-          <PainelResultadoDaRodada resultadoDaRodada={resultadoDaRodada} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onAvancar={temporada.responderResultadoDaRodada} />
+          <PainelResultadoDaRodada
+            resultadoDaRodada={resultadoDaRodada}
+            clubePorId={clubePorId}
+            nomePorCampeonato={nomePorCampeonato}
+            faixasPorCampeonato={temporada.faixasPorCampeonato}
+            onAvancar={temporada.responderResultadoDaRodada}
+          />
         ) : (
           <>
             {promptSemana && (
@@ -308,7 +316,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
 
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
             placares das suas partidas aparecem conforme a temporada avança. */}
-        <Feed eventos={feed} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />
+        <Feed eventos={feed} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} faixasPorCampeonato={temporada.faixasPorCampeonato} />
       </div>
     </div>
   );
@@ -397,6 +405,7 @@ function PainelDeCompeticoes({
   clubeId,
   clubePorId,
   nomePorCampeonato,
+  faixasPorCampeonato,
 }: {
   competicoesDoJogador: string[];
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
@@ -405,6 +414,7 @@ function PainelDeCompeticoes({
   clubeId: string;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
 }) {
   const [classificacaoAberta, setClassificacaoAberta] = useState(false);
 
@@ -421,10 +431,10 @@ function PainelDeCompeticoes({
           const posicao = posicaoNaTabela(tabelaPorCampeonato.get(campeonatoId), clubeId);
           const fase = faseMataMataPorCampeonato.get(campeonatoId);
           return (
-            <div key={campeonatoId} className="border-t border-slate-800 pt-2 first:border-t-0 first:pt-0">
+            <div key={campeonatoId} className={`border-t border-slate-800 pt-2 first:border-t-0 first:pt-0 ${fase?.eliminado ? "bg-red-950/30 -mx-2 px-2 rounded" : ""}`}>
               <div className="font-medium text-slate-200">{nomeDoCampeonato(nomePorCampeonato, campeonatoId)}</div>
               {fase ? (
-                <div className={fase.eliminado ? "text-slate-500" : "text-emerald-400"}>{fase.eliminado ? `Eliminado (${fase.etapa})` : fase.etapa}</div>
+                <div className={fase.eliminado ? "text-red-400 font-medium" : "text-emerald-400"}>{fase.eliminado ? `Eliminado (${rotuloEtapa(fase.etapa)})` : rotuloEtapa(fase.etapa)}</div>
               ) : posicao ? (
                 <div className="text-slate-400">{posicao}º colocado</div>
               ) : (
@@ -443,6 +453,7 @@ function PainelDeCompeticoes({
           clubeId={clubeId}
           clubePorId={clubePorId}
           nomePorCampeonato={nomePorCampeonato}
+          faixasPorCampeonato={faixasPorCampeonato}
           onFechar={() => setClassificacaoAberta(false)}
         />
       )}
@@ -461,6 +472,7 @@ function PainelClassificacao({
   clubeId,
   clubePorId,
   nomePorCampeonato,
+  faixasPorCampeonato,
   onFechar,
 }: {
   competicoesDoJogador: string[];
@@ -470,6 +482,7 @@ function PainelClassificacao({
   clubeId: string;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
   onFechar: () => void;
 }) {
   return (
@@ -487,15 +500,17 @@ function PainelClassificacao({
           const fase = faseMataMataPorCampeonato.get(campeonatoId);
           const tabela = tabelaPorCampeonato.get(campeonatoId);
           return (
-            <div key={campeonatoId} className="flex flex-col gap-2">
+            <div key={campeonatoId} className={`flex flex-col gap-2 ${fase?.eliminado ? "bg-red-950/30 -mx-3 px-3 py-2 rounded-lg" : ""}`}>
               <h3 className="text-sm font-semibold text-slate-200">
                 {nomeDoCampeonato(nomePorCampeonato, campeonatoId)}
                 {mostrarGrupo && <span className="text-slate-400 font-normal"> — {grupo}</span>}
               </h3>
               {fase ? (
-                <p className={`text-sm ${fase.eliminado ? "text-slate-500" : "text-emerald-400"}`}>{fase.eliminado ? `Eliminado(a) na fase: ${fase.etapa}` : `Fase atual: ${fase.etapa}`}</p>
+                <p className={`text-sm ${fase.eliminado ? "text-red-400 font-medium" : "text-emerald-400"}`}>
+                  {fase.eliminado ? `Eliminado(a) na fase: ${rotuloEtapa(fase.etapa)}` : `Fase atual: ${rotuloEtapa(fase.etapa)}`}
+                </p>
               ) : tabela ? (
-                <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} />
+                <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} faixas={faixasPorCampeonato.get(campeonatoId)} />
               ) : (
                 <p className="text-sm text-slate-500">Aguardando dados.</p>
               )}
@@ -507,7 +522,36 @@ function PainelClassificacao({
   );
 }
 
-function TabelaCompleta({ tabela, clubeId, clubePorId }: { tabela: LinhaTabela[]; clubeId: string; clubePorId: Map<string, Club> }) {
+/** Faixa de destaque da linha `indice` (0-based) de uma tabela com `totalLinhas` linhas — pedido do
+ * usuário: mostrar em cores os classificados pra próxima fase/vaga internacional (topo) e os
+ * rebaixados (fim), não só o resultado final. Só uma borda lateral colorida (não muda o fundo),
+ * pra não brigar com o destaque de "seu clube" (fundo esmeralda) quando as duas coincidem. */
+function classeFaixaDaLinha(indice: number, totalLinhas: number, faixas: FaixasDeDestaqueDaTabela | undefined): string {
+  if (!faixas) return "";
+  if (faixas.classificados && indice < faixas.classificados) return "border-l-4 border-l-sky-500";
+  if (faixas.rebaixados && indice >= totalLinhas - faixas.rebaixados) return "border-l-4 border-l-red-500";
+  return "";
+}
+
+function LegendaDeFaixas({ faixas }: { faixas: FaixasDeDestaqueDaTabela | undefined }) {
+  if (!faixas?.classificados && !faixas?.rebaixados) return null;
+  return (
+    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[11px] text-slate-500">
+      {faixas.classificados && (
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-sm bg-sky-500" /> Classificação / vaga internacional
+        </span>
+      )}
+      {faixas.rebaixados && (
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-sm bg-red-500" /> Rebaixamento
+        </span>
+      )}
+    </div>
+  );
+}
+
+function TabelaCompleta({ tabela, clubeId, clubePorId, faixas }: { tabela: LinhaTabela[]; clubeId: string; clubePorId: Map<string, Club>; faixas?: FaixasDeDestaqueDaTabela }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs tabular-nums">
@@ -525,7 +569,10 @@ function TabelaCompleta({ tabela, clubeId, clubePorId }: { tabela: LinhaTabela[]
         </thead>
         <tbody>
           {tabela.map((linha, indice) => (
-            <tr key={linha.clubeId} className={`border-t border-slate-800 ${linha.clubeId === clubeId ? "bg-emerald-950/60 text-emerald-300 font-medium" : ""}`}>
+            <tr
+              key={linha.clubeId}
+              className={`border-t border-slate-800 ${classeFaixaDaLinha(indice, tabela.length, faixas)} ${linha.clubeId === clubeId ? "bg-emerald-950/60 text-emerald-300 font-medium" : ""}`}
+            >
               <td className="pr-2 py-1">{indice + 1}</td>
               <td className="pr-2 py-1">
                 <span className="flex items-center gap-1.5">
@@ -543,6 +590,7 @@ function TabelaCompleta({ tabela, clubeId, clubePorId }: { tabela: LinhaTabela[]
           ))}
         </tbody>
       </table>
+      <LegendaDeFaixas faixas={faixas} />
     </div>
   );
 }
@@ -573,14 +621,16 @@ function Cabecalho({
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
-      <div className="flex items-baseline justify-between flex-wrap gap-x-4 gap-y-1">
-        <h1 className="text-xl font-semibold">
-          {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {nomeDaNacionalidade}
-        </h1>
-        <span className="text-sm text-slate-400 flex items-center gap-1.5">
-          <Escudo url={escudoClube} alt={nomeClube} tamanho={18} />
-          {nomeClube} · Temporada {estado.temporada}
-        </span>
+      <div className="flex items-center gap-4 flex-wrap">
+        <Escudo url={escudoClube} alt={nomeClube} tamanho={56} />
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-semibold">
+            {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {nomeDaNacionalidade}
+          </h1>
+          <span className="text-sm text-slate-400">
+            {nomeClube} · Temporada {estado.temporada}
+          </span>
+        </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
         <Stat rotulo="Overall" valor={overallAtual(estado)} />
@@ -681,6 +731,39 @@ const ROTULO_PERIODO: Record<string, string> = {
 
 function rotuloPeriodo(periodo: string): string {
   return ROTULO_PERIODO[periodo] ?? periodo.replaceAll("_", " ").replaceAll("-", " ");
+}
+
+/** Nomes de fase de mata-mata vêm crus dos arquivos de dado (`FaseDeMataMata.nome`, ex:
+ * "segunda_fase", "quartas") — sem isso apareciam com underscore na tela ("Eliminado
+ * (segunda_fase)"). Cobre os valores conhecidos usados hoje; qualquer outro cai no fallback
+ * genérico (troca `_`/`-` por espaço + primeira letra maiúscula), então nunca mostra underscore. */
+const ROTULO_ETAPA: Record<string, string> = {
+  primeira_fase: "Primeira fase",
+  segunda_fase: "Segunda fase",
+  terceira_fase: "Terceira fase",
+  quarta_fase: "Quarta fase",
+  quinta_fase: "Quinta fase",
+  oitavas: "Oitavas de final",
+  quartas: "Quartas de final",
+  quartas_liguilla: "Quartas da liguilla",
+  semifinal: "Semifinal",
+  semifinal_liguilla: "Semifinal da liguilla",
+  final: "Final",
+  final_liguilla: "Final da liguilla",
+  final_do_apertura_ou_clausura: "Final do Apertura/Clausura",
+  repescagem: "Repescagem",
+  hexagonal_titulo: "Hexagonal do título",
+  hexagonal_ascenso: "Hexagonal de acesso",
+  hexagonal_descenso: "Hexagonal de descenso",
+  hexagonal_rebaixamento: "Hexagonal de rebaixamento",
+  quadrangular_internacional: "Quadrangular internacional",
+};
+
+function rotuloEtapa(etapa: string): string {
+  const conhecido = ROTULO_ETAPA[etapa];
+  if (conhecido) return conhecido;
+  const comEspacos = etapa.replaceAll("_", " ").replaceAll("-", " ");
+  return comEspacos.charAt(0).toUpperCase() + comEspacos.slice(1);
 }
 
 const NOMES_DOS_MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -1082,12 +1165,15 @@ function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: Evento
         </p>
       );
     }
-    case "evento_de_contexto":
+    case "evento_de_contexto": {
+      const efeitoDeGol = evento.escolha.resultado.impacto.efeitoDeGol;
       return (
-        <p>
-          {evento.minuto}' {evento.escolha.resultado.impacto.narrativa}
+        <p className={efeitoDeGol === "a_favor" ? "text-emerald-400 font-medium" : efeitoDeGol === "contra" ? "text-red-400 font-medium" : ""}>
+          {evento.minuto}' {efeitoDeGol === "a_favor" ? "GOL! " : efeitoDeGol === "contra" ? "GOL CONTRA! " : ""}
+          {evento.escolha.resultado.impacto.narrativa}
         </p>
       );
+    }
     case "incidente_jogador":
       return (
         <p className={evento.incidente.tipo === "cartao_vermelho" || evento.incidente.tipo === "lesao" ? "text-red-400 font-medium" : ""}>
@@ -1256,7 +1342,17 @@ function PromptCenario({ titulo, descricao, opcoes, onEscolher }: { titulo: stri
   );
 }
 
-function Feed({ eventos, clubePorId, nomePorCampeonato }: { eventos: EventoDeFeed[]; clubePorId: Map<string, Club>; nomePorCampeonato: Map<string, string> }) {
+function Feed({
+  eventos,
+  clubePorId,
+  nomePorCampeonato,
+  faixasPorCampeonato,
+}: {
+  eventos: EventoDeFeed[];
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
+}) {
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-4 flex flex-col gap-2 text-slate-100">
       <h2 className="text-sm font-semibold text-slate-400 px-1">Partidas e eventos da temporada</h2>
@@ -1264,14 +1360,26 @@ function Feed({ eventos, clubePorId, nomePorCampeonato }: { eventos: EventoDeFee
         {eventos.length === 0 ? (
           <p className="text-sm text-slate-500 px-1 py-2">Nada aconteceu ainda — os placares e eventos vão aparecer aqui, mais recentes primeiro.</p>
         ) : (
-          eventos.map((evento) => <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />)
+          eventos.map((evento) => (
+            <EventoCard key={evento.id} evento={evento} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} faixasPorCampeonato={faixasPorCampeonato} />
+          ))
         )}
       </div>
     </div>
   );
 }
 
-function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoDeFeed; clubePorId: Map<string, Club>; nomePorCampeonato: Map<string, string> }) {
+function EventoCard({
+  evento,
+  clubePorId,
+  nomePorCampeonato,
+  faixasPorCampeonato,
+}: {
+  evento: EventoDeFeed;
+  clubePorId: Map<string, Club>;
+  nomePorCampeonato: Map<string, string>;
+  faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
+}) {
   switch (evento.tipo) {
     case "treino":
       return (
@@ -1338,7 +1446,7 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
       const decisao = confronto.decididoNosPenaltis ? " (nos pênaltis)" : "";
       return (
         <Card destaque>
-          [{etapa}] {nomeDoClube(clubePorId, confronto.timeA)} {confronto.golsA} x {confronto.golsB} {nomeDoClube(clubePorId, confronto.timeB)}
+          [{rotuloEtapa(etapa)}] {nomeDoClube(clubePorId, confronto.timeA)} {confronto.golsA} x {confronto.golsB} {nomeDoClube(clubePorId, confronto.timeB)}
           {decisao} — vencedor: {nomeDoClube(clubePorId, confronto.vencedor)}
         </Card>
       );
@@ -1350,44 +1458,78 @@ function EventoCard({ evento, clubePorId, nomePorCampeonato }: { evento: EventoD
         </Card>
       );
     case "tabela":
-      return <TabelaCard campeonatoId={evento.campeonatoId} periodo={evento.periodo} tabela={evento.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />;
+      return (
+        <TabelaCard
+          campeonatoId={evento.campeonatoId}
+          periodo={evento.periodo}
+          tabela={evento.tabela}
+          clubePorId={clubePorId}
+          nomePorCampeonato={nomePorCampeonato}
+          faixas={faixasPorCampeonato.get(evento.campeonatoId)}
+        />
+      );
   }
 }
 
-/** Alterna a cada tanto tempo (ver `INTERVALO_TROCA_MS`) até completar `DURACAO_ANIMACAO_MS`, então "para" no `indiceResultado` de verdade — só então chama `onConcluir` (com um pequeno atraso extra pro jogador ver onde parou antes da tela sumir e o resultado entrar no feed). */
-const DURACAO_ANIMACAO_MS = 1400;
-const INTERVALO_TROCA_MS = 130;
-const PAUSA_APOS_PARAR_MS = 550;
+/**
+ * Gira mostrando CADA possibilidade por `TEMPO_POR_CANDIDATO_MS` (tempo suficiente pra ler a
+ * narrativa de cada uma, não só o número — pedido do usuário: "os spins estão muito rápidos e não
+ * dá pra ler o output"), completando pelo menos `VOLTAS_MINIMAS` voltas pela lista inteira antes de
+ * parar — sempre no `indiceResultado` de verdade (nunca no índice errado por coincidência de
+ * tempo, já que o nº de passos é calculado, não medido por relógio). Só então chama `onConcluir`
+ * (com um atraso extra pro jogador terminar de ler onde parou antes da tela sumir).
+ */
+const TEMPO_POR_CANDIDATO_MS = 550;
+const VOLTAS_MINIMAS = 1;
+const PAUSA_APOS_PARAR_MS = 700;
 
 function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoDeEscolhaPendente; onConcluir: () => void }) {
   const { cenarioResolvido, indiceResultado } = animacao;
   const { cenario, escolha } = cenarioResolvido;
   const { opcao } = escolha;
+  const totalCandidatos = opcao.resultados.length;
   const [indiceAtual, setIndiceAtual] = useState(0);
   const [parou, setParou] = useState(false);
 
   useEffect(() => {
     let cancelado = false;
-    const inicio = Date.now();
-    let indice = 0;
     let timer: ReturnType<typeof setTimeout>;
+
+    function parar(): void {
+      setIndiceAtual(indiceResultado);
+      setParou(true);
+      timer = setTimeout(() => {
+        if (!cancelado) onConcluir();
+      }, PAUSA_APOS_PARAR_MS);
+    }
+
+    // Opção "garantida" (probabilidade 1, 1 resultado só) não tem o que girar — revela direto, sem
+    // fingir suspense onde não existe.
+    if (totalCandidatos <= 1) {
+      parar();
+      return () => {
+        cancelado = true;
+        clearTimeout(timer);
+      };
+    }
+
+    // Passos suficientes pra passar pela lista inteira `VOLTAS_MINIMAS` vezes e ainda assim
+    // terminar EXATAMENTE no `indiceResultado` (índice do passo N = N % totalCandidatos).
+    const passosTotais = VOLTAS_MINIMAS * totalCandidatos + indiceResultado;
+    let passo = 0;
 
     function tick(): void {
       if (cancelado) return;
-      if (Date.now() - inicio >= DURACAO_ANIMACAO_MS) {
-        setIndiceAtual(indiceResultado);
-        setParou(true);
-        timer = setTimeout(() => {
-          if (!cancelado) onConcluir();
-        }, PAUSA_APOS_PARAR_MS);
+      if (passo >= passosTotais) {
+        parar();
         return;
       }
-      indice = (indice + 1) % opcao.resultados.length;
-      setIndiceAtual(indice);
-      timer = setTimeout(tick, INTERVALO_TROCA_MS);
+      passo++;
+      setIndiceAtual(passo % totalCandidatos);
+      timer = setTimeout(tick, TEMPO_POR_CANDIDATO_MS);
     }
 
-    timer = setTimeout(tick, INTERVALO_TROCA_MS);
+    timer = setTimeout(tick, TEMPO_POR_CANDIDATO_MS);
     return () => {
       cancelado = true;
       clearTimeout(timer);
@@ -1410,11 +1552,11 @@ function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoD
             }`}
           >
             <div className="text-sm font-medium">{Math.round(resultado.probabilidade * 100)}%</div>
-            <div className="text-xs text-slate-400 mt-0.5">{formatarImpactoResumido(resultado.impacto)}</div>
+            <div className="text-sm mt-1">{resultado.impacto.narrativa}</div>
+            <div className="text-xs text-slate-400 mt-1">{formatarImpactoResumido(resultado.impacto)}</div>
           </div>
         ))}
       </div>
-      {parou && <p className="text-xs text-emerald-400">{escolha.resultado.impacto.narrativa}</p>}
     </div>
   );
 }
@@ -1423,11 +1565,13 @@ function PainelResultadoDaRodada({
   resultadoDaRodada,
   clubePorId,
   nomePorCampeonato,
+  faixasPorCampeonato,
   onAvancar,
 }: {
   resultadoDaRodada: ResultadoDaRodadaExibido;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
   onAvancar: () => void;
 }) {
   return (
@@ -1460,16 +1604,25 @@ function PainelResultadoDaRodada({
           {resultadoDaRodada.tabela && (
             <div>
               <div className="text-sm font-medium text-slate-300 mb-1.5">Classificação</div>
-              <TabelaCard campeonatoId={resultadoDaRodada.campeonatoId} periodo={`rodada ${resultadoDaRodada.rodada}`} tabela={resultadoDaRodada.tabela} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} />
+              <TabelaCard
+                campeonatoId={resultadoDaRodada.campeonatoId}
+                periodo={`rodada ${resultadoDaRodada.rodada}`}
+                tabela={resultadoDaRodada.tabela}
+                clubePorId={clubePorId}
+                nomePorCampeonato={nomePorCampeonato}
+                faixas={faixasPorCampeonato.get(resultadoDaRodada.campeonatoId)}
+              />
             </div>
           )}
         </>
       ) : (
         <>
           <h2 className="text-lg font-semibold">
-            {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — {resultadoDaRodada.etapa}, resultado
+            {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — {rotuloEtapa(resultadoDaRodada.etapa)}, resultado
           </h2>
-          <div className="flex items-center justify-between rounded-lg px-3 py-1.5 bg-emerald-950/60 border border-emerald-800 text-sm">
+          <div
+            className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
+          >
             <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
               {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}
               <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)} alt="" tamanho={16} />
@@ -1482,7 +1635,7 @@ function PainelResultadoDaRodada({
               {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
             </span>
           </div>
-          <p className={resultadoDaRodada.eliminado ? "text-slate-400 text-sm" : "text-emerald-400 text-sm font-medium"}>
+          <p className={resultadoDaRodada.eliminado ? "text-red-400 text-sm font-medium" : "text-emerald-400 text-sm font-medium"}>
             {resultadoDaRodada.eliminado ? "Eliminado(a) dessa competição." : "Avançou para a próxima fase!"}
           </p>
         </>
@@ -1571,7 +1724,7 @@ function PainelChaveamento({
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 items-center text-center text-slate-100">
       <h2 className="text-lg font-semibold">Chaveamento definido — {nomeDoCampeonato(nomePorCampeonato, chaveamento.campeonatoId)}</h2>
-      <p className="text-sm text-slate-400 capitalize">{chaveamento.etapaNome.replaceAll("_", " ")}</p>
+      <p className="text-sm text-slate-400">{rotuloEtapa(chaveamento.etapaNome)}</p>
       <div className="flex flex-col gap-1.5 w-full max-w-sm text-sm">
         {chaveamento.pares.map(([mandanteId, visitanteId], indice) => (
           <div key={indice} className="flex items-center justify-between rounded-lg px-3 py-1.5 bg-slate-800/60">
@@ -1600,12 +1753,14 @@ function TabelaCard({
   tabela,
   clubePorId,
   nomePorCampeonato,
+  faixas,
 }: {
   campeonatoId: string;
   periodo: string;
   tabela: LinhaTabela[];
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  faixas?: FaixasDeDestaqueDaTabela;
 }) {
   return (
     <div className="rounded-xl bg-slate-900 border border-slate-800 p-4 text-slate-100">
@@ -1627,7 +1782,7 @@ function TabelaCard({
           </thead>
           <tbody>
             {tabela.map((linha, indice) => (
-              <tr key={linha.clubeId} className="border-t border-slate-800">
+              <tr key={linha.clubeId} className={`border-t border-slate-800 ${classeFaixaDaLinha(indice, tabela.length, faixas)}`}>
                 <td className="pr-2 py-1">{indice + 1}</td>
                 <td className="pr-2 py-1">
                   <span className="flex items-center gap-1.5">
@@ -1645,6 +1800,7 @@ function TabelaCard({
           </tbody>
         </table>
       </div>
+      <LegendaDeFaixas faixas={faixas} />
     </div>
   );
 }

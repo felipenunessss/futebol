@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { jogarPartidaAoVivo, type EventoAoVivo } from "../../src/simulation/live-match.js";
+import { cenariosElegiveis, jogarPartidaAoVivo, type EventoAoVivo } from "../../src/simulation/live-match.js";
 import type { ParticipacaoJogador, PerfilTime } from "../../src/simulation/match.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
 import type { Opcao } from "../../src/progression/scenarios.js";
+import { EVENTOS_DE_PARTIDA } from "../../src/progression/match-events.js";
 
 const perfilSimetrico: PerfilTime = { defesa: 1600, meio: 1600, ataque: 1600 };
 
@@ -180,5 +181,80 @@ describe("jogarPartidaAoVivo", () => {
       expect(ultimo.golsCasa).toBe(resultado.golsCasa);
       expect(ultimo.golsFora).toBe(resultado.golsFora);
     }
+  });
+
+  describe("cenariosElegiveis", () => {
+    it("no minuto 5, só sobram cenários sem janela ou com janela 'inicio' (bug real: 'crise de ansiedade no início' podia sair aos 80')", () => {
+      const elegiveis = cenariosElegiveis(5, false);
+      expect(elegiveis.length).toBeGreaterThan(0);
+      for (const cenario of elegiveis) {
+        expect(cenario.janelaDePartida === undefined || cenario.janelaDePartida === "inicio").toBe(true);
+      }
+      expect(elegiveis.some((c) => c.id === "crise_de_ansiedade_pre_jogo")).toBe(true);
+      expect(elegiveis.some((c) => c.id === "pressao_para_cobrar_penalti")).toBe(false); // janela "fim"
+    });
+
+    it("no minuto 80, só sobram cenários sem janela ou com janela 'fim' (bug real: pênalti/falta decisiva podiam sair no início do jogo)", () => {
+      const elegiveis = cenariosElegiveis(80, false);
+      for (const cenario of elegiveis) {
+        expect(cenario.janelaDePartida === undefined || cenario.janelaDePartida === "fim").toBe(true);
+      }
+      expect(elegiveis.some((c) => c.id === "pressao_para_cobrar_penalti")).toBe(true);
+      expect(elegiveis.some((c) => c.id === "assumir_cobranca_de_falta_decisiva")).toBe(true);
+      expect(elegiveis.some((c) => c.id === "crise_de_ansiedade_pre_jogo")).toBe(false); // janela "inicio"
+    });
+
+    it("'comemoração polêmica de gol' só é elegível se o jogador já marcou um gol nesta partida", () => {
+      expect(cenariosElegiveis(50, false).some((c) => c.id === "comemoracao_polemica")).toBe(false);
+      expect(cenariosElegiveis(50, true).some((c) => c.id === "comemoracao_polemica")).toBe(true);
+    });
+
+    it("nunca fica vazio (sempre sobra pelo menos os cenários sem restrição nenhuma)", () => {
+      for (let minuto = 1; minuto <= 90; minuto++) {
+        expect(cenariosElegiveis(minuto, false).length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  it("bug real corrigido: cenário de contexto com efeito de gol (pênalti/gol contra) atualiza o placar de verdade, não só a narrativa", async () => {
+    const jogador: Jogador = {
+      id: "j1",
+      nome: "Teste",
+      posicao: "atacante",
+      arquetipo_id: buscarArquetipo("finalizador").id,
+      idade: 22,
+      atributos: { finalizacao: 50, cabeceio: 50, drible: 50, visao_de_jogo: 50, desarme: 50 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador, estiloTecnico: "equilibrado" };
+
+    const cenarioComGolAFavor = EVENTOS_DE_PARTIDA.find((c) => c.id === "pressao_para_cobrar_penalti")!;
+    const cenarioComGolContra = EVENTOS_DE_PARTIDA.find((c) => c.id === "gol_contra")!;
+    expect(cenarioComGolAFavor).toBeDefined();
+    expect(cenarioComGolContra).toBeDefined();
+
+    // random=0.1 constante: < 0.25 (PROBABILIDADE_DE_EVENTO_DE_CONTEXTO, garante o slot de evento
+    // quando maxEventosDeContexto:1) e < 0.6 (garante cair no resultados[0] de "aceitar_cobrar", que
+    // tem efeitoDeGol "a_favor"). Por ser uma constante (não uma sequência), as DUAS partidas abaixo
+    // resolvem toda chance genérica/do jogador de forma IDÊNTICA — a única diferença entre elas é a
+    // existência (ou não) do slot de evento de contexto, isolando exatamente o efeito dele no placar.
+    const random = () => 0.1;
+    const semEvento = await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, random, participacao, { msPorMinuto: 0, maxEventosDeContexto: 0 });
+    const comGolAFavor = await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, random, participacao, {
+      msPorMinuto: 0,
+      maxEventosDeContexto: 1,
+      decidirEventoDeContexto: () => cenarioComGolAFavor.opcoes[0], // "aceitar_cobrar"
+    });
+    // participacao.lado é "casa" — "a_favor" soma pro lado do próprio jogador.
+    expect(comGolAFavor.resultado.golsCasa).toBe(semEvento.resultado.golsCasa + 1);
+    expect(comGolAFavor.resultado.golsFora).toBe(semEvento.resultado.golsFora);
+
+    const comGolContra = await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, random, participacao, {
+      msPorMinuto: 0,
+      maxEventosDeContexto: 1,
+      decidirEventoDeContexto: () => cenarioComGolContra.opcoes[0], // "pedir_a_bola_de_novo_rapido" — TODO resultado tem efeitoDeGol "contra"
+    });
+    // participacao.lado é "casa" — "contra" soma pro lado adversário ("fora").
+    expect(comGolContra.resultado.golsFora).toBe(semEvento.resultado.golsFora + 1);
+    expect(comGolContra.resultado.golsCasa).toBe(semEvento.resultado.golsCasa);
   });
 });

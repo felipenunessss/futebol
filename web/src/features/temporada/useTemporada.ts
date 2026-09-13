@@ -25,6 +25,8 @@ import {
   type TreinoResolvidoNaTemporada,
 } from "@motor/career/career-loop.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
+import type { CampeonatoEstadual } from "@motor/schemas/championship.js";
+import type { CampeonatoNacional } from "@motor/schemas/national-championship.js";
 import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type EscolhaDeFimDeTemporada, type PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
 
 /** Velocidades de exibição da partida ao vivo escolhíveis pelo jogador (pedido do usuário:
@@ -33,6 +35,43 @@ import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type Es
  * dezenas de partidas do próprio clube pra assistir; "rápido"/"ultrarrápido" comprimem ainda mais. */
 export type VelocidadeAoVivo = "normal" | "rapida" | "ultrarrapida";
 const MS_POR_MINUTO_POR_VELOCIDADE: Record<VelocidadeAoVivo, number> = { normal: 90, rapida: 35, ultrarrapida: 8 };
+
+/** Quantas linhas do TOPO/FIM de uma tabela de classificação destacar (pedido do usuário: "quero
+ * que a tabela de classificação mostre em cores os classificados pra próxima fase/campeonatos
+ * internacionais e os rebaixados") — é sempre uma aproximação POSICIONAL simples (top-N/bottom-N),
+ * não tenta reproduzir critério textual mais fino (`vaga_copa_do_brasil_criterio` etc, geralmente
+ * "melhor colocado sem competição nacional" — depende de outros clubes, não só posição na tabela),
+ * de propósito deixados de fora daqui pra não arriscar destacar a linha errada. */
+export interface FaixasDeDestaqueDaTabela {
+  /** Top N avança (mata-mata/próxima fase/liguilla) OU tem vaga internacional (Libertadores +
+   * Sul-Americana) OU acesso à divisão de cima — o maior desses 3 números, quando mais de um dá
+   * pra calcular pro mesmo campeonato (não é comum acontecer, mas nesse caso o de cima já cobre o
+   * de baixo). `undefined` = nenhuma dessas informações disponível pra esse campeonato. */
+  classificados?: number;
+  /** Bottom N é rebaixado — vem direto de `Premiacao.rebaixamento_proxima_divisao`. */
+  rebaixados?: number;
+}
+
+function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNacional): FaixasDeDestaqueDaTabela {
+  const { formato, premiacao } = campeonato;
+  const classificadosParaFase =
+    formato.fase_suica?.classificam_mata_mata ??
+    formato.fase_grupos?.classificam_por_grupo ??
+    (formato.fase_quadrangular?.ativa ? formato.fase_quadrangular.classificam_por_grupo : undefined) ??
+    formato.turno?.classificam_proxima_fase ??
+    formato.returno?.classificam_proxima_fase ??
+    // Pontos corridos + mata-mata simples (sem entrada escalonada por etapa) sem contador próprio —
+    // aproxima pelo tamanho do bracket (3 fases = quartas/semi/final = 8 times, etc).
+    (formato.pontos_corridos && formato.mata_mata && !formato.mata_mata.etapas ? 2 ** formato.mata_mata.fases.length : undefined);
+  const vagaInternacional = (premiacao.vaga_libertadores ?? 0) + (premiacao.vaga_sulamericana ?? 0);
+  const acesso = premiacao.acesso_proxima_divisao ?? 0;
+  const melhorFaixa = Math.max(classificadosParaFase ?? 0, vagaInternacional, acesso);
+
+  return {
+    classificados: melhorFaixa > 0 ? melhorFaixa : undefined,
+    rebaixados: premiacao.rebaixamento_proxima_divisao,
+  };
+}
 
 /** TODOS os subtipos de chance do jogador viram gol quando `sucesso` — o motor (`match.ts`/
  * `live-match.ts`) incrementa o placar incondicionalmente em qualquer chance bem-sucedida, sem
@@ -296,6 +335,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Nome de exibição (ex: "Campeonato Brasileiro Série C") por id (ex: "brasileirao_serie_c") — pra UI nunca mostrar o id bruto com "_". */
   const nomePorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.nome])), [campeonatos]);
   const escudoPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.escudo_url])), [campeonatos]);
+  const faixasPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, faixasDeDestaqueDaTabela(c)])), [campeonatos]);
 
   function pushEvento(evento: EventoDeFeedVariante): void {
     setFeed((atual) => [{ ...evento, id: `evt-${proximoId.current++}` }, ...atual]);
@@ -439,7 +479,23 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           golsFora: atual.golsFora + (fezGol && atual.ladoDoJogador === "fora" ? 1 : 0),
         };
       }
-      if (evento.tipo === "evento_de_contexto" || evento.tipo === "incidente_jogador") {
+      if (evento.tipo === "evento_de_contexto") {
+        // Alguns cenários de contexto são um gol de verdade acontecendo (pênalti, gol contra, falta
+        // decisiva — ver `Cenario.efeitoDeGol` em `progression/scenarios.ts`) — sem atualizar o
+        // placar aqui, o motor já contava certo por baixo (`resultado.golsCasa/golsFora` final),
+        // mas a tela ao vivo ficava mostrando o placar antigo até o apito final (bug relatado:
+        // "gol contra e placar 0-0").
+        const efeitoDeGol = evento.escolha.resultado.impacto.efeitoDeGol;
+        const ladoQueMarcou = efeitoDeGol === "a_favor" ? atual.ladoDoJogador : efeitoDeGol === "contra" ? (atual.ladoDoJogador === "casa" ? "fora" : "casa") : undefined;
+        return {
+          ...atual,
+          eventos,
+          minutoAtual: evento.minuto,
+          golsCasa: atual.golsCasa + (ladoQueMarcou === "casa" ? 1 : 0),
+          golsFora: atual.golsFora + (ladoQueMarcou === "fora" ? 1 : 0),
+        };
+      }
+      if (evento.tipo === "incidente_jogador") {
         return { ...atual, eventos, minutoAtual: evento.minuto };
       }
       // apito_final — placar oficial substitui qualquer contagem aproximada feita ao vivo.
@@ -824,6 +880,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     clubePorId,
     nomePorCampeonato,
     escudoPorCampeonato,
+    faixasPorCampeonato,
     jogarTemporada,
     propostasFimDeTemporada,
     verPropostasFimDeTemporada,
