@@ -76,6 +76,14 @@ export interface ResultadoCampeonatoSimples {
   campeao: string;
   /** Uma entrada por partida do clube do jogador nessa competição (todas as fases/etapas), se ele participou. */
   partidasDoJogador: ResultadoPartida[];
+  /**
+   * Classificação final, quando o formato permite extrair uma — ver `simulation/incremental.ts`
+   * `ContextoDePrograma.tabelaFinal` (única fonte que popula isso hoje; este motor "em lote" nunca
+   * preenche, sempre `undefined`, mas o campo existe aqui pro tipo ser compartilhado com
+   * `career/career-loop.ts` `jogarTemporadaSemanal`, o caminho que a UI web usa de verdade). Usado
+   * por `career/mundo-persistente.ts` pra promoção/rebaixamento entre temporadas.
+   */
+  tabelaFinal?: LinhaTabela[];
 }
 
 export interface CampeonatoSimulavel {

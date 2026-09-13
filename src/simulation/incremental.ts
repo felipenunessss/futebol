@@ -400,6 +400,14 @@ function ordenarPorForca(times: string[], ratings: Record<string, number>): stri
 
 export interface ContextoDePrograma {
   campeao?: string;
+  /**
+   * Classificação final da competição, quando o formato permite uma (por enquanto só
+   * `pontos_corridos` sem mata-mata — ver `passosPontosCorridos`) — usado por `career/
+   * mundo-persistente.ts` pra decidir promoção/rebaixamento entre temporadas. `undefined` pros
+   * demais formatos (mata-mata puro não tem "tabela final" nenhuma; fase suíça/turno-retorno/etc
+   * ainda não têm essa extração implementada — fica como pendência documentada).
+   */
+  tabelaFinal?: LinhaTabela[];
   [chave: string]: unknown;
 }
 
@@ -419,7 +427,9 @@ function passosPontosCorridos(campeonato: CampeonatoSimulavel): PassoDePrograma[
       unidades: totalDeRodadas(campeonato.times.length, idaEVolta),
       criar: () => criarFaseRodadas("liga", [campeonato.times], idaEVolta, 1),
       aoConcluir: (fase, ctx) => {
-        ctx.campeao = tabelaDoGrupoUnico(fase as FaseRodadas)[0].clubeId;
+        const tabelaFinal = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.campeao = tabelaFinal[0].clubeId;
+        ctx.tabelaFinal = tabelaFinal;
       },
     },
   ];
@@ -1162,6 +1172,8 @@ export interface CompeticaoIncremental {
   contexto: ContextoDePrograma;
   concluida: boolean;
   campeao?: string;
+  /** Ver `ContextoDePrograma.tabelaFinal` — só populado pra formatos que suportam extração hoje. */
+  tabelaFinal?: LinhaTabela[];
   /** Presente quando a competição quebrou no meio da temporada (ex: dado incompatível só detectável depois que uma fase anterior já concluiu — `criar` de um passo posterior pode lançar). A partir daí `avancarSemana` não tenta mais avançar essa competição (fica `concluida: true` sem `campeao`) — mesma tolerância a falha isolada de `engine.ts` `ResultadoCompeticaoNaTemporada.erro`, só que detectada mais tarde (aqui) em vez de na montagem inicial (`CompeticoesDaTemporada.erros`). */
   erro?: string;
   partidasDoJogador: ResultadoPartida[];
@@ -1253,6 +1265,7 @@ export async function avancarSemana(
         if (estado.indicePasso >= estado.passos.length) {
           estado.concluida = true;
           estado.campeao = estado.contexto.campeao as string;
+          estado.tabelaFinal = estado.contexto.tabelaFinal;
         }
       }
     }

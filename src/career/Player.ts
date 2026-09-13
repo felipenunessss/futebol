@@ -61,6 +61,16 @@ export interface EstadoDeCarreira {
    * Sobrescreve (não soma) uma pendência anterior — uma nova lesão/suspensão substitui a anterior.
    */
   foraDeCombate?: { motivo: "suspensao" | "lesao"; partidasRestantes: number };
+  /**
+   * Sobreposição de `Club.id[]` por campeonatoId — só entra aqui uma competição que já teve
+   * promoção/rebaixamento aplicado em alguma temporada anterior desta carreira (ver `career/
+   * mundo-persistente.ts`); sem entrada = usa o `times` estático do arquivo de dado normalmente. É
+   * assim que um clube rebaixado/promovido continua na divisão certa nas temporadas seguintes da
+   * MESMA carreira, sem editar os arquivos de dado (que continuam representando a "edição de
+   * referência" original). Escopo desta 1ª versão: só competições com `tabelaFinal` suportado (ver
+   * `mundo-persistente.ts`) — as demais nunca aparecem aqui, sempre usam o `times` estático.
+   */
+  composicaoDasCompeticoes?: Record<string, string[]>;
 }
 
 export interface OpcoesEstadoInicial {

@@ -29,7 +29,6 @@ import {
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
 import { extrairCorDominante } from "../../lib/corDoEscudo.js";
-import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
@@ -208,34 +207,40 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           </button>
         </div>
       )}
-      {estadoAtual.foraDeCombate && (
-        <div className="fixed top-4 right-4 z-20 flex items-center gap-2 rounded-full bg-red-950/95 border border-red-800 shadow-xl px-4 py-2 text-xs backdrop-blur">
-          <span className="text-red-300 font-medium">
-            {estadoAtual.foraDeCombate.motivo === "suspensao" ? "Suspenso" : "Lesionado"} —{" "}
-            {estadoAtual.foraDeCombate.partidasRestantes > 1 ? `faltam ${estadoAtual.foraDeCombate.partidasRestantes} partidas` : "falta 1 partida"} do clube
-          </span>
-        </div>
-      )}
-      {competicoesDoJogador.length > 0 && (
-        <PainelDeCompeticoes
-          competicoesDoJogador={competicoesDoJogador}
-          tabelaPorCampeonato={tabelaPorCampeonato}
-          faseMataMataPorCampeonato={faseMataMataPorCampeonato}
-          grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
-          clubeId={estadoAtual.clubeAtualId}
-          clubePorId={clubePorId}
+      <div className="fixed top-4 right-4 z-20 w-56 flex flex-col gap-3 max-h-[calc(100vh-2rem)] overflow-y-auto">
+        {estadoAtual.foraDeCombate && (
+          <div className="flex items-center gap-2 rounded-full bg-red-950/95 border border-red-800 shadow-xl px-4 py-2 text-xs backdrop-blur shrink-0">
+            <span className="text-red-300 font-medium">
+              {estadoAtual.foraDeCombate.motivo === "suspensao" ? "Suspenso" : "Lesionado"} —{" "}
+              {estadoAtual.foraDeCombate.partidasRestantes > 1 ? `faltam ${estadoAtual.foraDeCombate.partidasRestantes} partidas` : "falta 1 partida"} do clube
+            </span>
+          </div>
+        )}
+        {competicoesDoJogador.length > 0 && (
+          <PainelDeCompeticoes
+            competicoesDoJogador={competicoesDoJogador}
+            tabelaPorCampeonato={tabelaPorCampeonato}
+            faseMataMataPorCampeonato={faseMataMataPorCampeonato}
+            grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
+            clubeId={estadoAtual.clubeAtualId}
+            clubePorId={clubePorId}
+            nomePorCampeonato={nomePorCampeonato}
+            faixasPorCampeonato={temporada.faixasPorCampeonato}
+          />
+        )}
+        <PainelLateralEstatisticasEAtributos
+          estatisticasCarreira={estatisticasCarreira}
           nomePorCampeonato={nomePorCampeonato}
-          faixasPorCampeonato={temporada.faixasPorCampeonato}
+          atributos={estadoAtual.jogador.atributos}
+          atributosDaPosicao={ATRIBUTOS_POR_POSICAO[estadoAtual.jogador.posicao]}
         />
-      )}
+      </div>
       <div className="relative z-[1] mx-auto max-w-3xl flex flex-col gap-4">
         <Cabecalho
           estado={estadoAtual}
           nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
           escudoClube={escudoDoClube(clubePorId, estadoAtual.clubeAtualId)}
           nomeDaNacionalidade={nomeDaNacionalidade}
-          estatisticasCarreira={estatisticasCarreira}
-          nomePorCampeonato={nomePorCampeonato}
           focoAutomatico={temporada.focoAutomatico}
           onDesligarTreinoAutomatico={temporada.desligarTreinoAutomatico}
         />
@@ -286,11 +291,13 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
               <PainelPartidaAoVivo
                 partida={partidaAoVivo}
                 clubePorId={clubePorId}
+                status={estadoAtual.statusNoClube}
                 prompt={promptDaPartidaAoVivo}
                 velocidade={temporada.velocidadeAoVivo}
                 onDefinirVelocidade={temporada.definirVelocidadeAoVivo}
                 onResponderChance={temporada.responderChanceAoVivo}
                 onResponderEvento={temporada.responderEventoAoVivo}
+                onConfirmarFimDeJogo={temporada.confirmarFimDeJogo}
               />
             )}
             {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
@@ -420,7 +427,7 @@ function PainelDeCompeticoes({
 
   return (
     <>
-      <div className="fixed top-4 right-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
+      <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold text-slate-400">Suas competições</h2>
           <button type="button" onClick={() => setClassificacaoAberta(true)} className="shrink-0 text-emerald-400 hover:text-emerald-300 transition-colors">
@@ -600,8 +607,6 @@ function Cabecalho({
   nomeClube,
   escudoClube,
   nomeDaNacionalidade,
-  estatisticasCarreira,
-  nomePorCampeonato,
   focoAutomatico,
   onDesligarTreinoAutomatico,
 }: {
@@ -609,15 +614,11 @@ function Cabecalho({
   nomeClube: string;
   escudoClube: string | undefined;
   nomeDaNacionalidade: string | undefined;
-  estatisticasCarreira: EstatisticasCarreira;
-  nomePorCampeonato: Map<string, string>;
   focoAutomatico: FocoDeTreino | undefined;
   onDesligarTreinoAutomatico: () => void;
 }) {
   const xpNecessario = xpParaProximoNivel(estado.nivel);
   const progresso = Math.min(100, Math.round((estado.xpAcumulado / xpNecessario) * 100));
-  const [mostrarEstatisticas, setMostrarEstatisticas] = useState(false);
-  const [mostrarAtributos, setMostrarAtributos] = useState(false);
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
@@ -634,7 +635,7 @@ function Cabecalho({
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
         <Stat rotulo="Overall" valor={overallAtual(estado)} />
-        <Stat rotulo="Status" valor={estado.statusNoClube} />
+        <Stat rotulo="Status no elenco" valor={ROTULO_STATUS[estado.statusNoClube]} />
         <Stat rotulo="Moral" valor={estado.moral} />
         <Stat rotulo="Pontos disponíveis" valor={estado.pontosDisponiveis} destaque={estado.pontosDisponiveis > 0} />
       </div>
@@ -649,36 +650,33 @@ function Cabecalho({
           <div className="h-full bg-emerald-500" style={{ width: `${progresso}%` }} />
         </div>
       </div>
-      <div className="flex items-center gap-3 flex-wrap">
-        <button type="button" onClick={() => setMostrarEstatisticas((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
-          {mostrarEstatisticas ? "Ocultar" : "Ver"} estatísticas da carreira
-        </button>
-        <button type="button" onClick={() => setMostrarAtributos((atual) => !atual)} className="self-start text-xs text-emerald-400 hover:text-emerald-300 transition-colors">
-          {mostrarAtributos ? "Ocultar" : "Ver"} atributos
-        </button>
-        {focoAutomatico && (
+      {focoAutomatico && (
+        <div className="flex items-center gap-3 flex-wrap">
           <span className="text-xs text-slate-400">
             Treino rápido ativado ({ROTULO_FOCO[focoAutomatico]}) ·{" "}
             <button type="button" onClick={onDesligarTreinoAutomatico} className="text-emerald-400 hover:text-emerald-300 transition-colors">
               voltar a perguntar
             </button>
           </span>
-        )}
-      </div>
-      {mostrarEstatisticas && <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />}
-      {mostrarAtributos && (
-        <div className="rounded-lg bg-slate-800/60 p-3">
-          <RadarDeAtributos atributos={estado.jogador.atributos} atributosDaPosicao={ATRIBUTOS_POR_POSICAO[estado.jogador.posicao]} />
         </div>
       )}
     </div>
   );
 }
 
-function PainelEstatisticas({ estatisticas, nomePorCampeonato }: { estatisticas: EstatisticasCarreira; nomePorCampeonato: Map<string, string> }) {
+function PainelEstatisticas({
+  estatisticas,
+  nomePorCampeonato,
+  colunas = 4,
+}: {
+  estatisticas: EstatisticasCarreira;
+  nomePorCampeonato: Map<string, string>;
+  /** 4 (padrão) pro uso mais largo (fim de temporada); 2 pra caber na lateral estreita sempre visível. */
+  colunas?: 2 | 4;
+}) {
   return (
     <div className="rounded-lg bg-slate-800/60 p-3 text-sm flex flex-col gap-2">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className={`grid gap-2 ${colunas === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}>
         <Stat rotulo="Temporadas" valor={estatisticas.temporadas} />
         <Stat rotulo="Partidas" valor={estatisticas.partidas} />
         <Stat rotulo="Gols" valor={estatisticas.gols} />
@@ -697,6 +695,55 @@ function PainelEstatisticas({ estatisticas, nomePorCampeonato }: { estatisticas:
             ))}
           </ul>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** Versão compacta do radar de atributos, pra caber na lateral estreita sempre visível (o SVG do
+ * radar de verdade escala proporcionalmente com a largura — numa coluna de ~14rem os rótulos
+ * ficariam ilegíveis, ver `RadarDeAtributos.tsx`). Mesmos valores, só como lista com barra. */
+function ListaCompactaDeAtributos({ atributos, atributosDaPosicao }: { atributos: Partial<Record<Atributo, number>>; atributosDaPosicao: Atributo[] }) {
+  return (
+    <div className="flex flex-col gap-1">
+      {atributosDaPosicao.map((atributo) => {
+        const valor = atributos[atributo] ?? 0;
+        return (
+          <div key={atributo} className="flex items-center gap-2">
+            <span className="flex-1 truncate text-slate-400 capitalize">{atributo.replaceAll("_", " ")}</span>
+            <div className="w-12 h-1.5 rounded-full bg-slate-700 overflow-hidden shrink-0">
+              <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (valor / 99) * 100)}%` }} />
+            </div>
+            <span className="tabular-nums text-slate-200 w-5 text-right shrink-0">{valor}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Painel fixo na lateral direita, sempre visível (pedido do usuário: "eu não quero que o gráfico
+ * de atributos e as estatísticas fique escondido") — antes era um toggle escondido no cabeçalho. */
+function PainelLateralEstatisticasEAtributos({
+  estatisticasCarreira,
+  nomePorCampeonato,
+  atributos,
+  atributosDaPosicao,
+}: {
+  estatisticasCarreira: EstatisticasCarreira;
+  nomePorCampeonato: Map<string, string>;
+  atributos: Partial<Record<Atributo, number>>;
+  atributosDaPosicao: Atributo[];
+}) {
+  return (
+    <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
+      <div>
+        <h2 className="font-semibold text-slate-400 mb-2">Estatísticas da carreira</h2>
+        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} colunas={2} />
+      </div>
+      <div className="border-t border-slate-800 pt-2">
+        <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
+        <ListaCompactaDeAtributos atributos={atributos} atributosDaPosicao={atributosDaPosicao} />
       </div>
     </div>
   );
@@ -1052,19 +1099,23 @@ function SeletorDeVelocidade({ velocidade, onDefinirVelocidade }: { velocidade: 
 function PainelPartidaAoVivo({
   partida,
   clubePorId,
+  status,
   prompt,
   velocidade,
   onDefinirVelocidade,
   onResponderChance,
   onResponderEvento,
+  onConfirmarFimDeJogo,
 }: {
   partida: PartidaAoVivoEmAndamento;
   clubePorId: Map<string, Club>;
+  status: StatusNoClube;
   prompt: Extract<PromptPendente, { tipo: "chance_ao_vivo" | "evento_ao_vivo" }> | undefined;
   velocidade: VelocidadeAoVivo;
   onDefinirVelocidade: (velocidade: VelocidadeAoVivo) => void;
   onResponderChance: (resultado: ResultadoDecisaoChance) => void;
   onResponderEvento: (opcao: Opcao) => void;
+  onConfirmarFimDeJogo: () => void;
 }) {
   const mandanteNome = nomeDoClube(clubePorId, partida.mandanteId);
   const visitanteNome = nomeDoClube(clubePorId, partida.visitanteId);
@@ -1075,13 +1126,22 @@ function PainelPartidaAoVivo({
   }, [partida.eventos.length]);
 
   return (
-    <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-4 flex flex-col gap-3 text-slate-100">
+    <div className={`rounded-2xl bg-slate-900 border shadow-xl p-4 flex flex-col gap-3 text-slate-100 ${partida.finalizada ? "border-slate-700" : "border-emerald-700"}`}>
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Ao vivo — {partida.minutoAtual}'
+        <div className="flex items-center gap-2">
+          {partida.finalizada ? (
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Fim de jogo</div>
+          ) : (
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Ao vivo — {partida.minutoAtual}'
+            </div>
+          )}
+          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300" title="Seu status no elenco nesta partida">
+            {ROTULO_STATUS[status]}
+          </span>
         </div>
-        <SeletorDeVelocidade velocidade={velocidade} onDefinirVelocidade={onDefinirVelocidade} />
+        {!partida.finalizada && <SeletorDeVelocidade velocidade={velocidade} onDefinirVelocidade={onDefinirVelocidade} />}
       </div>
       <div className="flex items-center justify-center gap-4">
         <span className="text-right flex-1 font-medium flex items-center justify-end gap-1.5">
@@ -1108,6 +1168,11 @@ function PainelPartidaAoVivo({
         <div className="border-t border-slate-800 pt-3">
           <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={onResponderEvento} />
         </div>
+      )}
+      {partida.finalizada && !prompt && (
+        <button type="button" onClick={onConfirmarFimDeJogo} className="self-start rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium text-sm">
+          Continuar
+        </button>
       )}
     </div>
   );

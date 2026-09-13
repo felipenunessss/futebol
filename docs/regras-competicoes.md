@@ -6,6 +6,55 @@ comportam entre temporadas — coisas que já decidimos mas que só fazem sentid
 implementar quando o motor de simulação de temporadas (Fase 2) existir.
 Enquanto isso, ficam documentadas aqui para não se perder.
 
+## Promoção/rebaixamento entre divisões (implementado, escopo parcial)
+
+Antes, toda temporada nova recarregava sempre a MESMA lista estática de
+`times` de cada competição (`src/data/estaduais/*.json`/`campeonatos-nacionais/
+*.json`) — nenhum clube subia/descia de verdade entre temporadas simuladas
+da mesma carreira, mesmo com `Premiacao.acesso_proxima_divisao`/
+`rebaixamento_proxima_divisao` cadastrados nos dados (bug relatado pelo
+usuário: "não estou vendo os rebaixamentos/promoções/premiações
+funcionarem"). Implementado em `src/career/mundo-persistente.ts`
+(`calcularMudancasDeDivisao`/`aplicarMudancasDeDivisao`) + `simulation/
+incremental.ts` (`ContextoDePrograma.tabelaFinal`, `CompeticaoIncremental.tabelaFinal`)
++ `web/src/features/temporada/useTemporada.ts` (aplica a sobreposição salva
+em `EstadoDeCarreira.composicaoDasCompeticoes` antes de montar a temporada, e
+recalcula/persiste a sobreposição depois que ela termina).
+
+**Escopo confirmado funcionando**: promoção/rebaixamento entre 2 divisões da
+MESMA hierarquia (mesmo estado, pro Brasil, ou mesmo país) quando AS DUAS só
+usam `formato.pontos_corridos` puro (sem mata-mata/fase suíça/turno-retorno
+anexado) — é o único tipo de formato que hoje expõe uma classificação final
+extraível (`tabelaFinal`). Confirmado com dado real: Brasileirão Série A ↔ B
+(20 times cada, 4 sobem/4 descem, testado com `avancarSemana` até o fim das
+duas competições).
+
+**Ainda não coberto** (fica como pendência, não implementado):
+- A maioria dos estaduais (a maior parte usa `fase_suica`/`fase_grupos`/
+  `turno`+`returno`, nenhum expõe `tabelaFinal` ainda).
+- Brasileirão Série B↔C e C↔D (Série C usa `fase_grupos`+`fase_quadrangular`+
+  `final_estadual`; Série D usa `fase_grupos`+`mata_mata` — nenhuma das duas
+  tem `tabelaFinal`). Por design, uma troca só acontece quando AS DUAS
+  divisões do par suportam `tabelaFinal` (ver comentário em
+  `mundo-persistente.ts`) — evita drenar/inchar uma divisão sem nunca
+  devolver do outro lado.
+- Vagas de Copa do Brasil/Libertadores/Sul-Americana/Série D concedidas a um
+  estadual (`Premiacao.vaga_copa_do_brasil`/`vaga_libertadores`/
+  `vaga_sulamericana`/`vaga_serie_d`) — são inserções cross-competição em
+  competições já com fases escalonadas/sorteio de grupos (Copa do Brasil,
+  Libertadores, Sul-Americana, a própria Série D — ver seção abaixo), fora de
+  escopo por ora.
+- Título/campeão de competições sem `tabelaFinal` continua funcionando
+  normalmente (não depende de `tabelaFinal`) — só a composição de times pra
+  temporada seguinte é que não muda pra essas.
+
+Extensão natural pra quando alguém for aumentar a cobertura: expor
+`tabelaFinal` nas demais receitas de `incremental.ts` que já têm uma
+classificação por trás (`fase_grupos` sem mata-mata teria uma tabela por
+grupo, não uma única — precisaria decidir o que "classificação final" quer
+dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra formatos
+multi-grupo).
+
 ## Série D — preenchimento de vagas por temporada
 
 Fonte: `src/data/campeonatos-nacionais/brasileirao_serie_d.json` (elenco) e
@@ -49,6 +98,13 @@ princípio — elenco fixo real sempre que existir, sem sorteio.
 
 ### Status
 
-- [ ] Não implementado — depende do motor de simulação de temporadas (Fase 2)
-  para gerar a classificação final dos estaduais e da própria Série D, e da
-  lógica de subida/permanência entre temporadas.
+- [ ] Não implementado. O motor de simulação de temporadas (Fase 2) já existe,
+  e a lógica de subida/permanência entre temporadas para o caso simples já
+  foi implementada (ver seção "Promoção/rebaixamento entre divisões" acima,
+  `career/mundo-persistente.ts`) — mas o mecanismo específico deste item
+  (`vaga_serie_d` vindo de um estadual, resolvido por `resolverVagasEstaduais`)
+  ainda não foi ligado a ela: exigiria inserir clubes numa competição que
+  ainda não roda `tabelaFinal` (Série D usa `fase_grupos`+`mata_mata`) a
+  partir de uma classificação estadual que, na maioria dos casos, TAMBÉM não
+  tem `tabelaFinal` ainda. Fica pendente até que pelo menos um dos dois lados
+  ganhe suporte.

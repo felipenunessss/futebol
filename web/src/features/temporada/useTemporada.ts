@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { FocoDeTreino } from "@motor/progression/xp.js";
+import { converterChancesEmDesempenho, type FocoDeTreino } from "@motor/progression/xp.js";
 import { buscarArquetipo } from "@motor/schemas/player.js";
 import type { Cenario, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
@@ -28,6 +28,7 @@ import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/
 import type { CampeonatoEstadual } from "@motor/schemas/championship.js";
 import type { CampeonatoNacional } from "@motor/schemas/national-championship.js";
 import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type EscolhaDeFimDeTemporada, type PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
+import { aplicarMudancasDeDivisao, calcularMudancasDeDivisao, type CompeticaoParaMundoPersistente } from "@motor/career/mundo-persistente.js";
 
 /** Velocidades de exibição da partida ao vivo escolhíveis pelo jogador (pedido do usuário:
  * "implementar velocidade na simulação do jogo"). ms de espera real por minuto simulado — "normal"
@@ -71,6 +72,32 @@ function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNac
     classificados: melhorFaixa > 0 ? melhorFaixa : undefined,
     rebaixados: premiacao.rebaixamento_proxima_divisao,
   };
+}
+
+/** "estadual:MG" ou "nacional:BR" — competições da mesma chave promovem/rebaixam entre si por
+ * nivel adjacente (ver `career/mundo-persistente.ts`). Estaduais não têm campo `pais` (são sempre
+ * do Brasil, por convenção da pasta `src/data/estaduais/`), nacionais não têm `estado`. */
+function chaveDeHierarquia(campeonato: CampeonatoEstadual | CampeonatoNacional): string {
+  return "estado" in campeonato ? `estadual:${campeonato.estado}` : `nacional:${campeonato.pais}`;
+}
+
+/** Aplica a sobreposição de composição salva na carreira (`EstadoDeCarreira.composicaoDasCompeticoes`,
+ * ver `career/mundo-persistente.ts`) sobre a lista estática de campeonatos — sem isso, toda
+ * temporada nova usava sempre os mesmos `times` do arquivo de dado, mesmo depois de promoção/
+ * rebaixamento em temporadas anteriores da MESMA carreira (bug relatado pelo usuário: "não estou
+ * vendo os rebaixamentos/promoções funcionarem"). */
+function aplicarComposicaoSalva<T extends CampeonatoEstadual | CampeonatoNacional>(campeonatosBase: T[], composicaoSalva: Record<string, string[]> | undefined): T[] {
+  if (!composicaoSalva) return campeonatosBase;
+  return campeonatosBase.map((c) => (composicaoSalva[c.id] ? { ...c, times: composicaoSalva[c.id] } : c));
+}
+
+/** Compara 2 listas de Club.id como conjunto (ordem não importa) — usado só pra saber se a
+ * composição de uma competição realmente divergiu do arquivo de dado estático, e por isso vale a
+ * pena persistir uma sobreposição pra ela (ver uso em `jogarTemporada`). */
+function mesmoConjunto(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const conjuntoA = new Set(a);
+  return b.every((id) => conjuntoA.has(id));
 }
 
 /** TODOS os subtipos de chance do jogador viram gol quando `sucesso` — o motor (`match.ts`/
@@ -134,6 +161,13 @@ export interface PartidaAoVivoEmAndamento {
   golsCasa: number;
   golsFora: number;
   eventos: EventoAoVivo[];
+  /** `true` a partir do apito final — o painel ao vivo continua na tela (agora como "fim de jogo",
+   * não mais "ao vivo"), esperando o jogador confirmar antes de ir pro resto do fluxo (resultado da
+   * rodada, etc). Fora da janela automática (fast-forward), essa confirmação nunca pausa nada de
+   * verdade — o motor já resolveu tudo, é só a UI segurando a revelação (mesmo padrão de
+   * `resultadoDaRodada`/sorteio/chaveamento). Pedido do usuário: "quero que apareça uma tela de fim
+   * de jogo ao final das partidas". */
+  finalizada?: boolean;
 }
 
 /** Fase atual do jogador numa competição de mata-mata — só existe pra competições em fase eliminatória; pontos corridos usa `tabelaPorCampeonato`/posição. */
@@ -297,6 +331,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const focoAutomaticoRef = useRef<FocoDeTreino | undefined>(undefined);
   const [focoAutomatico, setFocoAutomatico] = useState<FocoDeTreino>();
   const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
+  /** Resultado da rodada calculado no momento em que a partida ao vivo do jogador termina, mas
+   * represado até o jogador confirmar a tela de "fim de jogo" (`confirmarFimDeJogo`) — sem isso, o
+   * painel de resultado da rodada substituía o painel ao vivo instantaneamente no apito final, sem
+   * dar nenhum momento de "fim de jogo" (ver `PartidaAoVivoEmAndamento.finalizada`). Ref, não
+   * state: não precisa re-renderizar nada sozinho, só ser lido quando `confirmarFimDeJogo` rodar. */
+  const resultadoDaRodadaPendenteRef = useRef<ResultadoDaRodadaExibido | undefined>(undefined);
+  /** `true` do momento em que o jogador escolhe "ao vivo" no menu pré-jogo até `confirmarFimDeJogo`
+   * — evita ler `partidaAoVivo` (state) dentro do updater de outro `setState` (efeito colateral
+   * indevido); os hooks de resultado da partida (`onPartidaPontosCorridos`/`onPartidaMataMata`)
+   * consultam este ref pra saber se devem represar o resultado da rodada ou revelar na hora. */
+  const partidaAoVivoAtivaRef = useRef(false);
   const [animacaoDeEscolha, setAnimacaoDeEscolha] = useState<AnimacaoDeEscolhaPendente>();
   /** Sorteio de grupos de uma competição do jogador, aguardando revelação — ver `onSorteioDeGrupos`. */
   const [sorteioPendente, setSorteioPendente] = useState<SorteioDeGruposNaTemporada>();
@@ -382,6 +427,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function responderResultadoDaRodada(): void {
     setResultadoDaRodada(undefined);
+  }
+
+  /** Fecha a tela de "fim de jogo" (`PartidaAoVivoEmAndamento.finalizada`) — libera o resultado da
+   * rodada represado por `onPartidaPontosCorridos`/`onPartidaMataMata`, se houver (não há quando a
+   * partida terminou já em modo automático, ou quando a competição não tem resultado de rodada
+   * pra mostrar). */
+  function confirmarFimDeJogo(): void {
+    setPartidaAoVivo(undefined);
+    partidaAoVivoAtivaRef.current = false;
+    const pendente = resultadoDaRodadaPendenteRef.current;
+    resultadoDaRodadaPendenteRef.current = undefined;
+    if (pendente) setResultadoDaRodada(pendente);
   }
 
   /** Fecha o painel de sorteio de grupos — chamado pelo clique do jogador, não pelo motor (que já seguiu em frente, ver `onSorteioDeGrupos`). */
@@ -498,8 +555,9 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       if (evento.tipo === "incidente_jogador") {
         return { ...atual, eventos, minutoAtual: evento.minuto };
       }
-      // apito_final — placar oficial substitui qualquer contagem aproximada feita ao vivo.
-      return { ...atual, eventos, minutoAtual: 90, golsCasa: evento.golsCasa, golsFora: evento.golsFora };
+      // apito_final — placar oficial substitui qualquer contagem aproximada feita ao vivo, e marca
+      // "finalizada" pro painel virar a tela de fim de jogo (ver `PartidaAoVivoEmAndamento.finalizada`).
+      return { ...atual, eventos, minutoAtual: 90, golsCasa: evento.golsCasa, golsFora: evento.golsFora, finalizada: true };
     });
 
     // Reaproveita a mesma animação de "spin" dos cenários de carreira fora de campo (`onCenarioResolvido`
@@ -524,6 +582,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * assíncrono — usar `estadoAtual` direto aqui pegaria o clube ANTIGO). */
   async function jogarTemporada(estadoParaComecar?: EstadoDeCarreira): Promise<void> {
     const estadoInicialDaTemporada = estadoParaComecar ?? estadoAtual;
+    // Reflete qualquer promoção/rebaixamento de temporadas anteriores desta carreira antes de
+    // montar a temporada (ver `career/mundo-persistente.ts`) — sem isso, um clube rebaixado
+    // continuaria aparecendo na divisão de cima pra sempre, todo ano.
+    const campeonatosEfetivos = aplicarComposicaoSalva(campeonatos, estadoInicialDaTemporada.composicaoDasCompeticoes);
     setEstadoAtual(estadoInicialDaTemporada);
     setFase("jogando");
     setFeed([]);
@@ -541,6 +603,9 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     bufferRodadaRef.current = new Map();
     setJogoDaSemana(undefined);
     setResultadoDaRodada(undefined);
+    setPartidaAoVivo(undefined);
+    partidaAoVivoAtivaRef.current = false;
+    resultadoDaRodadaPendenteRef.current = undefined;
     setAnimacaoDeEscolha(undefined);
     setSorteioPendente(undefined);
     setChaveamentoPendente(undefined);
@@ -587,9 +652,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       onMinutoAoVivo,
       msPorMinutoAoVivo: () => MS_POR_MINUTO_POR_VELOCIDADE[velocidadeAoVivoRef.current],
       onPartidaPontosCorridos: (info) => {
-        // a partida "ao vivo" já resolveu por completo antes deste hook disparar — some o painel
-        // em andamento (o resultado final já vai pro feed permanente logo abaixo).
-        setPartidaAoVivo(undefined);
         if (info.grupoNome) registrarGrupoDoJogador(info.campeonatoId, info.grupoNome);
         atualizarTabela(info.campeonatoId, info.evento.tabelaDepois);
         pushEvento({ tipo: "partida_propria", info });
@@ -604,15 +666,37 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         setJogoDaSemana((atual) =>
           atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: resultadoDaPartida.golsCasa, golsFora: resultadoDaPartida.golsFora } } : atual,
         );
-        if (!emJanelaAutomatica()) {
-          const bufferDaRodada = bufferRodadaRef.current.get(info.campeonatoId);
-          setResultadoDaRodada({
-            tipo: "pontos_corridos",
-            campeonatoId: info.campeonatoId,
-            rodada: confronto.rodada,
-            confrontos: bufferDaRodada ? [...bufferDaRodada.confrontos] : [],
-            tabela: info.evento.tabelaDepois,
-          });
+        // Estatísticas da carreira atualizam partida a partida, não só de uma vez no fim da
+        // temporada (pedido do usuário: "os jogos devem atualizar as estatísticas conforme
+        // acontecem, não quero que os números da temporada apareçam direto").
+        const desempenhoDaPartida = converterChancesEmDesempenho(resultadoDaPartida.chancesJogador, 0, 1);
+        setEstatisticasCarreira((atual) => ({
+          ...atual,
+          partidas: atual.partidas + 1,
+          gols: atual.gols + desempenhoDaPartida.gols,
+          assistencias: atual.assistencias + desempenhoDaPartida.assistencias,
+        }));
+        const resultadoParaExibir: ResultadoDaRodadaExibido | undefined = emJanelaAutomatica()
+          ? undefined
+          : {
+              tipo: "pontos_corridos",
+              campeonatoId: info.campeonatoId,
+              rodada: confronto.rodada,
+              confrontos: (() => {
+                const bufferDaRodada = bufferRodadaRef.current.get(info.campeonatoId);
+                return bufferDaRodada ? [...bufferDaRodada.confrontos] : [];
+              })(),
+              tabela: info.evento.tabelaDepois,
+            };
+        // Se a partida foi "ao vivo", represa o resultado da rodada até o jogador confirmar a tela
+        // de fim de jogo (`confirmarFimDeJogo`) — o painel ao vivo continua na tela (já marcado
+        // `finalizada` por `onEventoAoVivo`). Se foi "simulação rápida" (sem painel ao vivo) ou
+        // estamos em modo automático, revela na hora, como sempre.
+        if (partidaAoVivoAtivaRef.current) {
+          resultadoDaRodadaPendenteRef.current = resultadoParaExibir;
+        } else {
+          setPartidaAoVivo(undefined);
+          if (resultadoParaExibir) setResultadoDaRodada(resultadoParaExibir);
         }
       },
       escolherCampeonatosParaSeguir,
@@ -639,27 +723,51 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         });
       },
       onPartidaMataMata: (info) => {
-        setPartidaAoVivo(undefined);
         const eliminado = info.evento.confronto.vencedor !== estadoAtual.clubeAtualId;
         setFaseMataMataPorCampeonato((atual) => new Map(atual).set(info.campeonatoId, { etapa: info.evento.etapa, eliminado }));
         pushEvento({ tipo: "partida_mata_mata", info });
         setJogoDaSemana((atual) =>
           atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: info.evento.confronto.golsA, golsFora: info.evento.confronto.golsB } } : atual,
         );
-        if (!emJanelaAutomatica()) {
-          setResultadoDaRodada({
-            tipo: "mata_mata",
-            campeonatoId: info.campeonatoId,
-            etapa: info.evento.etapa,
-            confrontoDoJogador: {
-              mandanteId: info.evento.confronto.timeA,
-              visitanteId: info.evento.confronto.timeB,
-              golsCasa: info.evento.confronto.golsA,
-              golsFora: info.evento.confronto.golsB,
-              ehDoJogador: true,
-            },
-            eliminado,
-          });
+        // Mesma atualização incremental de `onPartidaPontosCorridos` — 1 ou 2 partidas (ida e
+        // volta) por confronto de mata-mata.
+        const partidasDoJogadorNestaEtapa = info.evento.confronto.partidasDoJogador ?? [];
+        if (partidasDoJogadorNestaEtapa.length > 0) {
+          let golsDaEtapa = 0;
+          let assistenciasDaEtapa = 0;
+          for (const partida of partidasDoJogadorNestaEtapa) {
+            const desempenho = converterChancesEmDesempenho(partida.chancesJogador, 0, 1);
+            golsDaEtapa += desempenho.gols;
+            assistenciasDaEtapa += desempenho.assistencias;
+          }
+          setEstatisticasCarreira((atual) => ({
+            ...atual,
+            partidas: atual.partidas + partidasDoJogadorNestaEtapa.length,
+            gols: atual.gols + golsDaEtapa,
+            assistencias: atual.assistencias + assistenciasDaEtapa,
+          }));
+        }
+        const resultadoParaExibir: ResultadoDaRodadaExibido | undefined = emJanelaAutomatica()
+          ? undefined
+          : {
+              tipo: "mata_mata",
+              campeonatoId: info.campeonatoId,
+              etapa: info.evento.etapa,
+              confrontoDoJogador: {
+                mandanteId: info.evento.confronto.timeA,
+                visitanteId: info.evento.confronto.timeB,
+                golsCasa: info.evento.confronto.golsA,
+                golsFora: info.evento.confronto.golsB,
+                ehDoJogador: true,
+              },
+              eliminado,
+            };
+        // Mesmo represamento de `onPartidaPontosCorridos` — ver comentário lá.
+        if (partidaAoVivoAtivaRef.current) {
+          resultadoDaRodadaPendenteRef.current = resultadoParaExibir;
+        } else {
+          setPartidaAoVivo(undefined);
+          if (resultadoParaExibir) setResultadoDaRodada(resultadoParaExibir);
         }
       },
       onStatusAtualizado: (info) => pushEvento({ tipo: "status", info }),
@@ -674,20 +782,42 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       },
     };
 
-    const resultadoDaTemporada = await jogarTemporadaSemanal(estadoInicialDaTemporada, campeonatos, clubes, opcoes);
+    const resultadoDaTemporada = await jogarTemporadaSemanal(estadoInicialDaTemporada, campeonatosEfetivos, clubes, opcoes);
     setResultado(resultadoDaTemporada);
-    setEstadoAtual(resultadoDaTemporada.estado);
+
+    // Promoção/rebaixamento entre temporadas (ver `career/mundo-persistente.ts`) — calcula a partir
+    // da classificação final desta temporada (só disponível pra competições `pontos_corridos`
+    // puras por enquanto) e persiste só o que realmente divergiu da referência estática original,
+    // pra `composicaoDasCompeticoes` não crescer sem necessidade.
+    const competicoesParaMundo: CompeticaoParaMundoPersistente[] = campeonatosEfetivos.map((c) => ({
+      id: c.id,
+      chaveDeHierarquia: chaveDeHierarquia(c),
+      nivel: c.nivel,
+      premiacao: c.premiacao,
+      tabelaFinal: resultadoDaTemporada.resultadoTemporada.competicoes.find((r) => r.campeonatoId === c.id)?.resultado?.tabelaFinal,
+    }));
+    const mudancasDeDivisao = calcularMudancasDeDivisao(competicoesParaMundo);
+    const composicaoAtualMap = new Map(campeonatosEfetivos.map((c) => [c.id, c.times]));
+    const novaComposicaoMap = aplicarMudancasDeDivisao(composicaoAtualMap, mudancasDeDivisao);
+    const novaComposicaoSalva: Record<string, string[]> = {};
+    for (const base of campeonatos) {
+      const novosTimes = novaComposicaoMap.get(base.id);
+      if (novosTimes && !mesmoConjunto(novosTimes, base.times)) novaComposicaoSalva[base.id] = novosTimes;
+    }
+
+    setEstadoAtual({ ...resultadoDaTemporada.estado, composicaoDasCompeticoes: Object.keys(novaComposicaoSalva).length > 0 ? novaComposicaoSalva : undefined });
     setFase("resumo");
 
     const clubeDaTemporada = resultadoDaTemporada.estado.clubeAtualId;
     const novosTitulos: TituloDeCarreira[] = resultadoDaTemporada.resultadoTemporada.competicoes
       .filter((c) => c.resultado?.campeao === clubeDaTemporada)
       .map((c) => ({ campeonatoId: c.campeonatoId, temporada: resultadoDaTemporada.resultadoTemporada.temporada, clubeId: clubeDaTemporada }));
+    // partidas/gols/assistências já foram somados partida a partida (`onPartidaPontosCorridos`/
+    // `onPartidaMataMata`, ver comentário lá) — aqui só soma o que só faz sentido fechar no fim da
+    // temporada (temporadas jogadas, títulos conquistados).
     setEstatisticasCarreira((atual) => ({
+      ...atual,
       temporadas: atual.temporadas + 1,
-      partidas: atual.partidas + resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.partidasDoJogador, 0),
-      gols: atual.gols + resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.golsDoJogador, 0),
-      assistencias: atual.assistencias + resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.assistenciasDoJogador, 0),
       titulos: [...atual.titulos, ...novosTitulos],
     }));
   }
@@ -773,6 +903,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setPromptPendente(undefined);
 
     if (escolha === "ao_vivo") {
+      partidaAoVivoAtivaRef.current = true;
       setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
       resolve("ao_vivo");
     } else {
@@ -805,6 +936,15 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setSorteioPendente(undefined);
     setChaveamentoPendente(undefined);
     concluirAnimacaoDeEscolha();
+    // Mesma ideia acima, pro painel de "fim de jogo" (`PartidaAoVivoEmAndamento.finalizada`) — só
+    // fecha se já tiver chegado no apito final; uma partida ainda em andamento nesse exato instante
+    // não é interrompida (o motor já vai resolvê-la sozinho, sem pausa, pelo resto da simulação).
+    setPartidaAoVivo((atual) => {
+      if (!atual?.finalizada) return atual;
+      partidaAoVivoAtivaRef.current = false;
+      resultadoDaRodadaPendenteRef.current = undefined;
+      return undefined;
+    });
     if (!promptPendente) return;
     switch (promptPendente.tipo) {
       case "semana":
@@ -901,6 +1041,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     simularAteOFinalDaTemporada,
     resultadoDaRodada,
     responderResultadoDaRodada,
+    confirmarFimDeJogo,
     animacaoDeEscolha,
     concluirAnimacaoDeEscolha,
     sorteioPendente,

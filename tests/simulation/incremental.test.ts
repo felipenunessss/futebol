@@ -68,6 +68,17 @@ describe("criarCompeticaoIncremental — pontos_corridos", () => {
     await avancarSemana(estado, 3, () => Math.random());
     expect(estado.unidadesConcluidas).toBe(unidadesApos);
   });
+
+  it("bug real corrigido: expõe a classificação final (tabelaFinal), não só o campeão — usada por career/mundo-persistente.ts pra promoção/rebaixamento", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 6 }, () => Math.random());
+    for (let semana = 1; semana <= 6; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+    expect(estado.concluida).toBe(true);
+    expect(estado.tabelaFinal).toBeDefined();
+    expect(estado.tabelaFinal!.map((l) => l.clubeId).sort()).toEqual([...times].sort());
+    expect(estado.tabelaFinal![0].clubeId).toBe(estado.campeao);
+  });
 });
 
 describe("criarCompeticaoIncremental — fase_suica + mata_mata (Paulistão/Gauchão)", () => {
