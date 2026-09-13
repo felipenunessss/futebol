@@ -13,8 +13,20 @@ export interface PerfilTime {
   ataque: number;
 }
 
-/** Desvio (pra mais ou pra menos) aplicado ao rating do clube ao gerar cada zona — é o que permite zebra. */
-const VARIANCIA_PERFIL = 80;
+/**
+ * Desvio (pra mais ou pra menos) aplicado ao rating do clube ao gerar cada
+ * zona — é o principal fator de "zebra"/imprevisibilidade de uma partida
+ * específica. Subido de 80 pra 130 depois de um relato real (favorito quase
+ * sempre vencendo mesmo dentro da MESMA divisão, com diferença de rating
+ * pequena) confirmado por simulação: com 80, um gap de só 100 pontos (comum
+ * entre times do mesmo campeonato) já dava ~67% de vitória pro favorito
+ * contra ~12% do azarão; com 130 (+ ajustes em `VANTAGEM_MAXIMA_DE_MEIO` e
+ * no teto/piso de `resolverDuelo`), esse mesmo gap fica em ~51%/22% — o
+ * favorito ainda vence mais, mas o azarão tem chance de verdade. Gaps bem
+ * maiores (~600+, ex: clube de Série A contra clube pequeno de estadual)
+ * continuam favorecendo fortemente o time forte (~75%+), o que é esperado.
+ */
+const VARIANCIA_PERFIL = 130;
 
 /** Gera o perfil de zonas de um time pra uma partida, com variância em torno do rating do clube. */
 export function gerarPerfilTime(rating: number, random: () => number = Math.random): PerfilTime {
@@ -37,18 +49,17 @@ export function probabilidadeDeVencer(forcaA: number, forcaB: number): number {
  * rating comuns entre divisões diferentes (ex: ~450+ de diferença já chega a
  * ~99%), o que fazia cada uma das ~10-14 chances de uma partida virar quase
  * certeza pro time forte e produzia placares tipo 10-0/11-0 rotineiros
- * mesmo com bastante ruído de perfil (`VARIANCIA_PERFIL`). Calibrado junto
- * com `CHANCES_BASE_POR_PARTIDA`/`VANTAGEM_MAXIMA_DE_MEIO` (ver histórico do
- * commit) pra times de divisões bem distantes (~900 de gap de rating)
- * ficarem em torno de 4x1 na média, com goleada de 6+ gols de diferença
- * numa fração pequena (~4%) das partidas, não na maioria delas. Não se
- * aplica ao duelo de meio-campo que decide a FATIA de chances de cada time
- * (`simularPartida`/`live-match.ts` continuam usando `probabilidadeDeVencer`
- * puro ali) — só limita a conversão de cada chance já distribuída, pra
- * manter zebra pontual possível mesmo entre times muito desiguais.
+ * mesmo com bastante ruído de perfil (`VARIANCIA_PERFIL`). Estreitado de
+ * 0.3-0.55 pra 0.35-0.5 junto com o aumento de `VARIANCIA_PERFIL` (ver ali)
+ * — reduz um pouco mais a vantagem determinística do time mais forte em
+ * cada chance pontual, sem zerar a diferença. Não se aplica ao duelo de
+ * meio-campo que decide a FATIA de chances de cada time (`simularPartida`/
+ * `live-match.ts` continuam usando `probabilidadeDeVencer` puro ali) — só
+ * limita a conversão de cada chance já distribuída, pra manter zebra
+ * pontual possível mesmo entre times muito desiguais.
  */
-const PROBABILIDADE_MINIMA_POR_DUELO = 0.3;
-const PROBABILIDADE_MAXIMA_POR_DUELO = 0.55;
+const PROBABILIDADE_MINIMA_POR_DUELO = 0.35;
+const PROBABILIDADE_MAXIMA_POR_DUELO = 0.5;
 
 /** `probabilidadeDeVencer` com o teto/piso de `resolverDuelo` já aplicado — exportado pra quem quiser EXIBIR a chance de um duelo pontual (ex: UI de partida ao vivo) mostrar o número que de fato vale, não a probabilidade bruta saturada. */
 export function probabilidadeDeDuelo(forcaA: number, forcaB: number): number {
@@ -215,8 +226,8 @@ export function participacaoNoConfronto(
 
 /** Exportado pra `simulation/live-match.ts` calcular o mesmo total de chances de uma partida sem duplicar a conta. */
 export const CHANCES_BASE_POR_PARTIDA = 6;
-/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.2 = até 70%/30% num duelo muito dominante). Exportado pelo mesmo motivo que `CHANCES_BASE_POR_PARTIDA`. */
-export const VANTAGEM_MAXIMA_DE_MEIO = 0.2;
+/** Quanto o time que vence o duelo de meio pode esticar a fatia de chances a seu favor (0.12 = até 62%/38% num duelo muito dominante) — reduzido de 0.2 junto com `VARIANCIA_PERFIL` (ver ali), pra não empilhar vantagem determinística na CONTAGEM de chances em cima da vantagem já dada pela conversão de cada uma. Exportado pelo mesmo motivo que `CHANCES_BASE_POR_PARTIDA`. */
+export const VANTAGEM_MAXIMA_DE_MEIO = 0.12;
 
 export interface ResultadoPartida {
   golsCasa: number;

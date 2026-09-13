@@ -48,6 +48,26 @@ describe("gerarConfrontosFaseSuica", () => {
     const formatoInvalido: FaseSuica = { ...formato, jogos_por_time: 2 }; // pote já garante 3
     expect(() => gerarConfrontosFaseSuica(times, formatoInvalido)).toThrow(/jogos_por_time/);
   });
+
+  it("nenhum time joga 2 vezes na mesma rodada (bug real: rodízio dentro do pote jogava tudo na 'rodada 1')", () => {
+    const confrontos = gerarConfrontosFaseSuica(times, formato, () => Math.random());
+    const timesPorRodada = new Map<number, string[]>();
+    for (const c of confrontos) {
+      const lista = timesPorRodada.get(c.rodada) ?? [];
+      lista.push(c.mandante, c.visitante);
+      timesPorRodada.set(c.rodada, lista);
+    }
+    for (const [rodada, timesDaRodada] of timesPorRodada) {
+      expect(new Set(timesDaRodada).size, `rodada ${rodada} repete algum time`).toBe(timesDaRodada.length);
+    }
+  });
+
+  it("o rodízio dentro do pote (4 times) usa 3 rodadas reais, não 1", () => {
+    const confrontos = gerarConfrontosFaseSuica(times, formato, () => Math.random());
+    const poteA = new Set(["a1", "a2", "a3", "a4"]);
+    const rodadasDoPoteA = new Set(confrontos.filter((c) => poteA.has(c.mandante) && poteA.has(c.visitante)).map((c) => c.rodada));
+    expect(rodadasDoPoteA.size).toBe(3);
+  });
 });
 
 describe("simularFaseSuica", () => {

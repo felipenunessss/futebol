@@ -32,10 +32,12 @@ describe("jogarPartidaAoVivo", () => {
     };
     const participacao: ParticipacaoJogador = { lado: "casa", jogador, estiloTecnico: "equilibrado" };
     const perfilFora: PerfilTime = { defesa: 1800, meio: 1600, ataque: 1600 };
-    // random constante 0.3: pesoJogador do atacante é 0.4 (0.3 < 0.4 → toda chance da casa é do jogador),
-    // e o mesmo 0.3 decide o duelo — com força base (atributo 1), a probabilidade de vencer é ínfima (perde);
-    // com o ajuste, a probabilidade passa de 0.3 (vira gol).
-    const randomConstante = () => 0.3;
+    // random constante 0.38: precisa ficar estritamente ABAIXO de pesoJogador do atacante (0.4, ver
+    // PESO_ENVOLVIMENTO_ATAQUE) pra a chance cair pro jogador, e estritamente ENTRE o piso (0.35) e
+    // o teto (0.5) de `resolverDuelo` — sem ajuste, a probabilidade de vencer (força base, atributo
+    // 1) é ínfima, presa no PISO (0.35): 0.38 não é menor que 0.35, perde; com o ajuste, a
+    // probabilidade sobe pro TETO (0.5): 0.38 é menor que 0.5, vira gol.
+    const randomConstante = () => 0.38;
 
     const semAjuste = await jogarPartidaAoVivo(perfilSimetrico, perfilFora, randomConstante, participacao, {
       msPorMinuto: 0,

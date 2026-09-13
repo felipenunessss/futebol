@@ -162,11 +162,15 @@ function totalDeRodadas(quantidadeDeTimes: number, idaEVolta: boolean): number {
   return idaEVolta ? rodadasDeUmTurno * 2 : rodadasDeUmTurno;
 }
 
-/** Mesma matemática de `swiss.ts` `gerarConfrontosFaseSuica` — também pura (só depende dos números do formato). */
+/** Mesma matemática de `swiss.ts` `gerarConfrontosFaseSuica`/`gerarRodadasDeRodizio` — também pura (só
+ * depende dos números do formato). Rodízio completo dentro do pote precisa de `times_por_pote - 1`
+ * rodadas reais quando o pote tem número par de times (par nos dados atuais), ou `times_por_pote`
+ * rodadas com 1 "bye" por rodada quando é ímpar. */
 function totalDeRodadasSuica(formato: FaseSuica): number {
   const jogosDentroDoPote = formato.times_por_pote - 1;
+  const rodadasDentroDoPote = formato.times_por_pote % 2 === 0 ? formato.times_por_pote - 1 : formato.times_por_pote;
   const jogosForaDoPote = formato.jogos_por_time - jogosDentroDoPote;
-  return 1 + jogosForaDoPote;
+  return rodadasDentroDoPote + jogosForaDoPote;
 }
 
 function criarFaseRodadas(nome: string, gruposDeTimes: string[][], idaEVolta: boolean, classificamPorGrupo: number): FaseRodadas {

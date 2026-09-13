@@ -68,7 +68,7 @@ type EventoDeFeedVariante =
 export type EventoDeFeed = EventoDeFeedVariante & { id: string };
 
 /** Escolha na tela pré-jogo — espelha o menu de 4 opções de `src/cli/index.ts` `escolherModoDePartidaInterativo`. */
-export type EscolhaDePrePartida = "rapida" | "ate_a_metade" | "ate_o_final" | "ao_vivo";
+export type EscolhaDePrePartida = "rapida" | "ao_vivo";
 
 export type PromptPendente =
   | { tipo: "foco"; resolve: (foco: FocoDeTreino) => void }
@@ -280,6 +280,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const campeonatos = useMemo(() => [...loadCampeonatosNacionais(), ...loadEstaduais()], []);
   /** Nome de exibição (ex: "Campeonato Brasileiro Série C") por id (ex: "brasileirao_serie_c") — pra UI nunca mostrar o id bruto com "_". */
   const nomePorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.nome])), [campeonatos]);
+  const escudoPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.escudo_url])), [campeonatos]);
 
   function pushEvento(evento: EventoDeFeedVariante): void {
     setFeed((atual) => [{ ...evento, id: `evt-${proximoId.current++}` }, ...atual]);
@@ -693,21 +694,34 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     const { contexto, resolve } = promptPendente;
     setPromptPendente(undefined);
 
-    if (escolha === "ate_a_metade") {
-      modoAutoAteSemanaRef.current = Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2);
-      setSimulandoAutomaticamente(true);
-    }
-    if (escolha === "ate_o_final") {
-      modoAutoAteSemanaRef.current = ULTIMA_SEMANA_DA_TEMPORADA;
-      setSimulandoAutomaticamente(true);
-    }
-
     if (escolha === "ao_vivo") {
       setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
       resolve("ao_vivo");
     } else {
       resolve("rapida");
     }
+  }
+
+  /** Liga o modo "não perguntar de novo até a semana X" — botão sempre visível na tela (fora do menu
+   * pré-jogo, ver `docs`/pedido do usuário: "as opções de simular a temporada devem ficar fora do menu
+   * de jogo"), funciona a qualquer momento, não só quando há uma partida do jogador essa semana. Se
+   * houver um menu pré-jogo pendente no momento do clique, resolve ele direto como "rapida" — entrar
+   * no automático já implica não parar pra decidir essa partida também. */
+  function simularAteSemana(semana: number): void {
+    modoAutoAteSemanaRef.current = semana;
+    setSimulandoAutomaticamente(true);
+    if (promptPendente?.tipo === "pre_partida") {
+      promptPendente.resolve("rapida");
+      setPromptPendente(undefined);
+    }
+  }
+
+  function simularAteAMetadeDaTemporada(): void {
+    simularAteSemana(Math.floor(ULTIMA_SEMANA_DA_TEMPORADA / 2));
+  }
+
+  function simularAteOFinalDaTemporada(): void {
+    simularAteSemana(ULTIMA_SEMANA_DA_TEMPORADA);
   }
 
   function responderSeguirCampeonatos(idsEscolhidos: string[]): void {
@@ -749,6 +763,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     resultado,
     clubePorId,
     nomePorCampeonato,
+    escudoPorCampeonato,
     jogarTemporada,
     propostasFimDeTemporada,
     verPropostasFimDeTemporada,
@@ -765,6 +780,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     desligarTreinoAutomatico,
     simulandoAutomaticamente,
     pararSimulacaoAutomatica,
+    simularAteAMetadeDaTemporada,
+    simularAteOFinalDaTemporada,
     resultadoDaRodada,
     responderResultadoDaRodada,
     animacaoDeEscolha,

@@ -29,6 +29,44 @@ function chaveDoConfronto(a: string, b: string): string {
   return [a, b].sort().join("|");
 }
 
+/**
+ * Rodízio completo de verdade (método do círculo) — cada time joga contra
+ * todos os outros exatamente 1x, distribuído em rodadas reais (1 jogo por
+ * time por rodada, nunca 2 no mesmo time na mesma rodada). Corrige um bug
+ * real: a versão anterior gerava todos os `n*(n-1)/2` jogos do rodízio
+ * dentro do pote de uma vez, todos rotulados como "1 rodada só" — um time
+ * podia jogar 3x enquanto outro (de outro pote, também "rodada 1") não
+ * tinha entrado ainda, e a tela mostrava "Rodada 1" com times desbalanceados
+ * (reportado pelo usuário: Cruzeiro com 3 jogos, Itabirito com 0, ambos
+ * ainda "rodada 1" do Campeonato Mineiro - Módulo I). Com número ÍMPAR de
+ * times, usa um "bye" (turno de descanso) por rodada — mais rodadas (`n`
+ * em vez de `n-1`), mas cada time ainda joga exatamente `n-1` partidas no
+ * total. Times por pote nos dados atuais são sempre pares, mas a função
+ * fica correta pro caso ímpar também.
+ */
+function gerarRodadasDeRodizio(times: string[]): [string, string][][] {
+  const impar = times.length % 2 !== 0;
+  const lista = impar ? [...times, null] : [...times];
+  const n = lista.length;
+  const fixo = lista[0];
+  let resto = lista.slice(1);
+  const rodadas: [string, string][][] = [];
+
+  for (let r = 0; r < n - 1; r++) {
+    const atual = [fixo, ...resto];
+    const pares: [string, string][] = [];
+    for (let i = 0; i < n / 2; i++) {
+      const a = atual[i];
+      const b = atual[n - 1 - i];
+      if (a !== null && b !== null) pares.push([a, b]);
+    }
+    rodadas.push(pares);
+    resto = [resto[resto.length - 1], ...resto.slice(0, resto.length - 1)];
+  }
+
+  return rodadas;
+}
+
 /** Pote 1 = primeiros `times_por_pote` times da lista recebida, etc. — quem monta os potes por força/sorteio real é responsabilidade de quem chama. */
 function dividirEmPotes(times: string[], numPotes: number, timesPorPote: number): string[][] {
   return Array.from({ length: numPotes }, (_, i) => times.slice(i * timesPorPote, (i + 1) * timesPorPote));
@@ -72,14 +110,16 @@ export function gerarConfrontosFaseSuica(times: string[], formato: FaseSuica, ra
     jaJogaram.add(chaveDoConfronto(a, b));
   }
 
-  for (const pote of potes) {
-    for (let i = 0; i < pote.length; i++) {
-      for (let j = i + 1; j < pote.length; j++) {
-        registrar(pote[i], pote[j]);
-      }
+  // Rodízio completo dentro de cada pote, intercalado por rodada real (a rodada 1 de TODOS os
+  // potes acontece "ao mesmo tempo", não pote por pote) — ver `gerarRodadasDeRodizio`.
+  const rodadasPorPote = potes.map((pote) => gerarRodadasDeRodizio(pote));
+  const numRodadasDentroDoPote = Math.max(0, ...rodadasPorPote.map((rodadas) => rodadas.length));
+  for (let r = 0; r < numRodadasDentroDoPote; r++) {
+    for (const rodadasDoPote of rodadasPorPote) {
+      for (const [a, b] of rodadasDoPote[r] ?? []) registrar(a, b);
     }
+    rodadaAtual++;
   }
-  rodadaAtual++;
 
   for (let rodadaCruzada = 0; rodadaCruzada < jogosForaDoPote; rodadaCruzada++) {
     const disponiveis = embaralhar(times, random);

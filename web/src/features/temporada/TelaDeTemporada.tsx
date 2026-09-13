@@ -26,6 +26,7 @@ import {
 } from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
+import { extrairCorDominante } from "../../lib/corDoEscudo.js";
 import { RadarDeAtributos } from "./RadarDeAtributos.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
@@ -56,6 +57,40 @@ const LABEL_SUBTIPO: Record<SubtipoChance, string> = {
 
 function escudoDoClube(clubePorId: Map<string, Club>, id: string): string | undefined {
   return clubePorId.get(id)?.escudo_url;
+}
+
+/** Cache em módulo (sobrevive a remounts/trocas de clube dentro da mesma sessão de página) — evita
+ * reprocessar a mesma imagem de escudo mais de uma vez. `undefined` como valor é um resultado válido
+ * (extração tentada e não deu cor vibrante nenhuma), por isso o cache usa `has`, não só truthiness. */
+const cacheDeCorPorEscudo = new Map<string, string | undefined>();
+
+/** Cor de fundo dinâmica "extraída" do escudo do clube atual (canvas, ver `lib/corDoEscudo.ts`) — só
+ * usada quando o clube não tem `cor_primaria` cadastrada manualmente (a maioria). `undefined` enquanto
+ * a extração ainda não terminou ou falhou (quem chama cai pro `cor_primaria`/fundo padrão nesse caso). */
+function useCorDominanteDoEscudo(url: string | undefined): string | undefined {
+  const [cor, setCor] = useState<string | undefined>(url ? cacheDeCorPorEscudo.get(url) : undefined);
+
+  useEffect(() => {
+    if (!url) {
+      setCor(undefined);
+      return;
+    }
+    if (cacheDeCorPorEscudo.has(url)) {
+      setCor(cacheDeCorPorEscudo.get(url));
+      return;
+    }
+    let cancelado = false;
+    setCor(undefined);
+    extrairCorDominante(url).then((corExtraida) => {
+      cacheDeCorPorEscudo.set(url, corExtraida);
+      if (!cancelado) setCor(corExtraida);
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, [url]);
+
+  return cor;
 }
 
 function nomeDoClube(clubePorId: Map<string, Club>, id: string): string {
@@ -125,6 +160,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
     resultado,
     clubePorId,
     nomePorCampeonato,
+    escudoPorCampeonato,
   } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
   const promptSemana = promptPendente?.tipo === "semana" ? promptPendente : undefined;
@@ -134,19 +170,33 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
   const promptDeCarreira = promptPendente && !promptSemana && !promptPrePartida && !promptSeguirCampeonatos && !promptDaPartidaAoVivo ? promptPendente : undefined;
   const lesionado = estadoAtual.bandeirasNarrativas.includes("lesionado");
   const { resultadoDaRodada, animacaoDeEscolha, sorteioPendente, chaveamentoPendente } = temporada;
-  const corDeFundo = clubePorId.get(estadoAtual.clubeAtualId)?.cor_primaria;
+  const escudoClubeAtual = escudoDoClube(clubePorId, estadoAtual.clubeAtualId);
+  const corExtraidaDoEscudo = useCorDominanteDoEscudo(escudoClubeAtual);
+  const corDeFundo = corExtraidaDoEscudo ?? clubePorId.get(estadoAtual.clubeAtualId)?.cor_primaria;
+  const escudoDoProximoCampeonato = temporada.jogoDaSemana ? escudoPorCampeonato.get(temporada.jogoDaSemana.campeonatoId) : undefined;
 
   return (
     <div
-      className="min-h-screen p-6 transition-colors"
+      className="min-h-screen p-6 transition-colors relative overflow-hidden"
       style={{ backgroundColor: corDeFundo ?? "#020617", color: corDeFundo ? corDeTextoContrastante(corDeFundo) : "#f1f5f9" }}
     >
+      {escudoDoProximoCampeonato && (
+        <img
+          src={escudoDoProximoCampeonato}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none select-none fixed -right-24 -bottom-24 w-[32rem] h-[32rem] object-contain opacity-[0.08] z-0"
+        />
+      )}
       <CalendarioSemanalLateral
         temporada={estadoAtual.temporada}
         semanaAtual={temporada.semanaAtual}
         jogoDaSemana={temporada.jogoDaSemana}
         clubePorId={clubePorId}
         nomePorCampeonato={nomePorCampeonato}
+        simulandoAutomaticamente={temporada.simulandoAutomaticamente}
+        onSimularAteAMetade={temporada.simularAteAMetadeDaTemporada}
+        onSimularAteOFinal={temporada.simularAteOFinalDaTemporada}
       />
       {temporada.simulandoAutomaticamente && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 rounded-full bg-slate-900/95 border border-slate-800 shadow-xl px-4 py-2 text-xs backdrop-blur text-slate-100">
@@ -175,7 +225,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           nomePorCampeonato={nomePorCampeonato}
         />
       )}
-      <div className="mx-auto max-w-3xl flex flex-col gap-4">
+      <div className="relative z-[1] mx-auto max-w-3xl flex flex-col gap-4">
         <Cabecalho
           estado={estadoAtual}
           nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
@@ -278,12 +328,18 @@ function CalendarioSemanalLateral({
   jogoDaSemana,
   clubePorId,
   nomePorCampeonato,
+  simulandoAutomaticamente,
+  onSimularAteAMetade,
+  onSimularAteOFinal,
 }: {
   temporada: number;
   semanaAtual: number;
   jogoDaSemana: JogoDaSemana | undefined;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  simulandoAutomaticamente: boolean;
+  onSimularAteAMetade: () => void;
+  onSimularAteOFinal: () => void;
 }) {
   const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
   const temTreino = periodos.some((p) => p.semanaInicio === semanaAtual && p.pontoDeTreino !== false);
@@ -315,6 +371,17 @@ function CalendarioSemanalLateral({
           );
         })}
       </div>
+      {!simulandoAutomaticamente && (
+        <div className="flex flex-col gap-1 border-t border-slate-800 pt-2">
+          <span className="text-slate-500">Simular semanas de uma vez:</span>
+          <button type="button" onClick={onSimularAteAMetade} className="text-left text-emerald-400 hover:text-emerald-300 transition-colors">
+            Até a metade da temporada
+          </button>
+          <button type="button" onClick={onSimularAteOFinal} className="text-left text-emerald-400 hover:text-emerald-300 transition-colors">
+            Até o final da temporada
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -801,20 +868,6 @@ function PainelPrePartida({
       <div className="grid gap-2">
         <button type="button" onClick={() => onEscolher("rapida")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
           Simulação rápida (direto pro resultado)
-        </button>
-        <button
-          type="button"
-          onClick={() => onEscolher("ate_a_metade")}
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
-        >
-          Simular até a metade da temporada (não pergunta de novo até lá)
-        </button>
-        <button
-          type="button"
-          onClick={() => onEscolher("ate_o_final")}
-          className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
-        >
-          Simular até o final da temporada direto (não pergunta mais nada este ano)
         </button>
         <button type="button" onClick={() => onEscolher("ao_vivo")} className="rounded-lg bg-emerald-900/40 border border-emerald-700 px-4 py-2.5 text-left hover:border-emerald-500 transition-colors">
           Simular o jogo (ao vivo — pausa em lances importantes)
@@ -1437,10 +1490,10 @@ function TabelaCard({
       <div className="text-sm font-medium mb-2">
         {nomeDoCampeonato(nomePorCampeonato, campeonatoId)} — resumo do período {periodo}
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-auto max-h-72">
         <table className="w-full text-xs tabular-nums">
           <thead>
-            <tr className="text-slate-400 text-left">
+            <tr className="text-slate-400 text-left sticky top-0 bg-slate-900">
               <th className="pr-2 py-1">Pos</th>
               <th className="pr-2 py-1">Clube</th>
               <th className="pr-2 py-1 text-right">Pts</th>
@@ -1451,7 +1504,7 @@ function TabelaCard({
             </tr>
           </thead>
           <tbody>
-            {tabela.slice(0, 10).map((linha, indice) => (
+            {tabela.map((linha, indice) => (
               <tr key={linha.clubeId} className="border-t border-slate-800">
                 <td className="pr-2 py-1">{indice + 1}</td>
                 <td className="pr-2 py-1">
