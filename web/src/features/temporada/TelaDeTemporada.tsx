@@ -23,6 +23,7 @@ import {
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
   type ResultadoDaRodadaExibido,
+  type VelocidadeAoVivo,
 } from "./useTemporada.js";
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
@@ -278,6 +279,8 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
                 partida={partidaAoVivo}
                 clubePorId={clubePorId}
                 prompt={promptDaPartidaAoVivo}
+                velocidade={temporada.velocidadeAoVivo}
+                onDefinirVelocidade={temporada.definirVelocidadeAoVivo}
                 onResponderChance={temporada.responderChanceAoVivo}
                 onResponderEvento={temporada.responderEventoAoVivo}
               />
@@ -673,12 +676,56 @@ const ROTULO_PERIODO: Record<string, string> = {
   fev: "Fevereiro",
   mar: "Março",
   abr: "Abril",
-  "mai-nov": "Maio a novembro",
   "temporada-conmebol": "Ligas CONMEBOL (fora do Brasil)",
 };
 
 function rotuloPeriodo(periodo: string): string {
   return ROTULO_PERIODO[periodo] ?? periodo.replaceAll("_", " ").replaceAll("-", " ");
+}
+
+const NOMES_DOS_MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+/** Uma linha já pronta pra exibir no calendário — periodos "curtos" (jan-1a_quinz/fev/mar/abr/
+ * temporada-conmebol) viram 1 linha só, igual antes; o período longo `mai-nov` (7 meses inteiros
+ * num período só, ver `data/loaders/calendario.ts`) vira 1 linha POR MÊS (pedido do usuário: "os
+ * meses devem ser individuais, não agrupados") — só na exibição, sem mexer no período real usado
+ * pelo motor (`pontoDeTreino`/janela de competição continuam intocados, ver
+ * `expandirPeriodoLongoEmMeses`). */
+interface LinhaDoCalendario {
+  chave: string;
+  rotulo: string;
+  semanaInicio: number;
+  semanaFim: number;
+  competicoesAtivas: string[];
+  temTreino: boolean;
+}
+
+/** Só `mai-nov` é "longo" o bastante pra fazer sentido quebrar por mês — os demais períodos padrão
+ * já são no máximo 1 mês (ou uma quinzena). Quebra usando a mesma conversão semana→data aproximada
+ * de `intervaloDeSemana` (7 dias por semana a partir de 1º de janeiro), então cada mês pode não ter
+ * exatamente 4 semanas — é só pra exibição, não muda a janela real do período. */
+function expandirPeriodoLongoEmMeses(periodo: PeriodoCalendario, temporada: number): LinhaDoCalendario[] {
+  const temTreino = periodo.pontoDeTreino !== false;
+  if (periodo.periodo !== "mai-nov") {
+    return [{ chave: periodo.periodo, rotulo: rotuloPeriodo(periodo.periodo), semanaInicio: periodo.semanaInicio, semanaFim: periodo.semanaFim, competicoesAtivas: periodo.competicoes_ativas, temTreino }];
+  }
+
+  const gruposPorMes: { mes: number; semanaInicio: number; semanaFim: number }[] = [];
+  for (let semana = periodo.semanaInicio; semana <= periodo.semanaFim; semana++) {
+    const mes = intervaloDeSemana(temporada, semana).inicio.getUTCMonth();
+    const ultimoGrupo = gruposPorMes[gruposPorMes.length - 1];
+    if (ultimoGrupo && ultimoGrupo.mes === mes) ultimoGrupo.semanaFim = semana;
+    else gruposPorMes.push({ mes, semanaInicio: semana, semanaFim: semana });
+  }
+
+  return gruposPorMes.map((grupo) => ({
+    chave: `${periodo.periodo}-${grupo.mes}`,
+    rotulo: NOMES_DOS_MESES[grupo.mes],
+    semanaInicio: grupo.semanaInicio,
+    semanaFim: grupo.semanaFim,
+    competicoesAtivas: periodo.competicoes_ativas,
+    temTreino,
+  }));
 }
 
 /**
@@ -689,32 +736,53 @@ function rotuloPeriodo(periodo: string): string {
  */
 function CalendarioDaTemporada({
   periodos,
+  temporada,
   semanaAtual,
   competicoesDoJogador,
   nomePorCampeonato,
 }: {
   periodos: PeriodoCalendario[];
+  temporada: number;
   semanaAtual: number;
   competicoesDoJogador: string[];
   nomePorCampeonato: Map<string, string>;
 }) {
+  const linhas = useMemo(() => {
+    const expandidas = periodos.flatMap((periodo) => expandirPeriodoLongoEmMeses(periodo, temporada));
+    // Uma semana de fronteira entre 2 períodos (ex: fim de `abr` e começo de `mai-nov`) pode cair no
+    // mesmo mês pela conversão semana→data aproximada (7 dias por semana, não alinhado com o
+    // calendário real) — sem isso, "Abril" aparecia 2x seguidas, cada uma com só 1 semana. Junta
+    // linhas ADJACENTES de mesmo rótulo numa só, em vez de deixar a duplicata visualmente confusa.
+    const mescladas: LinhaDoCalendario[] = [];
+    for (const linha of expandidas) {
+      const anterior = mescladas[mescladas.length - 1];
+      if (anterior && anterior.rotulo === linha.rotulo) {
+        anterior.semanaFim = linha.semanaFim;
+        anterior.temTreino = anterior.temTreino || linha.temTreino;
+        anterior.competicoesAtivas = [...new Set([...anterior.competicoesAtivas, ...linha.competicoesAtivas])];
+      } else {
+        mescladas.push({ ...linha });
+      }
+    }
+    return mescladas;
+  }, [periodos, temporada]);
+
   return (
     <div className="rounded-lg bg-slate-800/60 p-3">
       <div className="text-xs font-medium text-slate-400 mb-2">Calendário da temporada</div>
       <div className="flex flex-col gap-1.5">
-        {periodos.map((periodo) => {
-          const ehPeriodoAtual = semanaAtual >= periodo.semanaInicio && semanaAtual <= periodo.semanaFim;
-          const temTreino = periodo.pontoDeTreino !== false;
-          const competicoesDoJogadorNoPeriodo = periodo.competicoes_ativas.filter((id) => competicoesDoJogador.includes(id));
+        {linhas.map((linha) => {
+          const ehPeriodoAtual = semanaAtual >= linha.semanaInicio && semanaAtual <= linha.semanaFim;
+          const competicoesDoJogadorNoPeriodo = linha.competicoesAtivas.filter((id) => competicoesDoJogador.includes(id));
 
           return (
             <div
-              key={periodo.periodo}
+              key={linha.chave}
               className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-3 py-1.5 text-xs ${ehPeriodoAtual ? "bg-emerald-950/60 border border-emerald-700" : "bg-slate-900/60"}`}
             >
-              <span className="w-40 shrink-0 text-slate-300 font-medium">{rotuloPeriodo(periodo.periodo)}</span>
-              <span className="text-slate-500 tabular-nums shrink-0">sem. {periodo.semanaInicio}-{periodo.semanaFim}</span>
-              {temTreino && <span title="Treino/cenário toda semana desse período">🏋️ treino</span>}
+              <span className="w-40 shrink-0 text-slate-300 font-medium">{linha.rotulo}</span>
+              <span className="text-slate-500 tabular-nums shrink-0">sem. {linha.semanaInicio}-{linha.semanaFim}</span>
+              {linha.temTreino && <span title="Treino/cenário toda semana desse período">🏋️ treino</span>}
               {competicoesDoJogadorNoPeriodo.length > 0 ? (
                 <span className="text-emerald-400">⚽ {competicoesDoJogadorNoPeriodo.map((id) => nomeDoCampeonato(nomePorCampeonato, id)).join(", ")}</span>
               ) : (
@@ -753,7 +821,7 @@ function PainelSemana({
       ) : (
         <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
       )}
-      <CalendarioDaTemporada periodos={periodos} semanaAtual={info.semana} competicoesDoJogador={info.competicoesDoJogador} nomePorCampeonato={nomePorCampeonato} />
+      <CalendarioDaTemporada periodos={periodos} temporada={temporada} semanaAtual={info.semana} competicoesDoJogador={info.competicoesDoJogador} nomePorCampeonato={nomePorCampeonato} />
       <div className="flex gap-2">
         <button type="button" onClick={() => onContinuar()} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
           Continuar
@@ -877,16 +945,41 @@ function PainelPrePartida({
   );
 }
 
+const ROTULO_VELOCIDADE: Record<VelocidadeAoVivo, string> = { normal: "Normal", rapida: "Rápido", ultrarrapida: "Ultrarrápido" };
+
+function SeletorDeVelocidade({ velocidade, onDefinirVelocidade }: { velocidade: VelocidadeAoVivo; onDefinirVelocidade: (velocidade: VelocidadeAoVivo) => void }) {
+  return (
+    <div className="flex items-center gap-1 text-xs">
+      {(Object.keys(ROTULO_VELOCIDADE) as VelocidadeAoVivo[]).map((opcao) => (
+        <button
+          key={opcao}
+          type="button"
+          onClick={() => onDefinirVelocidade(opcao)}
+          className={`rounded-md px-2 py-0.5 border transition-colors ${
+            opcao === velocidade ? "bg-emerald-700 border-emerald-500 text-white" : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500"
+          }`}
+        >
+          {ROTULO_VELOCIDADE[opcao]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function PainelPartidaAoVivo({
   partida,
   clubePorId,
   prompt,
+  velocidade,
+  onDefinirVelocidade,
   onResponderChance,
   onResponderEvento,
 }: {
   partida: PartidaAoVivoEmAndamento;
   clubePorId: Map<string, Club>;
   prompt: Extract<PromptPendente, { tipo: "chance_ao_vivo" | "evento_ao_vivo" }> | undefined;
+  velocidade: VelocidadeAoVivo;
+  onDefinirVelocidade: (velocidade: VelocidadeAoVivo) => void;
   onResponderChance: (resultado: ResultadoDecisaoChance) => void;
   onResponderEvento: (opcao: Opcao) => void;
 }) {
@@ -900,9 +993,12 @@ function PainelPartidaAoVivo({
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-4 flex flex-col gap-3 text-slate-100">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        Ao vivo — {partida.minutoAtual}'
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-emerald-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Ao vivo — {partida.minutoAtual}'
+        </div>
+        <SeletorDeVelocidade velocidade={velocidade} onDefinirVelocidade={onDefinirVelocidade} />
       </div>
       <div className="flex items-center justify-center gap-4">
         <span className="text-right flex-1 font-medium flex items-center justify-end gap-1.5">
@@ -934,29 +1030,55 @@ function PainelPartidaAoVivo({
   );
 }
 
+/** Frases de lance perdido, no lugar do número de probabilidade (pedido do usuário: "não quero que
+ * apareça a probabilidade de gol nos lances mas quero algo mais narrado"). Não há nenhum dado real
+ * de "como" a chance foi perdida vindo do motor (só o resultado sucesso/fracasso) — a escolha da
+ * frase aqui é só flavor textual, sorteada de forma determinística a partir do próprio evento
+ * (minuto + um traço do evento) pra não mudar a cada re-render nem precisar de estado novo. */
+const NARRACOES_DE_CHANCE_PERDIDA = [
+  "chute pra fora",
+  "defesa segura do goleiro",
+  "bola no travessão",
+  "bloqueio da zaga",
+  "escanteio",
+  "chute travado, sem força",
+  "goleiro espalma, escanteio",
+  "cabeceada por cima do gol",
+];
+
+function narracaoDeChancePerdida(semente: number): string {
+  const indice = ((semente % NARRACOES_DE_CHANCE_PERDIDA.length) + NARRACOES_DE_CHANCE_PERDIDA.length) % NARRACOES_DE_CHANCE_PERDIDA.length;
+  return NARRACOES_DE_CHANCE_PERDIDA[indice];
+}
+
 function LinhaDeEvento({ evento, mandanteNome, visitanteNome }: { evento: EventoAoVivo; mandanteNome: string; visitanteNome: string }) {
   switch (evento.tipo) {
     case "chance_generica": {
       const time = evento.lado === "casa" ? mandanteNome : visitanteNome;
-      const percentual = Math.round(evento.probabilidade * 100);
       return (
         <p>
-          {evento.minuto}' {evento.gol ? <span className="text-emerald-400 font-medium">GOL do {time}!</span> : <>Chance perdida do {time}.</>}{" "}
-          <span className="text-slate-500">({percentual}% de chance de gol)</span>
+          {evento.minuto}'{" "}
+          {evento.gol ? (
+            <span className="text-emerald-400 font-medium">GOL do {time}!</span>
+          ) : (
+            <>
+              Chance do {time} — {narracaoDeChancePerdida(evento.minuto * 7 + (evento.lado === "casa" ? 1 : 3))}.
+            </>
+          )}
         </p>
       );
     }
     case "chance_jogador": {
       const rotulo = LABEL_SUBTIPO[evento.chance.subtipo];
       const finalizacao = evento.chance.subtipo === "voleio" || evento.chance.subtipo === "cabeceio" || evento.chance.subtipo === "chute_de_fora" || evento.chance.subtipo === "jogada_individual";
+      const semente = evento.minuto * 11 + rotulo.length;
       let texto: string;
-      if (finalizacao) texto = evento.chance.sucesso ? `GOL SEU! (${rotulo})` : `Você não converteu (${rotulo}).`;
-      else if (evento.chance.subtipo === "passe_decisivo") texto = evento.chance.sucesso ? "Assistência sua!" : "Seu passe decisivo não deu certo.";
+      if (finalizacao) texto = evento.chance.sucesso ? `GOL SEU! (${rotulo})` : `Você não converteu (${rotulo}) — ${narracaoDeChancePerdida(semente)}.`;
+      else if (evento.chance.subtipo === "passe_decisivo") texto = evento.chance.sucesso ? "Assistência sua!" : "Seu passe decisivo não deu certo — a defesa cortou antes.";
       else texto = evento.chance.sucesso ? "Desarme decisivo seu!" : "Você não conseguiu desarmar dessa vez.";
-      const percentual = Math.round(evento.probabilidade * 100);
       return (
         <p className={evento.chance.sucesso ? "text-emerald-400 font-medium" : ""}>
-          {evento.minuto}' {texto} <span className="text-slate-500">({percentual}% de chance)</span>
+          {evento.minuto}' {texto}
         </p>
       );
     }

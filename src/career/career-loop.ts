@@ -262,8 +262,10 @@ export interface OpcoesJogarTemporada {
   decidirEventoDePartida?: (cenario: Cenario) => Opcao | Promise<Opcao>;
   /** Chamado a cada evento de uma partida "ao vivo" (chance genérica, chance do jogador, evento de contexto, apito final) — pra narrar em tempo real. */
   onEventoAoVivo?: (evento: EventoAoVivo) => void | Promise<void>;
-  /** Repassado direto pra `simulation/live-match.ts` `jogarPartidaAoVivo` (`OpcoesPartidaAoVivo.msPorMinuto`) — 0 em teste, pra não esperar de verdade. */
-  msPorMinutoAoVivo?: number;
+  /** Chamado a cada minuto sem evento nenhum acontecendo, entre um evento e o próximo — ver `simulation/live-match.ts` `OpcoesPartidaAoVivo.onMinuto`. */
+  onMinutoAoVivo?: (minuto: number) => void | Promise<void>;
+  /** Repassado direto pra `simulation/live-match.ts` `jogarPartidaAoVivo` (`OpcoesPartidaAoVivo.msPorMinuto`) — 0 em teste, pra não esperar de verdade. Aceita função pra permitir trocar a velocidade em tempo real (ver `OpcoesPartidaAoVivo.msPorMinuto`). */
+  msPorMinutoAoVivo?: number | (() => number);
   /** Repassado direto pra `simulation/live-match.ts` `jogarPartidaAoVivo` (`OpcoesPartidaAoVivo.maxEventosDeContexto`). */
   maxEventosDeContextoAoVivo?: number;
   /** Chamado assim que cada negociação de transferência é resolvida (aceita ou não) — útil pra mostrar o desfecho em tempo real numa interface interativa, antes do resto da temporada continuar. */
@@ -615,6 +617,7 @@ export async function jogarTemporada(
     decidirChanceAoVivo,
     decidirEventoDePartida,
     onEventoAoVivo,
+    onMinutoAoVivo,
     msPorMinutoAoVivo,
     maxEventosDeContextoAoVivo,
     random = Math.random,
@@ -664,6 +667,7 @@ export async function jogarTemporada(
       decidirChance: decidirChanceAoVivo,
       decidirEventoDeContexto: decidirEventoDePartida,
       onEvento: onEventoAoVivo,
+      onMinuto: onMinutoAoVivo,
       msPorMinuto: msPorMinutoAoVivo,
       maxEventosDeContexto: maxEventosDeContextoAoVivo,
     });
@@ -915,6 +919,7 @@ export async function jogarTemporadaSemanal(
     decidirChanceAoVivo,
     decidirEventoDePartida,
     onEventoAoVivo,
+    onMinutoAoVivo,
     msPorMinutoAoVivo,
     maxEventosDeContextoAoVivo,
     escolherCampeonatosParaSeguir,
@@ -1000,6 +1005,7 @@ export async function jogarTemporadaSemanal(
       decidirChance: decidirChanceAoVivo,
       decidirEventoDeContexto: decidirEventoDePartida,
       onEvento: onEventoAoVivo,
+      onMinuto: onMinutoAoVivo,
       msPorMinuto: msPorMinutoAoVivo,
       maxEventosDeContexto: maxEventosDeContextoAoVivo,
     });

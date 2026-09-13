@@ -86,8 +86,16 @@ export interface OpcoesPartidaAoVivo {
   decidirEventoDeContexto?: (cenario: Cenario) => Opcao | Promise<Opcao>;
   /** Chamado a cada evento da linha do tempo (chance genérica, chance do jogador, evento de contexto resolvido, apito final) — pra narrar em tempo real. */
   onEvento?: (evento: EventoAoVivo) => void | Promise<void>;
-  /** ms de espera real por minuto de jogo decorrido — 0 pula a espera (sem isso os testes ficariam lentos de verdade). Padrão `MS_POR_MINUTO_PADRAO`. */
-  msPorMinuto?: number;
+  /** Chamado a cada minuto "de passagem" (sem evento nenhum acontecendo nele) entre um evento e o
+   * próximo — pra quem exibe a partida atualizar o relógio de forma corrida, não só quando um
+   * evento chega (pedido do usuário: "os minutos do jogo passem de forma corrida"). Não é chamado
+   * pro minuto do evento em si (esse já vem no próprio `onEvento`, evitaria duplicar o update). */
+  onMinuto?: (minuto: number) => void | Promise<void>;
+  /** ms de espera real por minuto de jogo decorrido — 0 pula a espera (sem isso os testes ficariam
+   * lentos de verdade). Aceita uma função em vez de um número fixo pra quem quer trocar a
+   * velocidade EM TEMPO REAL (normal/rápido/ultrarrápido) sem precisar reiniciar a partida — lida a
+   * cada minuto, não só 1x no início. Padrão `MS_POR_MINUTO_PADRAO`. */
+  msPorMinuto?: number | (() => number);
   /**
    * Teto de quantos eventos de contexto **podem** ser sorteados nesta
    * partida — o número real que acontece varia partida a partida (cada
@@ -145,10 +153,12 @@ export async function jogarPartidaAoVivo(
     decidirChance,
     decidirEventoDeContexto,
     onEvento,
+    onMinuto,
     msPorMinuto = MS_POR_MINUTO_PADRAO,
     maxEventosDeContexto = MAX_EVENTOS_DE_CONTEXTO_PADRAO,
     probabilidadeDePausarChance = PROBABILIDADE_DE_PAUSAR_CHANCE_DO_JOGADOR,
   } = opcoes;
+  const msPorMinutoAtual = typeof msPorMinuto === "function" ? msPorMinuto : () => msPorMinuto;
 
   const probabilidadeMeioCasa = probabilidadeDeVencer(perfilCasa.meio, perfilFora.meio);
   const margemMeio = Math.abs(probabilidadeMeioCasa - 0.5) * 2;
@@ -190,7 +200,15 @@ export async function jogarPartidaAoVivo(
   let minutoAnterior = 0;
 
   for (const slot of slots) {
-    await dormir((slot.minuto - minutoAnterior) * msPorMinuto);
+    // Passa minuto a minuto (não 1 sleep só pro intervalo inteiro) pra dar chance de narrar o
+    // relógio correndo (`onMinuto`) mesmo nos minutos sem nenhum evento — mesma espera real total
+    // de antes (soma dos `msPorMinutoAtual()` por minuto), só quebrada em pedaços menores. Também
+    // relê `msPorMinutoAtual()` a cada minuto, então uma troca de velocidade no meio da partida
+    // (`msPorMinuto` como função) já vale a partir do próximo minuto, sem esperar a partida acabar.
+    for (let minuto = minutoAnterior + 1; minuto <= slot.minuto; minuto++) {
+      await dormir(msPorMinutoAtual());
+      if (minuto < slot.minuto) await onMinuto?.(minuto);
+    }
     minutoAnterior = slot.minuto;
 
     if (slot.tipo === "evento") {

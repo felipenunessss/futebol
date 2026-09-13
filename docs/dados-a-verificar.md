@@ -388,6 +388,34 @@ individual de cada um. Se notar outro escudo claramente errado no jogo,
 documente aqui e reverta esse registro específico (`escudo_url` removido,
 não precisa reverter o resto).
 
+**2ª rodada de auditoria (dirigida pelo usuário, focada em nomes genéricos:
+"atletico, porto, internacional, vitoria")**: verificação visual de todos os
+clubes com "porto"/"vitória"/"atlético"/"internacional" no nome (qualquer
+fonte, TheSportsDB ou Wikipédia) mais uma amostra ampla de outros apelidos
+curtos (santos, sport, central, independiente, nacional...). Confirmados
+errados e removidos (`escudo_url`, e cor quando veio junto):
+`porto_ba` (bateu com F.C. Porto-POR, mesmo problema em 2 clubes brasileiros
+diferentes chamados "Porto" — `porto_caruaru`, que também tinha
+`cor_primaria`/`cor_secundaria` puxadas do mesmo escudo errado, azul/branco
+do FC Porto), `vitoria` (Esporte Clube Vitória-BA bateu com Vitória SC
+Guimarães-POR), `santos_fc_pe` (o pequeno Santos FC do Peru bateu com o
+Santos FC brasileiro, mesmo nome só que em país diferente — não precisa nem
+ser outro país pro problema acontecer), `central_pe` (Central Sport
+Club-Caruaru/PE bateu com Central FC de Trinidad e Tobago, apelido "The
+Sharks" — daria pra notar pelo desenho de tubarão/torre de petróleo no
+escudo, sem relação nenhuma com o clube brasileiro), `independiente_fbc`
+(Independiente Football Club-PY bateu com um escudo de um clube chamado
+"Caravel", nome completamente diferente — falha mais grosseira que as
+outras, mera coincidência de busca). Todos os outros clubes com esses
+apelidos genéricos checados nesta rodada (`internacional`, `porto_velho_ec`,
+`alianza_atletico`, `atletico_grau`, `atletico_gloriense`,
+`atletico_rafaela`, `central_norte_salta`, `el_nacional`,
+`comercial_ribeirao_preto`, `itz_sport`, `sport_huancayo`, `sport_boys`,
+`central_espanol`) foram conferidos visualmente e batem com o escudo real do
+próprio clube — não é motivo pra desconfiar de todo clube com nome
+genérico, só reforça que a checagem tem que ser visual, não por
+palavra-chave.
+
 ## Como resolver
 
 Cada item acima deveria ser confirmado contra a fonte primária (site da

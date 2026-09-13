@@ -119,10 +119,7 @@
     "nome_popular": "Porto",
     "pais": "BR",
     "estado": "PE",
-    "cidade": "Caruaru",
-    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/xu47rb1628855600.png",
-    "cor_primaria": "#00428C",
-    "cor_secundaria": "#FFFFFF"
+    "cidade": "Caruaru"
   },
   {
     "id": "vera_cruz_pe",
@@ -153,7 +150,6 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    },
-    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/55xc7t1758817256.png"
+    }
   }
 ]

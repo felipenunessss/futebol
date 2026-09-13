@@ -27,9 +27,12 @@ import {
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
 import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type EscolhaDeFimDeTemporada, type PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
 
-/** ms de espera real por minuto simulado — mais rápido que o padrão da CLI (220ms, ~20s/partida)
- * porque uma temporada web pode ter dezenas de partidas do próprio clube pra assistir. */
-const MS_POR_MINUTO_AO_VIVO = 90;
+/** Velocidades de exibição da partida ao vivo escolhíveis pelo jogador (pedido do usuário:
+ * "implementar velocidade na simulação do jogo"). ms de espera real por minuto simulado — "normal"
+ * já era mais rápido que o padrão da CLI (220ms, ~20s/partida) porque uma temporada web pode ter
+ * dezenas de partidas do próprio clube pra assistir; "rápido"/"ultrarrápido" comprimem ainda mais. */
+export type VelocidadeAoVivo = "normal" | "rapida" | "ultrarrapida";
+const MS_POR_MINUTO_POR_VELOCIDADE: Record<VelocidadeAoVivo, number> = { normal: 90, rapida: 35, ultrarrapida: 8 };
 
 /** TODOS os subtipos de chance do jogador viram gol quando `sucesso` — o motor (`match.ts`/
  * `live-match.ts`) incrementa o placar incondicionalmente em qualquer chance bem-sucedida, sem
@@ -183,6 +186,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * antes de iniciar a próxima temporada. */
   const [propostasFimDeTemporada, setPropostasFimDeTemporada] = useState<PropostasDeFimDeTemporada>();
   const [partidaAoVivo, setPartidaAoVivo] = useState<PartidaAoVivoEmAndamento>();
+  /** Velocidade escolhida da partida ao vivo — `useState` pra UI (seletor) e `useRef` em paralelo
+   * (`velocidadeAoVivoRef`) porque o motor (`career-loop.ts`/`live-match.ts`) lê `msPorMinutoAoVivo`
+   * como uma FUNÇÃO chamada minuto a minuto durante a partida (ver `jogarPartidaAoVivo`), não 1x só
+   * no início — sem o ref, trocar a velocidade no meio de uma partida em andamento não faria nada
+   * até a próxima partida (o `useState` sozinho fica "preso" no valor capturado quando a partida
+   * começou, por causa de closures). */
+  const [velocidadeAoVivo, setVelocidadeAoVivo] = useState<VelocidadeAoVivo>("normal");
+  const velocidadeAoVivoRef = useRef<VelocidadeAoVivo>("normal");
+  function definirVelocidadeAoVivo(velocidade: VelocidadeAoVivo): void {
+    velocidadeAoVivoRef.current = velocidade;
+    setVelocidadeAoVivo(velocidade);
+  }
   /** Última tabela conhecida de cada competição — alimentada por `tabelaDepois` de qualquer partida
    * observada (própria ou da rodada, ver `atualizarTabela`), só pra mostrar posição na tela
    * pré-jogo. Aproximação (reflete só até a última partida vista, não necessariamente "agora"). */
@@ -400,6 +415,12 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     return new Promise((resolve) => setPromptPendente({ tipo: "evento_ao_vivo", cenario, resolve }));
   }
 
+  /** Minuto "de passagem" sem evento nenhum — só atualiza o relógio exibido, pra ele correr de
+   * forma contínua em vez de só pular quando um evento chega (pedido do usuário). */
+  function onMinutoAoVivo(minuto: number): void {
+    setPartidaAoVivo((atual) => (atual ? { ...atual, minutoAtual: minuto } : atual));
+  }
+
   function onEventoAoVivo(evento: EventoAoVivo): void {
     setPartidaAoVivo((atual) => {
       if (!atual) return atual;
@@ -507,7 +528,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       decidirChanceAoVivo,
       decidirEventoDePartida,
       onEventoAoVivo,
-      msPorMinutoAoVivo: MS_POR_MINUTO_AO_VIVO,
+      onMinutoAoVivo,
+      msPorMinutoAoVivo: () => MS_POR_MINUTO_POR_VELOCIDADE[velocidadeAoVivoRef.current],
       onPartidaPontosCorridos: (info) => {
         // a partida "ao vivo" já resolveu por completo antes deste hook disparar — some o painel
         // em andamento (o resultado final já vai pro feed permanente logo abaixo).
@@ -705,15 +727,51 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Liga o modo "não perguntar de novo até a semana X" — botão sempre visível na tela (fora do menu
    * pré-jogo, ver `docs`/pedido do usuário: "as opções de simular a temporada devem ficar fora do menu
    * de jogo"), funciona a qualquer momento, não só quando há uma partida do jogador essa semana. Se
-   * houver um menu pré-jogo pendente no momento do clique, resolve ele direto como "rapida" — entrar
-   * no automático já implica não parar pra decidir essa partida também. */
+   * houver QUALQUER prompt de transição de semana pendente no momento do clique (semana sem jogo,
+   * menu pré-jogo, treino, distribuição de pontos, cenário de carreira), resolve ele direto com o
+   * mesmo padrão automático que `emJanelaAutomatica()` já usa daqui pra frente — sem isso, o clique
+   * ligava o modo automático mas o jogador ainda precisava dar 1 clique manual em "Continuar" pra
+   * sair da tela em que já estava, o que não é "um botão direto" (pedido explícito do usuário).
+   * Prompts que representam uma decisão real e não repetitiva (ex: `seguir_campeonatos`, ou uma
+   * partida "ao vivo" já em andamento) ficam de fora de propósito. */
   function simularAteSemana(semana: number): void {
     modoAutoAteSemanaRef.current = semana;
     setSimulandoAutomaticamente(true);
-    if (promptPendente?.tipo === "pre_partida") {
-      promptPendente.resolve("rapida");
-      setPromptPendente(undefined);
+    // Painéis de "pausa" que NÃO fazem parte de `promptPendente` (resultado da rodada, sorteio de
+    // grupos, chaveamento, animação de escolha) não bloqueiam o motor de verdade — ele já resolveu
+    // tudo e seguiu em frente sozinho (ver comentário de `ResultadoDaRodadaExibido`), só a UI que
+    // fica esperando o clique antes de trocar de tela. Sem fechar esses aqui, o painel antigo (de
+    // ANTES do modo automático ligar) ficava preso na tela pro resto da simulação inteira — o motor
+    // simulava a temporada inteira (e a próxima) por baixo, mas a tela continuava mostrando o
+    // resultado da 1ª rodada, porque nada nunca mais chamava `setResultadoDaRodada` de novo (só
+    // acontece fora da janela automática).
+    setResultadoDaRodada(undefined);
+    setSorteioPendente(undefined);
+    setChaveamentoPendente(undefined);
+    concluirAnimacaoDeEscolha();
+    if (!promptPendente) return;
+    switch (promptPendente.tipo) {
+      case "semana":
+        promptPendente.resolve();
+        break;
+      case "pre_partida":
+        promptPendente.resolve("rapida");
+        break;
+      case "foco":
+        promptPendente.resolve("tecnico"); // mesmo padrão do motor quando ninguém escolhe (ver career-loop.ts)
+        break;
+      case "pontos": {
+        const { estado } = promptPendente;
+        promptPendente.resolve([{ atributo: buscarArquetipo(estado.jogador.arquetipo_id).atributos_prioritarios[0], quantidade: estado.pontosDisponiveis }]);
+        break;
+      }
+      case "cenario":
+        promptPendente.resolve(promptPendente.cenario.opcoes[0]); // mesmo padrão do motor quando ninguém escolhe
+        break;
+      default:
+        return;
     }
+    setPromptPendente(undefined);
   }
 
   function simularAteAMetadeDaTemporada(): void {
@@ -755,6 +813,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     feed,
     promptPendente,
     partidaAoVivo,
+    velocidadeAoVivo,
+    definirVelocidadeAoVivo,
     tabelaPorCampeonato,
     faseMataMataPorCampeonato,
     grupoDoJogadorPorCampeonato,
