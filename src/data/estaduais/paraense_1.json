@@ -6,9 +6,9 @@
   "ano_referencia": 2026,
   "formato": {
     "fase_suica": {
-      "num_potes": 2,
-      "times_por_pote": 6,
-      "jogos_por_time": 6,
+      "num_potes": 3,
+      "times_por_pote": 4,
+      "jogos_por_time": 8,
       "classificam_mata_mata": 8
     },
     "mata_mata": {

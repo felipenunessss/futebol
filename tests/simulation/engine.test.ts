@@ -215,7 +215,7 @@ describe("receitaFaseSuicaEMataMata (Paulistão A1, Gauchão, etc)", () => {
     const campeonato: CampeonatoSimulavel = {
       id: "paulistao_a1",
       formato: {
-        fase_suica: { num_potes: 2, times_por_pote: 4, jogos_por_time: 5, classificam_mata_mata: 4 },
+        fase_suica: { num_potes: 2, times_por_pote: 4, jogos_por_time: 4, classificam_mata_mata: 4 },
         mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false },
       },
       times,
@@ -231,7 +231,7 @@ describe("receitaFaseSuicaEMataMata (Paulistão A1, Gauchão, etc)", () => {
     const campeonato: CampeonatoSimulavel = {
       id: "paulistao_a1",
       formato: {
-        fase_suica: { num_potes: 2, times_por_pote: 4, jogos_por_time: 5, classificam_mata_mata: 4 },
+        fase_suica: { num_potes: 2, times_por_pote: 4, jogos_por_time: 4, classificam_mata_mata: 4 },
         mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false },
       },
       times,

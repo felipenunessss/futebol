@@ -9,7 +9,11 @@
       "num_potes": 3,
       "times_por_pote": 4,
       "jogos_por_time": 8,
-      "classificam_mata_mata": 4
+      "classificam_mata_mata": 4,
+      "classificacao_por_pote": {
+        "vagas_por_pote": 1,
+        "vagas_extras_melhor_geral": 1
+      }
     },
     "mata_mata": {
       "fases": [

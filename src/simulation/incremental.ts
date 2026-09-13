@@ -12,7 +12,7 @@ import {
   type EventoConfrontoPontosCorridos,
   type LinhaTabela,
 } from "./season.js";
-import { gerarConfrontosFaseSuica } from "./swiss.js";
+import { gerarConfrontosFaseSuica, construirPotePorTime, selecionarClassificadosFaseSuica } from "./swiss.js";
 import { dividirEmGruposPorForca, type Grupo } from "./groups.js";
 import {
   emparelharPorForca,
@@ -162,15 +162,17 @@ function totalDeRodadas(quantidadeDeTimes: number, idaEVolta: boolean): number {
   return idaEVolta ? rodadasDeUmTurno * 2 : rodadasDeUmTurno;
 }
 
-/** Mesma matemática de `swiss.ts` `gerarConfrontosFaseSuica`/`gerarRodadasDeRodizio` — também pura (só
- * depende dos números do formato). Rodízio completo dentro do pote precisa de `times_por_pote - 1`
- * rodadas reais quando o pote tem número par de times (par nos dados atuais), ou `times_por_pote`
- * rodadas com 1 "bye" por rodada quando é ímpar. */
+/** `swiss.ts` `gerarConfrontosFaseSuica` só joga cruzado (nunca dentro do pote) e sempre fecha no
+ * mínimo teórico de rodadas — 1 jogo por time por rodada — então o total é sempre `jogos_por_time`. */
 function totalDeRodadasSuica(formato: FaseSuica): number {
-  const jogosDentroDoPote = formato.times_por_pote - 1;
-  const rodadasDentroDoPote = formato.times_por_pote % 2 === 0 ? formato.times_por_pote - 1 : formato.times_por_pote;
-  const jogosForaDoPote = formato.jogos_por_time - jogosDentroDoPote;
-  return rodadasDentroDoPote + jogosForaDoPote;
+  return formato.jogos_por_time;
+}
+
+/** Classificação da fase suíça respeitando `classificacao_por_pote` quando presente (ver `swiss.ts` `selecionarClassificadosFaseSuica`) — a fase suíça sempre roda como 1 grupo único (`fase.grupos[0]`), então a tabela geral já é a tabela do único grupo. */
+function classificadosDaFaseSuica(fase: FaseRodadas, times: string[], formato: FaseSuica): string[] {
+  const tabelaOrdenada = tabelaDoGrupoUnico(fase);
+  const potePorTime = construirPotePorTime(times, formato.num_potes, formato.times_por_pote);
+  return selecionarClassificadosFaseSuica(tabelaOrdenada, potePorTime, formato);
 }
 
 function criarFaseRodadas(nome: string, gruposDeTimes: string[][], idaEVolta: boolean, classificamPorGrupo: number): FaseRodadas {
@@ -500,7 +502,7 @@ function passosFaseSuicaEMataMata(campeonato: CampeonatoSimulavel, random: () =>
       unidades: totalDeRodadasSuica(suica),
       criar: () => criarFaseRodadasSuica("suica", campeonato.times, suica, random),
       aoConcluir: (fase, ctx) => {
-        ctx.classificados = classificadosDaFase(fase as FaseRodadas);
+        ctx.classificados = classificadosDaFaseSuica(fase as FaseRodadas, campeonato.times, suica);
       },
     },
     {
@@ -526,7 +528,7 @@ function passosFaseSuicaMataMataEFinal(campeonato: CampeonatoSimulavel, random: 
       unidades: totalDeRodadasSuica(suica),
       criar: () => criarFaseRodadasSuica("suica", campeonato.times, suica, random),
       aoConcluir: (fase, ctx) => {
-        ctx.classificados = classificadosDaFase(fase as FaseRodadas);
+        ctx.classificados = classificadosDaFaseSuica(fase as FaseRodadas, campeonato.times, suica);
       },
     },
     {

@@ -5,11 +5,9 @@
   "nivel": 1,
   "ano_referencia": 2026,
   "formato": {
-    "fase_suica": {
-      "num_potes": 2,
-      "times_por_pote": 6,
-      "jogos_por_time": 6,
-      "classificam_mata_mata": 8
+    "pontos_corridos": {
+      "ida_e_volta": false,
+      "rodadas": 11
     },
     "mata_mata": {
       "fases": [

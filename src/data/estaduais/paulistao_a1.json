@@ -8,8 +8,12 @@
     "fase_suica": {
       "num_potes": 4,
       "times_por_pote": 4,
-      "jogos_por_time": 9,
-      "classificam_mata_mata": 8
+      "jogos_por_time": 12,
+      "classificam_mata_mata": 8,
+      "classificacao_por_pote": {
+        "vagas_por_pote": 2,
+        "vagas_extras_melhor_geral": 0
+      }
     },
     "mata_mata": {
       "fases": [

@@ -63,14 +63,29 @@ export interface FinalEstadual {
 }
 
 /**
- * Fase "suíça" por potes, adotada pelo Paulistão A1 a partir de 2026:
- * turno único, cada time joga um subconjunto dos outros times (não todos-contra-todos).
+ * Regra de classificação por grupo pra fase suíça, quando a vaga no mata-mata depende da posição
+ * DENTRO do próprio pote (não só do lugar na tabela geral) — ex: Paulistão A1 real (2025) classifica
+ * os 2 melhores de CADA um dos 4 grupos (`vagas_por_pote: 2, vagas_extras_melhor_geral: 0`); Mineiro/
+ * Gauchão reais classificam o líder de cada um dos 3 grupos + o melhor 2º colocado entre todos
+ * (`vagas_por_pote: 1, vagas_extras_melhor_geral: 1`). Quando ausente, `classificam_mata_mata` da
+ * `FaseSuica` continua sendo aplicado como top-N simples da tabela geral (ex: Paraense real).
+ */
+export interface ClassificacaoPorPoteFaseSuica {
+  vagas_por_pote: number;
+  vagas_extras_melhor_geral: number;
+}
+
+/**
+ * Fase "suíça" por potes (Paulistão A1, Mineiro, Gauchão, Paraense): turno único, cada time joga só
+ * contra times de OUTROS potes (nunca dentro do próprio) — ver `docs/dados-a-verificar.md` sobre a
+ * confirmação por fonte de cada competição.
  */
 export interface FaseSuica {
   num_potes: number;
   times_por_pote: number;
   jogos_por_time: number;
   classificam_mata_mata: number;
+  classificacao_por_pote?: ClassificacaoPorPoteFaseSuica;
 }
 
 /** Liga de pontos corridos sem fase de mata-mata (Brasileirão Séries A e B). */

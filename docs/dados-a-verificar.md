@@ -137,6 +137,52 @@ dado, se precisar recuperar o raciocínio).
   campo do schema cobre vaga direta na Copa Intercontinental FIFA/Recopa/
   Mundial de Clubes (campeão da Libertadores) nem a vaga do campeão da
   Sul-Americana na Libertadores seguinte — fica só documentado aqui.
+- **Bug real corrigido — fase suíça jogava dentro do próprio pote** (reportado
+  pelo usuário: "Paulistão A1 mostra 16 times num grupo só" e "Cruzeiro com 3
+  jogos, Itabirito com 0 no Mineiro Módulo I"): confirmado via Wikipédia/CNN
+  Brasil/Lance que Paulistão A1, Mineiro, Gauchão e Paraense (2025) usam
+  pote/chave só pra DEFINIR quem enfrenta quem — cada time joga contra TODOS
+  os times de fora do próprio pote, NUNCA contra os do próprio pote
+  (`gerarConfrontosFaseSuica`, `simulation/swiss.ts`, jogava rodízio dentro
+  do pote + parte cruzada, o oposto do real). Corrigido: novo algoritmo de
+  emparelhamento máximo por backtracking (fecha sempre no número mínimo de
+  rodadas = `jogos_por_time`) só gera jogo cruzado. Também corrigida a
+  classificação: Paulistão real classifica os 2 melhores de CADA grupo (não
+  top-8 da tabela geral simples); Mineiro/Gauchão reais classificam o líder
+  de cada grupo + o melhor 2º colocado geral — novo campo opcional
+  `classificacao_por_pote` (`schemas/championship.ts` `FaseSuica`) modela
+  isso, aplicado em `swiss.ts`/`incremental.ts`. Dados corrigidos:
+  `paulistao_a1` (`jogos_por_time` 9→12, 4 potes de 4), `gauchao_1`
+  (2 potes de 6→3 potes de 4, `jogos_por_time` 6→8, `classificam_mata_mata`
+  8→4, mata-mata vira só semifinal+final — líderes/melhor 2º avançam DIRETO,
+  sem quartas), `paraense_1` (2 potes de 6→3 potes de 4, `jogos_por_time`
+  6→8, mantém top-8 geral simples — confirmado que essa é a regra real do
+  Paraense). `mineiro_1` já tinha a contagem de potes/jogos certa, só a
+  regra de classificação mudou. **Ainda não modelado**: Troféu Farroupilha
+  do Gauchão (5º-8º colocados disputam um mini-torneio à parte por vaga na
+  Copa do Brasil, à parte do mata-mata principal) — fora de escopo desta
+  correção, fica como pendência. Fontes: [2025 Campeonato Paulista
+  (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Paulista),
+  [Paulistão 2025 formato (CNN Brasil)](https://www.cnnbrasil.com.br/esportes/futebol/campeonato-paulista/paulistao-2025-veja-datas-do-mata-mata-e-formato/),
+  [Campeonato Mineiro de Futebol de 2025 - Módulo I (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Mineiro_de_Futebol_de_2025_-_M%C3%B3dulo_I),
+  [2025 Campeonato Gaúcho (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Ga%C3%BAcho),
+  [Campeonato Paraense de Futebol de 2025 - Série A (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Paraense_de_Futebol_de_2025_-_S%C3%A9rie_A).
+- **Bug real corrigido — Catarinense/Goiano/Paranaense modelados como fase
+  suíça, mas o formato real é pontos corridos puro**: confirmado (Wikipedia/
+  NSC Total/Lance) que essas 3 competições NÃO usam pote/chave nenhum — é
+  turno único todos-contra-todos (12 times, 11 rodadas), top-8 pro mata-mata
+  (quartas/semifinal/final). `paranaense_1` também tinha `classificam_mata_mata: 4`
+  (só semifinal+final) — real é top-8 igual Catarinense/Goiano, corrigido
+  pra 3 fases de mata-mata. Dado trocado de `formato.fase_suica` pra
+  `formato.pontos_corridos` (`ida_e_volta: false, rodadas: 11`) + `mata_mata`
+  (já existia receita genérica pra essa combinação, `receitaPontosCorridosComLiguilla`).
+  As sub-mecânicas especiais dessas 3 competições continuam não modeladas
+  (ver entradas mais abaixo: "Torneio da Morte" do Paranaense, quadrangular
+  de rebaixamento do Catarinense, playoff 10º×11º do Goiano) — só a fase
+  principal (pontos corridos → top-8 → mata-mata) foi corrigida agora.
+  Fontes: [Campeonato Catarinense de Futebol de 2025 - Série A (Wikipedia)](https://pt.wikipedia.org/wiki/Campeonato_Catarinense_de_Futebol_de_2025_-_S%C3%A9rie_A),
+  [Campeonato Goiano: regulamento, formato e times (Lance)](https://www.lance.com.br/lancepedia/campeonato-goiano.html),
+  [2025 Campeonato Paranaense (Wikipedia)](https://en.wikipedia.org/wiki/2025_Campeonato_Paranaense).
 
 ## Formatos que o schema não representa bem (decisão de arquitetura)
 

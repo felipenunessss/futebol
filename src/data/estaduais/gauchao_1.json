@@ -6,14 +6,17 @@
   "ano_referencia": 2026,
   "formato": {
     "fase_suica": {
-      "num_potes": 2,
-      "times_por_pote": 6,
-      "jogos_por_time": 6,
-      "classificam_mata_mata": 8
+      "num_potes": 3,
+      "times_por_pote": 4,
+      "jogos_por_time": 8,
+      "classificam_mata_mata": 4,
+      "classificacao_por_pote": {
+        "vagas_por_pote": 1,
+        "vagas_extras_melhor_geral": 1
+      }
     },
     "mata_mata": {
       "fases": [
-        "quartas",
         "semifinal",
         "final"
       ],
