@@ -22,7 +22,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1627
+    "rating_inicial": 1627,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/yxi2wi1736387630.png"
   },
   {
     "id": "danubio",
@@ -86,7 +87,10 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1572
+    "rating_inicial": 1572,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vi4mu41695734959.png",
+    "cor_primaria": "#029CDC",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "montevideo_wanderers",
@@ -98,7 +102,8 @@
       "pais": "UY",
       "nivel": 1
     },
-    "rating_inicial": 1506
+    "rating_inicial": 1506,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/5u0wty1787592867.png"
   },
   {
     "id": "juventud",

@@ -152,7 +152,10 @@
       "pais": "CO",
       "nivel": 1
     },
-    "rating_inicial": 1520
+    "rating_inicial": 1520,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/w1c6ix1769101721.png",
+    "cor_primaria": "#FFFFFF",
+    "cor_secundaria": "#FF1B44"
   },
   {
     "id": "independiente_medellin",

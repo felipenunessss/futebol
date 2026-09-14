@@ -20,7 +20,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7ejtnt1754889328.png"
   },
   {
     "id": "mixto",
@@ -33,7 +34,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/6388y31713439332.png"
   },
   {
     "id": "nova_mutum",
@@ -42,7 +44,8 @@
     "pais": "BR",
     "estado": "MT",
     "cidade": "Nova Mutum",
-    "estadio": "Valdir Doilho Wons"
+    "estadio": "Valdir Doilho Wons",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qtywlj1625422457.png"
   },
   {
     "id": "sport_sinop",
@@ -61,6 +64,7 @@
     "pais": "BR",
     "estado": "MT",
     "cidade": "Chapada dos Guimarães",
-    "estadio": "Apolônio Bouret de Mello"
+    "estadio": "Apolônio Bouret de Mello",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/xnthi01768838025.png"
   }
 ]

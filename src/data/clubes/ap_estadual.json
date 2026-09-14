@@ -59,7 +59,10 @@
     "nome_popular": "Santos-AP",
     "pais": "BR",
     "estado": "AP",
-    "cidade": "Macapá"
+    "cidade": "Macapá",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/j8xk9g1679447486.png",
+    "cor_primaria": "#FFFFFF",
+    "cor_secundaria": "#000000"
   },
   {
     "id": "cristal",

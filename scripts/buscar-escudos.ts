@@ -132,14 +132,21 @@ async function main(): Promise<void> {
     let mudou = false;
     for (const clube of clubes) {
       clubesTotal++;
+      if (clube.escudo_url) continue; // prioriza quem ainda não tem — não gasta requisição reconfirmando quem já tem
       const paisEsperado = PAIS_PARA_NOME_THESPORTSDB[clube.pais];
       if (!paisEsperado) {
         relatorio.push(`SKIP clube ${clube.id}: país "${clube.pais}" sem mapeamento pro TheSportsDB`);
         continue;
       }
       const nomeBusca = clube.nome_popular ?? clube.nome;
-      const resultado = await buscarEscudoDeClube(nomeBusca, paisEsperado);
+      let resultado = await buscarEscudoDeClube(nomeBusca, paisEsperado);
       await dormir(DELAY_ENTRE_REQUISICOES_MS);
+      // Nome popular abreviado com sufixo de UF (ex: "Atlético-MG") não bate com o nome cadastrado
+      // no TheSportsDB — tenta de novo com o nome completo antes de desistir.
+      if (!resultado.encontrado && clube.nome !== nomeBusca) {
+        resultado = await buscarEscudoDeClube(clube.nome, paisEsperado);
+        await dormir(DELAY_ENTRE_REQUISICOES_MS);
+      }
       if (resultado.encontrado && resultado.url) {
         if (clube.escudo_url !== resultado.url) {
           clube.escudo_url = resultado.url;
@@ -169,6 +176,7 @@ async function main(): Promise<void> {
   for (const dir of [ESTADUAIS_DIR, NACIONAIS_DIR]) {
     for (const { arquivo, competicao } of carregarCompeticoes<CampeonatoEstadual | CampeonatoNacional>(dir)) {
       competicoesTotal++;
+      if (competicao.escudo_url) continue; // mesma priorização de quem ainda não tem, ver clubes acima
       const paisCodigo = "pais" in competicao ? competicao.pais : "BR"; // CampeonatoEstadual não tem `pais` (é sempre Brasil)
       const paisEsperado = PAIS_PARA_NOME_THESPORTSDB[paisCodigo] ?? "Brazil";
       const resultado = await buscarEscudoDeLiga(competicao.nome, paisEsperado);

@@ -235,10 +235,15 @@ fonte boa o suficiente.
 Populado por `scripts/buscar-escudos.ts` (API pública TheSportsDB) +
 `scripts/buscar-escudos-wikipedia.ts` (imagem principal de artigo na
 Wikipédia pt/es, pra quem o TheSportsDB não achou). Cobertura atual:
-**567/678 clubes** e **42/62 competições** com escudo; cores (`cor_primaria`/
+**641/678 clubes** e **42/62 competições** com escudo; cores (`cor_primaria`/
 `cor_secundaria`) só vêm quando a fonte trazia essa informação junto — bem
 mais raro que o escudo em si. Reexecutar os scripts é seguro (idempotente,
-só atualiza o que a busca achar de novo).
+só atualiza o que a busca achar de novo — pula quem já tem `escudo_url` pra
+não gastar requisição à toa, e busca de novo pelo nome completo do clube
+quando o nome popular abreviado com sufixo de UF, ex: "Atlético-MG", não bate
+com o cadastro do TheSportsDB). Os ~37 clubes ainda sem escudo são casos que
+o TheSportsDB genuinamente não tem cadastrado (clubes pequenos/regionais),
+mesmo tentando nome popular e nome completo.
 
 **Risco aberto, não fechado no código**: um clube com apelido genérico (uma
 ou duas palavras, sem cidade/estado no nome popular) pode "perder" pra um
@@ -251,9 +256,11 @@ rodada extra dirigida especificamente a apelidos genéricos como "porto",
 "independente", "nacional") e todos os casos encontrados foram corrigidos
 (`escudo_url` removido, junto com cor quando veio da mesma fonte errada),
 mas não há garantia de cobertura 100% — a auditoria foi por amostragem +
-busca dirigida, não verificação individual de cada um dos 567 clubes/42
-competições. Se notar outro escudo claramente errado no jogo, documente
-aqui e remova só esse registro específico (não precisa reverter o resto).
+busca dirigida, não verificação individual de cada um dos 641 clubes/42
+competições (os ~80 clubes preenchidos na rodada mais recente, incluindo os
+achados via nome completo, ainda não passaram por essa auditoria dirigida).
+Se notar outro escudo claramente errado no jogo, documente aqui e remova só
+esse registro específico (não precisa reverter o resto).
 
 ## Taças/troféus de competição (`taca_url`)
 

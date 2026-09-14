@@ -9,7 +9,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/c806qa1768450356.png"
   },
   {
     "id": "maracana_ce",
@@ -21,7 +22,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/zxxyv51713439330.png"
   },
   {
     "id": "horizonte",
@@ -29,7 +31,8 @@
     "nome_popular": "Horizonte",
     "pais": "BR",
     "estado": "CE",
-    "cidade": "Horizonte"
+    "cidade": "Horizonte",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ob7g8l1733804852.png"
   },
   {
     "id": "quixada",
@@ -51,7 +54,8 @@
       "pais": "BR",
       "nivel": 3
     },
-    "rating_inicial": 1518
+    "rating_inicial": 1518,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1ch7n01617198950.png"
   },
   {
     "id": "iguatu",
@@ -76,7 +80,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wn0i2k1754113916.png"
   },
   {
     "id": "maranguape",

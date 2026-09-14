@@ -5,7 +5,8 @@
     "nome_popular": "Pantanal",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Ladário"
+    "cidade": "Ladário",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7287xk1754209361.png"
   },
   {
     "id": "aguia_negra",
@@ -31,7 +32,10 @@
     "nome_popular": "Costa Rica",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Costa Rica"
+    "cidade": "Costa Rica",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/bss90a1637840151.png",
+    "cor_primaria": "#EC1D25",
+    "cor_secundaria": "#132361"
   },
   {
     "id": "cra_aquidauana",
@@ -39,7 +43,8 @@
     "nome_popular": "CRA",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Aquidauana"
+    "cidade": "Aquidauana",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/5gwxrj1768793743.png"
   },
   {
     "id": "bataguassu",
@@ -65,7 +70,8 @@
     "nome_popular": "DAC",
     "pais": "BR",
     "estado": "MS",
-    "cidade": "Dourados"
+    "cidade": "Dourados",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1d8jgj1682086653.png"
   },
   {
     "id": "ivinhema",

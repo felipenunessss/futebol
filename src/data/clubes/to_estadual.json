@@ -18,7 +18,8 @@
     "nome_popular": "Bela Vista",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Cachoeirinha"
+    "cidade": "Cachoeirinha",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/g3z28j1769577100.png"
   },
   {
     "id": "capital_fc_to",
@@ -27,7 +28,8 @@
     "pais": "BR",
     "estado": "TO",
     "cidade": "Palmas",
-    "estadio": "Nilton Santos"
+    "estadio": "Nilton Santos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/e64m471769577148.png"
   },
   {
     "id": "guarai",
@@ -35,7 +37,8 @@
     "nome_popular": "Guaraí",
     "pais": "BR",
     "estado": "TO",
-    "cidade": "Guaraí"
+    "cidade": "Guaraí",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/7i3b0k1769577334.png"
   },
   {
     "id": "gurupi",

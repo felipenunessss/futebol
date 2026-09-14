@@ -156,7 +156,8 @@
       "nivel": 1
     },
     "forca_financeira": "alta",
-    "rating_inicial": 1709
+    "rating_inicial": 1709,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ra89oc1743742894.png"
   },
   {
     "id": "botafogo",
@@ -241,7 +242,10 @@
       "nivel": 2
     },
     "forca_financeira": "media",
-    "rating_inicial": 1685
+    "rating_inicial": 1685,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/tosmdr1532853458.png",
+    "cor_primaria": "#006CB5",
+    "cor_secundaria": "#ED3237"
   },
   {
     "id": "athletico_pr",
@@ -304,7 +308,8 @@
       "nivel": 1
     },
     "forca_financeira": "media",
-    "rating_inicial": 1639
+    "rating_inicial": 1639,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/tysrrx1473538156.png"
   },
   {
     "id": "criciuma",
@@ -351,7 +356,8 @@
       "nivel": 2
     },
     "forca_financeira": "media",
-    "rating_inicial": 1612
+    "rating_inicial": 1612,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0ccv781758334788.png"
   },
   {
     "id": "nautico",
@@ -414,7 +420,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1631
+    "rating_inicial": 1631,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/vpypuq1472069179.png"
   },
   {
     "id": "coritiba",
@@ -477,7 +484,10 @@
       "nivel": 2
     },
     "forca_financeira": "media",
-    "rating_inicial": 1629
+    "rating_inicial": 1629,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/qhfhdp1635869930.png",
+    "cor_primaria": "#00491e",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "vila_nova",
@@ -492,7 +502,8 @@
       "nivel": 2
     },
     "forca_financeira": "baixa",
-    "rating_inicial": 1620
+    "rating_inicial": 1620,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/nwd4ns1740851638.png"
   },
   {
     "id": "guarani",
@@ -601,7 +612,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1591
+    "rating_inicial": 1591,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/myl7c31677056352.png"
   },
   {
     "id": "remo",
@@ -631,7 +643,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1604
+    "rating_inicial": 1604,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/fhrc6i1560791704.png"
   },
   {
     "id": "londrina",
@@ -660,7 +673,8 @@
       "pais": "BR",
       "nivel": 2
     },
-    "rating_inicial": 1638
+    "rating_inicial": 1638,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/l7382k1766505911.png"
   },
   {
     "id": "confianca",
@@ -962,7 +976,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/m4wh2f1754889593.png"
   },
   {
     "id": "operario_ms",
@@ -975,7 +990,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/mxt0e81773680770.png"
   },
   {
     "id": "blumenau_ec",

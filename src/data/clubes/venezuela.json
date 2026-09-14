@@ -165,7 +165,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1439
+    "rating_inicial": 1439,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/et9aaf1768236511.png"
   },
   {
     "id": "zamora_venezuela",
@@ -177,7 +178,8 @@
       "pais": "VE",
       "nivel": 1
     },
-    "rating_inicial": 1361
+    "rating_inicial": 1361,
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/61dbsg1578737886.png"
   },
   {
     "id": "atletico_avila",
@@ -201,7 +203,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/8wujyr1639000523.png"
   },
   {
     "id": "bolivar_ve",
@@ -239,7 +242,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/d0ue0z1751998093.png"
   },
   {
     "id": "maritimo_la_guaira",
@@ -303,7 +307,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/uy8jxp1771777431.png"
   },
   {
     "id": "atletico_el_vigia",
@@ -315,7 +320,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/ug6ba21751737545.png"
   },
   {
     "id": "barquisimeto_sc",
@@ -327,7 +333,8 @@
     "divisao_nacional": {
       "pais": "VE",
       "nivel": 2
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/jmjdsu1751738243.png"
   },
   {
     "id": "deportivo_lara",

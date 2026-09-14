@@ -4,3 +4,4 @@ dist/
 *.log
 *.tsbuildinfo
 .claude/settings.local.json
+relatorio-escudos.txt

@@ -6,7 +6,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Salvador",
-    "estadio": "Roberto Santos"
+    "estadio": "Roberto Santos",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/o3bvx61767025686.png"
   },
   {
     "id": "atletico_alagoinhas",
@@ -19,7 +20,8 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/sn8hzw1688967156.png"
   },
   {
     "id": "bahia_de_feira",
@@ -80,7 +82,10 @@
     "divisao_nacional": {
       "pais": "BR",
       "nivel": 4
-    }
+    },
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/xu47rb1628855600.png",
+    "cor_primaria": "#00428C",
+    "cor_secundaria": "#FFFFFF"
   },
   {
     "id": "barcelona_ilheus",
@@ -89,7 +94,10 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Ilhéus",
-    "estadio": "Mário Pessoa"
+    "estadio": "Mário Pessoa",
+    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wq9sir1639406443.png",
+    "cor_primaria": "#004d98",
+    "cor_secundaria": "#a50044"
   },
   {
     "id": "leonico",
