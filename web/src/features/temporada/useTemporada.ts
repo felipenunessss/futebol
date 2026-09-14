@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { converterChancesEmDesempenho, type FocoDeTreino } from "@motor/progression/xp.js";
+import { converterChancesEmDesempenho } from "@motor/progression/xp.js";
 import { buscarArquetipo } from "@motor/schemas/player.js";
 import type { Cenario, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
@@ -23,7 +23,6 @@ import {
   type ResultadoTemporadaDeCarreira,
   type SorteioDeGruposNaTemporada,
   type StatusAtualizadoNaTemporada,
-  type TreinoResolvidoNaTemporada,
 } from "@motor/career/career-loop.js";
 import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/browserLoaders.js";
 import type { CampeonatoEstadual } from "@motor/schemas/championship.js";
@@ -162,7 +161,6 @@ const SUBTIPOS_DE_GOL = new Set<SubtipoChance>(["voleio", "cabeceio", "chute_de_
  */
 
 type EventoDeFeedVariante =
-  | { tipo: "treino"; treino: TreinoResolvidoNaTemporada }
   | { tipo: "nivel"; info: NivelAlcancadoNaTemporada }
   | { tipo: "cenario"; cenario: Cenario; opcao: Opcao; narrativa: string }
   | { tipo: "negociacao"; negociacao: NegociacaoResolvidaNaTemporada }
@@ -178,7 +176,6 @@ export type EventoDeFeed = EventoDeFeedVariante & { id: string };
 export type EscolhaDePrePartida = "rapida" | "ao_vivo";
 
 export type PromptPendente =
-  | { tipo: "foco"; resolve: (foco: FocoDeTreino) => void }
   | { tipo: "pontos"; estado: EstadoDeCarreira; resolve: (alocacoes: AlocacaoDePontos[]) => void }
   | { tipo: "cenario"; cenario: Cenario; resolve: (opcao: Opcao) => void }
   | { tipo: "chance_ao_vivo"; contexto: ContextoDecisaoChance; resolve: (resultado: ResultadoDecisaoChance) => void }
@@ -199,6 +196,9 @@ export interface PartidaAoVivoEmAndamento {
   golsCasa: number;
   golsFora: number;
   eventos: EventoAoVivo[];
+  /** Rodada (pontos corridos) ou etapa (mata-mata) dessa partida — ver `ContextoPartidaDoJogador`. Pedido do usuário: mostrar isso na tela de partida ao vivo, não só no resultado depois. */
+  rodada?: number;
+  etapa?: string;
   /** `true` a partir do apito final — o painel ao vivo continua na tela (agora como "fim de jogo",
    * não mais "ao vivo"), esperando o jogador confirmar antes de ir pro resto do fluxo (resultado da
    * rodada, etc). Fora da janela automática (fast-forward), essa confirmação nunca pausa nada de
@@ -222,6 +222,8 @@ export interface ConfrontoDoChaveamento {
   golsB: number;
   vencedor: string;
   decididoNosPenaltis: boolean;
+  /** Placar da disputa de pênaltis (perspectiva timeA/timeB) — só presente quando `decididoNosPenaltis`. */
+  penaltis?: { golsA: number; golsB: number };
 }
 
 /** Uma etapa do chaveamento (ex: "quartas", "semifinal", "final") com todos os confrontos JÁ resolvidos dela — ver `chaveamentoPorCampeonato`. */
@@ -265,6 +267,9 @@ export type ResultadoDaRodadaExibido =
       /** Titular ou reserva do jogador em cada perna — `titularIda` sempre presente quando houve partida (jogo único usa só esse), `titularVolta` só quando `volta` está presente. */
       titularIda?: boolean;
       titularVolta?: boolean;
+      /** Confirma se o agregado foi decidido nos pênaltis — quando `true`, `penaltis` traz o placar da disputa (perspectiva mandante/visitante de `confrontoDoJogador`, mesmo padrão de `ida`/`volta`). */
+      decididoNosPenaltis?: boolean;
+      penaltis?: { golsCasa: number; golsFora: number };
     };
 
 /**
@@ -387,7 +392,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const cancelarAutoRef = useRef(false);
   /**
    * "Simular até o próximo jogo" — pula tudo que não é partida (semana,
-   * treino, pontos, cenário, resultado da rodada) até a PRÓXIMA vez que
+   * pontos, cenário, resultado da rodada) até a PRÓXIMA vez que
    * `escolherModoDePartida` for chamado, onde volta a perguntar (o próprio
    * `escolherModoDePartida` desliga essa flag ao chegar lá — ver mais
    * abaixo). Ao contrário de `modoAutoAteSemanaRef`, não é por número de
@@ -395,15 +400,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * leve.
    */
   const pularAteProximoJogoRef = useRef(false);
-  /**
-   * Foco de treino automático ("treino rápido") — quando definido, pula o
-   * `PromptFoco` e resolve direto com esse foco, sem perguntar de novo.
-   * Ref por causa da mesma clausura de `jogarTemporada()` que já explica
-   * `modoAutoAteSemanaRef` acima; `focoAutomatico` (estado) só existe pra UI
-   * mostrar/desligar, o ref é que vale de verdade dentro da Promise.
-   */
-  const focoAutomaticoRef = useRef<FocoDeTreino | undefined>(undefined);
-  const [focoAutomatico, setFocoAutomatico] = useState<FocoDeTreino>();
   const [resultadoDaRodada, setResultadoDaRodada] = useState<ResultadoDaRodadaExibido>();
   /** Resultado da rodada calculado no momento em que a partida ao vivo do jogador termina, mas
    * represado até o jogador confirmar a tela de "fim de jogo" (`confirmarFimDeJogo`) — sem isso, o
@@ -495,13 +491,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
   function pushEvento(evento: EventoDeFeedVariante): void {
     setFeed((atual) => [{ ...evento, id: `evt-${proximoId.current++}` }, ...atual]);
-  }
-
-  function escolherFocoDeTreino(estado: EstadoDeCarreira): Promise<FocoDeTreino> {
-    setEstadoAtual(estado);
-    if (focoAutomaticoRef.current !== undefined) return Promise.resolve(focoAutomaticoRef.current);
-    if (emJanelaAutomatica()) return Promise.resolve("tecnico"); // mesmo padrão do motor quando ninguém escolhe (ver career-loop.ts)
-    return new Promise((resolve) => setPromptPendente({ tipo: "foco", resolve }));
   }
 
   function escolherDistribuicaoDePontos(estado: EstadoDeCarreira): Promise<AlocacaoDePontos[]> {
@@ -739,8 +728,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       // antes de chegar aqui — sem isso, o jogador podia receber a MESMA proposta de novo, narrada
       // durante a pré-temporada, um mecanismo antigo que essa tela substitui.
       desativarNegociacaoNarrativa: true,
-      escolherFocoDeTreino,
-      onTreinoResolvido: (treino) => pushEvento({ tipo: "treino", treino }),
       escolherDistribuicaoDePontos,
       onNivelAlcancado: (info) => {
         setEstadoAtual((atual) => ({ ...atual, nivel: info.nivelNovo, pontosDisponiveis: atual.pontosDisponiveis + info.pontosGanhos }));
@@ -848,6 +835,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
             golsB: info.evento.confronto.golsB,
             vencedor: info.evento.confronto.vencedor,
             decididoNosPenaltis: info.evento.confronto.decididoNosPenaltis,
+            penaltis: info.evento.confronto.penaltis,
           };
           const indiceEtapa = etapas.findIndex((e) => e.nome === info.evento.etapa);
           if (indiceEtapa === -1) {
@@ -902,6 +890,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
               volta: info.evento.confronto.volta ? { golsCasa: info.evento.confronto.volta.golsA, golsFora: info.evento.confronto.volta.golsB } : undefined,
               titularIda: info.titularPorPartida?.[0],
               titularVolta: info.evento.confronto.volta ? info.titularPorPartida?.[1] : undefined,
+              decididoNosPenaltis: info.evento.confronto.decididoNosPenaltis,
+              penaltis: info.evento.confronto.penaltis
+                ? { golsCasa: info.evento.confronto.penaltis.golsA, golsFora: info.evento.confronto.penaltis.golsB }
+                : undefined,
             };
         // Mesmo represamento de `onPartidaPontosCorridos` — ver comentário lá.
         if (partidaAoVivoAtivaRef.current) {
@@ -996,22 +988,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** `manterAutomatico` liga o "treino rápido" — próximos treinos usam esse foco sem perguntar de novo (ver `desligarTreinoAutomatico`). */
-  function responderFoco(foco: FocoDeTreino, manterAutomatico = false): void {
-    if (promptPendente?.tipo !== "foco") return;
-    if (manterAutomatico) {
-      focoAutomaticoRef.current = foco;
-      setFocoAutomatico(foco);
-    }
-    promptPendente.resolve(foco);
-    setPromptPendente(undefined);
-  }
-
-  function desligarTreinoAutomatico(): void {
-    focoAutomaticoRef.current = undefined;
-    setFocoAutomatico(undefined);
-  }
-
   /**
    * Pede pra interromper "simular até a metade/final da temporada" — não
    * corta na hora (a semana em andamento termina normalmente), só marca
@@ -1069,7 +1045,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
 
     if (escolha === "ao_vivo") {
       partidaAoVivoAtivaRef.current = true;
-      setPartidaAoVivo({ mandanteId: contexto.mandanteId, visitanteId: contexto.visitanteId, ladoDoJogador: contexto.lado, minutoAtual: 0, golsCasa: 0, golsFora: 0, eventos: [] });
+      setPartidaAoVivo({
+        mandanteId: contexto.mandanteId,
+        visitanteId: contexto.visitanteId,
+        ladoDoJogador: contexto.lado,
+        minutoAtual: 0,
+        golsCasa: 0,
+        golsFora: 0,
+        eventos: [],
+        rodada: contexto.rodada,
+        etapa: contexto.etapa,
+      });
       resolve("ao_vivo");
     } else {
       resolve("rapida");
@@ -1117,9 +1103,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         break;
       case "pre_partida":
         promptPendente.resolve("rapida");
-        break;
-      case "foco":
-        promptPendente.resolve("tecnico"); // mesmo padrão do motor quando ninguém escolhe (ver career-loop.ts)
         break;
       case "pontos": {
         const { estado } = promptPendente;
@@ -1193,7 +1176,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     propostasFimDeTemporada,
     verPropostasFimDeTemporada,
     responderFimDeTemporada,
-    responderFoco,
     responderDistribuicaoDePontos,
     responderCenario,
     responderChanceAoVivo,
@@ -1201,8 +1183,6 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     responderSemana,
     responderPrePartida,
     responderSeguirCampeonatos,
-    focoAutomatico,
-    desligarTreinoAutomatico,
     simulandoAutomaticamente,
     pararSimulacaoAutomatica,
     simularAteAMetadeDaTemporada,

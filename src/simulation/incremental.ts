@@ -325,7 +325,7 @@ async function avancarRodada(
       const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
       const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
       const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
-      const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante });
+      const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante, rodada: confronto.rodada });
 
       const tabelaAntes = hooks?.aoSimularConfrontoPontosCorridos ? ordenarTabela([...grupo.tabela.values()].map((linha) => ({ ...linha }))) : undefined;
       atualizarLinha(grupo.tabela.get(confronto.mandante)!, resultado.golsCasa, resultado.golsFora);
@@ -387,7 +387,7 @@ async function avancarEtapa(
     if (ehPrimeiraEtapa) await hooks?.aoDefinirChaveamento?.({ etapaNome: etapa.nome, pares });
     const confrontos: ResultadoConfrontoMataMata[] = [];
     for (const [timeA, timeB] of pares) {
-      const confronto = await resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador, resolverPartida);
+      const confronto = await resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador, resolverPartida, etapa.nome);
       await hooks?.aoResolverConfrontoMataMata?.({ etapa: etapa.nome, confronto });
       confrontos.push(confronto);
       if (confronto.partidasDoJogador) fase.partidasDoJogador.push(...confronto.partidasDoJogador);
@@ -409,7 +409,7 @@ async function avancarRepechaje(
   hooks?: HooksDeFase,
 ): Promise<void> {
   const indice = fase.indiceAtual;
-  const confronto = await resolverConfronto(fase.segundosSula[indice], fase.terceirosLibertadores[indice], ratings, true, random, participacaoJogador, resolverPartida);
+  const confronto = await resolverConfronto(fase.segundosSula[indice], fase.terceirosLibertadores[indice], ratings, true, random, participacaoJogador, resolverPartida, fase.nome);
   await hooks?.aoResolverConfrontoMataMata?.({ etapa: fase.nome, confronto });
   fase.vencedores.push(confronto.vencedor);
   if (confronto.partidasDoJogador) fase.partidasDoJogador.push(...confronto.partidasDoJogador);

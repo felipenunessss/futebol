@@ -35,7 +35,7 @@ describe("jogarTemporada", () => {
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.estado.temporada).toBe(2028);
-    expect(resultado.estado.jogador.idade).toBe(19);
+    expect(resultado.estado.jogador.idade).toBe(18);
   });
 
   it("aplica XP das partidas do jogador — nível/pontos disponíveis mudam em relação ao estado inicial (overall só muda por escolha manual, ver investirPontos)", async () => {
@@ -159,67 +159,59 @@ describe("jogarTemporada", () => {
   });
 });
 
-describe("jogarTemporada — treino", () => {
-  it("resolve uma sessão de treino por período (5), com o foco padrão 'tecnico'", async () => {
+describe("jogarTemporada — treino descontinuado, moral recupera passivamente", () => {
+  it("moral sobe ao longo da temporada mesmo sem nenhuma escolha de treino (recuperação passiva por período)", async () => {
+    const times = ["a", "b", "c", "d"];
+    const estadoInicial = estadoDeTeste();
+    const resultado = await jogarTemporada(estadoInicial, campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
+
+    expect(resultado.estado.moral).toBeGreaterThan(estadoInicial.moral);
+  });
+
+  it("nenhuma opção de foco de treino existe mais — jogarTemporada não aceita escolherFocoDeTreino/onTreinoResolvido (removidos do tipo)", async () => {
     const times = ["a", "b", "c", "d"];
     const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
-    expect(resultado.treinosResolvidos).toHaveLength(5);
-    expect(resultado.treinosResolvidos.every((t) => t.foco === "tecnico")).toBe(true);
+    expect(resultado).not.toHaveProperty("treinosResolvidos");
   });
 
-  it("permite injetar o foco de treino (ex: sempre 'fisico')", async () => {
-    const times = ["a", "b", "c", "d"];
-    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
-      random: () => 0.5,
-      escolherFocoDeTreino: () => "fisico",
-    });
-
-    expect(resultado.treinosResolvidos.every((t) => t.foco === "fisico")).toBe(true);
-  });
-
-  it("foco 'descanso' recupera moral e não gera XP (os demais focos geram XP, mas nenhum atributo direto — ver investirPontos)", async () => {
-    const times = ["a", "b", "c", "d"];
-    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
-      random: () => 0.5,
-      escolherFocoDeTreino: () => "descanso",
-    });
-
-    for (const treino of resultado.treinosResolvidos) {
-      expect(treino.foco).toBe("descanso");
-      expect(treino.moralDepois).toBeGreaterThan(treino.moralAntes);
-    }
-  });
-
-  it("chama onTreinoResolvido uma vez por período, antes do onCenarioResolvido correspondente", async () => {
+  it("chama onCenarioResolvido uma vez por período (5), sem nenhum evento de treino no meio", async () => {
     const times = ["a", "b", "c", "d"];
     const ordemDeChamadas: string[] = [];
 
     await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
       random: () => 0.5,
-      onTreinoResolvido: () => {
-        ordemDeChamadas.push("treino");
-      },
       onCenarioResolvido: () => {
         ordemDeChamadas.push("cenario");
       },
     });
 
-    // cada período gera "treino" seguido de "cenario", nessa ordem, 5 vezes
-    expect(ordemDeChamadas).toEqual(["treino", "cenario", "treino", "cenario", "treino", "cenario", "treino", "cenario", "treino", "cenario"]);
+    expect(ordemDeChamadas).toEqual(["cenario", "cenario", "cenario", "cenario", "cenario"]);
   });
+});
 
-  it("escolherFocoDeTreino assíncrono funciona (ex: prompt interativo)", async () => {
+describe("jogarTemporada — XP só de desempenho em partida, alocação de pontos a cada level-up", () => {
+  it("escolherDistribuicaoDePontos é chamado logo depois de onNivelAlcancado, não uma vez por período", async () => {
     const times = ["a", "b", "c", "d"];
-    const resultado = await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
-      random: () => 0.5,
-      escolherFocoDeTreino: async () => {
-        await Promise.resolve();
-        return "tatico";
+    const ordemDeChamadas: string[] = [];
+
+    await jogarTemporada(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.9, // alto o bastante pra garantir gol/bom desempenho e cruzar nível
+      onNivelAlcancado: () => {
+        ordemDeChamadas.push("nivel");
+      },
+      escolherDistribuicaoDePontos: (estado) => {
+        ordemDeChamadas.push("pontos");
+        return [{ atributo: "finalizacao", quantidade: estado.pontosDisponiveis }];
       },
     });
 
-    expect(resultado.treinosResolvidos.every((t) => t.foco === "tatico")).toBe(true);
+    // toda vez que "nivel" aparece, "pontos" vem logo em seguida (não há "pontos" nunca antes do
+    // primeiro "nivel", nem "pontos" sem "nivel" correspondente antes).
+    for (let i = 0; i < ordemDeChamadas.length; i += 2) {
+      expect(ordemDeChamadas[i]).toBe("nivel");
+      expect(ordemDeChamadas[i + 1]).toBe("pontos");
+    }
   });
 });
 
@@ -507,7 +499,7 @@ describe("jogarTemporadaSemanal", () => {
     const resultado = await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), { random: () => 0.5 });
 
     expect(resultado.estado.temporada).toBe(2028);
-    expect(resultado.estado.jogador.idade).toBe(19);
+    expect(resultado.estado.jogador.idade).toBe(18);
   });
 
   it("resolve os 5 períodos do calendário padrão, mesmo cenário do jogarTemporada", async () => {
@@ -516,7 +508,6 @@ describe("jogarTemporadaSemanal", () => {
 
     expect(resultado.cenariosResolvidos).toHaveLength(5);
     expect(resultado.cenariosResolvidos.map((c) => c.periodo)).toEqual(["jan-1a_quinz", "fev", "mar", "abr", "mai-nov"]);
-    expect(resultado.treinosResolvidos).toHaveLength(5);
   });
 
   it("devolve resumoPartidas/resultadoTemporada com o mesmo formato de jogarTemporada", async () => {
@@ -564,26 +555,61 @@ describe("jogarTemporadaSemanal", () => {
     expect([...campeonatosIdsVistos]).toEqual(["brasileirao_serie_a"]);
   });
 
-  it("intercala de verdade: pelo menos um treino acontece ANTES de alguma partida do jogador ainda por vir (não é mais 'todas as partidas primeiro, todos os treinos depois')", async () => {
+  it("escolherModoDePartida recebe a rodada (pontos corridos) em toda partida do jogador", async () => {
+    const times = ["a", "b", "c", "d"];
+    const rodadasVistas: (number | undefined)[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: (contexto) => {
+        rodadasVistas.push(contexto.rodada);
+        return "rapida";
+      },
+    });
+
+    expect(rodadasVistas.length).toBeGreaterThan(0);
+    expect(rodadasVistas.every((r) => r !== undefined)).toBe(true);
+    expect(new Set(rodadasVistas).size).toBeGreaterThan(1); // varia rodada a rodada, não é sempre o mesmo número
+  });
+
+  it("escolherModoDePartida recebe a etapa (mata-mata) em toda partida do jogador, sem rodada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonatos = [{ id: "copa_do_brasil", formato: { mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } }, times }];
+    const etapasVistas: (string | undefined)[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatos, times.map((id) => clube(id)), {
+      random: () => 0.5,
+      escolherModoDePartida: (contexto) => {
+        etapasVistas.push(contexto.etapa);
+        expect(contexto.rodada).toBeUndefined();
+        return "rapida";
+      },
+    });
+
+    expect(etapasVistas.length).toBeGreaterThanOrEqual(1);
+    expect(etapasVistas.every((e) => e === "semifinal" || e === "final")).toBe(true);
+  });
+
+  it("intercala de verdade: pelo menos um período (cenário) acontece ANTES de alguma partida do jogador ainda por vir (não é mais 'todas as partidas primeiro, todos os períodos depois')", async () => {
     const times = ["a", "b", "c", "d"];
     const ordemDeEventos: string[] = [];
 
     await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
       random: () => 0.5,
-      onTreinoResolvido: () => ordemDeEventos.push("treino"),
+      onCenarioResolvido: () => ordemDeEventos.push("periodo"),
       escolherModoDePartida: () => "rapida",
       onPartidaPontosCorridos: () => ordemDeEventos.push("partida"),
     });
 
-    expect(ordemDeEventos).toContain("treino");
+    expect(ordemDeEventos).toContain("periodo");
     expect(ordemDeEventos).toContain("partida");
 
-    // prova de intercalação real: existe um "treino" com pelo menos uma "partida" depois dele —
+    // prova de intercalação real: existe um "periodo" com pelo menos uma "partida" depois dele —
     // impossível no motor em lote antigo, onde TODAS as partidas do calendário resolvem antes de
-    // QUALQUER treino (ver jogarTemporada, que continua assim de propósito).
-    const primeiroTreino = ordemDeEventos.indexOf("treino");
+    // QUALQUER período (ver jogarTemporada, que continua assim de propósito).
+    const primeiroPeriodo = ordemDeEventos.indexOf("periodo");
     const ultimaPartida = ordemDeEventos.lastIndexOf("partida");
-    expect(ultimaPartida).toBeGreaterThan(primeiroTreino);
+    expect(ultimaPartida).toBeGreaterThan(primeiroPeriodo);
   });
 
   it("chama escolherModoDePartida com a semana atual (não decrescente) antes de cada partida do jogador", async () => {
@@ -800,7 +826,7 @@ describe("jogarCarreira", () => {
     expect(resultado.temporadas).toHaveLength(3);
     expect(resultado.temporadas.map((t) => t.estado.temporada)).toEqual([2028, 2029, 2030]);
     expect(resultado.estadoFinal.temporada).toBe(2030);
-    expect(resultado.estadoFinal.jogador.idade).toBe(21);
+    expect(resultado.estadoFinal.jogador.idade).toBe(20);
     expect(resultado.estadoFinal).toBe(resultado.temporadas[2].estado);
   });
 });

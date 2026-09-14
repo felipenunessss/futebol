@@ -4,6 +4,9 @@
   "pais": "AR",
   "nivel": 1,
   "ano_referencia": 2026,
+  "midia": {
+    "trofeu": "argentina apertura.svg"
+  },
   "formato": {
     "turno": {
       "nome": "Torneo Apertura",

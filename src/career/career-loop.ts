@@ -16,7 +16,7 @@ import {
   tabelaAtualDaCompeticao,
   type HooksDeFase,
 } from "../simulation/incremental.js";
-import { calcularNotaPartida, converterChancesEmDesempenho, MORAL_RECUPERADA_NO_DESCANSO, xpDeSessaoDeTreino, type FocoDeTreino } from "../progression/xp.js";
+import { calcularNotaPartida, converterChancesEmDesempenho } from "../progression/xp.js";
 import {
   CENARIOS,
   filtrarCenariosElegiveis,
@@ -34,7 +34,7 @@ import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressado
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
 import { evoluirStatus, foiTitularNaPartida, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
-import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, consumirPartidaForaDeCombate, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
+import { assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, consumirPartidaForaDeCombate, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
  * Game loop de carreira — junta as peças já implementadas (`simulation/
@@ -49,6 +49,8 @@ import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplica
 const IMPORTANCIA_PADRAO = 1;
 /** Minutos usados só pra calcular a nota de avaliação de status (`career/status.ts` `evoluirStatus`) — sempre 90, independente do status atual, pra não penalizar duplamente quem já joga pouco (ver comentário no loop de partidas). */
 const MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO = 90;
+/** Moral recuperada automaticamente a cada período do calendário (5x/temporada), sem exigir nenhuma escolha do jogador — substitui o antigo foco de treino "descanso" (descontinuado junto com o resto do sistema de treino: XP agora vem só de desempenho em partida, ver `progression/xp.ts`). Valor menor que o antigo `MORAL_RECUPERADA_NO_DESCANSO` (8) de propósito: antes só recuperava quando o jogador ABRIA MÃO de treinar pra descansar (custo real); agora é automático todo período, então precisa ser mais modesto pra não inflar moral sem esforço nenhum. */
+const MORAL_RECUPERADA_PASSIVAMENTE_POR_PERIODO = 3;
 
 export interface PartidaDoJogadorPontosCorridos {
   campeonatoId: string;
@@ -130,15 +132,6 @@ export interface StatusAtualizadoNaTemporada {
   partidasJogadas: number;
 }
 
-export interface TreinoResolvidoNaTemporada {
-  periodo: string;
-  foco: FocoDeTreino;
-  overallAntes: number;
-  overallDepois: number;
-  moralAntes: number;
-  moralDepois: number;
-}
-
 /** Uma alocação de pontos de atributo (`career/Player.ts` `investirPontos`) — devolvida por `OpcoesJogarTemporada.escolherDistribuicaoDePontos`. */
 export interface AlocacaoDePontos {
   atributo: Atributo;
@@ -162,6 +155,10 @@ export interface ContextoPartidaDoJogador {
   lado: "casa" | "fora";
   mandanteId: string;
   visitanteId: string;
+  /** Rodada do calendário (pontos corridos/turno/returno) — `undefined` em mata-mata. Pedido do usuário: mostrar a rodada/fase na tela de partida antes/durante o jogo, não só no resultado depois. */
+  rodada?: number;
+  /** Nome da etapa de mata-mata (ex: "quartas") — `undefined` em pontos corridos. */
+  etapa?: string;
 }
 
 export interface ResultadoTemporadaDeCarreira {
@@ -173,8 +170,6 @@ export interface ResultadoTemporadaDeCarreira {
   resumoPartidas: ResumoPartidasDaTemporada;
   /** Ausente quando o jogador não jogou nenhuma partida na temporada (status não muda sem desempenho real em campo pra avaliar). */
   statusAtualizado?: StatusAtualizadoNaTemporada;
-  /** Uma sessão de treino resolvida por período do calendário, na ordem em que aconteceram (ver `progression/xp.ts` `aplicarTreino`). */
-  treinosResolvidos: TreinoResolvidoNaTemporada[];
   /** Um cenário resolvido por período do calendário, na ordem em que aconteceram. */
   cenariosResolvidos: CenarioResolvidoNaTemporada[];
   /** Propostas de transferência negociadas na janela da temporada (só período mapeado pra `pre_temporada`, ver `market/transfers.ts` `estaNaJanelaDeTransferencia`) — vazio se nenhum clube demonstrou interesse. Para no primeiro `aceito`. */
@@ -217,31 +212,19 @@ export interface OpcoesJogarTemporada {
    */
   responderProposta?: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">;
   /**
-   * Como decidir o foco de treino de cada período — por padrão, sempre
-   * `"tecnico"` (escolha arbitrária, mesmo espírito do padrão de
-   * `escolherOpcao`). Injete pra plugar uma escolha real (jogador humano
-   * escolhendo via prompt, IA, etc — também pode ser assíncrona). Recebe
-   * o `EstadoDeCarreira` atual (já com o XP das partidas da temporada
-   * aplicado) pra poder decidir com base em atributos/moral atuais.
-   */
-  escolherFocoDeTreino?: (estado: EstadoDeCarreira) => FocoDeTreino | Promise<FocoDeTreino>;
-  /** Chamado assim que cada sessão de treino do período é resolvida — útil pra mostrar o desfecho em tempo real numa interface interativa. */
-  onTreinoResolvido?: (treino: TreinoResolvidoNaTemporada) => void | Promise<void>;
-  /**
    * Como decidir onde investir os pontos de atributo disponíveis
-   * (`career/Player.ts` `EstadoDeCarreira.pontosDisponiveis`, ganhos em
-   * level-up — ver `onNivelAlcancado`) — chamado 1x por período, logo
-   * depois do treino ser resolvido, só quando há pontos disponíveis
-   * (podem ter sobrado de períodos anteriores, não precisa gastar tudo de
-   * uma vez). Por padrão, investe tudo no 1º atributo prioritário do
-   * arquétipo (mesmo espírito do padrão de `escolherFocoDeTreino`).
-   * Devolve uma lista (pode investir em mais de um atributo por vez);
-   * cada item é aplicado via `career/Player.ts` `investirPontos`, na
-   * ordem devolvida — se a soma passar do disponível, os últimos itens
-   * que não couberem mais são ignorados (não lança erro).
+   * (`career/Player.ts` `EstadoDeCarreira.pontosDisponiveis`) — chamado
+   * toda vez que o jogador sobe de nível (ver `onNivelAlcancado`, disparado
+   * logo antes), já que XP só vem de desempenho em partida agora (sistema
+   * de treino com foco descontinuado). Por padrão, investe tudo no 1º
+   * atributo prioritário do arquétipo. Devolve uma lista (pode investir em
+   * mais de um atributo por vez); cada item é aplicado via
+   * `career/Player.ts` `investirPontos`, na ordem devolvida — se a soma
+   * passar do disponível, os últimos itens que não couberem mais são
+   * ignorados (não lança erro).
    */
   escolherDistribuicaoDePontos?: (estado: EstadoDeCarreira) => AlocacaoDePontos[] | Promise<AlocacaoDePontos[]>;
-  /** Chamado sempre que o jogador sobe 1+ nível (`career/Player.ts` `ganharXp`) — tanto por XP de partida quanto de treino. */
+  /** Chamado sempre que o jogador sobe 1+ nível de XP de partida (`career/Player.ts` `ganharXp`) — logo em seguida, `escolherDistribuicaoDePontos` é chamado pra gastar os pontos ganhos. */
   onNivelAlcancado?: (info: NivelAlcancadoNaTemporada) => void | Promise<void>;
   /**
    * Chamado a cada confronto de pontos corridos que o clube atual do
@@ -369,10 +352,6 @@ interface ContextoResolucaoDePeriodo {
   clubes: Club[];
   clubePorId: Map<string, Club>;
   regiaoAtualPadrao?: string;
-  escolherFocoDeTreino: (estado: EstadoDeCarreira) => FocoDeTreino | Promise<FocoDeTreino>;
-  onTreinoResolvido?: (treino: TreinoResolvidoNaTemporada) => void | Promise<void>;
-  escolherDistribuicaoDePontos?: (estado: EstadoDeCarreira) => AlocacaoDePontos[] | Promise<AlocacaoDePontos[]>;
-  onNivelAlcancado?: (info: NivelAlcancadoNaTemporada) => void | Promise<void>;
   escolherOpcao: (cenario: Cenario) => Opcao | Promise<Opcao>;
   responderProposta: (proposta: PropostaTransferencia) => TermosDeContrato | "recusar" | Promise<TermosDeContrato | "recusar">;
   onNegociacaoResolvida?: (negociacao: NegociacaoResolvidaNaTemporada) => void | Promise<void>;
@@ -385,19 +364,6 @@ interface ContextoResolucaoDePeriodo {
    * `jogarTemporada`/quem não passar essa opção. */
   desativarNegociacaoNarrativa?: boolean;
   random: () => number;
-}
-
-/** Aplica um ganho de XP (`career/Player.ts` `ganharXp`) e notifica `onNivelAlcancado` se cruzou 1+ nível — reaproveitado pelo XP de treino (aqui) e de partida (`jogarTemporada`/`jogarTemporadaSemanal`, abaixo). */
-async function ganharXpComNotificacao(
-  estado: EstadoDeCarreira,
-  xp: number,
-  onNivelAlcancado: ((info: NivelAlcancadoNaTemporada) => void | Promise<void>) | undefined,
-): Promise<EstadoDeCarreira> {
-  const resultado = ganharXp(estado, xp);
-  if (resultado.subiuDeNivel) {
-    await onNivelAlcancado?.({ nivelAnterior: resultado.nivelAnterior, nivelNovo: resultado.nivelNovo, pontosGanhos: resultado.pontosGanhos });
-  }
-  return resultado.estado;
 }
 
 /**
@@ -426,48 +392,27 @@ async function investirPontosDisponiveis(
 }
 
 /**
- * Resolve o treino + o cenário (com eventual negociação real de transferência)
- * de UM período do calendário — extraído do corpo do loop de períodos que
- * `jogarTemporada` já tinha, pra ser reaproveitado também por
- * `jogarTemporadaSemanal` (que chama isso a cada início de período dentro do
- * loop semanal, em vez de rodar todos os períodos de uma vez só no final).
- * Mesmo comportamento exato de antes, só extraído — nenhuma mudança de regra.
+ * Resolve a recuperação passiva de moral + o cenário (com eventual negociação
+ * real de transferência) de UM período do calendário — extraído do corpo do
+ * loop de períodos que `jogarTemporada` já tinha, pra ser reaproveitado
+ * também por `jogarTemporadaSemanal` (que chama isso a cada início de
+ * período dentro do loop semanal, em vez de rodar todos os períodos de uma
+ * vez só no final). Treino com foco/XP de treino foi descontinuado (XP só
+ * vem de desempenho em partida agora, ver `jogarTemporada`/
+ * `jogarTemporadaSemanal` abaixo, que chamam `investirPontosDisponiveis` a
+ * cada level-up em vez desta função cuidar de pontos).
  */
 async function resolverPeriodoDaCarreira(
   periodo: PeriodoCalendario,
   estadoInicial: EstadoDeCarreira,
   ctx: ContextoResolucaoDePeriodo,
   negociacoesResolvidas: NegociacaoResolvidaNaTemporada[],
-): Promise<{ estado: EstadoDeCarreira; treino: TreinoResolvidoNaTemporada; cenario: CenarioResolvidoNaTemporada }> {
-  const { clubes, clubePorId, regiaoAtualPadrao, escolherFocoDeTreino, onTreinoResolvido, escolherDistribuicaoDePontos, onNivelAlcancado, escolherOpcao, responderProposta, onNegociacaoResolvida, onCenarioResolvido, desativarNegociacaoNarrativa, random } = ctx;
-  let estadoAtual = estadoInicial;
+): Promise<{ estado: EstadoDeCarreira; cenario: CenarioResolvidoNaTemporada }> {
+  const { clubes, clubePorId, regiaoAtualPadrao, escolherOpcao, responderProposta, onNegociacaoResolvida, onCenarioResolvido, desativarNegociacaoNarrativa, random } = ctx;
   const momento = momentoDoPeriodo(periodo.periodo);
 
-  const foco = await escolherFocoDeTreino(estadoAtual);
-  const overallAntesTreino = overallAtual(estadoAtual);
-  const moralAntesTreino = estadoAtual.moral;
-
-  if (foco === "descanso") {
-    const regiaoParaDescanso = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
-    estadoAtual = aplicarImpactoDeCenario(estadoAtual, { moral: MORAL_RECUPERADA_NO_DESCANSO, narrativa: "" }, regiaoParaDescanso);
-  } else {
-    estadoAtual = await ganharXpComNotificacao(estadoAtual, xpDeSessaoDeTreino(foco), onNivelAlcancado);
-    estadoAtual = aplicarGanhoDeTreino(estadoAtual, foco);
-  }
-
-  const treinoResolvido: TreinoResolvidoNaTemporada = {
-    periodo: periodo.periodo,
-    foco,
-    overallAntes: overallAntesTreino,
-    overallDepois: overallAtual(estadoAtual),
-    moralAntes: moralAntesTreino,
-    moralDepois: estadoAtual.moral,
-  };
-  await onTreinoResolvido?.(treinoResolvido);
-
-  // Oferece gastar pontos disponíveis logo depois do treino (podem ter sobrado de partidas/
-  // treinos anteriores) — 1x por período, nunca no meio de uma partida (ver doc da opção).
-  estadoAtual = await investirPontosDisponiveis(estadoAtual, escolherDistribuicaoDePontos);
+  const regiaoParaMoral = clubePorId.get(estadoInicial.clubeAtualId)?.estado ?? regiaoAtualPadrao;
+  let estadoAtual = aplicarImpactoDeCenario(estadoInicial, { moral: MORAL_RECUPERADA_PASSIVAMENTE_POR_PERIODO, narrativa: "" }, regiaoParaMoral);
 
   const regiaoAtual = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
 
@@ -563,7 +508,7 @@ async function resolverPeriodoDaCarreira(
   const resolvido: CenarioResolvidoNaTemporada = { periodo: periodo.periodo, momento, cenario, escolha };
   await onCenarioResolvido?.(resolvido);
 
-  return { estado: estadoAtual, treino: treinoResolvido, cenario: resolvido };
+  return { estado: estadoAtual, cenario: resolvido };
 }
 
 /**
@@ -620,14 +565,12 @@ export async function jogarTemporada(
     desativarNegociacaoNarrativa,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
-    escolherFocoDeTreino = () => "tecnico" as const,
     escolherDistribuicaoDePontos,
     onNivelAlcancado,
     onNegociacaoResolvida,
     onCenarioResolvido,
     onPartidasResumidas,
     onStatusAtualizado,
-    onTreinoResolvido,
     onPartidaPontosCorridos,
     onPartidaMataMata,
     escolherModoDePartida,
@@ -674,6 +617,8 @@ export async function jogarTemporada(
       lado: participacao.lado,
       mandanteId: contexto?.mandanteId ?? "",
       visitanteId: contexto?.visitanteId ?? "",
+      rodada: contexto?.rodada,
+      etapa: contexto?.etapa,
     });
 
     if (modo !== "ao_vivo") {
@@ -724,7 +669,10 @@ export async function jogarTemporada(
       const desempenho = converterChancesEmDesempenho(partida.chancesJogador, minutosDaPartida, IMPORTANCIA_PADRAO);
       const ganho = aplicarDesempenhoPartida(estadoAtual, desempenho);
       estadoAtual = ganho.estado;
-      if (ganho.subiuDeNivel) await onNivelAlcancado?.({ nivelAnterior: ganho.nivelAnterior, nivelNovo: ganho.nivelNovo, pontosGanhos: ganho.pontosGanhos });
+      if (ganho.subiuDeNivel) {
+        await onNivelAlcancado?.({ nivelAnterior: ganho.nivelAnterior, nivelNovo: ganho.nivelNovo, pontosGanhos: ganho.pontosGanhos });
+        estadoAtual = await investirPontosDisponiveis(estadoAtual, escolherDistribuicaoDePontos);
+      }
       golsDoJogador += desempenho.gols;
       assistenciasDoJogador += desempenho.assistencias;
       // nota de avaliação usa 90 minutos fixos, não os minutos "reais" do status — senão um
@@ -759,16 +707,11 @@ export async function jogarTemporada(
 
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
-  const treinosResolvidos: TreinoResolvidoNaTemporada[] = [];
 
   const contextoDePeriodo: ContextoResolucaoDePeriodo = {
     clubes,
     clubePorId,
     regiaoAtualPadrao,
-    escolherFocoDeTreino,
-    onTreinoResolvido,
-    escolherDistribuicaoDePontos,
-    onNivelAlcancado,
     escolherOpcao,
     responderProposta,
     onNegociacaoResolvida,
@@ -778,19 +721,18 @@ export async function jogarTemporada(
   };
 
   // `pontoDeTreino: false` (ex: janela genérica de outros países CONMEBOL, ver
-  // `data/loaders/calendario.ts`) não conta como período de treino/cenário — só dá janela de
-  // semana pra competição, não muda quantas sessões de treino a temporada tem.
+  // `data/loaders/calendario.ts`) não conta como período de recuperação/cenário — só dá janela de
+  // semana pra competição, não muda quantos períodos a temporada tem.
   for (const periodo of construirCalendarioPadrao(estadoAtual.temporada).calendario.filter((p) => p.pontoDeTreino !== false)) {
-    const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodo, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
+    const { estado: estadoAposPeriodo, cenario } = await resolverPeriodoDaCarreira(periodo, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
     estadoAtual = estadoAposPeriodo;
-    treinosResolvidos.push(treino);
     cenariosResolvidos.push(cenario);
   }
 
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
   estadoAtual = avancarTemporada(estadoAtual, regiaoFinal, random);
 
-  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ContextoPartidaDoJogadorSemanal extends ContextoPartidaDoJogador {
@@ -932,14 +874,12 @@ export async function jogarTemporadaSemanal(
     desativarNegociacaoNarrativa,
     escolherOpcao = (cenario: Cenario) => cenario.opcoes[0],
     responderProposta = contrapropostaPadrao,
-    escolherFocoDeTreino = () => "tecnico" as const,
     escolherDistribuicaoDePontos,
     onNivelAlcancado,
     onNegociacaoResolvida,
     onCenarioResolvido,
     onPartidasResumidas,
     onStatusAtualizado,
-    onTreinoResolvido,
     onPartidaPontosCorridos,
     onPartidaMataMata,
     onPartidaDaRodadaNaCompeticaoDoJogador,
@@ -981,7 +921,10 @@ export async function jogarTemporadaSemanal(
     const desempenho = converterChancesEmDesempenho(resultado.chancesJogador, minutosDaPartida, IMPORTANCIA_PADRAO);
     const ganho = aplicarDesempenhoPartida(estadoAtual, desempenho);
     estadoAtual = ganho.estado;
-    if (ganho.subiuDeNivel) await onNivelAlcancado?.({ nivelAnterior: ganho.nivelAnterior, nivelNovo: ganho.nivelNovo, pontosGanhos: ganho.pontosGanhos });
+    if (ganho.subiuDeNivel) {
+      await onNivelAlcancado?.({ nivelAnterior: ganho.nivelAnterior, nivelNovo: ganho.nivelNovo, pontosGanhos: ganho.pontosGanhos });
+      estadoAtual = await investirPontosDisponiveis(estadoAtual, escolherDistribuicaoDePontos);
+    }
     golsPorCompeticao.set(campeonatoId, (golsPorCompeticao.get(campeonatoId) ?? 0) + desempenho.gols);
     assistenciasPorCompeticao.set(campeonatoId, (assistenciasPorCompeticao.get(campeonatoId) ?? 0) + desempenho.assistencias);
     partidasPorCompeticao.set(campeonatoId, (partidasPorCompeticao.get(campeonatoId) ?? 0) + 1);
@@ -1022,6 +965,8 @@ export async function jogarTemporadaSemanal(
       lado: participacaoEfetiva.lado,
       mandanteId: contexto?.mandanteId ?? "",
       visitanteId: contexto?.visitanteId ?? "",
+      rodada: contexto?.rodada,
+      etapa: contexto?.etapa,
       semana: semanaAtualParaContexto,
       campeonatoId: campeonatoIdAtualParaContexto,
     });
@@ -1099,16 +1044,11 @@ export async function jogarTemporadaSemanal(
   const periodos = construirCalendarioPadrao(estadoAtual.temporada).calendario;
   const cenariosResolvidos: CenarioResolvidoNaTemporada[] = [];
   const negociacoesResolvidas: NegociacaoResolvidaNaTemporada[] = [];
-  const treinosResolvidos: TreinoResolvidoNaTemporada[] = [];
 
   const contextoDePeriodo: ContextoResolucaoDePeriodo = {
     clubes,
     clubePorId,
     regiaoAtualPadrao,
-    escolherFocoDeTreino,
-    onTreinoResolvido,
-    escolherDistribuicaoDePontos,
-    onNivelAlcancado,
     escolherOpcao,
     responderProposta,
     onNegociacaoResolvida,
@@ -1123,12 +1063,11 @@ export async function jogarTemporadaSemanal(
     await aoIniciarSemana?.({ semana, competicoesDoJogador: [...idsDoJogador] });
 
     // `pontoDeTreino: false` (ex: janela genérica de outros países CONMEBOL) só dá janela de
-    // semana pra competição, não dispara uma sessão de treino/cenário a mais na temporada.
+    // semana pra competição, não dispara mais período de recuperação/cenário a mais na temporada.
     const periodoQueComeca = periodos.find((p) => p.semanaInicio === semana && p.pontoDeTreino !== false);
     if (periodoQueComeca) {
-      const { estado: estadoAposPeriodo, treino, cenario } = await resolverPeriodoDaCarreira(periodoQueComeca, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
+      const { estado: estadoAposPeriodo, cenario } = await resolverPeriodoDaCarreira(periodoQueComeca, estadoAtual, contextoDePeriodo, negociacoesResolvidas);
       estadoAtual = estadoAposPeriodo;
-      treinosResolvidos.push(treino);
       cenariosResolvidos.push(cenario);
     }
 
@@ -1205,7 +1144,7 @@ export async function jogarTemporadaSemanal(
   const regiaoFinal = clubePorId.get(estadoAtual.clubeAtualId)?.estado ?? regiaoAtualPadrao;
   estadoAtual = avancarTemporada(estadoAtual, regiaoFinal, random);
 
-  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, treinosResolvidos, cenariosResolvidos, negociacoesResolvidas };
+  return { estado: estadoAtual, resultadoTemporada, resumoPartidas, statusAtualizado, cenariosResolvidos, negociacoesResolvidas };
 }
 
 export interface ResultadoCarreiraDeVariasTemporadas {

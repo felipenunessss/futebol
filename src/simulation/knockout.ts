@@ -1,4 +1,5 @@
 import type { EtapaMataMata, FinalEstadual, MataMata } from "../schemas/championship.js";
+import type { Jogador } from "../schemas/player.js";
 import { gerarPerfilTime, probabilidadeDeVencer, resolverPartidaPadrao, type ParticipacaoJogador, type ParticipacaoJogadorClube, type ResolverPartida, type ResultadoPartida } from "./match.js";
 
 /**
@@ -22,8 +23,10 @@ export interface ResultadoConfrontoMataMata {
   golsA: number;
   golsB: number;
   vencedor: string;
-  /** true quando o agregado empatou e o vencedor saiu de pênaltis (aproximação: sorteio ponderado pelo rating geral, sem zona). */
+  /** true quando o agregado empatou e o vencedor saiu de pênaltis (disputa simulada de verdade, ver `simularDisputaDePenaltis` — não é mais um sorteio ponderado sem cobrança nenhuma). */
   decididoNosPenaltis: boolean;
+  /** Placar da disputa de pênaltis (perspectiva timeA/timeB) — só presente quando `decididoNosPenaltis`. */
+  penaltis?: { golsA: number; golsB: number };
   /** 1 entrada (jogo único) ou 2 (ida e volta) — só presente quando o clube do jogador estava nesse confronto. */
   partidasDoJogador?: ResultadoPartida[];
   /**
@@ -120,6 +123,105 @@ function participacaoComoLado(participacao: ParticipacaoJogadorClube | undefined
   return participacao ? { lado, jogador: participacao.jogador, estiloTecnico: participacao.estiloTecnico } : undefined;
 }
 
+/** Conversão média real de cobranças de pênalti em futebol profissional (~75-80%). */
+const CONVERSAO_BASE_PENALTI = 0.78;
+/** Cobranças por time na fase inicial da disputa (5 a 5) antes de ir pra morte súbita. */
+const COBRANCAS_INICIAIS = 5;
+
+function clamp01(valor: number): number {
+  return Math.max(0.5, Math.min(0.95, valor));
+}
+
+/**
+ * Probabilidade do time que está cobrando converter UMA cobrança contra o goleiro adversário —
+ * base realista (`CONVERSAO_BASE_PENALTI`) com um pequeno ajuste pela diferença de rating geral
+ * (`probabilidadeDeVencer`, mesma fórmula Elo do resto do motor, só que com peso reduzido — pênalti
+ * é mais aleatório que jogo aberto). Quando o clube do JOGADOR está envolvido (Camada 2, mesmo
+ * espírito de `ParticipacaoJogador` no resto do arquivo): se ele é quem cobra e joga numa posição
+ * com `frieza` (meia/atacante), a própria frieza pesa na conversão; se é o goleiro adversário, os
+ * `reflexos` dele pesam pra baixo na conversão de quem cobra — sem precisar simular cobrador a
+ * cobrador (o resto do elenco continua Camada 1, probabilidade só de time).
+ */
+function probabilidadeDeConversao(
+  ratingCobrador: number,
+  ratingGoleiro: number,
+  clubeCobrador: string,
+  clubeGoleiro: string,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+): number {
+  let probabilidade = CONVERSAO_BASE_PENALTI + (probabilidadeDeVencer(ratingCobrador, ratingGoleiro) - 0.5) * 0.2;
+
+  if (participacaoJogador?.clubeId === clubeCobrador) {
+    const frieza = jogadorTemAtributo(participacaoJogador.jogador, "frieza") ? (participacaoJogador.jogador.atributos.frieza ?? 70) : undefined;
+    if (frieza !== undefined) probabilidade += (frieza - 70) / 500;
+  }
+  if (participacaoJogador?.clubeId === clubeGoleiro && participacaoJogador.jogador.posicao === "goleiro") {
+    const reflexos = participacaoJogador.jogador.atributos.reflexos ?? 70;
+    probabilidade -= (reflexos - 70) / 500;
+  }
+
+  return clamp01(probabilidade);
+}
+
+function jogadorTemAtributo(jogador: Jogador, atributo: "frieza"): boolean {
+  return jogador.posicao === "meia" || jogador.posicao === "atacante" || jogador.atributos[atributo] !== undefined;
+}
+
+/**
+ * Simula uma disputa de pênaltis de verdade — 5 cobranças por time (parando mais cedo se o
+ * resultado já estiver matematicamente decidido, regra padrão de futebol), depois morte súbita
+ * (1 cobrança cada por rodada até alguém marcar e o outro não). Substitui a antiga "moeda ponderada
+ * pelo rating" (que decidia o vencedor sem simular cobrança nenhuma) — ver
+ * `ResultadoConfrontoMataMata.penaltis`.
+ */
+function simularDisputaDePenaltis(
+  timeA: string,
+  timeB: string,
+  ratingA: number,
+  ratingB: number,
+  random: () => number,
+  participacaoJogador: ParticipacaoJogadorClube | undefined,
+): { golsA: number; golsB: number } {
+  const probA = probabilidadeDeConversao(ratingA, ratingB, timeA, timeB, participacaoJogador);
+  const probB = probabilidadeDeConversao(ratingB, ratingA, timeB, timeA, participacaoJogador);
+
+  let golsA = 0;
+  let golsB = 0;
+  let cobrancasA = 0;
+  let cobrancasB = 0;
+
+  const decidido = (): boolean => {
+    const restantesA = COBRANCAS_INICIAIS - cobrancasA;
+    const restantesB = COBRANCAS_INICIAIS - cobrancasB;
+    return golsA > golsB + restantesB || golsB > golsA + restantesA;
+  };
+
+  while (cobrancasA < COBRANCAS_INICIAIS || cobrancasB < COBRANCAS_INICIAIS) {
+    if (decidido()) break;
+    if (cobrancasA < COBRANCAS_INICIAIS) {
+      if (random() < probA) golsA++;
+      cobrancasA++;
+      if (decidido()) break;
+    }
+    if (cobrancasB < COBRANCAS_INICIAIS) {
+      if (random() < probB) golsB++;
+      cobrancasB++;
+    }
+  }
+
+  // Morte súbita: 1 cobrança cada por rodada — decide assim que um marca e o outro erra. Teto de
+  // segurança (nunca deveria chegar perto disso com probabilidades reais) pra garantir término.
+  for (let rodada = 0; golsA === golsB && rodada < 50; rodada++) {
+    const marcouA = random() < probA;
+    const marcouB = random() < probB;
+    if (marcouA) golsA++;
+    if (marcouB) golsB++;
+  }
+  if (golsA === golsB) golsA++; // teto de segurança improvável: decide sem empate eterno
+
+  return { golsA, golsB };
+}
+
 /**
  * Exportado pra `simularFinalEstadualDoFormato` reaproveitar (uma final de
  * estadual é, na essência, um confronto de mata-mata isolado).
@@ -135,6 +237,8 @@ export async function resolverConfronto(
   random: () => number = Math.random,
   participacaoJogador?: ParticipacaoJogadorClube,
   resolverPartida: ResolverPartida = resolverPartidaPadrao,
+  /** Nome da etapa de mata-mata (ex: "quartas") — meramente informativo, repassado em `ContextoConfronto.etapa` pra quem resolve a partida (`career/career-loop.ts`) saber mostrar isso na tela de partida antes/durante o jogo. Opcional pra não quebrar quem já chama `resolverConfronto` sem essa info. */
+  etapa?: string,
 ): Promise<ResultadoConfrontoMataMata> {
   const ratingA = ratings[timeA];
   const ratingB = ratings[timeB];
@@ -148,12 +252,12 @@ export async function resolverConfronto(
   if (idaEVolta) {
     // jogo 1: A manda em casa
     const participacaoJogo1 = ehTimeA ? participacaoComoLado(participacaoJogador, "casa") : ehTimeB ? participacaoComoLado(participacaoJogador, "fora") : undefined;
-    const jogo1 = await resolverPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacaoJogo1, { mandanteId: timeA, visitanteId: timeB });
+    const jogo1 = await resolverPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacaoJogo1, { mandanteId: timeA, visitanteId: timeB, etapa });
     if (participacaoJogo1) partidasDoJogador.push(jogo1);
 
     // jogo 2: B manda em casa
     const participacaoJogo2 = ehTimeA ? participacaoComoLado(participacaoJogador, "fora") : ehTimeB ? participacaoComoLado(participacaoJogador, "casa") : undefined;
-    const jogo2 = await resolverPartida(gerarPerfilTime(ratingB, random), gerarPerfilTime(ratingA, random), random, participacaoJogo2, { mandanteId: timeB, visitanteId: timeA });
+    const jogo2 = await resolverPartida(gerarPerfilTime(ratingB, random), gerarPerfilTime(ratingA, random), random, participacaoJogo2, { mandanteId: timeB, visitanteId: timeA, etapa });
     if (participacaoJogo2) partidasDoJogador.push(jogo2);
 
     golsA = jogo1.golsCasa + jogo2.golsFora;
@@ -172,11 +276,12 @@ export async function resolverConfronto(
     if (golsA > golsB) return { ...base, vencedor: timeA, decididoNosPenaltis: false };
     if (golsB > golsA) return { ...base, vencedor: timeB, decididoNosPenaltis: false };
 
-    const vencedorIdaVolta = random() < probabilidadeDeVencer(ratingA, ratingB) ? timeA : timeB;
-    return { ...base, vencedor: vencedorIdaVolta, decididoNosPenaltis: true };
+    const penaltis = simularDisputaDePenaltis(timeA, timeB, ratingA, ratingB, random, participacaoJogador);
+    const vencedorIdaVolta = penaltis.golsA > penaltis.golsB ? timeA : timeB;
+    return { ...base, vencedor: vencedorIdaVolta, decididoNosPenaltis: true, penaltis };
   } else {
     const participacao = ehTimeA ? participacaoComoLado(participacaoJogador, "casa") : ehTimeB ? participacaoComoLado(participacaoJogador, "fora") : undefined;
-    const jogo = await resolverPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacao, { mandanteId: timeA, visitanteId: timeB });
+    const jogo = await resolverPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacao, { mandanteId: timeA, visitanteId: timeB, etapa });
     if (participacao) partidasDoJogador.push(jogo);
     golsA = jogo.golsCasa;
     golsB = jogo.golsFora;
@@ -187,8 +292,9 @@ export async function resolverConfronto(
   if (golsA > golsB) return { ...base, vencedor: timeA, decididoNosPenaltis: false };
   if (golsB > golsA) return { ...base, vencedor: timeB, decididoNosPenaltis: false };
 
-  const vencedor = random() < probabilidadeDeVencer(ratingA, ratingB) ? timeA : timeB;
-  return { ...base, vencedor, decididoNosPenaltis: true };
+  const penaltis = simularDisputaDePenaltis(timeA, timeB, ratingA, ratingB, random, participacaoJogador);
+  const vencedor = penaltis.golsA > penaltis.golsB ? timeA : timeB;
+  return { ...base, vencedor, decididoNosPenaltis: true, penaltis };
 }
 
 export interface ResultadoEtapasMataMata {
@@ -231,7 +337,7 @@ async function resolverEtapasMataMata(
     const pares = emparelharPorForca(vivos, ratings);
     const confrontos: ResultadoConfrontoMataMata[] = [];
     for (const [timeA, timeB] of pares) {
-      const confronto = await resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador, resolverPartida);
+      const confronto = await resolverConfronto(timeA, timeB, ratings, etapa.ida_e_volta, random, participacaoJogador, resolverPartida, etapa.nome);
       aoResolverConfronto?.({ etapa: etapa.nome, confronto });
       confrontos.push(confronto);
     }
@@ -352,6 +458,6 @@ export async function simularFinalEstadualDoFormato(
     throw new Error(`simularFinalEstadualDoFormato: esperava 1 ou 2 participantes, recebeu ${participantes.length}`);
   }
 
-  const confronto = await resolverConfronto(participantes[0], participantes[1], ratings, formato.ida_e_volta, random, participacaoJogador, resolverPartida);
+  const confronto = await resolverConfronto(participantes[0], participantes[1], ratings, formato.ida_e_volta, random, participacaoJogador, resolverPartida, "final");
   return { campeao: confronto.vencedor, confronto };
 }

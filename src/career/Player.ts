@@ -1,13 +1,5 @@
-import type { DesempenhoPartida, FocoDeTreino } from "../progression/xp.js";
-import {
-  ATRIBUTOS_POR_FOCO,
-  calcularXpPartida,
-  fatorDeRetornoDecrescente,
-  GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO,
-  ganhoPorPonto,
-  PONTOS_POR_NIVEL,
-  xpParaProximoNivel,
-} from "../progression/xp.js";
+import type { DesempenhoPartida } from "../progression/xp.js";
+import { calcularXpPartida, fatorDeRetornoDecrescente, ganhoPorPonto, PONTOS_POR_NIVEL, xpParaProximoNivel } from "../progression/xp.js";
 import { aplicarDeclinioPorIdade } from "../progression/aging.js";
 import type { ImpactoCarreira, Reputacao } from "../progression/scenarios.js";
 import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
@@ -27,11 +19,12 @@ import { gerarAvaliacaoDeOlheiros, multiplicadorDePotencial, sortearPotencial, t
  *
  * `overall` continua sempre derivado dos atributos via `overallAtual`,
  * nunca guardado aqui — mas desde a seção 5.16 existe sim um `nivel`
- * separado dele: XP de partida/treino sobe `nivel` (`ganharXp`), e cada
- * level-up dá `pontosDisponiveis` pra investir manualmente em qualquer
- * atributo da posição (`investirPontos`, estilo Pro Clubs) — ainda "sem
- * perks" no sentido de nunca desbloquear efeito especial, só acelera
- * atributo numérico.
+ * separado dele: XP de PARTIDA (só isso — o sistema de treino com foco foi
+ * descontinuado) sobe `nivel` (`ganharXp`), e cada level-up dá
+ * `pontosDisponiveis` pra investir manualmente em qualquer atributo da
+ * posição (`investirPontos`, estilo Pro Clubs) — ainda "sem perks" no
+ * sentido de nunca desbloquear efeito especial, só acelera atributo
+ * numérico.
  */
 export interface EstadoDeCarreira {
   jogador: Jogador;
@@ -99,7 +92,7 @@ export interface OpcoesEstadoInicial {
   random?: () => number;
 }
 
-const IDADE_INICIAL_PADRAO = 18;
+const IDADE_INICIAL_PADRAO = 17;
 /**
  * Centro da distribuição de atributo inicial — antes eram valores FIXOS
  * (45/35, todo jogador novo idêntico). Agora tem 2 fontes de ruído
@@ -212,7 +205,7 @@ export function overallAtual(estado: EstadoDeCarreira): number {
 
 export interface ResultadoGanhoDeXp {
   estado: EstadoDeCarreira;
-  /** `true` se esse ganho de XP cruzou 1+ limiar de nível (`xpParaProximoNivel`) — uma partida/treino muito bom pode subir mais de 1 nível de uma vez. */
+  /** `true` se esse ganho de XP cruzou 1+ limiar de nível (`xpParaProximoNivel`) — uma partida muito boa pode subir mais de 1 nível de uma vez. */
   subiuDeNivel: boolean;
   nivelAnterior: number;
   nivelNovo: number;
@@ -221,8 +214,8 @@ export interface ResultadoGanhoDeXp {
 }
 
 /**
- * Aplica um ganho de XP (partida, `aplicarDesempenhoPartida`, ou treino,
- * `career/career-loop.ts` `resolverPeriodoDaCarreira`) ao **nível** do
+ * Aplica um ganho de XP (sempre de partida, `aplicarDesempenhoPartida` —
+ * o sistema de treino com foco foi descontinuado) ao **nível** do
  * jogador — desde a seção 5.16, XP não sobe atributo nenhum direto, só
  * acumula rumo ao próximo nível (`progression/xp.ts` `xpParaProximoNivel`);
  * cada nível dá `PONTOS_POR_NIVEL` pontos pra investir depois
@@ -291,36 +284,6 @@ export function investirPontos(estado: EstadoDeCarreira, atributo: Atributo, qua
     jogador: { ...estado.jogador, atributos: { ...estado.jogador.atributos, [atributo]: valorAtual } },
     pontosDisponiveis: estado.pontosDisponiveis - quantidade,
   };
-}
-
-/**
- * Aplica o ganho direto de atributo de uma sessão de treino com foco
- * (`foco !== "descanso"`, ver `progression/xp.ts` `ATRIBUTOS_POR_FOCO`) —
- * só nos atributos dessa categoria que também sejam relevantes pra
- * posição do jogador (`ATRIBUTOS_POR_POSICAO`); é automático (não é
- * escolha do jogador) e sempre nos mesmos atributos daquele foco, ao
- * contrário de `investirPontos` (escolha livre, alimentada por
- * `pontosDisponiveis`, que continua existindo e sendo alimentada
- * igualmente pelos 3 focos — este ganho é complementar, não substitui).
- * Sem interseção foco×posição (não deveria acontecer, todo foco cobre
- * pelo menos 1 atributo de cada posição), não faz nada.
- */
-export function aplicarGanhoDeTreino(estado: EstadoDeCarreira, foco: FocoDeTreino): EstadoDeCarreira {
-  if (foco === "descanso") return estado;
-
-  const atributosDaPosicao = ATRIBUTOS_POR_POSICAO[estado.jogador.posicao];
-  const atributosRelevantes = ATRIBUTOS_POR_FOCO[foco].filter((atributo) => atributosDaPosicao.includes(atributo));
-  if (atributosRelevantes.length === 0) return estado;
-
-  const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
-  let atributos = estado.jogador.atributos;
-  for (const atributo of atributosRelevantes) {
-    const valorAtual = atributos[atributo] ?? 1;
-    const ganho = GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios) * fatorDeRetornoDecrescente(valorAtual);
-    atributos = { ...atributos, [atributo]: Math.min(ATRIBUTO_MAXIMO, valorAtual + ganho) };
-  }
-
-  return { ...estado, jogador: { ...estado.jogador, atributos } };
 }
 
 /**

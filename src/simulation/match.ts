@@ -336,6 +336,10 @@ export type ResolverPartida = (
 export interface ContextoConfronto {
   mandanteId: string;
   visitanteId: string;
+  /** Rodada do calendário de pontos corridos (turno/returno/fase de grupos) — `undefined` em mata-mata, que usa `etapa` em vez disso. Pedido do usuário: mostrar a rodada/fase na tela de partida, antes/durante o jogo (não só depois, como já acontecia no resultado da rodada). */
+  rodada?: number;
+  /** Nome da etapa de mata-mata (ex: "quartas", "semifinal") — `undefined` em pontos corridos, que usa `rodada` em vez disso. */
+  etapa?: string;
 }
 
 /** Resolvedor padrão — só chama `simularPartida` normalmente, sem narração/pausa nenhuma. */

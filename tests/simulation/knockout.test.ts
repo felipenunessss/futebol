@@ -11,7 +11,7 @@ import {
   type EventoConfrontoMataMata,
 } from "../../src/simulation/knockout.js";
 import { buscarArquetipo, type Jogador } from "../../src/schemas/player.js";
-import type { ParticipacaoJogadorClube } from "../../src/simulation/match.js";
+import type { ParticipacaoJogadorClube, ResolverPartida } from "../../src/simulation/match.js";
 
 describe("simularMataMataSimples", () => {
   it("4 times, 2 fases (semifinal+final): produz 1 campeão que estava entre os 4", async () => {
@@ -195,6 +195,70 @@ describe("resolverConfronto — placar por perna (ida/volta)", () => {
     const confronto = await resolverConfronto("a", "b", ratings, false, () => Math.random());
     expect(confronto.ida).toBeUndefined();
     expect(confronto.volta).toBeUndefined();
+  });
+});
+
+/** Mulberry32 — PRNG seedado determinístico, mesmo padrão usado em outros testes do motor pra rodar muitos trials sem depender de `Math.random`. */
+function criarRandomSeedado(seed: number): () => number {
+  let estado = seed;
+  return () => {
+    estado |= 0;
+    estado = (estado + 0x6d2b79f5) | 0;
+    let t = Math.imul(estado ^ (estado >>> 15), 1 | estado);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** `ResolverPartida` de mentira que sempre empata 1-1 — força `resolverConfronto` a cair no desempate por pênaltis, sem depender de sorte pra gerar um empate de verdade. */
+const empatePadrao: ResolverPartida = () => ({ golsCasa: 1, golsFora: 1, chancesCasa: 0, chancesFora: 0, chancesJogador: [] });
+
+describe("resolverConfronto — disputa de pênaltis (desempate no agregado)", () => {
+  const ratings = { a: 1600, b: 1600 };
+
+  it("empate no agregado sempre resolve com uma disputa de pênaltis de verdade, não um sorteio sem placar", async () => {
+    const confronto = await resolverConfronto("a", "b", ratings, false, criarRandomSeedado(1), undefined, empatePadrao);
+    expect(confronto.decididoNosPenaltis).toBe(true);
+    expect(confronto.penaltis).toBeDefined();
+    expect(confronto.penaltis!.golsA).not.toBe(confronto.penaltis!.golsB); // disputa nunca termina empatada
+  });
+
+  it("o vencedor bate com quem fez mais gols na disputa de pênaltis", async () => {
+    for (let seed = 0; seed < 30; seed++) {
+      const confronto = await resolverConfronto("a", "b", ratings, false, criarRandomSeedado(seed), undefined, empatePadrao);
+      const vencedorEsperado = confronto.penaltis!.golsA > confronto.penaltis!.golsB ? "a" : "b";
+      expect(confronto.vencedor).toBe(vencedorEsperado);
+    }
+  });
+
+  it("com ratings iguais, os 2 times vencem a disputa em amostras diferentes (não é sempre o mesmo lado)", async () => {
+    const vencedores = new Set<string>();
+    for (let seed = 0; seed < 40; seed++) {
+      const confronto = await resolverConfronto("a", "b", ratings, false, criarRandomSeedado(seed), undefined, empatePadrao);
+      vencedores.add(confronto.vencedor);
+    }
+    expect(vencedores.size).toBe(2);
+  });
+
+  it("ida e volta: agregado empatado também vai pra pênaltis de verdade", async () => {
+    const confronto = await resolverConfronto("a", "b", ratings, true, criarRandomSeedado(7), undefined, empatePadrao);
+    expect(confronto.decididoNosPenaltis).toBe(true);
+    expect(confronto.penaltis).toBeDefined();
+  });
+
+  it("goleiro do jogador com reflexos altos reduz a taxa de conversão do adversário na disputa (Camada 2)", async () => {
+    const goleiroCraque: Jogador = { id: "g1", nome: "Goleiro", posicao: "goleiro", arquetipo_id: buscarArquetipo("muralha").id, idade: 25, atributos: { reflexos: 99 } };
+    const participacao: ParticipacaoJogadorClube = { clubeId: "b", jogador: goleiroCraque, estiloTecnico: "equilibrado" };
+
+    let vitoriasDoTimeComGoleiroCraque = 0;
+    const amostras = 60;
+    for (let seed = 0; seed < amostras; seed++) {
+      const confronto = await resolverConfronto("a", "b", ratings, false, criarRandomSeedado(seed), participacao, empatePadrao);
+      if (confronto.vencedor === "b") vitoriasDoTimeComGoleiroCraque++;
+    }
+    // Sem o goleiro craque, ratings iguais dão ~50% pro time B; com reflexos 99 reduzindo a conversão
+    // do adversário, B deveria vencer bem mais da metade das amostras.
+    expect(vitoriasDoTimeComGoleiroCraque).toBeGreaterThan(amostras / 2);
   });
 });
 

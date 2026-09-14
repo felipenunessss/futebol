@@ -3,7 +3,7 @@ import { construirCalendarioPadrao } from "@motor/data/loaders/calendario.js";
 import type { Club } from "@motor/schemas/club.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Atributo, type Posicao } from "@motor/schemas/player.js";
 import { overallAtual, type EstadoDeCarreira } from "@motor/career/Player.js";
-import { xpParaProximoNivel, type FocoDeTreino } from "@motor/progression/xp.js";
+import { xpParaProximoNivel } from "@motor/progression/xp.js";
 import type { ImpactoCarreira, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
@@ -40,13 +40,6 @@ const ROTULO_POSICAO: Record<Posicao, string> = {
   volante: "Volante",
   meia: "Meia",
   atacante: "Atacante",
-};
-
-const ROTULO_FOCO: Record<FocoDeTreino, string> = {
-  fisico: "Físico",
-  tecnico: "Técnico",
-  tatico: "Tático",
-  descanso: "Descanso",
 };
 
 const LABEL_SUBTIPO: Record<SubtipoChance, string> = {
@@ -247,8 +240,6 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
           nomeClube={nomeDoClube(clubePorId, estadoAtual.clubeAtualId)}
           escudoClube={escudoDoClube(clubePorId, estadoAtual.clubeAtualId)}
           nomeDaNacionalidade={nomeDaNacionalidade}
-          focoAutomatico={temporada.focoAutomatico}
-          onDesligarTreinoAutomatico={temporada.desligarTreinoAutomatico}
         />
 
         {/* Enquanto a animação de escolha, o sorteio/chaveamento ou a tela de resultados da rodada
@@ -616,7 +607,9 @@ function ChaveamentoDaCompeticao({ etapas, clubeId, clubePorId }: { etapas: Etap
                   venceu={confronto.vencedor === confronto.timeB}
                   ehDoJogador={confronto.timeB === clubeId}
                 />
-                {confronto.decididoNosPenaltis && <div className="text-slate-500 text-[11px] text-center">nos pênaltis</div>}
+                {confronto.decididoNosPenaltis && (
+                  <div className="text-slate-500 text-[11px] text-center">nos pênaltis{confronto.penaltis && ` (${confronto.penaltis.golsA} x ${confronto.penaltis.golsB})`}</div>
+                )}
               </div>
             ))}
           </div>
@@ -770,15 +763,11 @@ function Cabecalho({
   nomeClube,
   escudoClube,
   nomeDaNacionalidade,
-  focoAutomatico,
-  onDesligarTreinoAutomatico,
 }: {
   estado: EstadoDeCarreira;
   nomeClube: string;
   escudoClube: string | undefined;
   nomeDaNacionalidade: string | undefined;
-  focoAutomatico: FocoDeTreino | undefined;
-  onDesligarTreinoAutomatico: () => void;
 }) {
   const xpNecessario = xpParaProximoNivel(estado.nivel);
   const progresso = Math.min(100, Math.round((estado.xpAcumulado / xpNecessario) * 100));
@@ -789,7 +778,7 @@ function Cabecalho({
         <Escudo url={escudoClube} alt={nomeClube} tamanho={56} />
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-semibold">
-            {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {nomeDaNacionalidade}
+            {estado.jogador.nome} #{estado.jogador.numero} — {ROTULO_POSICAO[estado.jogador.posicao]}, {estado.jogador.idade} anos, {nomeDaNacionalidade}
           </h1>
           <span className="text-sm text-slate-400">
             {nomeClube} · Temporada {estado.temporada}
@@ -813,16 +802,6 @@ function Cabecalho({
           <div className="h-full bg-emerald-500" style={{ width: `${progresso}%` }} />
         </div>
       </div>
-      {focoAutomatico && (
-        <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-xs text-slate-400">
-            Treino rápido ativado ({ROTULO_FOCO[focoAutomatico]}) ·{" "}
-            <button type="button" onClick={onDesligarTreinoAutomatico} className="text-emerald-400 hover:text-emerald-300 transition-colors">
-              voltar a perguntar
-            </button>
-          </span>
-        </div>
-      )}
     </div>
   );
 }
@@ -950,7 +929,6 @@ function Stat({ rotulo, valor, destaque }: { rotulo: string; valor: string | num
 function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; temporada: ReturnType<typeof useTemporada> }) {
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 text-slate-100">
-      {prompt.tipo === "foco" && <PromptFoco onEscolher={temporada.responderFoco} />}
       {prompt.tipo === "pontos" && <PromptDistribuicaoDePontos estado={prompt.estado} onConfirmar={temporada.responderDistribuicaoDePontos} />}
       {prompt.tipo === "cenario" && <PromptCenario titulo={prompt.cenario.titulo} descricao={prompt.cenario.descricao} opcoes={prompt.cenario.opcoes} onEscolher={temporada.responderCenario} />}
     </div>
@@ -1099,7 +1077,8 @@ function PainelPrePartida({
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       <div className="text-xs uppercase tracking-wide text-emerald-400">
-        {nomeDoCampeonato(nomePorCampeonato, contexto.campeonatoId)} — semana {contexto.semana}
+        {nomeDoCampeonato(nomePorCampeonato, contexto.campeonatoId)}
+        {contexto.etapa ? ` — ${rotuloEtapa(contexto.etapa)}` : contexto.rodada !== undefined ? ` — Rodada ${contexto.rodada}` : ""} — semana {contexto.semana}
       </div>
       <div className="flex items-center justify-center gap-4">
         <div className="text-right flex-1">
@@ -1201,6 +1180,9 @@ function PainelPartidaAoVivo({
           <span className="text-xs px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300" title="Seu status no elenco nesta partida">
             {ROTULO_STATUS[status]}
           </span>
+          {(partida.etapa || partida.rodada !== undefined) && (
+            <span className="text-xs text-slate-400">{partida.etapa ? rotuloEtapa(partida.etapa) : `Rodada ${partida.rodada}`}</span>
+          )}
         </div>
         {!partida.finalizada && <SeletorDeVelocidade velocidade={velocidade} onDefinirVelocidade={onDefinirVelocidade} />}
       </div>
@@ -1346,39 +1328,6 @@ function DecisaoDeChance({ contexto, onEscolher }: { contexto: ContextoDecisaoCh
   );
 }
 
-function PromptFoco({ onEscolher }: { onEscolher: (foco: FocoDeTreino, manterAutomatico: boolean) => void }) {
-  const focos: { foco: FocoDeTreino; descricao: string }[] = [
-    { foco: "fisico", descricao: "velocidade, força, resistência, jogo aéreo, reflexos" },
-    { foco: "tecnico", descricao: "finalização, drible, cruzamento, passe, cabeceio, etc — depende da posição" },
-    { foco: "tatico", descricao: "visão de jogo, frieza, marcação, desarme, posicionamento, liderança" },
-    { foco: "descanso", descricao: "recupera moral, não gera XP" },
-  ];
-  const [treinoRapido, setTreinoRapido] = useState(false);
-
-  return (
-    <div className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold">Sessão de treino — qual o foco?</h2>
-      <div className="grid gap-2">
-        {focos.map((f) => (
-          <button
-            key={f.foco}
-            type="button"
-            onClick={() => onEscolher(f.foco, treinoRapido)}
-            className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors"
-          >
-            <div className="font-medium">{ROTULO_FOCO[f.foco]}</div>
-            <div className="text-xs text-slate-400">{f.descricao}</div>
-          </button>
-        ))}
-      </div>
-      <label className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-        <input type="checkbox" checked={treinoRapido} onChange={(evento) => setTreinoRapido(evento.target.checked)} className="accent-emerald-500" />
-        Treino rápido — usar essa escolha em todos os treinos seguintes, sem perguntar de novo
-      </label>
-    </div>
-  );
-}
-
 function PromptDistribuicaoDePontos({ estado, onConfirmar }: { estado: EstadoDeCarreira; onConfirmar: (alocacoes: AlocacaoDePontos[]) => void }) {
   const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
   const atributosDaPosicao = ATRIBUTOS_POR_POSICAO[estado.jogador.posicao];
@@ -1507,18 +1456,6 @@ function EventoCard({
   faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
 }) {
   switch (evento.tipo) {
-    case "treino":
-      return (
-        <Card>
-          {evento.treino.foco === "descanso" ? (
-            <>
-              Descanso — moral {evento.treino.moralAntes} → {evento.treino.moralDepois}
-            </>
-          ) : (
-            <>Sessão de treino ({ROTULO_FOCO[evento.treino.foco]})</>
-          )}
-        </Card>
-      );
     case "nivel":
       return (
         <Card destaque>
@@ -1570,7 +1507,7 @@ function EventoCard({
     }
     case "partida_mata_mata": {
       const { etapa, confronto } = evento.info.evento;
-      const decisao = confronto.decididoNosPenaltis ? " (nos pênaltis)" : "";
+      const decisao = confronto.decididoNosPenaltis ? ` (nos pênaltis${confronto.penaltis ? `, ${confronto.penaltis.golsA} x ${confronto.penaltis.golsB}` : ""})` : "";
       const titularPorPartida = evento.info.titularPorPartida ?? [];
       return (
         <Card destaque>
@@ -1705,6 +1642,11 @@ function RotuloTitular({ titular }: { titular?: boolean }) {
   return <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${titular ? "bg-emerald-800/60 text-emerald-300" : "bg-slate-700/60 text-slate-300"}`}>{titular ? "Titular" : "Reserva"}</span>;
 }
 
+/** Placar entre parênteses de UM time (ida do mandante/visitante) — só aparece na linha da Volta, ao lado do nome do respectivo time, pra deixar claro o placar acumulado sem precisar de uma 3ª linha antes do agregado. Pedido do usuário: "(1) Santos X x Y Palmeiras (0)". */
+function PlacarDaIdaEntreParenteses({ gols }: { gols: number }) {
+  return <span className="text-slate-500 tabular-nums text-xs">({gols})</span>;
+}
+
 function LinhaDeConfrontoMataMata({
   rotulo,
   clubePorId,
@@ -1714,6 +1656,9 @@ function LinhaDeConfrontoMataMata({
   golsFora,
   pendente,
   titular,
+  /** Placar da IDA do mandante/visitante — só passado na linha da Volta (pedido do usuário: mostrar o placar da ida ao lado do nome de cada time na linha da volta, em vez de uma linha "Ida" separada de novo). `undefined` na própria linha da Ida (mostrada normal, sem anotação) e em jogo único. */
+  golsIdaMandante,
+  golsIdaVisitante,
 }: {
   rotulo: string;
   clubePorId: Map<string, Club>;
@@ -1723,11 +1668,14 @@ function LinhaDeConfrontoMataMata({
   golsFora: number;
   pendente?: boolean;
   titular?: boolean;
+  golsIdaMandante?: number;
+  golsIdaVisitante?: number;
 }) {
   return (
     <div className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm transition-opacity duration-300 ${pendente ? "opacity-40 bg-slate-800/40 border-slate-800" : "bg-slate-800/60 border-slate-700"}`}>
       <span className="text-xs font-semibold text-slate-400 w-12 shrink-0">{rotulo}</span>
       <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+        {golsIdaMandante !== undefined && <PlacarDaIdaEntreParenteses gols={golsIdaMandante} />}
         {nomeDoClube(clubePorId, mandanteId)}
         <Escudo url={escudoDoClube(clubePorId, mandanteId)} alt="" tamanho={16} />
       </span>
@@ -1735,6 +1683,7 @@ function LinhaDeConfrontoMataMata({
       <span className="flex-1 flex items-center gap-1.5 truncate">
         <Escudo url={escudoDoClube(clubePorId, visitanteId)} alt="" tamanho={16} />
         {nomeDoClube(clubePorId, visitanteId)}
+        {golsIdaVisitante !== undefined && <PlacarDaIdaEntreParenteses gols={golsIdaVisitante} />}
       </span>
       {!pendente && <RotuloTitular titular={titular} />}
     </div>
@@ -1832,16 +1781,28 @@ function PainelResultadoDaRodada({
                 golsFora={resultadoDaRodada.volta.golsFora}
                 pendente={aguardandoVolta}
                 titular={resultadoDaRodada.titularVolta}
+                golsIdaMandante={resultadoDaRodada.ida.golsCasa}
+                golsIdaVisitante={resultadoDaRodada.ida.golsFora}
               />
               {voltaRevelada && (
-                <div
-                  className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm font-medium ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
-                >
-                  <span>Agregado</span>
-                  <span className="tabular-nums">
-                    {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
-                  </span>
-                </div>
+                <>
+                  <div
+                    className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm font-medium ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
+                  >
+                    <span>Agregado</span>
+                    <span className="tabular-nums">
+                      {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
+                    </span>
+                  </div>
+                  {resultadoDaRodada.decididoNosPenaltis && resultadoDaRodada.penaltis && (
+                    <div className="flex items-center justify-between rounded-lg px-3 py-1.5 border border-slate-700 bg-slate-800/60 text-sm text-slate-300">
+                      <span>Pênaltis</span>
+                      <span className="tabular-nums">
+                        {resultadoDaRodada.penaltis.golsCasa} x {resultadoDaRodada.penaltis.golsFora}
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           ) : (
@@ -1860,6 +1821,14 @@ function PainelResultadoDaRodada({
                 {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
               </span>
               <RotuloTitular titular={resultadoDaRodada.titularIda} />
+            </div>
+          )}
+          {!temIdaEVolta && resultadoDaRodada.decididoNosPenaltis && resultadoDaRodada.penaltis && (
+            <div className="flex items-center justify-between rounded-lg px-3 py-1.5 border border-slate-700 bg-slate-800/60 text-sm text-slate-300">
+              <span>Pênaltis</span>
+              <span className="tabular-nums">
+                {resultadoDaRodada.penaltis.golsCasa} x {resultadoDaRodada.penaltis.golsFora}
+              </span>
             </div>
           )}
           {!aguardandoVolta && (

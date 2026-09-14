@@ -17,7 +17,7 @@ import {
   type EstadoJogadorParaImpacto,
   type Opcao,
 } from "../progression/scenarios.js";
-import { converterChancesEmDesempenho, xpParaProximoNivel, type FocoDeTreino } from "../progression/xp.js";
+import { converterChancesEmDesempenho, xpParaProximoNivel } from "../progression/xp.js";
 import { ROTULO_POTENCIAL } from "../progression/potencial.js";
 import { ARQUETIPOS, ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Posicao } from "../schemas/player.js";
 import { gerarPerfilTime, simularPartida, type ParticipacaoJogador } from "../simulation/match.js";
@@ -39,7 +39,6 @@ import {
   type ResultadoTemporadaDeCarreira,
   type ResumoPartidasDaTemporada,
   type StatusAtualizadoNaTemporada,
-  type TreinoResolvidoNaTemporada,
 } from "../career/career-loop.js";
 import { multiplicadorDeValorizacaoPorStatus } from "../career/status.js";
 import { gerarPropostasIniciais } from "../market/transfers.js";
@@ -670,31 +669,6 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
     }
   };
 
-  const FOCOS_DE_TREINO: { foco: FocoDeTreino; rotulo: string }[] = [
-    { foco: "fisico", rotulo: "Físico (velocidade, força, resistência, jogo aéreo, reflexos)" },
-    { foco: "tecnico", rotulo: "Técnico (finalização, drible, cruzamento, passe, cabeceio, etc — depende da posição)" },
-    { foco: "tatico", rotulo: "Tático (visão de jogo, frieza, marcação, desarme, posicionamento, liderança)" },
-    { foco: "descanso", rotulo: "Descanso (recupera moral, não treina atributo)" },
-  ];
-
-  const escolherFocoDeTreinoInterativo = async (): Promise<FocoDeTreino> => {
-    console.log(`\n--- Sessão de treino ---`);
-    FOCOS_DE_TREINO.forEach((f, i) => console.log(`  ${i + 1}. ${f.rotulo}`));
-    while (true) {
-      const escolha = Number((await perguntar("Foco desta sessão (número): ")).trim());
-      if (escolha >= 1 && escolha <= FOCOS_DE_TREINO.length) return FOCOS_DE_TREINO[escolha - 1].foco;
-      console.log("Opção inválida, tente de novo.");
-    }
-  };
-
-  const onTreinoResolvido = (treino: TreinoResolvidoNaTemporada): void => {
-    if (treino.foco === "descanso") {
-      console.log(`  -> Moral: ${treino.moralAntes} -> ${treino.moralDepois}`);
-    } else {
-      console.log(`  -> Sessão de treino (${treino.foco}) concluída — o XP conta pro seu nível, não pro atributo direto.`);
-    }
-  };
-
   const onNivelAlcancado = (info: NivelAlcancadoNaTemporada): void => {
     console.log(`\n🎉 Subiu para o nível ${info.nivelNovo}! (+${info.pontosGanhos} ponto(s) de atributo pra distribuir)`);
   };
@@ -817,12 +791,10 @@ async function jogarCarreiraInterativaCli(): Promise<void> {
   while (continuar) {
     const resultado: ResultadoTemporadaDeCarreira = await jogarTemporadaSemanal(estado, campeonatos, clubes, {
       escolherOpcao: escolherOpcaoInterativa,
-      escolherFocoDeTreino: escolherFocoDeTreinoInterativo,
       onNegociacaoResolvida,
       onCenarioResolvido,
       onPartidasResumidas,
       onStatusAtualizado,
-      onTreinoResolvido,
       escolherDistribuicaoDePontos: escolherDistribuicaoDePontosInterativo,
       onNivelAlcancado,
       onPartidaPontosCorridos,

@@ -200,7 +200,7 @@ O XP vem de desempenho real (Copero), mas se converte em **nível do jogador + e
 ### 5.2 Profundidade tática e técnica
 - Posições e sub-funções (ex: lateral que ataca vs. que marca) mudam quais XPs são mais úteis.
 - Estilos de jogo do técnico afetam quais atributos rendem XP mais rápido.
-- Sessões de treino semanais com escolha de foco (físico, técnico, tático, descanso).
+- ~~Sessões de treino semanais com escolha de foco (físico, técnico, tático, descanso).~~ Descontinuado (pedido do usuário): XP vem exclusivamente do desempenho em partida agora, sem escolha de foco de treino nenhuma — ver `docs/motor-de-partida.md` seção 5.32.
 - Condicionamento físico e fadiga acumulada ao longo da temporada de estaduais + nacional.
 
 ### 5.3 Vida fora de campo

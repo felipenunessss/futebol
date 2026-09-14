@@ -181,7 +181,7 @@ export async function simularTemporadaPontosCorridos(
     const perfilMandante = gerarPerfilTime(ratings[confronto.mandante], random);
     const perfilVisitante = gerarPerfilTime(ratings[confronto.visitante], random);
     const participacao = participacaoNoConfronto(participacaoJogador, confronto.mandante, confronto.visitante);
-    const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante });
+    const resultado = await resolverPartida(perfilMandante, perfilVisitante, random, participacao, { mandanteId: confronto.mandante, visitanteId: confronto.visitante, rodada: confronto.rodada });
 
     const tabelaAntes = aoSimularConfronto ? ordenarTabela([...tabela.values()].map((linha) => ({ ...linha }))) : undefined;
 

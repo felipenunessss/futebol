@@ -8,7 +8,6 @@ import {
   GANHO_POR_PONTO_PADRAO,
   GANHO_POR_PONTO_PRIORITARIO,
   PONTOS_POR_NIVEL,
-  xpDeSessaoDeTreino,
   xpParaProximoNivel,
   type DesempenhoPartida,
 } from "../../src/progression/xp.js";
@@ -142,21 +141,6 @@ describe("ganhoPorPonto", () => {
   });
 });
 
-describe("xpDeSessaoDeTreino", () => {
-  it("descanso não gera XP", () => {
-    expect(xpDeSessaoDeTreino("descanso")).toBe(0);
-  });
-
-  it("físico/técnico/tático geram a mesma quantidade de XP — a diferença hoje é só narrativa, quem decide ONDE aplicar os pontos é o jogador (career/Player.ts investirPontos)", () => {
-    const fisico = xpDeSessaoDeTreino("fisico");
-    const tecnico = xpDeSessaoDeTreino("tecnico");
-    const tatico = xpDeSessaoDeTreino("tatico");
-
-    expect(fisico).toBeGreaterThan(0);
-    expect(fisico).toBe(tecnico);
-    expect(tecnico).toBe(tatico);
-  });
-});
 
 describe("fatorDeRetornoDecrescente", () => {
   it("é 1 (ganho cheio) até o limiar, sem penalizar quem ainda está longe do teto", () => {
