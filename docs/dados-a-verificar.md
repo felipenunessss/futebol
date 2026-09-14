@@ -283,13 +283,31 @@ verificada manualmente antes de aplicar)**:
 - `guarani_mg` (Guarani Esporte Clube, Divinópolis-MG): estava sem
   `escudo_url` (TheSportsDB não tinha cadastrado). Preenchido com o escudo
   real (Wikimedia Commons, `Escudoguaranimg.png`).
+- `river_plate_uy` (River Plate Fútbol Club, Montevidéu): `escudo_url` era
+  do **Club Atlético River Plate da Argentina** (o "CARP" bem mais famoso)
+  — mesmo tipo de erro de nome homônimo genérico. Corrigido pro escudo real
+  (Wikimedia Commons, `Club_Atletico_River_Plate.svg`).
+- `sao_francisco_ac` (São Francisco Futebol Clube, Rio Branco-AC) e
+  `linense` (Associação Desportiva Classista Linense, Lins-SP): estavam sem
+  `escudo_url`. Preenchidos com os escudos reais (Wikipédia PT,
+  `Escudo_do_São_Francisco_do_Acre.png` e Wikimedia Commons,
+  `CAL_LINENSE_ESCUDO.png`).
 
-Esses 3 primeiros casos (2 deles clubes homônimos de países/times
-diferentes, 1 confusão bandeira-do-estado×escudo-do-clube) reforçam que a
-auditoria automática por país/relevância não é suficiente — recomenda-se
-desconfiar especialmente de escudos vindos de nomes com apelido curto e
-genérico ("Guarani"/"Guaraní", "Ceará" batendo com o nome do estado, etc.)
-até serem conferidos visualmente contra uma fonte confiável.
+Esses casos (a maioria clubes homônimos de países/times diferentes, 1
+confusão bandeira-do-estado×escudo-do-clube) reforçam que a auditoria
+automática por país/relevância não é suficiente — recomenda-se desconfiar
+especialmente de escudos vindos de nomes com apelido curto e genérico
+("Guarani"/"Guaraní", "River Plate", "Ceará" batendo com o nome do estado,
+etc.) até serem conferidos visualmente contra uma fonte confiável.
+
+**Pendência menor, não corrigida**: o artigo da Wikipédia sobre `linense`
+usa o nome oficial "Clube Atlético Linense" (fundado 1927, apelido
+"Elefante da Noroeste"), diferente do `nome` cadastrado aqui ("Associação
+Desportiva Classista Linense") — mesma cidade (Lins-SP) e mesmo apelido
+popular ("Linense"), então é quase certamente o mesmo clube, mas não
+mudei o campo `nome` sem confirmar se há uma razão histórica/institucional
+pra essa diferença (ex: entidade guarda-chuva multiesportiva vs. o
+departamento de futebol). Só o escudo foi atualizado.
 
 ## Taças/troféus de competição (`taca_url`)
 

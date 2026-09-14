@@ -5,3 +5,4 @@ dist/
 *.tsbuildinfo
 .claude/settings.local.json
 relatorio-escudos.txt
+relatorio-tacas.txt

@@ -1,5 +1,0 @@
-OK   brasileirao_serie_a (idLeague 4351, "Brazilian Serie A"): https://r2.thesportsdb.com/images/media/league/trophy/02ftjh1684945323.png
-OK   brasileirao_serie_b (idLeague 4404, "Brazilian Serie B"): https://r2.thesportsdb.com/images/media/league/trophy/s6a14o1778446984.png
-OK   brasileirao_serie_d (idLeague 5079, "Brazil Serie D"): https://r2.thesportsdb.com/images/media/league/trophy/68jxq51766785056.png
-
-3/3 taças encontradas

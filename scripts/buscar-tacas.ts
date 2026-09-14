@@ -22,13 +22,17 @@ import type { CampeonatoNacional } from "../src/schemas/national-championship.js
 const NACIONAIS_DIR = join(import.meta.dirname, "../src/data/campeonatos-nacionais");
 
 /** campeonatoId (nosso) -> idLeague do TheSportsDB — só entradas CONFIRMADAS (nome batido manualmente
- * contra `strLeague` da resposta da API). Ainda não cobre Copa do Brasil/Série C/Libertadores/
- * Sul-Americana/estaduais — o endpoint de busca por nome não devolveu esses sob a chave de teste, e
- * não dá pra adivinhar o id sem confirmar (ver decisão registrada em `docs/dados-a-verificar.md`). */
+ * contra `strLeague` da resposta da API). Ainda não cobre os estaduais — competições regionais
+ * provavelmente sem cobertura no TheSportsDB, e não dá pra adivinhar o id sem confirmar (ver decisão
+ * registrada em `docs/dados-a-verificar.md`). */
 const ID_LEAGUE_POR_CAMPEONATO: Record<string, number> = {
   brasileirao_serie_a: 4351,
   brasileirao_serie_b: 4404,
+  brasileirao_serie_c: 4625,
   brasileirao_serie_d: 5079,
+  copa_do_brasil: 4725,
+  libertadores: 4501,
+  sulamericana: 4724,
 };
 
 const DELAY_ENTRE_REQUISICOES_MS = 300;
