@@ -38,12 +38,10 @@ duas competições).
   divisões do par suportam `tabelaFinal` (ver comentário em
   `mundo-persistente.ts`) — evita drenar/inchar uma divisão sem nunca
   devolver do outro lado.
-- Vagas de Copa do Brasil/Libertadores/Sul-Americana/Série D concedidas a um
-  estadual (`Premiacao.vaga_copa_do_brasil`/`vaga_libertadores`/
-  `vaga_sulamericana`/`vaga_serie_d`) — são inserções cross-competição em
-  competições já com fases escalonadas/sorteio de grupos (Copa do Brasil,
-  Libertadores, Sul-Americana, a própria Série D — ver seção abaixo), fora de
-  escopo por ora.
+- Vagas de Copa do Brasil/Série D concedidas a um estadual
+  (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição
+  em competições já com fases escalonadas/sorteio de grupos (a própria Série D
+  — ver seção abaixo), fora de escopo por ora.
 - Título/campeão de competições sem `tabelaFinal` continua funcionando
   normalmente (não depende de `tabelaFinal`) — só a composição de times pra
   temporada seguinte é que não muda pra essas.
@@ -54,6 +52,50 @@ classificação por trás (`fase_grupos` sem mata-mata teria uma tabela por
 grupo, não uma única — precisaria decidir o que "classificação final" quer
 dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra formatos
 multi-grupo).
+
+## Vagas de Libertadores/Sul-Americana (implementado, escopo parcial)
+
+Mecanismo separado do de promoção/rebaixamento acima (não é entre níveis de
+uma hierarquia, é uma competição NACIONAL alimentando uma das 2 competições
+continentais fixas) — antes, `Premiacao.vaga_libertadores`/`vaga_sulamericana`
+só serviam pra destacar linha na tabela de classificação, sem NENHUM efeito
+na composição de Libertadores/Sul-Americana da temporada seguinte (bug
+relatado pelo usuário: "validar se as premiações [de Libertadores/Sul-
+Americana] estão funcionando"). Implementado em `src/career/
+mundo-persistente.ts` (`calcularMudancasContinentais`), chamado de
+`web/src/features/temporada/useTemporada.ts` junto com
+`calcularMudancasDeDivisao` (os `MudancaDeDivisao[]` das duas fontes são
+concatenados antes de `aplicarMudancasDeDivisao`, que já é genérico o
+bastante pra aplicar qualquer lista, venha de onde vier).
+
+**Escopo confirmado funcionando**: quando a soma das vagas RESOLVIDAS de um
+país nesta temporada bate EXATAMENTE com o tamanho atual da fatia dele na
+competição continental — condição de segurança que evita encolher a
+representação de um país quando só PARTE das competições que dão vaga pra
+ele estão modeladas (ver `docs/dados-a-verificar.md`). Cobre: `tabelaFinal`
+disponível → N primeiros colocados pra Libertadores, M seguintes pra
+Sul-Americana (Chile e Bolívia, ambos `pontos_corridos` puro); mata-mata sem
+`tabelaFinal` com `vaga_libertadores === 1` → campeão leva a vaga (Copa do
+Brasil).
+
+**Ainda não coberto** (fica como pendência, não implementado):
+- Brasil — Série A não tem `vaga_libertadores`/`vaga_sulamericana`
+  cadastrados (pendência de DADO, não de código — ver
+  `docs/dados-a-verificar.md`: "o número varia ano a ano pelo ranking CBF,
+  não é posição fixa simples"). Enquanto isso, o Brasil nunca é tocado por
+  este mecanismo (só a Copa do Brasil tem 1 vaga modelada, que sozinha nunca
+  bate com o tamanho atual da fatia brasileira — ver condição de segurança
+  acima) — a composição brasileira de Libertadores/Sul-Americana continua
+  sempre a estática do ano de referência, exatamente como antes desta
+  mudança (sem regressão, só sem cobertura ainda).
+- `vaga_sulamericana` de uma competição sem `tabelaFinal` (mata-mata) nunca é
+  resolvida — não tem como saber quem é o "vice"/2º colocado num chaveamento
+  eliminatório sem uma tabela por trás.
+- Formatos `turno`+`returno`/`tabela_acumulada`/`fase_quadrangular` (a
+  maioria dos outros países CONMEBOL — Argentina, Colômbia, Uruguai,
+  Paraguai, Peru, Equador, Venezuela) não expõem `tabelaFinal` ainda — mesma
+  pendência de `calcularMudancasDeDivisao` acima, extensão natural quando
+  alguém for aumentar a cobertura.
 
 ## Série D — preenchimento de vagas por temporada
 

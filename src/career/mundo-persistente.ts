@@ -20,11 +20,16 @@ import type { LinhaTabela } from "../simulation/season.js";
  * recebendo de um lado sem nunca devolver do outro). Confirmado funcionando: Brasileirão Série A ↔
  * B (as duas são `pontos_corridos` puro). **Ainda não cobre**: a maioria dos estaduais (fase_suica/
  * fase_grupos/turno-retorno não têm `tabelaFinal` ainda) nem Brasileirão B↔C↔D (Série C/D usam
- * fase_grupos+mata-mata). Também não cobre vagas de Copa do Brasil/Libertadores/Sul-Americana/
- * Série D concedidas a um estadual (`Premiacao.vaga_copa_do_brasil`/`vaga_libertadores`/
- * `vaga_sulamericana`/`vaga_serie_d`) — são inserções cross-competição em competições já complexas
- * (fases escalonadas, sorteio de grupos), fora de escopo por ora; fica documentado como pendência,
- * não implementado nem simulado.
+ * fase_grupos+mata-mata). Também não cobre vagas de Copa do Brasil/Série D concedidas a um estadual
+ * (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição em competições já
+ * complexas (fases escalonadas, sorteio de grupos), fora de escopo por ora.
+ *
+ * **Vagas de Libertadores/Sul-Americana** (`Premiacao.vaga_libertadores`/`vaga_sulamericana`) têm um
+ * mecanismo PRÓPRIO nesse mesmo arquivo (`calcularMudancasContinentais`) — não é promoção/
+ * rebaixamento entre níveis de uma hierarquia, é uma competição nacional alimentando uma competição
+ * continental de um país inteiro (várias competições podem contribuir pro mesmo país). Mesma
+ * ressalva de escopo condicional: só resolve quando o formato da competição de origem suporta
+ * `tabelaFinal` OU quando é uma vaga única pro campeão de um mata-mata (ver doc da função).
  */
 
 export interface CompeticaoParaMundoPersistente {
@@ -105,6 +110,99 @@ export function calcularMudancasDeDivisao(competicoes: CompeticaoParaMundoPersis
   }
 
   return [...mudancas.entries()].map(([competicaoId, { entram, saem }]) => ({ competicaoId, entram: [...entram], saem: [...saem] }));
+}
+
+/**
+ * Uma competição NACIONAL candidata a conceder vaga de Libertadores/Sul-Americana nesta temporada
+ * (ver `calcularMudancasContinentais`) — `pais` é `CampeonatoNacional.pais` (código ISO, ex: "BR",
+ * "CL"), não `chaveDeHierarquia` (que serve só pra `calcularMudancasDeDivisao`, um conceito
+ * diferente). `tabelaFinal`/`campeao` seguem a mesma disponibilidade condicional de
+ * `CompeticaoParaMundoPersistente` (só formatos suportados pelo motor incremental).
+ */
+export interface CompeticaoParaVagaContinental {
+  id: string;
+  pais: string;
+  premiacao: Premiacao;
+  /** Só quando o formato é `pontos_corridos` de fase única (mesma restrição de `tabelaFinal` em `calcularMudancasDeDivisao`) — usado pra tirar os N primeiros (Libertadores) e os M seguintes (Sul-Americana) colocados. */
+  tabelaFinal?: LinhaTabela[];
+  /** Campeão da competição — disponível mesmo pra formatos sem `tabelaFinal` (mata-mata inclusive, via `ResultadoCampeonatoSimples.campeao`). Só usado quando `premiacao.vaga_libertadores === 1` (regra inequívoca "campeão leva a vaga", ex: Copa do Brasil) — sem tabela pra ordenar 2º/3º/etc, uma vaga_sulamericana>0 sem `tabelaFinal` não é resolvida (ficaria ambíguo quem é o "vice"). */
+  campeao?: string;
+}
+
+/** Uma competição continental (Libertadores/Sul-Americana) e sua composição atual — usada como entrada e como saída de `calcularMudancasContinentais`. */
+export interface CompeticaoContinental {
+  id: string;
+  timesAtuais: string[];
+}
+
+/**
+ * Calcula a nova composição de Libertadores/Sul-Americana a partir das vagas concedidas por
+ * competições nacionais nesta temporada (`Premiacao.vaga_libertadores`/`vaga_sulamericana`) — sem
+ * isso, essas duas competições sempre recarregavam a MESMA lista estática de `times`, mesmo com
+ * campeonatos concedendo vaga de verdade (bug relatado pelo usuário: "validar se as premiações [de
+ * Libertadores/Sul-Americana] estão funcionando" — não estavam, só serviam pra destacar linha na
+ * tabela, sem efeito nenhum na temporada seguinte).
+ *
+ * **Escopo, de propósito, pra não arriscar ENCOLHER a representação de um país por acidente**: só
+ * troca a fatia de um país numa competição continental quando a soma das vagas RESOLVIDAS desta
+ * temporada bate EXATAMENTE com o tamanho atual da fatia desse país nela — se um país tem hoje 8
+ * clubes na Libertadores mas só uma das competições dele (ex: só a copa nacional, não a liga) tem
+ * `vaga_libertadores` modelada, a soma resolvida (1) não bate com 8, e a fatia desse país fica
+ * INTOCADA nesta rodada (mesmo comportamento de sempre) — evita o cenário de uma cobertura parcial
+ * substituir um país inteiro por 1 clube só. Fica documentado como pendência quando isso acontece
+ * (ver `docs/dados-a-verificar.md`, ex: Brasil — Série A não tem `vaga_libertadores`/
+ * `vaga_sulamericana` modelados, só a Copa do Brasil tem, então o Brasil nunca é tocado por este
+ * mecanismo até a Série A ganhar os campos).
+ */
+export function calcularMudancasContinentais(
+  competicoesNacionais: CompeticaoParaVagaContinental[],
+  paisPorClube: Map<string, string>,
+  libertadores: CompeticaoContinental,
+  sulamericana: CompeticaoContinental,
+): MudancaDeDivisao[] {
+  const porPais = new Map<string, CompeticaoParaVagaContinental[]>();
+  for (const competicao of competicoesNacionais) {
+    const lista = porPais.get(competicao.pais) ?? [];
+    lista.push(competicao);
+    porPais.set(competicao.pais, lista);
+  }
+
+  const libertadoresEntram: string[] = [];
+  const libertadoresSaem: string[] = [];
+  const sulamericanaEntram: string[] = [];
+  const sulamericanaSaem: string[] = [];
+
+  for (const [pais, competicoes] of porPais) {
+    const atuaisLibertadores = libertadores.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
+    const atuaisSulamericana = sulamericana.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
+
+    const novosLibertadores: string[] = [];
+    const novosSulamericana: string[] = [];
+    for (const competicao of competicoes) {
+      const vagaLibertadores = competicao.premiacao.vaga_libertadores ?? 0;
+      const vagaSulamericana = competicao.premiacao.vaga_sulamericana ?? 0;
+      if (competicao.tabelaFinal) {
+        if (vagaLibertadores > 0) novosLibertadores.push(...competicao.tabelaFinal.slice(0, vagaLibertadores).map((linha) => linha.clubeId));
+        if (vagaSulamericana > 0) novosSulamericana.push(...competicao.tabelaFinal.slice(vagaLibertadores, vagaLibertadores + vagaSulamericana).map((linha) => linha.clubeId));
+      } else if (competicao.campeao && vagaLibertadores === 1) {
+        novosLibertadores.push(competicao.campeao);
+      }
+    }
+
+    if (novosLibertadores.length > 0 && novosLibertadores.length === atuaisLibertadores.length) {
+      libertadoresEntram.push(...novosLibertadores);
+      libertadoresSaem.push(...atuaisLibertadores);
+    }
+    if (novosSulamericana.length > 0 && novosSulamericana.length === atuaisSulamericana.length) {
+      sulamericanaEntram.push(...novosSulamericana);
+      sulamericanaSaem.push(...atuaisSulamericana);
+    }
+  }
+
+  const resultado: MudancaDeDivisao[] = [];
+  if (libertadoresEntram.length > 0) resultado.push({ competicaoId: libertadores.id, entram: libertadoresEntram, saem: libertadoresSaem });
+  if (sulamericanaEntram.length > 0) resultado.push({ competicaoId: sulamericana.id, entram: sulamericanaEntram, saem: sulamericanaSaem });
+  return resultado;
 }
 
 /**

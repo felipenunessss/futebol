@@ -28,7 +28,13 @@ import { loadCampeonatosNacionais, loadClubes, loadEstaduais } from "../../data/
 import type { CampeonatoEstadual } from "@motor/schemas/championship.js";
 import type { CampeonatoNacional } from "@motor/schemas/national-championship.js";
 import { aplicarEscolhaDeFimDeTemporada, gerarPropostasDeFimDeTemporada, type EscolhaDeFimDeTemporada, type PropostasDeFimDeTemporada } from "@motor/career/fim-de-temporada.js";
-import { aplicarMudancasDeDivisao, calcularMudancasDeDivisao, type CompeticaoParaMundoPersistente } from "@motor/career/mundo-persistente.js";
+import {
+  aplicarMudancasDeDivisao,
+  calcularMudancasContinentais,
+  calcularMudancasDeDivisao,
+  type CompeticaoParaMundoPersistente,
+  type CompeticaoParaVagaContinental,
+} from "@motor/career/mundo-persistente.js";
 
 /** Velocidades de exibição da partida ao vivo escolhíveis pelo jogador (pedido do usuário:
  * "implementar velocidade na simulação do jogo"). ms de espera real por minuto simulado — "normal"
@@ -857,8 +863,27 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       tabelaFinal: resultadoDaTemporada.resultadoTemporada.competicoes.find((r) => r.campeonatoId === c.id)?.resultado?.tabelaFinal,
     }));
     const mudancasDeDivisao = calcularMudancasDeDivisao(competicoesParaMundo);
+
+    // Vagas de Libertadores/Sul-Americana (ver `calcularMudancasContinentais`) — mecanismo separado
+    // de promoção/rebaixamento: uma competição NACIONAL (identificada por `pais`, campo que só
+    // `CampeonatoNacional` tem) alimenta uma das 2 competições continentais fixas. Estaduais nunca
+    // concedem vaga continental direto (só via Copa do Brasil/Série D, fora de escopo — ver docs).
+    const competicoesParaVagaContinental: CompeticaoParaVagaContinental[] = campeonatosEfetivos
+      .filter((c): c is typeof c & { pais: string } => "pais" in c)
+      .map((c) => {
+        const resultado = resultadoDaTemporada.resultadoTemporada.competicoes.find((r) => r.campeonatoId === c.id)?.resultado;
+        return { id: c.id, pais: c.pais, premiacao: c.premiacao, tabelaFinal: resultado?.tabelaFinal, campeao: resultado?.campeao };
+      });
+    const paisPorClube = new Map(clubes.map((c) => [c.id, c.pais]));
+    const mudancasContinentais = calcularMudancasContinentais(
+      competicoesParaVagaContinental,
+      paisPorClube,
+      { id: "libertadores", timesAtuais: campeonatosEfetivos.find((c) => c.id === "libertadores")?.times ?? [] },
+      { id: "sulamericana", timesAtuais: campeonatosEfetivos.find((c) => c.id === "sulamericana")?.times ?? [] },
+    );
+
     const composicaoAtualMap = new Map(campeonatosEfetivos.map((c) => [c.id, c.times]));
-    const novaComposicaoMap = aplicarMudancasDeDivisao(composicaoAtualMap, mudancasDeDivisao);
+    const novaComposicaoMap = aplicarMudancasDeDivisao(composicaoAtualMap, [...mudancasDeDivisao, ...mudancasContinentais]);
     const novaComposicaoSalva: Record<string, string[]> = {};
     for (const base of campeonatos) {
       const novosTimes = novaComposicaoMap.get(base.id);
