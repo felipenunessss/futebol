@@ -7,6 +7,7 @@ import type { PropostaTransferencia } from "@motor/market/transfers.js";
 import { useCriacaoDeCarreira } from "./useCriacaoDeCarreira.js";
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
+import { formatarMoeda } from "../../lib/formato.js";
 
 const POSICOES: Posicao[] = ["goleiro", "zagueiro", "lateral", "volante", "meia", "atacante"];
 
@@ -297,7 +298,7 @@ function PassoProposta({
                 {nomeDoClube(clube, proposta.clubeOfertanteId)}
               </div>
               <div className="mt-1 text-sm text-slate-400">
-                Status: {proposta.statusOferecido} · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
+                Status: {proposta.statusOferecido} · R${formatarMoeda(termos.salarioMensal)}/mês + R${formatarMoeda(termos.luvas)} luvas · {termos.anos} anos
               </div>
               {campeonatosDoClube.length > 0 && (
                 <div className="mt-1.5 flex flex-wrap gap-1.5">

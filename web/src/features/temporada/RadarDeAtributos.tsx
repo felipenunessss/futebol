@@ -63,7 +63,7 @@ export function RadarDeAtributos({ atributos, atributosDaPosicao }: { atributos:
         const alinhamento = cosseno > 0.15 ? "start" : cosseno < -0.15 ? "end" : "middle";
         return (
           <text key={atributo} x={rotulo.x} y={rotulo.y} textAnchor={alinhamento} dominantBaseline="middle" fontSize={8.5} className="fill-slate-400">
-            {rotuloCurto(atributo)} ({atributos[atributo] ?? 0})
+            {rotuloCurto(atributo)} ({Math.round(atributos[atributo] ?? 0)})
           </text>
         );
       })}

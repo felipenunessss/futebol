@@ -29,6 +29,7 @@ import {
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
 import { extrairCorDominante } from "../../lib/corDoEscudo.js";
+import { formatarMoeda } from "../../lib/formato.js";
 import type { StatusNoClube } from "@motor/career/status.js";
 
 const ROTULO_POSICAO: Record<Posicao, string> = {
@@ -866,7 +867,7 @@ function ListaCompactaDeAtributos({ atributos, atributosDaPosicao }: { atributos
             <div className="w-12 h-1.5 rounded-full bg-slate-700 overflow-hidden shrink-0">
               <div className="h-full bg-emerald-500" style={{ width: `${Math.min(100, (valor / 99) * 100)}%` }} />
             </div>
-            <span className="tabular-nums text-slate-200 w-5 text-right shrink-0">{valor}</span>
+            <span className="tabular-nums text-slate-200 w-5 text-right shrink-0">{Math.round(valor)}</span>
           </div>
         );
       })}
@@ -1385,7 +1386,7 @@ function PromptDistribuicaoDePontos({ estado, onConfirmar }: { estado: EstadoDeC
                 <span className="text-xs text-slate-400 ml-2">{prioritario ? "prioritário, +1.5/ponto" : "+1/ponto"}</span>
               </span>
               <span className="font-medium tabular-nums">
-                {valorAtual}
+                {Math.round(valorAtual)}
                 {jaAlocado > 0 && <span className="text-emerald-400"> (+{jaAlocado})</span>}
               </span>
             </button>
@@ -2167,7 +2168,7 @@ function CardDePropostaFimDeTemporada({
         <div className="min-w-0">
           <div className="font-medium truncate">{titulo}</div>
           <div className="text-xs text-slate-400">
-            {ROTULO_STATUS[proposta.statusOferecido]} · R${termos.salarioMensal}/mês + R${termos.luvas} luvas · {termos.anos} anos
+            {ROTULO_STATUS[proposta.statusOferecido]} · R${formatarMoeda(termos.salarioMensal)}/mês + R${formatarMoeda(termos.luvas)} luvas · {termos.anos} anos
           </div>
         </div>
       </div>
