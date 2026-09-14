@@ -83,13 +83,22 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   (que é especificamente pra Série D do ano corrente).
 - **Vagas de Libertadores/Sul-Americana da Série A (Brasil)**: modeladas
   como aproximação posicional (`vaga_libertadores: 7`, `vaga_sulamericana:
-  7`) — o critério real varia ano a ano pelo ranking CBF, não é posição fixa
+  6`) — o critério real varia ano a ano pelo ranking CBF, não é posição fixa
   simples, e isso não foi apurado com precisão ainda; os números escolhidos
-  só batem com o TOTAL de clubes brasileiros na composição estática 2026 de
-  Libertadores/Sul-Americana (8 e 7 respectivamente, contando a vaga da
-  Copa do Brasil), pra `career/mundo-persistente.ts` `calcularMudancasContinentais`
-  poder atualizar a fatia brasileira de verdade a partir da temporada 2 (ver
-  `docs/regras-competicoes.md`) em vez de deixá-la sempre estática.
+  batem com o TOTAL de clubes brasileiros na composição estática 2026 de
+  Libertadores/Sul-Americana, MENOS 1 vaga de Sul-Americana (Botafogo) que
+  fica de fora do mecanismo de vaga por posição — ver bug corrigido em
+  `docs/motor-de-partida.md` seção 5.30 (Botafogo está cadastrado com papel
+  fixo de pré-classificatória em `sulamericana.json`/`libertadores.json`,
+  `calcularMudancasContinentais` nunca troca um clube desses). Mesma
+  correção aplicada a `chile_primera.json`/`bolivia_primera.json`
+  `vaga_sulamericana` (voltaram de 5 pra 4, batendo com o critério
+  pesquisado uma vez que o clube protegido de cada um — `ohiggins`/
+  `bolivar` — é excluído da contagem). Os números escolhidos servem pra
+  `career/mundo-persistente.ts` `calcularMudancasContinentais` poder
+  atualizar a fatia brasileira/chilena/boliviana de verdade a partir da
+  temporada 2 (ver `docs/regras-competicoes.md`) em vez de deixá-la sempre
+  estática.
 - **`vaga_libertadores` removida de Carioca A e Paulistão A1**: os dados
   tinham `vaga_libertadores: 1` em cada um, o que está incorreto pra era
   moderna do futebol brasileiro (bug relatado pelo usuário) — clubes se

@@ -94,14 +94,33 @@ Brasil).
 **Brasil agora coberto** (pedido do usuário: "quero que de fato temporada a
 temporada as vagas componham os times que participam das competições", não
 só Chile/Bolívia) — `brasileirao_serie_a.json` ganhou `vaga_libertadores: 7`/
-`vaga_sulamericana: 7` (aproximação posicional, mesmo espírito de todo país
+`vaga_sulamericana: 6` (aproximação posicional, mesmo espírito de todo país
 com critério real complexo/não pesquisado — ver `docs/dados-a-verificar.md`),
-calibrados pra bater exatamente com o total de clubes brasileiros na
-composição estática 2026 (8 de Libertadores, 7 de Sul-Americana, contando a
-vaga já modelada da Copa do Brasil). Também corrigido: `vaga_libertadores`
-removida de Carioca A e Paulistão A1 — clubes NÃO se classificam pra
-Libertadores via campeonato estadual na era moderna (bug relatado pelo
-usuário, dado estava errado).
+calibrados pra bater com o total de clubes brasileiros na composição
+estática 2026 MENOS 1 vaga de Sul-Americana (Botafogo, protegido — ver
+"clube com papel fixo de pré-classificatória" abaixo). Também corrigido:
+`vaga_libertadores` removida de Carioca A e Paulistão A1 — clubes NÃO se
+classificam pra Libertadores via campeonato estadual na era moderna (bug
+relatado pelo usuário, dado estava errado).
+
+**Bug crítico corrigido: clube com papel fixo de pré-classificatória
+sendo trocado por engano, derrubando Libertadores+Sul-Americana inteiras**
+(bug urgente relatado pelo usuário: clube se classificou pra Sul-Americana
+mas ela sumiu da lista de competições na temporada seguinte). Causa: alguns
+clubes (`botafogo` no Brasil, `ohiggins` no Chile, `bolivar` na Bolívia)
+estão cadastrados TANTO na fatia direta de Sul-Americana quanto numa etapa
+pré-classificatória de Libertadores (`formato.mata_mata.etapas[].entrantes`,
+`simulation/incremental.ts`) — a troca de vaga por país podia remover
+justamente esse clube, quebrando o equilíbrio "diretos vs pré-
+classificatórios" que o motor incremental depende pra achar o corte entre
+as duas fases, e a competição inteira virava erro (some da temporada de
+QUALQUER jogador, não só de quem ganhou a vaga). `calcularMudancasContinentais`
+ganhou `clubesProtegidos` — esses clubes nunca são trocados nem contam na
+fatia "atual" de um país; `vaga_sulamericana` de Chile/Bolívia voltou de 5
+pra 4 (a fonte pesquisada já dizia 4 — o "5" só existia por causa do bug) e
+a do Brasil foi ajustada de 7 pra 6 (só as vagas de fato controladas pela
+posição na tabela). Ver `docs/motor-de-partida.md` seção 5.30 pro
+detalhamento completo e validação com dado real.
 
 **Deduplicação entre vias** (bug real encontrado com dado de verdade: o
 campeão da Copa do Brasil também terminando entre os 7 primeiros do

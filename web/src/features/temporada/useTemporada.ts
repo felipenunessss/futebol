@@ -915,11 +915,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         return { id: c.id, pais: c.pais, premiacao: c.premiacao, tabelaFinal: resultado?.tabelaFinal, campeao: resultado?.campeao };
       });
     const paisPorClube = new Map(clubes.map((c) => [c.id, c.pais]));
+    // Clubes com papel fixo de pré-classificatória em Libertadores/Sul-Americana (ver doc de
+    // `calcularMudancasContinentais`) — nunca trocados pela vaga de país, só quem entra "direto".
+    const clubesProtegidosContinental = new Set(
+      ["libertadores", "sulamericana"].flatMap((id) => campeonatosEfetivos.find((c) => c.id === id)?.formato.mata_mata?.etapas?.flatMap((etapa) => etapa.entrantes ?? []) ?? []),
+    );
     const mudancasContinentais = calcularMudancasContinentais(
       competicoesParaVagaContinental,
       paisPorClube,
       { id: "libertadores", timesAtuais: campeonatosEfetivos.find((c) => c.id === "libertadores")?.times ?? [] },
       { id: "sulamericana", timesAtuais: campeonatosEfetivos.find((c) => c.id === "sulamericana")?.times ?? [] },
+      clubesProtegidosContinental,
     );
 
     const composicaoAtualMap = new Map(campeonatosEfetivos.map((c) => [c.id, c.times]));

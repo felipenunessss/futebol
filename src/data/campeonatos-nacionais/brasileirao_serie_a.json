@@ -13,8 +13,8 @@
   "premiacao": {
     "vaga_libertadores": 7,
     "vaga_libertadores_criterio": "Aproximação por posição na tabela (não é o critério real — depende do ranking histórico da CBF, mais complexo, não modelado — ver docs/dados-a-verificar.md). Número escolhido pra bater com a composição estática confirmada de 2026 de Libertadores (8 clubes brasileiros no total, 1 já vem da Copa do Brasil).",
-    "vaga_sulamericana": 7,
-    "vaga_sulamericana_criterio": "Mesma aproximação de vaga_libertadores. Cobre as 7 vagas brasileiras de Sul-Americana da composição estática de 2026 por inteiro (a vaga_sulamericana da Copa do Brasil não é resolvida por temporada — não dá pra saber quem seria o 'vice' de um mata-mata sem tabela — então fica sem efeito prático, e a Série A assume o total).",
+    "vaga_sulamericana": 6,
+    "vaga_sulamericana_criterio": "Mesma aproximação de vaga_libertadores. Cobre 6 das 7 vagas brasileiras de Sul-Americana da composição estática de 2026 (a 7ª, Botafogo, está cadastrado com papel fixo de pré-classificatória em sulamericana.json/libertadores.json — `calcularMudancasContinentais` nunca troca um clube desses, ver `clubesProtegidos` — então só as outras 6 vagas, preenchidas por posição na tabela, são de fato atualizadas temporada a temporada; a vaga_sulamericana da Copa do Brasil não é resolvida por temporada — não dá pra saber quem seria o 'vice' de um mata-mata sem tabela — então fica sem efeito prático).",
     "rebaixamento_proxima_divisao": 4
   },
   "classicos": [

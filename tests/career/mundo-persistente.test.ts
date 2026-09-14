@@ -311,6 +311,61 @@ describe("calcularMudancasContinentais", () => {
     const mudancas = calcularMudancasContinentais([semVaga], paisPorClube, { id: "libertadores", timesAtuais: [] }, { id: "sulamericana", timesAtuais: [] });
     expect(mudancas).toEqual([]);
   });
+
+  describe("clubesProtegidos (papel fixo de pré-classificatória)", () => {
+    // Bug real: um clube com papel fixo de pré-classificatória (`formato.mata_mata.etapas[].entrantes`,
+    // ex: Bolívia/Chile em Sul-Americana) contando como parte da fatia "atual" do país fazia a troca
+    // remover exatamente ESSE clube — mesmo total de país (N-por-N), mas o clube errado saía, quebrando
+    // o equilíbrio "direto vs pré-classificatório" que `derivarCortePreClassificatorio`
+    // (`simulation/incremental.ts`) depende — a competição inteira sumia da temporada seguinte.
+    it("clube protegido não conta na fatia atual do país nem pode ser trocado", () => {
+      const chile: CompeticaoParaVagaContinental = {
+        id: "chile_primera",
+        pais: "CL",
+        premiacao: { vaga_sulamericana: 1 },
+        tabelaFinal: ["cl_novo1"].map(linha),
+      };
+      // cl6 tem papel fixo de pré-classificatória — só cl5 conta como fatia "de verdade" (1 vaga).
+      const sulamericana = { id: "sulamericana", timesAtuais: ["cl5", "cl6"] };
+      const clubesProtegidos = new Set(["cl6"]);
+
+      const mudancas = calcularMudancasContinentais([chile], paisPorClube, { id: "libertadores", timesAtuais: [] }, sulamericana, clubesProtegidos);
+
+      const mudancaSula = mudancas.find((m) => m.competicaoId === "sulamericana")!;
+      expect(mudancaSula.entram).toEqual(["cl_novo1"]);
+      expect(mudancaSula.saem).toEqual(["cl5"]); // cl6 (protegido) nunca sai
+    });
+
+    it("sem excluir o protegido, a fatia atual (2) não bateria com a vaga resolvida (1) e a troca seria pulada — confirma que a proteção é o que destrava a troca", () => {
+      const chile: CompeticaoParaVagaContinental = {
+        id: "chile_primera",
+        pais: "CL",
+        premiacao: { vaga_sulamericana: 1 },
+        tabelaFinal: ["cl_novo1"].map(linha),
+      };
+      const sulamericana = { id: "sulamericana", timesAtuais: ["cl5", "cl6"] };
+
+      const mudancas = calcularMudancasContinentais([chile], paisPorClube, { id: "libertadores", timesAtuais: [] }, sulamericana);
+
+      expect(mudancas.find((m) => m.competicaoId === "sulamericana")).toBeUndefined();
+    });
+
+    it("um clube protegido nunca é escolhido como novo entrante, mesmo se aparecer bem colocado na tabela", () => {
+      const chile: CompeticaoParaVagaContinental = {
+        id: "chile_primera",
+        pais: "CL",
+        premiacao: { vaga_sulamericana: 1 },
+        tabelaFinal: ["cl6"].map(linha), // cl6 é protegido — não pode ser "promovido" por essa via
+      };
+      const sulamericana = { id: "sulamericana", timesAtuais: ["cl5"] };
+      const clubesProtegidos = new Set(["cl6"]);
+
+      const mudancas = calcularMudancasContinentais([chile], paisPorClube, { id: "libertadores", timesAtuais: [] }, sulamericana, clubesProtegidos);
+
+      // novosSulamericana fica vazio (cl6 filtrado) — 0 ≠ 1 (fatia atual), troca é pulada.
+      expect(mudancas.find((m) => m.competicaoId === "sulamericana")).toBeUndefined();
+    });
+  });
 });
 
 describe("aplicarMudancasDeDivisao", () => {

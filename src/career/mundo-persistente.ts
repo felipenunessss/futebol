@@ -194,7 +194,25 @@ export function calcularMudancasContinentais(
   paisPorClube: Map<string, string>,
   libertadores: CompeticaoContinental,
   sulamericana: CompeticaoContinental,
+  /**
+   * Clubes com um papel estrutural fixo na fase pré-classificatória/mata-mata de Libertadores/Sul-
+   * Americana (`formato.mata_mata.etapas[].entrantes`, ver `simulation/incremental.ts`
+   * `derivarCortePreClassificatorio`) — nunca trocados por este mecanismo, mesmo que o país deles
+   * mude de composição. Sem isso, um clube "direto" (vaga_libertadores/vaga_sulamericana = entrada
+   * direta na fase de grupos) podia acabar sendo trocado por um clube que na verdade tinha papel de
+   * pré-classificatório (ou vice-versa) — o total de clubes da competição continua batendo (a troca é
+   * sempre N-por-N dentro do mesmo país), mas o EQUILÍBRIO entre "quantos entram direto" e "quantos
+   * vêm de pré-classificatória" quebra, e `derivarCortePreClassificatorio` não consegue mais achar o
+   * corte exato entre as duas fases — quebrando a competição inteira (bug real: clube brasileiro
+   * ganhando vaga de Sul-Americana, temporada seguinte a competição sumia da lista do jogador, porque
+   * a troca de país (Chile/Bolívia, que têm clubes com papel fixo de pré-classificatória) trocou um
+   * clube pré-classificatório por um "direto" sem querer). Passe vazio/undefined se a competição não
+   * tiver etapas pré-classificatórias nomeadas (maioria dos casos).
+   */
+  clubesProtegidos?: Set<string>,
 ): MudancaDeDivisao[] {
+  const protegido = (id: string) => clubesProtegidos?.has(id) ?? false;
+
   const porPais = new Map<string, CompeticaoParaVagaContinental[]>();
   for (const competicao of competicoesNacionais) {
     const lista = porPais.get(competicao.pais) ?? [];
@@ -208,8 +226,8 @@ export function calcularMudancasContinentais(
   const sulamericanaSaem: string[] = [];
 
   for (const [pais, competicoes] of porPais) {
-    const atuaisLibertadores = libertadores.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
-    const atuaisSulamericana = sulamericana.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
+    const atuaisLibertadores = libertadores.timesAtuais.filter((id) => paisPorClube.get(id) === pais && !protegido(id));
+    const atuaisSulamericana = sulamericana.timesAtuais.filter((id) => paisPorClube.get(id) === pais && !protegido(id));
 
     const novosLibertadoresBruto: string[] = [];
     const novosSulamericanaBruto: string[] = [];
@@ -217,9 +235,9 @@ export function calcularMudancasContinentais(
       const vagaLibertadores = competicao.premiacao.vaga_libertadores ?? 0;
       const vagaSulamericana = competicao.premiacao.vaga_sulamericana ?? 0;
       if (competicao.tabelaFinal) {
-        if (vagaLibertadores > 0) novosLibertadoresBruto.push(...competicao.tabelaFinal.slice(0, vagaLibertadores).map((linha) => linha.clubeId));
-        if (vagaSulamericana > 0) novosSulamericanaBruto.push(...competicao.tabelaFinal.slice(vagaLibertadores, vagaLibertadores + vagaSulamericana).map((linha) => linha.clubeId));
-      } else if (competicao.campeao && vagaLibertadores === 1) {
+        if (vagaLibertadores > 0) novosLibertadoresBruto.push(...competicao.tabelaFinal.slice(0, vagaLibertadores).map((linha) => linha.clubeId).filter((id) => !protegido(id)));
+        if (vagaSulamericana > 0) novosSulamericanaBruto.push(...competicao.tabelaFinal.slice(vagaLibertadores, vagaLibertadores + vagaSulamericana).map((linha) => linha.clubeId).filter((id) => !protegido(id)));
+      } else if (competicao.campeao && vagaLibertadores === 1 && !protegido(competicao.campeao)) {
         novosLibertadoresBruto.push(competicao.campeao);
       }
     }
