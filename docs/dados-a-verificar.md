@@ -99,6 +99,28 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   continental nenhuma, correto).
 - **Rebaixamento da Série B (Brasil)**: mantido `4` por padrão histórico
   conhecido, mas não reconfirmado especificamente pra 2026.
+- **Série D `acesso_proxima_divisao`: 6 → 4** (bug relatado pelo usuário:
+  "os semifinalistas deveriam subir pra série C e não funcionou"). O real
+  critério de acesso da Série D é "os 4 semifinalistas sobem" (confiança
+  boa, é regra estável e conhecida) — o `6` anterior não batia com isso
+  (nem com nenhuma etapa nomeada do mata-mata: oitavas=8, quartas=4/
+  semifinal=4/final=2, nenhuma dá 6) e bloqueava a implementação de
+  `career/mundo-persistente.ts` (`semifinalistas.length` nunca ia bater com
+  um `acesso` que não fosse 4). Corrigido pra `4`.
+- **Série C `rebaixamento_proxima_divisao`: 2 → 4**: mudado pra CASAR
+  exatamente com a promoção da Série D (4 semifinalistas) — sem isso, a
+  Série D perderia 4 clubes/temporada pra cima sem receber os 4 de volta
+  (só 2), quebrando a contagem de 96 times (16 grupos × 6) já na 2ª
+  temporada simulada (erro de validação em `dividirEmGruposValidado`,
+  bug crítico — travaria a Série D de vez pra aquela carreira). Confiança
+  **moderada, não fonte-confirmada** — decisão tomada por necessidade de
+  manter a simulação estável, não por pesquisa direta contra o critério
+  real de 2026 da Série C (que pode legitimamente ser diferente de 4). Se
+  alguém confirmar o número real, ajustar aqui — só lembrar que qualquer
+  valor diferente de 4 volta a quebrar a simetria com a Série D enquanto
+  `vaga_serie_d` (preenchimento por estaduais, ver
+  `docs/regras-competicoes.md`) não estiver implementado como reposição
+  alternativa.
 - **Copa do Brasil — 3 estaduais sem pesquisa dedicada de vaga_serie_d**
   (`paulistao_a1`, `candangao_1`, `capixaba_1`): usam a regra padrão (1
   vaga, melhor colocado sem competição nacional) em vez de critério

@@ -81,6 +81,33 @@ describe("criarCompeticaoIncremental — pontos_corridos", () => {
   });
 });
 
+describe("criarCompeticaoIncremental — fase_grupos + mata_mata (Brasileirão Série D)", () => {
+  const times = Array.from({ length: 12 }, (_, i) => `t${i + 1}`); // 2 grupos de 6, classificam 4 cada = 8 no mata-mata (quartas de 8 -> semifinal de 4 -> final de 2)
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "serie_d_teste",
+    formato: {
+      fase_grupos: { num_grupos: 2, times_por_grupo: 6, ida_e_volta: true, classificam_por_grupo: 4 },
+      mata_mata: { fases: ["quartas", "semifinal", "final"], ida_e_volta: false },
+    },
+    times,
+  };
+
+  it("bug real corrigido: expõe semifinalistas (quem jogou a etapa 'semifinal', vencedores E perdedores) — usado por career/mundo-persistente.ts quando o formato não tem tabelaFinal", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 30 }, () => Math.random());
+    for (let semana = 1; semana <= 30; semana++) {
+      await avancarSemana(estado, semana, () => Math.random());
+    }
+    expect(estado.concluida).toBe(true);
+    expect(estado.tabelaFinal).toBeUndefined(); // formato multi-grupo, sem classificação ordenada única
+    expect(estado.semifinalistas).toBeDefined();
+    expect(estado.semifinalistas).toHaveLength(4);
+    expect(new Set(estado.semifinalistas)).toEqual(new Set(estado.semifinalistas)); // sem duplicata (4 times distintos)
+    expect(new Set(estado.semifinalistas!).size).toBe(4);
+    expect(estado.semifinalistas).toContain(estado.campeao); // o campeão obrigatoriamente passou pela semifinal
+  });
+});
+
 describe("criarCompeticaoIncremental — fase_suica + mata_mata (Paulistão/Gauchão)", () => {
   const times = Array.from({ length: 8 }, (_, i) => `t${i + 1}`);
   const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
@@ -411,6 +438,31 @@ describe("criarCompeticaoIncremental — pontos_corridos + fase final por classi
     const estado = criarCompeticaoIncremental(campeonato, ratingsFavorecendoA, undefined, { semanaInicio: 1, semanaFim: 20 }, () => 0.02);
     for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => 0.02);
     expect(estado.campeao).toBe("a");
+  });
+});
+
+describe("criarCompeticaoIncremental — fase_grupos (1 grupo) + fase_quadrangular + final_estadual (Brasileirão Série C)", () => {
+  const times = Array.from({ length: 8 }, (_, i) => `t${i + 1}`);
+  const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+  const campeonato: CampeonatoSimulavel = {
+    id: "serie_c_teste",
+    formato: {
+      fase_grupos: { num_grupos: 1, times_por_grupo: 8, ida_e_volta: false, classificam_por_grupo: 4 },
+      fase_quadrangular: { ativa: true, num_grupos: 2, times_por_grupo: 2, classificam_por_grupo: 1 },
+      final_estadual: { criterio: "lideres_dos_quadrangulares_disputam_titulo", ida_e_volta: false },
+    },
+    times,
+  };
+
+  it("bug real corrigido: expõe tabelaFinal da fase de grupos (1 grupo só = classificação inequívoca) — habilita career/mundo-persistente.ts pra Série C↔B e C↔D", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 20 }, () => Math.random());
+    for (let semana = 1; semana <= 20; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(estado.tabelaFinal).toBeDefined();
+    expect(estado.tabelaFinal!.map((l) => l.clubeId).sort()).toEqual([...times].sort());
+    // O campeão vem do quadrangular/final, não necessariamente do 1º colocado da fase de grupos —
+    // tabelaFinal é a classificação da fase de GRUPOS, uma coisa DIFERENTE de "quem é campeão".
+    expect(times).toContain(estado.campeao);
   });
 });
 

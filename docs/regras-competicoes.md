@@ -22,22 +22,34 @@ em `EstadoDeCarreira.composicaoDasCompeticoes` antes de montar a temporada, e
 recalcula/persiste a sobreposição depois que ela termina).
 
 **Escopo confirmado funcionando**: promoção/rebaixamento entre 2 divisões da
-MESMA hierarquia (mesmo estado, pro Brasil, ou mesmo país) quando AS DUAS só
-usam `formato.pontos_corridos` puro (sem mata-mata/fase suíça/turno-retorno
-anexado) — é o único tipo de formato que hoje expõe uma classificação final
-extraível (`tabelaFinal`). Confirmado com dado real: Brasileirão Série A ↔ B
-(20 times cada, 4 sobem/4 descem, testado com `avancarSemana` até o fim das
-duas competições).
+MESMA hierarquia (mesmo estado, pro Brasil, ou mesmo país) quando AS DUAS
+conseguem expor um sinal de "quem sobe/desce" — `tabelaFinal` (`pontos_corridos`
+puro, OU `fase_grupos` de 1 grupo só, ex: Brasileirão Série C) ou
+`semifinalistas` (mata-mata com uma etapa chamada "semifinal", só serve pra
+ACESSO — sem ordem dentro do conjunto, não dá pra tirar "os piores
+colocados" dele pra rebaixamento). Confirmado com dado real:
+- Brasileirão Série A ↔ B (20 times cada, 4 sobem/4 descem).
+- Brasileirão Série B ↔ C ↔ D em CADEIA (bug relatado pelo usuário: "na
+  série D os semifinalistas deveriam subir pra série C e não funcionou") —
+  Série D (fase_grupos de 16 grupos + mata_mata) não tem `tabelaFinal`, mas
+  expõe `semifinalistas` (os 4 que jogaram a etapa "semifinal", vencedores
+  e perdedores); Série C (fase_grupos de 1 grupo + fase_quadrangular +
+  final_estadual) ganhou `tabelaFinal` da sua fase de grupos, habilitando
+  tanto o acesso dela pra B quanto o rebaixamento dela pra D. Ajuste de
+  dado necessário pra fechar a simetria (ver `docs/dados-a-verificar.md`):
+  `brasileirao_serie_d.json` `acesso_proxima_divisao` 6→4 (não batia com
+  nenhuma etapa nomeada do mata-mata) e `brasileirao_serie_c.json`
+  `rebaixamento_proxima_divisao` 2→4 (precisa casar com os 4 semifinalistas
+  da D pra não drenar a Série D ao longo de várias temporadas — sem isso, a
+  Série D perderia 4 times/temporada sem receber nenhum de volta, quebrando
+  a contagem de 96 times exigida por `dividirEmGruposValidado` já na 2ª
+  temporada simulada). Confirmado com dado real: B/C mantêm 20 times cada,
+  D mantém 96, nenhum clube duplicado ou perdido, em todas as direções
+  simultaneamente (A↔B, C→B, B→C, D→C, C→D).
 
 **Ainda não coberto** (fica como pendência, não implementado):
-- A maioria dos estaduais (a maior parte usa `fase_suica`/`fase_grupos`/
-  `turno`+`returno`, nenhum expõe `tabelaFinal` ainda).
-- Brasileirão Série B↔C e C↔D (Série C usa `fase_grupos`+`fase_quadrangular`+
-  `final_estadual`; Série D usa `fase_grupos`+`mata_mata` — nenhuma das duas
-  tem `tabelaFinal`). Por design, uma troca só acontece quando AS DUAS
-  divisões do par suportam `tabelaFinal` (ver comentário em
-  `mundo-persistente.ts`) — evita drenar/inchar uma divisão sem nunca
-  devolver do outro lado.
+- A maioria dos estaduais (a maior parte usa `fase_suica`/`turno`+`returno`,
+  nenhum expõe `tabelaFinal`/`semifinalistas` ainda).
 - Vagas de Copa do Brasil/Série D concedidas a um estadual
   (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição
   em competições já com fases escalonadas/sorteio de grupos (a própria Série D
@@ -48,10 +60,11 @@ duas competições).
 
 Extensão natural pra quando alguém for aumentar a cobertura: expor
 `tabelaFinal` nas demais receitas de `incremental.ts` que já têm uma
-classificação por trás (`fase_grupos` sem mata-mata teria uma tabela por
-grupo, não uma única — precisaria decidir o que "classificação final" quer
-dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra formatos
-multi-grupo).
+classificação por trás (`fase_grupos` com MAIS de 1 grupo teria uma tabela
+por grupo, não uma única — precisaria decidir o que "classificação final"
+quer dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra
+formatos multi-grupo de verdade); ou expor `semifinalistas`-like em outros
+mata-matas com etapa nomeada relevante.
 
 ## Vagas de Libertadores/Sul-Americana (implementado, escopo parcial)
 

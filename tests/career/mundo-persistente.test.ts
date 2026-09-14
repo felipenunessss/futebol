@@ -118,6 +118,79 @@ describe("calcularMudancasDeDivisao", () => {
     // (chave diferente) não recebe nada dele.
     expect(mudancas).toEqual([]);
   });
+
+  it("bug real corrigido: `semifinalistas` promove pra divisão de cima quando não há tabelaFinal (Série D sem classificação ordenada, só sabe quem chegou à semifinal)", () => {
+    const serieD: CompeticaoParaMundoPersistente = {
+      id: "serie_d",
+      chaveDeHierarquia: "nacional:BR",
+      nivel: 4,
+      premiacao: { acesso_proxima_divisao: 4 },
+      semifinalistas: ["d1", "d2", "d3", "d4"],
+    };
+    const serieC: CompeticaoParaMundoPersistente = { id: "serie_c", chaveDeHierarquia: "nacional:BR", nivel: 3, premiacao: {}, tabelaFinal: ["c1", "c2"].map(linha) };
+
+    const mudancas = calcularMudancasDeDivisao([serieD, serieC]);
+
+    const mudancaD = mudancas.find((m) => m.competicaoId === "serie_d")!;
+    const mudancaC = mudancas.find((m) => m.competicaoId === "serie_c")!;
+    expect(mudancaD.saem.sort()).toEqual(["d1", "d2", "d3", "d4"]);
+    expect(mudancaC.entram.sort()).toEqual(["d1", "d2", "d3", "d4"]);
+  });
+
+  it("`semifinalistas` só promove quando o tamanho bate EXATAMENTE com acesso_proxima_divisao — evita ambiguidade de quem fica de fora", () => {
+    const serieD: CompeticaoParaMundoPersistente = {
+      id: "serie_d",
+      chaveDeHierarquia: "nacional:BR",
+      nivel: 4,
+      premiacao: { acesso_proxima_divisao: 6 }, // não bate com os 4 semifinalistas reais
+      semifinalistas: ["d1", "d2", "d3", "d4"],
+    };
+    const serieC: CompeticaoParaMundoPersistente = { id: "serie_c", chaveDeHierarquia: "nacional:BR", nivel: 3, premiacao: {}, tabelaFinal: ["c1", "c2"].map(linha) };
+
+    expect(calcularMudancasDeDivisao([serieD, serieC])).toEqual([]);
+  });
+
+  it("bug real corrigido: rebaixamento consegue entrar numa divisão que só tem `semifinalistas` (não `tabelaFinal`) — a divisão só precisa provar que foi simulada essa temporada, não precisa ter ordem pra RECEBER times", () => {
+    const serieC: CompeticaoParaMundoPersistente = {
+      id: "serie_c",
+      chaveDeHierarquia: "nacional:BR",
+      nivel: 3,
+      premiacao: { rebaixamento_proxima_divisao: 4 },
+      tabelaFinal: ["c1", "c2", "c3", "c4", "c5", "c6"].map(linha),
+    };
+    const serieD: CompeticaoParaMundoPersistente = {
+      id: "serie_d",
+      chaveDeHierarquia: "nacional:BR",
+      nivel: 4,
+      premiacao: { acesso_proxima_divisao: 4 },
+      semifinalistas: ["d1", "d2", "d3", "d4"],
+    };
+
+    const mudancas = calcularMudancasDeDivisao([serieC, serieD]);
+
+    // Os 2 sentidos devem acontecer na MESMA rodada: D promove seus 4 semifinalistas pra C, E C
+    // rebaixa seus 4 últimos colocados pra D — sem essa simetria, a Série D encolheria 4/temporada
+    // (bug real: só a promoção funcionava, o rebaixamento de volta ficava bloqueado).
+    const mudancaC = mudancas.find((m) => m.competicaoId === "serie_c")!;
+    const mudancaD = mudancas.find((m) => m.competicaoId === "serie_d")!;
+    expect(mudancaC.saem.sort()).toEqual(["c3", "c4", "c5", "c6"]); // 4 últimos colocados
+    expect(mudancaD.entram.sort()).toEqual(["c3", "c4", "c5", "c6"]);
+    expect(mudancaD.saem.sort()).toEqual(["d1", "d2", "d3", "d4"]);
+    expect(mudancaC.entram.sort()).toEqual(["d1", "d2", "d3", "d4"]);
+  });
+
+  it("`semifinalistas` nunca é usado pra rebaixamento (sem ordem dentro do conjunto pra saber 'os piores')", () => {
+    const serieD: CompeticaoParaMundoPersistente = {
+      id: "serie_d",
+      chaveDeHierarquia: "nacional:BR",
+      nivel: 4,
+      premiacao: { rebaixamento_proxima_divisao: 2 }, // Série D não teria rebaixamento de verdade, mas testando o limite da função
+      semifinalistas: ["d1", "d2", "d3", "d4"],
+    };
+    const serieE: CompeticaoParaMundoPersistente = { id: "serie_e", chaveDeHierarquia: "nacional:BR", nivel: 5, premiacao: {}, semifinalistas: ["e1", "e2"] };
+
+    expect(calcularMudancasDeDivisao([serieD, serieE])).toEqual([]);
+  });
 });
 
 describe("calcularMudancasContinentais", () => {

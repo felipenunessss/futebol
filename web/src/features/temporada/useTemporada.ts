@@ -879,13 +879,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     // da classificação final desta temporada (só disponível pra competições `pontos_corridos`
     // puras por enquanto) e persiste só o que realmente divergiu da referência estática original,
     // pra `composicaoDasCompeticoes` não crescer sem necessidade.
-    const competicoesParaMundo: CompeticaoParaMundoPersistente[] = campeonatosEfetivos.map((c) => ({
-      id: c.id,
-      chaveDeHierarquia: chaveDeHierarquia(c),
-      nivel: c.nivel,
-      premiacao: c.premiacao,
-      tabelaFinal: resultadoDaTemporada.resultadoTemporada.competicoes.find((r) => r.campeonatoId === c.id)?.resultado?.tabelaFinal,
-    }));
+    const competicoesParaMundo: CompeticaoParaMundoPersistente[] = campeonatosEfetivos.map((c) => {
+      const resultado = resultadoDaTemporada.resultadoTemporada.competicoes.find((r) => r.campeonatoId === c.id)?.resultado;
+      return { id: c.id, chaveDeHierarquia: chaveDeHierarquia(c), nivel: c.nivel, premiacao: c.premiacao, tabelaFinal: resultado?.tabelaFinal, semifinalistas: resultado?.semifinalistas };
+    });
     const mudancasDeDivisao = calcularMudancasDeDivisao(competicoesParaMundo);
 
     // Vagas de Libertadores/Sul-Americana (ver `calcularMudancasContinentais`) — mecanismo separado

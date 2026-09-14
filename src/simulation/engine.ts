@@ -84,6 +84,8 @@ export interface ResultadoCampeonatoSimples {
    * por `career/mundo-persistente.ts` pra promoção/rebaixamento entre temporadas.
    */
   tabelaFinal?: LinhaTabela[];
+  /** Ver `simulation/incremental.ts` `ContextoDePrograma.semifinalistas` — mesma ressalva de `tabelaFinal` (só o motor incremental popula). */
+  semifinalistas?: string[];
 }
 
 export interface CampeonatoSimulavel {

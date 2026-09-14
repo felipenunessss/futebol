@@ -17,12 +17,21 @@ import type { LinhaTabela } from "../simulation/season.js";
  * par conseguem expor uma `tabelaFinal` (hoje só `pontos_corridos` puro, sem mata-mata — ver
  * `simulation/incremental.ts` `ContextoDePrograma.tabelaFinal`); se só uma das duas suportar,
  * nenhuma troca acontece nesse par (evita drenar/inchar uma divisão ao longo de várias temporadas
- * recebendo de um lado sem nunca devolver do outro). Confirmado funcionando: Brasileirão Série A ↔
- * B (as duas são `pontos_corridos` puro). **Ainda não cobre**: a maioria dos estaduais (fase_suica/
- * fase_grupos/turno-retorno não têm `tabelaFinal` ainda) nem Brasileirão B↔C↔D (Série C/D usam
- * fase_grupos+mata-mata). Também não cobre vagas de Copa do Brasil/Série D concedidas a um estadual
- * (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição em competições já
- * complexas (fases escalonadas, sorteio de grupos), fora de escopo por ora.
+ * recebendo de um lado sem nunca devolver do outro). Confirmado funcionando: Brasileirão Série A/B
+ * (as duas são `pontos_corridos` puro), e Série B/C/D em cadeia — Série D não tem `tabelaFinal`
+ * (fase_grupos com 16 grupos, sem classificação ordenada), mas expõe `semifinalistas` como sinal
+ * alternativo pra ACESSO (ver campo abaixo); Série C ganhou `tabelaFinal` da sua fase de grupos
+ * único, que habilita tanto o acesso dela própria pra B quanto o REBAIXAMENTO dela pra D — o
+ * rebaixamento entrando numa divisão que só tem `semifinalistas` (não `tabelaFinal`) funciona
+ * porque a checagem de "divisão vizinha rastreável" aceita QUALQUER um dos dois sinais como prova
+ * de que a divisão foi simulada essa temporada (não precisa ordem pra RECEBER times, só pra decidir
+ * quem SAI de uma). Sem isso, a Série D promoveria 4 semifinalistas/temporada pra C sem nunca
+ * receber de volta os 4 que a C rebaixa — bug real encontrado com dado real (Série D caindo de 96
+ * pra 92 times já na 1ª aplicação). **Ainda não cobre**: a maioria dos estaduais (fase_suica/
+ * fase_grupos/turno-retorno não têm `tabelaFinal` ainda). Também não cobre vagas de Copa do
+ * Brasil/Série D concedidas a um estadual (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) —
+ * inserções cross-competição em competições já complexas (fases escalonadas, sorteio de grupos),
+ * fora de escopo por ora.
  *
  * **Vagas de Libertadores/Sul-Americana** (`Premiacao.vaga_libertadores`/`vaga_sulamericana`) têm um
  * mecanismo PRÓPRIO nesse mesmo arquivo (`calcularMudancasContinentais`) — não é promoção/
@@ -43,8 +52,17 @@ export interface CompeticaoParaMundoPersistente {
   premiacao: Premiacao;
   /** Classificação final desta temporada, do 1º ao último colocado — `undefined` quando o formato
    * não suporta extração ainda (ver docs no topo do arquivo). Sem isso, a competição não participa
-   * de nenhuma mudança de divisão nesta rodada (nem como origem nem como destino). */
+   * de nenhuma mudança de divisão nesta rodada (nem como origem nem como destino), A NÃO SER que
+   * `semifinalistas` esteja presente (ver campo abaixo). */
   tabelaFinal?: LinhaTabela[];
+  /** Alternativa a `tabelaFinal` pra `acesso_proxima_divisao` quando o formato não tem uma
+   * classificação ordenada (`fase_grupos`+`mata_mata` com mais de 1 grupo, ex: Brasileirão Série D:
+   * "os 4 semifinalistas sobem", não uma posição em tabela — ver `simulation/incremental.ts`
+   * `semifinalistasDaFase`). Só usado quando `acesso_proxima_divisao` bate EXATAMENTE com
+   * `semifinalistas.length` (ex: 4 semifinalistas pra 4 vagas) — sem essa checagem, um número de
+   * vagas diferente do de semifinalistas reais seria ambíguo (quem dos 4 fica de fora?). NUNCA usado
+   * pra `rebaixamento_proxima_divisao` (não tem "piores colocados" num conjunto sem ordem). */
+  semifinalistas?: string[];
 }
 
 export interface MudancaDeDivisao {
@@ -84,27 +102,44 @@ export function calcularMudancasDeDivisao(competicoes: CompeticaoParaMundoPersis
   for (const grupo of porChave.values()) {
     const porNivel = new Map(grupo.map((competicao) => [competicao.nivel, competicao] as const));
     for (const competicao of grupo) {
-      if (!competicao.tabelaFinal || competicao.tabelaFinal.length === 0) continue;
+      const temTabelaFinal = !!competicao.tabelaFinal && competicao.tabelaFinal.length > 0;
+      // `semifinalistas` só serve pra ACESSO (promoção) — sem ordem dentro do conjunto, não dá pra
+      // tirar "os piores colocados" dele pra rebaixamento (ver doc do campo).
+      const temSemifinalistas = !!competicao.semifinalistas && competicao.semifinalistas.length > 0;
+      if (!temTabelaFinal && !temSemifinalistas) continue;
 
-      // A divisão VIZINHA também precisa ter `tabelaFinal` (mesmo requisito de formato suportado)
-      // pra uma troca ser aplicada num sentido — sem essa checagem, uma divisão suportada podia
-      // mandar times pra uma vizinha não suportada (ou receber dela) só nesse UM sentido, drenando/
-      // inchando a vizinha ao longo de várias temporadas (ex: Série B rebaixando 4/ano pra Série C
-      // pra sempre, sem nunca receber de volta os 4 que a Série C promoveria).
+      // A divisão VIZINHA também precisa estar "rastreável" nesta temporada (`tabelaFinal` OU
+      // `semifinalistas` — QUALQUER um prova que ela foi simulada com sucesso, mesmo se não dá pra
+      // usá-la como ORIGEM de troca — ver `temTabelaFinal`/`temSemifinalistas` acima) pra uma troca
+      // ser aplicada num sentido — sem essa checagem, uma divisão suportada podia mandar times pra
+      // uma vizinha não rastreável (ou receber dela) só nesse UM sentido, drenando/inchando a
+      // vizinha ao longo de várias temporadas (ex: Série B rebaixando 4/ano pra Série C pra sempre,
+      // sem nunca receber de volta os 4 que a Série C promoveria — ou, o bug real que motivou esta
+      // checagem incluir `semifinalistas`: Série D promovendo 4 semifinalistas pra Série C todo ano
+      // sem nunca receber de volta os 4 que a Série C rebaixa, porque o rebaixamento exigia
+      // `tabelaFinal` da Série D, que ela nunca tem).
+      const divisaoRastreavel = (divisao: CompeticaoParaMundoPersistente | undefined): boolean => !!divisao && (!!divisao.tabelaFinal || !!divisao.semifinalistas);
+
       const rebaixamento = competicao.premiacao.rebaixamento_proxima_divisao ?? 0;
       const divisaoDeBaixo = porNivel.get(competicao.nivel + 1);
-      if (rebaixamento > 0 && divisaoDeBaixo?.tabelaFinal) {
-        const times = competicao.tabelaFinal.slice(-rebaixamento).map((linha) => linha.clubeId);
+      if (rebaixamento > 0 && temTabelaFinal && divisaoRastreavel(divisaoDeBaixo)) {
+        const times = competicao.tabelaFinal!.slice(-rebaixamento).map((linha) => linha.clubeId);
         adicionar(mudancas, competicao.id, "saem", times);
-        adicionar(mudancas, divisaoDeBaixo.id, "entram", times);
+        adicionar(mudancas, divisaoDeBaixo!.id, "entram", times);
       }
 
       const acesso = competicao.premiacao.acesso_proxima_divisao ?? 0;
       const divisaoDeCima = porNivel.get(competicao.nivel - 1);
-      if (acesso > 0 && divisaoDeCima?.tabelaFinal) {
-        const times = competicao.tabelaFinal.slice(0, acesso).map((linha) => linha.clubeId);
-        adicionar(mudancas, competicao.id, "saem", times);
-        adicionar(mudancas, divisaoDeCima.id, "entram", times);
+      if (acesso > 0 && divisaoRastreavel(divisaoDeCima)) {
+        const times = temTabelaFinal
+          ? competicao.tabelaFinal!.slice(0, acesso).map((linha) => linha.clubeId)
+          : competicao.semifinalistas!.length === acesso
+            ? competicao.semifinalistas!
+            : undefined;
+        if (times) {
+          adicionar(mudancas, competicao.id, "saem", times);
+          adicionar(mudancas, divisaoDeCima!.id, "entram", times);
+        }
       }
     }
   }

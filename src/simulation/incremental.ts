@@ -408,6 +408,15 @@ export interface ContextoDePrograma {
    * ainda não têm essa extração implementada — fica como pendência documentada).
    */
   tabelaFinal?: LinhaTabela[];
+  /**
+   * Club.id[] de quem chegou pelo menos à etapa "semifinal" de um mata-mata (2 confrontos, 4
+   * times — vencedores e perdedores, não só quem avança à final) — usado por `career/
+   * mundo-persistente.ts` como alternativa a `tabelaFinal` pra promoção quando o formato não expõe
+   * uma classificação final ordenada (`fase_grupos`+`mata_mata` com mais de 1 grupo, ex:
+   * Brasileirão Série D: "os 4 semifinalistas sobem", não uma posição em tabela). `undefined` se a
+   * competição não tiver uma etapa chamada exatamente "semifinal" — ver `passosFaseGruposEMataMata`.
+   */
+  semifinalistas?: string[];
   [chave: string]: unknown;
 }
 
@@ -973,6 +982,13 @@ function passosFaseGruposFaseQuadrangularEFinal(campeonato: CampeonatoSimulavel,
       criar: () => criarFaseRodadas("grupos", dividirEmGruposValidado(campeonato.times, fg.num_grupos, fg.times_por_grupo, ratings, campeonato.id).map((g) => g.times), fg.ida_e_volta, fg.classificam_por_grupo),
       aoConcluir: (fase, ctx) => {
         ctx.classificadosGrupos = classificadosDaFase(fase as FaseRodadas);
+        // Só quando ESSA fase tem 1 grupo só a tabela dela é uma classificação final inequívoca do
+        // campeonato inteiro (ex: Brasileirão Série C, 20 times num grupo único antes do
+        // quadrangular do título) — com mais de 1 grupo não tem "a" tabela, teria uma por grupo (ver
+        // `tabelasPorGrupo`), pendência de decidir o que "classificação final" quer dizer nesse caso
+        // (mesma ressalva de `docs/regras-competicoes.md`). Habilita `career/mundo-persistente.ts`
+        // `calcularMudancasDeDivisao` pra essas competições (acesso/rebaixamento).
+        if (fg.num_grupos === 1) ctx.tabelaFinal = tabelaDoGrupoUnico(fase as FaseRodadas);
       },
     },
     {
@@ -1056,9 +1072,20 @@ function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Rec
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
+        ctx.semifinalistas = semifinalistasDaFase(fase as FaseMataMata);
       },
     },
   ];
+}
+
+/** Club.id[] de quem jogou a etapa chamada exatamente "semifinal" (vencedores E perdedores dos 2
+ * confrontos — 4 times) — `undefined` se o mata-mata não tiver uma etapa com esse nome. Usado por
+ * `career/mundo-persistente.ts` como sinal alternativo de promoção quando o formato não expõe
+ * `tabelaFinal` (ver `ContextoDePrograma.semifinalistas`). */
+function semifinalistasDaFase(fase: FaseMataMata): string[] | undefined {
+  const semifinal = fase.resultados.find((etapa) => etapa.nome === "semifinal");
+  if (!semifinal) return undefined;
+  return semifinal.confrontos.flatMap((confronto) => [confronto.timeA, confronto.timeB]);
 }
 
 function passosMataMata(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
@@ -1174,6 +1201,8 @@ export interface CompeticaoIncremental {
   campeao?: string;
   /** Ver `ContextoDePrograma.tabelaFinal` — só populado pra formatos que suportam extração hoje. */
   tabelaFinal?: LinhaTabela[];
+  /** Ver `ContextoDePrograma.semifinalistas` — só populado quando o mata-mata tem uma etapa "semifinal". */
+  semifinalistas?: string[];
   /** Presente quando a competição quebrou no meio da temporada (ex: dado incompatível só detectável depois que uma fase anterior já concluiu — `criar` de um passo posterior pode lançar). A partir daí `avancarSemana` não tenta mais avançar essa competição (fica `concluida: true` sem `campeao`) — mesma tolerância a falha isolada de `engine.ts` `ResultadoCompeticaoNaTemporada.erro`, só que detectada mais tarde (aqui) em vez de na montagem inicial (`CompeticoesDaTemporada.erros`). */
   erro?: string;
   partidasDoJogador: ResultadoPartida[];
@@ -1266,6 +1295,7 @@ export async function avancarSemana(
           estado.concluida = true;
           estado.campeao = estado.contexto.campeao as string;
           estado.tabelaFinal = estado.contexto.tabelaFinal;
+          estado.semifinalistas = estado.contexto.semifinalistas;
         }
       }
     }

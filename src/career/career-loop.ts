@@ -1152,7 +1152,10 @@ export async function jogarTemporadaSemanal(
       resumoCompeticoes.push({ campeonatoId, erro: est.erro, partidasDoJogador: 0, golsDoJogador: 0, assistenciasDoJogador: 0 });
       continue;
     }
-    resultadoCompeticoes.push({ campeonatoId, resultado: { campeao: est.campeao ?? "", partidasDoJogador: est.partidasDoJogador, tabelaFinal: est.tabelaFinal } });
+    resultadoCompeticoes.push({
+      campeonatoId,
+      resultado: { campeao: est.campeao ?? "", partidasDoJogador: est.partidasDoJogador, tabelaFinal: est.tabelaFinal, semifinalistas: est.semifinalistas },
+    });
     resumoCompeticoes.push({
       campeonatoId,
       campeao: est.campeao,

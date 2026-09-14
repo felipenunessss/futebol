@@ -2330,6 +2330,63 @@ Libertadores/Sul-Americana na temporada seguinte.
   com legenda "Vaga Libertadores"/"Vaga Sul-Americana"/"Rebaixamento". 513
   testes passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
 
+### 5.27. Promoção Série D→C via semifinalistas + correções de vaga continental (implementado, escopo parcial)
+
+Pedido do jogador: "na série D os semifinalistas deveriam subir pra série
+C e não funcionou na carreira que rodei" + "o campeonato carioca está
+mostrando vaga pra libertadores, o que está incorreto — eu quero que a
+classificação pra Sul-Americana e Libertadores não sejam cosméticos
+apenas, quero que de fato temporada a temporada as vagas componham os
+times que participam das competições".
+
+- **Semifinalistas como sinal de promoção**: `simulation/incremental.ts`
+  ganhou `semifinalistasDaFase`/`ContextoDePrograma.semifinalistas`/
+  `CompeticaoIncremental.semifinalistas` (Club.id[] de quem jogou a etapa
+  "semifinal", vencedores E perdedores) — alternativa a `tabelaFinal` pra
+  formatos sem classificação ordenada (Série D: fase_grupos de 16 grupos).
+  `career/mundo-persistente.ts` `calcularMudancasDeDivisao` usa isso pra
+  ACESSO só quando `semifinalistas.length` bate exatamente com
+  `acesso_proxima_divisao` (evita ambiguidade de quem fica de fora).
+- **Série C ganhou `tabelaFinal`**: sua fase de grupos é 1 grupo só (20
+  times), uma classificação final inequívoca — habilita acesso pra B E
+  rebaixamento pra D pela mesma `calcularMudancasDeDivisao` de sempre.
+- **Checagem de "divisão vizinha" relaxada pra aceitar `semifinalistas`
+  como prova de rastreamento** (não só `tabelaFinal`) — sem isso, o
+  rebaixamento de C pra D ficava bloqueado (D nunca tem `tabelaFinal`),
+  causando o MESMO tipo de drift assimétrico já corrigido antes pra A/B:
+  Série D promovendo 4/temporada sem nunca receber de volta, encolhendo
+  de 96 pra 92 já na 2ª temporada e QUEBRANDO a simulação (erro de
+  validação em `dividirEmGruposValidado`, que exige a contagem exata).
+- **Dados ajustados pra fechar a simetria** (ver
+  `docs/dados-a-verificar.md`): `brasileirao_serie_d.json`
+  `acesso_proxima_divisao` 6→4 (não batia com nenhuma etapa nomeada do
+  mata-mata — real critério é "os 4 semifinalistas sobem"),
+  `brasileirao_serie_c.json` `rebaixamento_proxima_divisao` 2→4 (precisa
+  casar com os 4 da D — confiança moderada, decisão de estabilidade da
+  simulação, não fonte-confirmada).
+- **Vagas continentais do Brasil**: `vaga_libertadores`/`vaga_sulamericana`
+  removidas de Carioca A e Paulistão A1 (dado errado — clubes não se
+  classificam pra Libertadores via estadual na era moderna); adicionadas
+  ao Brasileirão Série A (`vaga_libertadores: 7`/`vaga_sulamericana: 7`,
+  aproximação posicional calibrada pra bater com a composição estática
+  2026), fazendo `calcularMudancasContinentais` (seção 5.26) atualizar a
+  fatia brasileira de Libertadores/Sul-Americana de verdade, não só
+  Chile/Bolívia.
+- **Bug de duplicata corrigido**: um clube que se qualifica por MAIS DE UMA
+  via na mesma temporada (ex: campeão da Copa do Brasil que também termina
+  no top 7 do Brasileirão) aparecia 2x na lista de Libertadores — dado
+  real reproduziu isso (Flamengo duplicado). `calcularMudancasContinentais`
+  agora deduplica antes de comparar com o tamanho da fatia atual.
+- **Validado**: 8 testes novos entre `tests/simulation/incremental.test.ts`
+  (semifinalistas + tabelaFinal de fase de grupos único) e
+  `tests/career/mundo-persistente.test.ts` (promoção via semifinalistas,
+  ambiguidade de contagem, rebaixamento numa divisão só-com-semifinalistas,
+  deduplicação). Scripts ad-hoc com dado real confirmaram: Série B/C/D
+  mantêm 20/20/96 times em todas as direções simultâneas (A↔B, C→B, B→C,
+  D→C, C→D) sem nenhum clube duplicado ou perdido; Brasil (Libertadores +
+  Sul-Americana) atualiza corretamente com os dois novos campos. 520
+  testes passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção
