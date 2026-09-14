@@ -635,23 +635,38 @@ function LinhaDeTimeNoChaveamento({
 }
 
 /** Faixa de destaque da linha `indice` (0-based) de uma tabela com `totalLinhas` linhas — pedido do
- * usuário: mostrar em cores os classificados pra próxima fase/vaga internacional (topo) e os
- * rebaixados (fim), não só o resultado final. Só uma borda lateral colorida (não muda o fundo),
- * pra não brigar com o destaque de "seu clube" (fundo esmeralda) quando as duas coincidem. */
+ * usuário: mostrar em cores os classificados pra próxima fase (topo) e os rebaixados (fim), não só
+ * o resultado final; depois pediu cor DIFERENTE pra Libertadores vs Sul-Americana quando o
+ * campeonato dá vaga pras duas (`faixas.libertadores`/`sulamericana`, mutuamente exclusivo com
+ * `faixas.classificados` — ver `useTemporada.ts` `faixasDeDestaqueDaTabela`). Só uma borda lateral
+ * colorida (não muda o fundo), pra não brigar com o destaque de "seu clube" (fundo esmeralda)
+ * quando as duas coincidem. */
 function classeFaixaDaLinha(indice: number, totalLinhas: number, faixas: FaixasDeDestaqueDaTabela | undefined): string {
   if (!faixas) return "";
+  if (faixas.libertadores && indice < faixas.libertadores) return "border-l-4 border-l-amber-500";
+  if (faixas.sulamericana && indice < (faixas.libertadores ?? 0) + faixas.sulamericana) return "border-l-4 border-l-cyan-500";
   if (faixas.classificados && indice < faixas.classificados) return "border-l-4 border-l-sky-500";
   if (faixas.rebaixados && indice >= totalLinhas - faixas.rebaixados) return "border-l-4 border-l-red-500";
   return "";
 }
 
 function LegendaDeFaixas({ faixas }: { faixas: FaixasDeDestaqueDaTabela | undefined }) {
-  if (!faixas?.classificados && !faixas?.rebaixados) return null;
+  if (!faixas?.classificados && !faixas?.libertadores && !faixas?.sulamericana && !faixas?.rebaixados) return null;
   return (
     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[11px] text-slate-500">
+      {faixas.libertadores && (
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-sm bg-amber-500" /> Vaga Libertadores
+        </span>
+      )}
+      {faixas.sulamericana && (
+        <span className="flex items-center gap-1">
+          <span className="inline-block w-2 h-2 rounded-sm bg-cyan-500" /> Vaga Sul-Americana
+        </span>
+      )}
       {faixas.classificados && (
         <span className="flex items-center gap-1">
-          <span className="inline-block w-2 h-2 rounded-sm bg-sky-500" /> Classificação / vaga internacional
+          <span className="inline-block w-2 h-2 rounded-sm bg-sky-500" /> Classificação
         </span>
       )}
       {faixas.rebaixados && (

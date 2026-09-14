@@ -50,17 +50,33 @@ const MS_POR_MINUTO_POR_VELOCIDADE: Record<VelocidadeAoVivo, number> = { normal:
  * "melhor colocado sem competição nacional" — depende de outros clubes, não só posição na tabela),
  * de propósito deixados de fora daqui pra não arriscar destacar a linha errada. */
 export interface FaixasDeDestaqueDaTabela {
-  /** Top N avança (mata-mata/próxima fase/liguilla) OU tem vaga internacional (Libertadores +
-   * Sul-Americana) OU acesso à divisão de cima — o maior desses 3 números, quando mais de um dá
-   * pra calcular pro mesmo campeonato (não é comum acontecer, mas nesse caso o de cima já cobre o
-   * de baixo). `undefined` = nenhuma dessas informações disponível pra esse campeonato. */
+  /** Top N avança (mata-mata/próxima fase/liguilla) OU tem acesso à divisão de cima — o maior
+   * desses 2 números, quando dá pra calcular os dois pro mesmo campeonato (não é comum, mas nesse
+   * caso o de cima já cobre o de baixo). Nunca coexiste com `libertadores`/`sulamericana` abaixo —
+   * campeonato com vaga internacional modelada usa essas 2 faixas específicas em vez desta genérica
+   * (pedido do usuário: "campeonatos que dão vagas pros 2 [Libertadores e Sul-Americana] devem ser
+   * destacados em cores diferentes", não a mesma cor de "classificados"). `undefined` = nenhuma
+   * dessas informações disponível pra esse campeonato. */
   classificados?: number;
+  /** Top N tem vaga de Libertadores (`Premiacao.vaga_libertadores`) — cor própria, distinta de `sulamericana`. */
+  libertadores?: number;
+  /** Próximos M colocados (logo depois dos `libertadores`) têm vaga de Sul-Americana (`Premiacao.vaga_sulamericana`) — cor própria. */
+  sulamericana?: number;
   /** Bottom N é rebaixado — vem direto de `Premiacao.rebaixamento_proxima_divisao`. */
   rebaixados?: number;
 }
 
 function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNacional): FaixasDeDestaqueDaTabela {
   const { formato, premiacao } = campeonato;
+  const rebaixados = premiacao.rebaixamento_proxima_divisao;
+
+  // Vaga internacional ganha faixa PRÓPRIA (cor distinta de "classificados" genérico) — só quando
+  // pelo menos uma das duas está modelada pro campeonato (a maioria não tem, ver
+  // docs/dados-a-verificar.md, ex: Brasileirão Série A ainda não tem essas vagas cadastradas).
+  if (premiacao.vaga_libertadores || premiacao.vaga_sulamericana) {
+    return { libertadores: premiacao.vaga_libertadores, sulamericana: premiacao.vaga_sulamericana, rebaixados };
+  }
+
   const classificadosParaFase =
     formato.fase_suica?.classificam_mata_mata ??
     formato.fase_grupos?.classificam_por_grupo ??
@@ -70,13 +86,12 @@ function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNac
     // Pontos corridos + mata-mata simples (sem entrada escalonada por etapa) sem contador próprio —
     // aproxima pelo tamanho do bracket (3 fases = quartas/semi/final = 8 times, etc).
     (formato.pontos_corridos && formato.mata_mata && !formato.mata_mata.etapas ? 2 ** formato.mata_mata.fases.length : undefined);
-  const vagaInternacional = (premiacao.vaga_libertadores ?? 0) + (premiacao.vaga_sulamericana ?? 0);
   const acesso = premiacao.acesso_proxima_divisao ?? 0;
-  const melhorFaixa = Math.max(classificadosParaFase ?? 0, vagaInternacional, acesso);
+  const melhorFaixa = Math.max(classificadosParaFase ?? 0, acesso);
 
   return {
     classificados: melhorFaixa > 0 ? melhorFaixa : undefined,
-    rebaixados: premiacao.rebaixamento_proxima_divisao,
+    rebaixados,
   };
 }
 

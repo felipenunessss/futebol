@@ -2287,6 +2287,49 @@ nenhuma imagem real da taça de cada competição.
   puramente de exibição, sem lógica de motor nova), `npx tsc --noEmit`
   (raiz) e `cd web && npx tsc -b` limpos.
 
+### 5.26. Vagas de Libertadores/Sul-Americana funcionando entre temporadas + cores próprias na tabela (implementado, escopo parcial)
+
+Pedido do jogador: "nos campeonatos que tão vagas pra Libertadores e Sul-
+Americana, você precisa validar se as premiações estão funcionando — e pra
+campeonatos que dão vagas pros 2, eu quero que eles sejam destacados em
+cores diferentes na classificação". Validação confirmou que não: `Premiacao.
+vaga_libertadores`/`vaga_sulamericana` só alimentavam o destaque de tabela
+(uma cor única "classificados"), sem NENHUM efeito na composição real de
+Libertadores/Sul-Americana na temporada seguinte.
+
+- **Motor** (`src/career/mundo-persistente.ts`, `calcularMudancasContinentais`
+  — ver seção "Vagas de Libertadores/Sul-Americana" em
+  `docs/regras-competicoes.md` pro detalhe completo de escopo/condição de
+  segurança): resolve as vagas a partir de `tabelaFinal` (Chile, Bolívia,
+  ambos `pontos_corridos` puro) ou do campeão de um mata-mata quando a vaga
+  é única (Copa do Brasil), só substituindo a fatia de um país numa
+  competição continental quando a soma das vagas resolvidas bate EXATAMENTE
+  com o tamanho atual dela — evita encolher a representação de um país por
+  cobertura parcial (Brasil intocado por ora: só a Copa do Brasil tem vaga
+  modelada, a Série A não, pendência de dado já documentada). Chamado de
+  `web/src/features/temporada/useTemporada.ts` junto com
+  `calcularMudancasDeDivisao`, concatenando as duas listas de mudança antes
+  de `aplicarMudancasDeDivisao`.
+- **Cores próprias na tabela** (`useTemporada.ts` `faixasDeDestaqueDaTabela`,
+  `TelaDeTemporada.tsx` `classeFaixaDaLinha`/`LegendaDeFaixas`):
+  `FaixasDeDestaqueDaTabela` ganhou `libertadores`/`sulamericana` (em vez de
+  cair no `classificados` genérico quando a competição tem vaga
+  internacional modelada) — âmbar pra Libertadores, ciano pra Sul-Americana,
+  céu pro "classificados" genérico (mata-mata/acesso de divisão, quando NÃO
+  há vaga internacional), vermelho pro rebaixamento, como antes.
+- **Validado**: `tests/career/mundo-persistente.test.ts` ganhou 6 testes
+  novos (`describe("calcularMudancasContinentais", ...)`, cobrindo
+  substituição bem-sucedida, cobertura parcial não tocando no país,
+  campeão-de-mata-mata resolvendo só `vaga_libertadores===1`, soma de mais
+  de 1 competição do mesmo país, e o caso vazio). Script ad-hoc confirmou
+  com dado real do Chile: Libertadores atualiza pros 4 primeiros colocados
+  da tabela simulada, Sul-Americana fica intocada por um mismatch
+  pré-existente nos dados (5 clubes atuais vs. 4 declarados na `premiacao`)
+  — comportamento de segurança correto. Confirmado ao vivo no browser
+  (Palestino, Chile): tabela mostra âmbar/ciano/vermelho nas faixas certas,
+  com legenda "Vaga Libertadores"/"Vaga Sul-Americana"/"Rebaixamento". 513
+  testes passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção
