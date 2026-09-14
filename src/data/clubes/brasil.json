@@ -356,8 +356,8 @@
       "nivel": 2
     },
     "forca_financeira": "media",
-    "rating_inicial": 1612,
-    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/0ccv781758334788.png"
+    "rating_inicial": 1645,
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/1/1a/Sport-clube-recife.svg/250px-Sport-clube-recife.svg.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
   },
   {
     "id": "nautico",
@@ -533,7 +533,7 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "baixa",
+    "forca_financeira": "muito_baixa",
     "rating_inicial": 1463,
     "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/wbss4d1644929547.png"
   },
@@ -549,7 +549,7 @@
       "pais": "BR",
       "nivel": 2
     },
-    "forca_financeira": "muito_baixa",
+    "forca_financeira": "baixa",
     "rating_inicial": 1695,
     "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/2qwxw51617198963.png"
   },
@@ -565,7 +565,7 @@
       "pais": "BR",
       "nivel": 1
     },
-    "forca_financeira": "muito_baixa",
+    "forca_financeira": "baixa",
     "rating_inicial": 1687,
     "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/pw8uo11765900737.png"
   },
@@ -870,7 +870,7 @@
       "pais": "BR",
       "nivel": 4
     },
-    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Sampaio_Corr%C3%AAa_FC.png?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/4/4e/Sampaio_Corr%C3%AAa-RJ_logo.png/250px-Sampaio_Corr%C3%AAa-RJ_logo.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
   },
   {
     "id": "america_rj",
