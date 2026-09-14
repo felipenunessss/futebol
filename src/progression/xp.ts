@@ -112,6 +112,37 @@ export function ganhoPorPonto(atributo: Atributo, atributosPrioritarios: Atribut
 }
 
 /**
+ * Retorno decrescente perto do teto (99) — reintroduz a curva descrita em
+ * `docs/motor-de-partida.md` seção 3 ("sair de 90→99 custa muito mais que
+ * 40→50"), perdida na seção 5.17 quando o crescimento virou pontos manuais
+ * lineares (o único limite era o clamp duro em 99, sem nada tornando os
+ * últimos pontos mais caros — jogador reportou "atributos 99 muito rápido").
+ * Abaixo de `LIMIAR_RETORNO_DECRESCENTE` o ganho é 100% (mesmo
+ * comportamento de antes); a partir daí, decai suavemente até
+ * `FATOR_MINIMO_RETORNO` bem perto do teto — nunca chega a exatamente 0
+ * pra não travar o jogador para sempre num último ponto, só torna
+ * extremamente lento (estilo FIFA/EA FC: raríssimo alguém bater 99 de
+ * verdade). Estimativa de design, não fórmula validada (mesma ressalva de
+ * toda constante de progressão do jogo) — aplicada em `career/Player.ts`
+ * `investirPontos`/`aplicarGanhoDeTreino`, nos DOIS canais de ganho de
+ * atributo, pra não dar pra contornar a curva trocando de canal.
+ */
+const LIMIAR_RETORNO_DECRESCENTE = 60;
+const FATOR_MINIMO_RETORNO = 0.08;
+const EXPOENTE_RETORNO_DECRESCENTE = 2.2;
+const ATRIBUTO_MAXIMO = 99;
+
+export function fatorDeRetornoDecrescente(valorAtual: number): number {
+  if (valorAtual <= LIMIAR_RETORNO_DECRESCENTE) return 1;
+
+  const distanciaMaxima = ATRIBUTO_MAXIMO - LIMIAR_RETORNO_DECRESCENTE;
+  const distanciaAoTeto = Math.max(0, ATRIBUTO_MAXIMO - valorAtual);
+  const fracaoLinear = Math.min(1, distanciaAoTeto / distanciaMaxima);
+
+  return FATOR_MINIMO_RETORNO + (1 - FATOR_MINIMO_RETORNO) * Math.pow(fracaoLinear, EXPOENTE_RETORNO_DECRESCENTE);
+}
+
+/**
  * Sessões de treino com escolha de foco — ver `docs/game-design.md` seção
  * 5.2. A seção 5.16 tinha desligado o foco de qualquer atributo específico
  * (só decidia gerar XP de nível ou recuperar moral, com a escolha de ONDE

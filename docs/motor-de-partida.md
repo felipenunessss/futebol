@@ -2179,6 +2179,47 @@ mostrando titular/reserva/etc — tudo "conectado com os eventos".
   tsc --noEmit` limpos na raiz; `cd web && npx tsc -b --noEmit` e `npm
   run build` limpos. Não testado num navegador de verdade nesta sessão.
 
+### 5.23. Retorno decrescente perto de 99 (implementado)
+
+Pedido do jogador: "a progressão está muito fácil, o jogador fica com
+atributos 99 muito rápido, quero uma curva de desenvolvimento mais
+parecida com FIFA etc". A seção 5.17 (nível + pontos manuais, estilo Pro
+Clubs) substituiu o crescimento automático de atributo por um sistema
+linear — `investirPontos`/`aplicarGanhoDeTreino` somavam sempre o mesmo
+ganho por ponto/sessão, só clampado em 99 no fim. Isso **perdeu** a curva
+de retorno decrescente já prevista na seção 3 acima ("sair de 90→99 custa
+muito mais que 40→50") — sem ela, e com level-up relativamente rápido, um
+jogador ativo maxava atributos prioritários em poucas semanas de
+temporada.
+
+- **`progression/xp.ts` `fatorDeRetornoDecrescente(valorAtual)`** (nova):
+  devolve 1 (ganho cheio) até `valorAtual` 60; a partir daí decai
+  suavemente (curva `fracaoLinear^2.2`) até um piso de 8% bem perto de 99
+  — nunca chega a 0 (não trava o jogador pra sempre num último ponto, só
+  torna extremamente lento, no espírito "raro alguém bater 99 de
+  verdade" do FIFA/EA FC).
+- **Aplicado nos DOIS canais de ganho de atributo** (`career/Player.ts`),
+  pra não dar pra contornar a curva trocando de canal:
+  - `investirPontos`: recalcula o fator A CADA ponto investido dentro do
+    mesmo `quantidade` (não uma vez só pro lote) — perto do teto, o mesmo
+    número de pontos rende bem menos, e precisa refletir o valor já
+    atualizado a cada incremento.
+  - `aplicarGanhoDeTreino`: mesmo fator aplicado ao ganho direto de cada
+    atributo relevante da sessão.
+- **Sem mudança de teto/arquétipo/potencial**: 99 continua sendo o mesmo
+  teto pra todo mundo (potencial de desenvolvimento — seção 5.16 —
+  continua só acelerando XP-pra-nível, não o teto de atributo; decisão
+  reafirmada, não revisitada nesta sessão), `ganhoPorPonto` (multiplicador
+  de arquétipo) e `GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO` continuam iguais —
+  só o retorno decrescente foi reintroduzido por cima.
+- **Validado**: `tests/progression/xp.test.ts` ganhou `describe(
+  "fatorDeRetornoDecrescente", ...)` (4 testes: cheio até o limiar, decai
+  suavemente, 90→99 muito mais caro que 40→50, nunca chega a 0);
+  `tests/career/Player.test.ts` `aplicarGanhoDeTreino > nunca ultrapassa
+  99` ajustado (perto do teto o ganho de 1 sessão não fecha mais
+  exatamente em 99 — o próprio ponto do pedido). 502 testes passando,
+  `npx tsc --noEmit` limpo.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção

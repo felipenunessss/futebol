@@ -273,11 +273,12 @@ describe("aplicarGanhoDeTreino", () => {
     expect(ganhoFinalizacao).toBeGreaterThan(ganhoDrible);
   });
 
-  it("nunca ultrapassa 99", () => {
+  it("nunca ultrapassa 99 (e perto do teto o retorno decrescente já deixa o ganho pequeno, ver progression/xp.ts fatorDeRetornoDecrescente)", () => {
     const quaseNoTeto = estadoBase();
     quaseNoTeto.jogador = { ...quaseNoTeto.jogador, atributos: { ...quaseNoTeto.jogador.atributos, finalizacao: 98.8 } };
     const depois = aplicarGanhoDeTreino(quaseNoTeto, "tecnico");
-    expect(depois.jogador.atributos.finalizacao).toBe(99);
+    expect(depois.jogador.atributos.finalizacao).toBeLessThanOrEqual(99);
+    expect(depois.jogador.atributos.finalizacao).toBeGreaterThan(98.8);
   });
 
   it("não muta o estado original", () => {

@@ -3,6 +3,7 @@ import {
   calcularNotaPartida,
   calcularXpPartida,
   converterChancesEmDesempenho,
+  fatorDeRetornoDecrescente,
   ganhoPorPonto,
   GANHO_POR_PONTO_PADRAO,
   GANHO_POR_PONTO_PRIORITARIO,
@@ -154,6 +155,35 @@ describe("xpDeSessaoDeTreino", () => {
     expect(fisico).toBeGreaterThan(0);
     expect(fisico).toBe(tecnico);
     expect(tecnico).toBe(tatico);
+  });
+});
+
+describe("fatorDeRetornoDecrescente", () => {
+  it("é 1 (ganho cheio) até o limiar, sem penalizar quem ainda está longe do teto", () => {
+    expect(fatorDeRetornoDecrescente(1)).toBe(1);
+    expect(fatorDeRetornoDecrescente(40)).toBe(1);
+    expect(fatorDeRetornoDecrescente(60)).toBe(1);
+  });
+
+  it("decai suavemente conforme o atributo se aproxima de 99", () => {
+    const em70 = fatorDeRetornoDecrescente(70);
+    const em80 = fatorDeRetornoDecrescente(80);
+    const em90 = fatorDeRetornoDecrescente(90);
+    const em98 = fatorDeRetornoDecrescente(98);
+
+    expect(em70).toBeLessThan(1);
+    expect(em80).toBeLessThan(em70);
+    expect(em90).toBeLessThan(em80);
+    expect(em98).toBeLessThan(em90);
+  });
+
+  it("sair de 90 pra 99 é muito mais caro que sair de 40 pra 50 (retorno decrescente perto do teto, ver docs/motor-de-partida.md seção 3)", () => {
+    expect(fatorDeRetornoDecrescente(40)).toBeGreaterThan(fatorDeRetornoDecrescente(90) * 5);
+  });
+
+  it("nunca chega a 0 — perto do teto o ganho fica pequeno, não impossível", () => {
+    expect(fatorDeRetornoDecrescente(99)).toBeGreaterThan(0);
+    expect(fatorDeRetornoDecrescente(150)).toBeGreaterThan(0); // acima do teto (não deveria acontecer, mas não quebra)
   });
 });
 

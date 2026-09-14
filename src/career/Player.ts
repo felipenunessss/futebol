@@ -1,5 +1,13 @@
 import type { DesempenhoPartida, FocoDeTreino } from "../progression/xp.js";
-import { ATRIBUTOS_POR_FOCO, calcularXpPartida, GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO, ganhoPorPonto, PONTOS_POR_NIVEL, xpParaProximoNivel } from "../progression/xp.js";
+import {
+  ATRIBUTOS_POR_FOCO,
+  calcularXpPartida,
+  fatorDeRetornoDecrescente,
+  GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO,
+  ganhoPorPonto,
+  PONTOS_POR_NIVEL,
+  xpParaProximoNivel,
+} from "../progression/xp.js";
 import { aplicarDeclinioPorIdade } from "../progression/aging.js";
 import type { ImpactoCarreira, Reputacao } from "../progression/scenarios.js";
 import { aplicarImpacto, criarReputacaoInicial, type EstadoJogadorParaImpacto } from "../progression/scenarios.js";
@@ -252,8 +260,14 @@ export function ganharXp(estado: EstadoDeCarreira, xpBruto: number): ResultadoGa
  * `progression/xp.ts` `ganhoPorPonto` por ponto (mais se o atributo for
  * prioritário do arquétipo, arquétipo aqui é multiplicador, nunca
  * restrição: dá pra investir em qualquer atributo da posição), capado em
- * 99. Lança erro se pedir mais pontos do que `estado.pontosDisponiveis`
- * (mesmo padrão de validação de `criarEstadoInicial`).
+ * 99. Aplica `fatorDeRetornoDecrescente` A CADA ponto investido (não uma
+ * vez só pro total) — perto do teto, o mesmo `quantidade` de pontos rende
+ * bem menos atributo, então precisa recalcular o fator a cada incremento
+ * pra refletir o valor JÁ atualizado (senão investir 10 pontos de uma vez
+ * ganharia o fator "barato" de retorno decrescente do valor inicial em
+ * todos os 10, escapando da curva). Lança erro se pedir mais pontos do que
+ * `estado.pontosDisponiveis` (mesmo padrão de validação de
+ * `criarEstadoInicial`).
  */
 const ATRIBUTO_MAXIMO = 99;
 
@@ -266,12 +280,15 @@ export function investirPontos(estado: EstadoDeCarreira, atributo: Atributo, qua
   }
 
   const arquetipo = buscarArquetipo(estado.jogador.arquetipo_id);
-  const valorAtual = estado.jogador.atributos[atributo] ?? 1;
-  const novoValor = Math.min(ATRIBUTO_MAXIMO, valorAtual + quantidade * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios));
+  const ganhoBase = ganhoPorPonto(atributo, arquetipo.atributos_prioritarios);
+  let valorAtual = estado.jogador.atributos[atributo] ?? 1;
+  for (let i = 0; i < quantidade; i++) {
+    valorAtual = Math.min(ATRIBUTO_MAXIMO, valorAtual + ganhoBase * fatorDeRetornoDecrescente(valorAtual));
+  }
 
   return {
     ...estado,
-    jogador: { ...estado.jogador, atributos: { ...estado.jogador.atributos, [atributo]: novoValor } },
+    jogador: { ...estado.jogador, atributos: { ...estado.jogador.atributos, [atributo]: valorAtual } },
     pontosDisponiveis: estado.pontosDisponiveis - quantidade,
   };
 }
@@ -299,7 +316,7 @@ export function aplicarGanhoDeTreino(estado: EstadoDeCarreira, foco: FocoDeTrein
   let atributos = estado.jogador.atributos;
   for (const atributo of atributosRelevantes) {
     const valorAtual = atributos[atributo] ?? 1;
-    const ganho = GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios);
+    const ganho = GANHO_DIRETO_POR_ATRIBUTO_NO_TREINO * ganhoPorPonto(atributo, arquetipo.atributos_prioritarios) * fatorDeRetornoDecrescente(valorAtual);
     atributos = { ...atributos, [atributo]: Math.min(ATRIBUTO_MAXIMO, valorAtual + ganho) };
   }
 
