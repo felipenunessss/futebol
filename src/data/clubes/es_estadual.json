@@ -65,5 +65,14 @@
     "estado": "ES",
     "cidade": "Castelo",
     "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/1irf1f1767219678.png"
+  },
+  {
+    "id": "capixaba_sc",
+    "nome": "Capixaba SC",
+    "nome_popular": "Capixaba",
+    "pais":"BR",
+    "estado":"ES",
+    "cidade": "Vila Valério",
+    "escudo_url": "https://pt.wikipedia.org/wiki/Capixaba_Sport_Club"
   }
 ]
