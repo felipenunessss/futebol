@@ -2259,6 +2259,34 @@ visual, e o motor só notificava a UI sobre o par da 1ª etapa
   e Mineiro Módulo I (semifinal → final, campeão destacado). 507 testes
   passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
 
+### 5.25. Taças reais na sala de troféus (implementado, cobertura parcial)
+
+Pedido: "importe as taças dos campeonatos pra que elas apareçam na sala de
+troféus do jogador quando conquistá-las". Antes, a lista de títulos
+(`PainelEstatisticas`) só mostrava um emoji 🏆 fixo + nome + temporada —
+nenhuma imagem real da taça de cada competição.
+
+- **`taca_url?: string`** novo em `CampeonatoEstadual`/`CampeonatoNacional`
+  (`schemas/championship.ts`/`national-championship.ts`) — mesma convenção
+  de `escudo_url` (URL externa, nunca baixa a imagem).
+- **`scripts/buscar-tacas.ts`** (novo): busca `strTrophy` no TheSportsDB
+  via `lookupleague.php?id=` — diferente de `buscar-escudos.ts`, não dá
+  pra usar busca por nome aqui (o endpoint de busca devolve amostra
+  pequena/fixa que não inclui a maioria das competições sob a chave de
+  teste, e não expõe `strTrophy`). Usa um mapa curado `campeonatoId ->
+  idLeague`, confirmado manualmente batendo `strLeague` contra o nosso.
+  **Só 3 competições cobertas**: Brasileirão Série A/B/D (ver
+  `docs/dados-a-verificar.md` pra escopo/como estender).
+- **UI** (`TelaDeTemporada.tsx`): `TrofeuDaCompeticao` mostra a imagem real
+  quando `taca_url` existe, senão um ícone de troféu genérico (SVG
+  embutido) — a sala de troféus nunca fica "sem nada". Aplicado em
+  `PainelEstatisticas` (usado tanto na lateral sempre visível quanto no
+  resumo de fim de temporada), com `tacaPorCampeonato` (novo, `useTemporada.ts`,
+  mesmo padrão de `escudoPorCampeonato`) threaded pelos 2 call sites.
+- **Validado**: 507 testes passando (nenhum teste novo — mudança é
+  puramente de exibição, sem lógica de motor nova), `npx tsc --noEmit`
+  (raiz) e `cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção

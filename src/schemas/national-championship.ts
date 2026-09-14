@@ -19,4 +19,6 @@ export interface CampeonatoNacional {
   times: string[]; // Club.id[]
   /** URL externa do escudo/emblema da competição (ver `schemas/club.ts` `Club.escudo_url` — mesma fonte/convenção, mesma ausência esperada pra maioria). */
   escudo_url?: string;
+  /** URL externa da imagem da TAÇA/troféu da competição (distinta do escudo/emblema) — usada na sala de troféus do jogador quando ele conquista o título (`web/src/features/temporada`). Só as competições nacionais mais conhecidas têm (ver `scripts/buscar-tacas.ts`); ausência é o esperado pra maioria — a UI cai pra um ícone genérico de taça. */
+  taca_url?: string;
 }

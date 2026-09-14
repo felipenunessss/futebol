@@ -409,6 +409,10 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Nome de exibição (ex: "Campeonato Brasileiro Série C") por id (ex: "brasileirao_serie_c") — pra UI nunca mostrar o id bruto com "_". */
   const nomePorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.nome])), [campeonatos]);
   const escudoPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.escudo_url])), [campeonatos]);
+  /** URL da imagem da TAÇA (distinta do escudo) por campeonatoId — ver `schemas/national-championship.ts`
+   * `taca_url`. A maioria não tem (só as competições mais conhecidas, ver `scripts/buscar-tacas.ts`) —
+   * a sala de troféus cai pra um ícone genérico nesse caso (`TrofeuDaCompeticao`). */
+  const tacaPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.taca_url])), [campeonatos]);
   const faixasPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, faixasDeDestaqueDaTabela(c)])), [campeonatos]);
 
   function pushEvento(evento: EventoDeFeedVariante): void {
@@ -1077,6 +1081,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     clubePorId,
     nomePorCampeonato,
     escudoPorCampeonato,
+    tacaPorCampeonato,
     faixasPorCampeonato,
     jogarTemporada,
     propostasFimDeTemporada,

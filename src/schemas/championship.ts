@@ -178,4 +178,6 @@ export interface CampeonatoEstadual {
   times: string[]; // Club.id[]
   /** URL externa do escudo/emblema da competição (ver `Club.escudo_url` — mesma fonte/convenção, mesma ausência esperada pra maioria). */
   escudo_url?: string;
+  /** URL externa da imagem da TAÇA/troféu da competição (distinta do escudo/emblema) — ver `CampeonatoNacional.taca_url`, mesma convenção. Praticamente nenhum estadual tem (fonte pública cobre só ligas de destaque nacional/continental) — a UI cai pra um ícone genérico de taça. */
+  taca_url?: string;
 }

@@ -233,6 +233,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         <PainelLateralEstatisticasEAtributos
           estatisticasCarreira={estatisticasCarreira}
           nomePorCampeonato={nomePorCampeonato}
+          tacaPorCampeonato={temporada.tacaPorCampeonato}
           atributos={estadoAtual.jogador.atributos}
           atributosDaPosicao={ATRIBUTOS_POR_POSICAO[estadoAtual.jogador.posicao]}
         />
@@ -315,6 +316,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
                 resultado={resultado}
                 clubePorId={clubePorId}
                 nomePorCampeonato={nomePorCampeonato}
+                tacaPorCampeonato={temporada.tacaPorCampeonato}
                 estatisticasCarreira={estatisticasCarreira}
                 onVerPropostas={temporada.verPropostasFimDeTemporada}
               />
@@ -770,10 +772,12 @@ function Cabecalho({
 function PainelEstatisticas({
   estatisticas,
   nomePorCampeonato,
+  tacaPorCampeonato,
   colunas = 4,
 }: {
   estatisticas: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
+  tacaPorCampeonato: Map<string, string | undefined>;
   /** 4 (padrão) pro uso mais largo (fim de temporada); 2 pra caber na lateral estreita sempre visível. */
   colunas?: 2 | 4;
 }) {
@@ -790,16 +794,38 @@ function PainelEstatisticas({
         {estatisticas.titulos.length === 0 ? (
           <p className="text-xs text-slate-500">Nenhum título ainda.</p>
         ) : (
-          <ul className="text-xs text-slate-300 flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1.5">
             {estatisticas.titulos.map((t, indice) => (
-              <li key={indice}>
-                🏆 {nomeDoCampeonato(nomePorCampeonato, t.campeonatoId)} — {t.temporada}
+              <li key={indice} className="flex items-center gap-2 text-xs text-slate-300">
+                <TrofeuDaCompeticao url={tacaPorCampeonato.get(t.campeonatoId)} />
+                <span>
+                  {nomeDoCampeonato(nomePorCampeonato, t.campeonatoId)} — {t.temporada}
+                </span>
               </li>
             ))}
           </ul>
         )}
       </div>
     </div>
+  );
+}
+
+/** Imagem real da taça quando a competição tem (`taca_url`, ver `scripts/buscar-tacas.ts` — só as
+ * mais conhecidas) — senão um ícone genérico de troféu (SVG embutido, não busca nada externo), pra
+ * sala de troféus sempre mostrar alguma coisa em vez de um emoji plano. Pedido do usuário: "importe
+ * as taças dos campeonatos pra que elas apareçam na sala de troféus". */
+function TrofeuDaCompeticao({ url }: { url: string | undefined }) {
+  if (url) return <img src={url} alt="" className="w-6 h-6 object-contain shrink-0" />;
+  return (
+    <svg viewBox="0 0 24 24" className="w-5 h-5 shrink-0 text-amber-400" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 4h8v4a4 4 0 0 1-8 0V4Z" />
+      <path d="M8 5H5a2 2 0 0 0 0 4h1" />
+      <path d="M16 5h3a2 2 0 0 1 0 4h-1" />
+      <path d="M10 12v3" />
+      <path d="M14 12v3" />
+      <path d="M9 19h6" />
+      <path d="M12 15v4" />
+    </svg>
   );
 }
 
@@ -830,11 +856,13 @@ function ListaCompactaDeAtributos({ atributos, atributosDaPosicao }: { atributos
 function PainelLateralEstatisticasEAtributos({
   estatisticasCarreira,
   nomePorCampeonato,
+  tacaPorCampeonato,
   atributos,
   atributosDaPosicao,
 }: {
   estatisticasCarreira: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
+  tacaPorCampeonato: Map<string, string | undefined>;
   atributos: Partial<Record<Atributo, number>>;
   atributosDaPosicao: Atributo[];
 }) {
@@ -842,7 +870,7 @@ function PainelLateralEstatisticasEAtributos({
     <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
       <div>
         <h2 className="font-semibold text-slate-400 mb-2">Estatísticas da carreira</h2>
-        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} colunas={2} />
+        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} colunas={2} />
       </div>
       <div className="border-t border-slate-800 pt-2">
         <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
@@ -1989,12 +2017,14 @@ function ResumoDeTemporada({
   resultado,
   clubePorId,
   nomePorCampeonato,
+  tacaPorCampeonato,
   estatisticasCarreira,
   onVerPropostas,
 }: {
   resultado: NonNullable<ReturnType<typeof useTemporada>["resultado"]>;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
+  tacaPorCampeonato: Map<string, string | undefined>;
   estatisticasCarreira: EstatisticasCarreira;
   onVerPropostas: () => void;
 }) {
@@ -2034,7 +2064,7 @@ function ResumoDeTemporada({
       )}
 
       <div className="border-t border-slate-800 pt-3">
-        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} />
+        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} />
       </div>
 
       <button type="button" onClick={onVerPropostas} className="mt-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium">

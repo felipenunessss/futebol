@@ -220,6 +220,26 @@ busca dirigida, não verificação individual de cada um dos 567 clubes/42
 competições. Se notar outro escudo claramente errado no jogo, documente
 aqui e remova só esse registro específico (não precisa reverter o resto).
 
+## Taças/troféus de competição (`taca_url`)
+
+Populado por `scripts/buscar-tacas.ts` (mesma API pública TheSportsDB de
+`buscar-escudos.ts`, mas endpoint diferente — `lookupleague.php?id=`, não
+busca por nome). Cobertura atual: **só 3 competições** — Campeonato
+Brasileiro Série A/B/D. O endpoint de busca por nome
+(`search_all_leagues.php`) sob a chave de teste devolve uma amostra
+pequena e fixa por país que não inclui a maioria das competições
+conhecidas (Copa do Brasil, Série C, Libertadores, Sul-Americana, nenhum
+estadual) — só dá pra confirmar um `idLeague` manualmente contra o
+`strLeague` retornado, um por um. Os 3 ids usados (4351/4404/5079) foram
+confirmados assim, batendo o nome. Sem confirmação, não dá pra advinhar o
+id de uma competição (arriscaria pegar a taça errada) — fica como
+pendência aberta, não implementada por enquanto. Se alguém achar o
+`idLeague` certo de outra competição (por lookup manual ou outra fonte
+confiável), adicionar em `ID_LEAGUE_POR_CAMPEONATO` e reexecutar o script
+(idempotente). Competições sem `taca_url` mostram um ícone genérico de
+troféu na sala de troféus (`web/src/features/temporada/TelaDeTemporada.tsx`
+`TrofeuDaCompeticao`), nunca ficam "sem nada".
+
 ## Como resolver
 
 Cada item acima deveria ser confirmado contra a fonte primária (site da
