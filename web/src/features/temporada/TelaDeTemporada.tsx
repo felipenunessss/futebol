@@ -625,8 +625,14 @@ function LinhaDeTimeNoChaveamento({
   venceu: boolean;
   ehDoJogador: boolean;
 }) {
+  // Duas classes `text-*` concorrentes na mesma tag empatam em especificidade — qual delas "ganha"
+  // depende da ordem em que o Tailwind gerou o CSS, não da ordem no JSX; sem decidir a cor final
+  // aqui em JS, o time do jogador podia ficar sem destaque nenhum quando PERDIA (a cor de "perdeu"
+  // apagava a de "é seu time") — pedido do usuário: "quero que o meu time esteja destacado nos
+  // brackets que ele estiver", inclusive numa eliminação. Uma única decisão de cor evita a disputa.
+  const corTexto = ehDoJogador ? (venceu ? "text-emerald-400 font-semibold" : "text-emerald-600") : venceu ? "text-slate-100 font-medium" : "text-slate-500";
   return (
-    <div className={`flex items-center gap-1.5 ${venceu ? "text-slate-100 font-medium" : "text-slate-500"} ${ehDoJogador ? "text-emerald-400" : ""}`}>
+    <div className={`flex items-center gap-1.5 ${corTexto}`}>
       <Escudo url={escudoDoClube(clubePorId, timeId)} alt="" tamanho={14} />
       <span className="flex-1 truncate">{nomeDoClube(clubePorId, timeId)}</span>
       <span className="tabular-nums shrink-0">{gols}</span>
