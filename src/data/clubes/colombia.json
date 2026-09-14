@@ -265,6 +265,7 @@
     "pais": "CO",
     "cidade": "Cali",
     "estadio": "Olímpico Pascual Guerrero",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/en/7/71/Atl%C3%A9tico_Cali.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
@@ -341,6 +342,7 @@
     "nome_popular": "Independiente Yumbo",
     "pais": "CO",
     "cidade": "Yumbo",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Idependiente.jpg",
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
@@ -353,6 +355,7 @@
     "pais": "CO",
     "cidade": "Palmira",
     "estadio": "Francisco Rivera Escobar",
+    "escudo_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQD7xoyikR1C2FBtwhn7-n4wFQUPdCWvREW75ELDiiElA&s=10",
     "divisao_nacional": {
       "pais": "CO",
       "nivel": 2
