@@ -16,16 +16,37 @@ export interface Confronto {
   rodada: number;
 }
 
+/** Fisher-Yates puro — mesma implementação de `swiss.ts` `embaralhar`, duplicada aqui (pequena e
+ * pura) pra não criar dependência cruzada só por isso. */
+function embaralhar<T>(lista: T[], random: () => number): T[] {
+  const copia = [...lista];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  return copia;
+}
+
 /**
  * Gera o calendário de pontos corridos pelo método do círculo (um time fixo,
  * os demais rotacionam a cada rodada). Com número ímpar de times, insere um
  * "BYE" fantasma pra fechar a rotação — quem cai contra ele folga na rodada.
+ *
+ * `random`, se passado, embaralha a ORDEM de `times` antes de gerar o
+ * calendário (uma cópia local — não muta `times`) — sem isso, o método do
+ * círculo é puramente determinístico pela ordem de entrada, e como `times`
+ * sempre vem na mesma ordem do arquivo de dado estático, toda temporada
+ * simulada produzia o MESMO confronto de rodada 1 pra sempre (bug relatado
+ * pelo usuário: "a rodada 1 sempre é contra o mesmo time"). Não muda o
+ * algoritmo de rodízio em si (continua garantindo todos-contra-todos) — só
+ * varia quem entra fixo/a ordem de rotação a cada temporada.
  */
-export function gerarConfrontosPontosCorridos(times: string[], idaEVolta: boolean): Confronto[] {
+export function gerarConfrontosPontosCorridos(times: string[], idaEVolta: boolean, random?: () => number): Confronto[] {
   if (times.length < 2) return [];
 
   const BYE = "__bye__";
-  const lista = times.length % 2 === 0 ? [...times] : [...times, BYE];
+  const timesParaSortear = random ? embaralhar(times, random) : times;
+  const lista = timesParaSortear.length % 2 === 0 ? [...timesParaSortear] : [...timesParaSortear, BYE];
 
   const numTimes = lista.length;
   const numRodadasTurno = numTimes - 1;
@@ -152,7 +173,7 @@ export async function simularTemporadaPontosCorridos(
   aoSimularConfronto?: (evento: EventoConfrontoPontosCorridos) => void,
   resolverPartida: ResolverPartida = resolverPartidaPadrao,
 ): Promise<ResultadoTemporadaPontosCorridos> {
-  const confrontos = gerarConfrontosPontosCorridos(times, idaEVolta);
+  const confrontos = gerarConfrontosPontosCorridos(times, idaEVolta, random);
   const tabela = new Map<string, LinhaTabela>(times.map((id) => [id, linhaVazia(id)]));
   const partidasDoJogador: PartidaDoJogador[] = [];
 

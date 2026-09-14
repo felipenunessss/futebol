@@ -113,7 +113,8 @@ function gerarRodadasCruzadas(times: string[], potePorTime: Map<string, number>)
   return rodadas;
 }
 
-function embaralhar<T>(lista: T[], random: () => number): T[] {
+/** Exportado pra `incremental.ts` reaproveitar o mesmo Fisher-Yates (embaralhar `campeonato.times` antes de gerar calendário de pontos corridos/turno — ver `construirPassos`). */
+export function embaralhar<T>(lista: T[], random: () => number): T[] {
   const copia = [...lista];
   for (let i = copia.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));

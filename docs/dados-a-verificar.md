@@ -66,6 +66,14 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   soma 6, mas os 7 clubes argentinos confirmados em `libertadores.json`
   mostram uma 7ª vaga real cujo mecanismo não foi reconfirmado por fonte
   específica.
+- **Paulistão A1 — chaveamento das quartas de final**: fontes públicas (CNN
+  Brasil, Itatiaia) descrevem um chaveamento "olímpico" pela classificação
+  GERAL (1ºx8º, 2ºx7º, 3ºx6º, 4ºx5º), cruzando potes. O jogador, perguntado
+  diretamente, confirmou uma regra diferente — 1º e 2º colocados do MESMO
+  pote se enfrentam — que é a implementada (`simulation/incremental.ts`
+  `paresPorPoteDaFaseSuica`, ver `docs/motor-de-partida.md` seção 5.31).
+  Divergência não resolvida: pode ser edição/temporada diferente da coberta
+  pelas fontes, ou o jogador descrevendo de memória um regulamento antigo.
 
 ## Vagas/premiação vazias ou não confirmadas
 
@@ -130,6 +138,29 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   `vaga_serie_d` (preenchimento por estaduais, ver
   `docs/regras-competicoes.md`) não estiver implementado como reposição
   alternativa.
+- **Paulistão A2 `acesso_proxima_divisao`: adicionado como `2`** (antes
+  ausente — bug relatado pelo usuário: rebaixamento/acesso não validável
+  nos estaduais com 2+ divisões). Escolhido `2`, não `1`, pra CASAR com o
+  `rebaixamento_proxima_divisao: 2` do A1 (mesmo motivo do ajuste Série C/D
+  documentado acima — sem isso o A1 perderia 2 times/temporada pro A2 e só
+  receberia 1 de volta, drenando 1 time/temporada até quebrar a validação
+  de 16 times exigida por `dividirEmPotes` da fase suíça). O critério real
+  de acesso do A2 é "quem vence a final de acesso"
+  (`final_estadual.criterio: "lideres_dos_quadrangulares_disputam_final_de_acesso"`),
+  não posição na fase de grupos — mas `career/mundo-persistente.ts` só sabe
+  tirar o top-N de uma `tabelaFinal`/lista ordenada por eliminação, então
+  isso é resolvido pelos 2 primeiros colocados da fase de grupos (ANTES do
+  quadrangular/final), mesma simplificação já usada pra Série C — aproximação,
+  não o critério exato. Se `mundo-persistente.ts` ganhar um sinal baseado em
+  `campeao`/vice no futuro, revisar pra usar o resultado de verdade da final.
+- **Paulistão A3 `acesso_proxima_divisao`: adicionado como `2`** (antes
+  `premiacao` vazio) — mesmo motivo acima, casar com o `rebaixamento_proxima_divisao: 2`
+  do A2 (sem isso o A2 drenaria 2 times/temporada pro A3 sem nunca receber
+  de volta). Resolvido pelos 2 primeiros colocados na ordem de eliminação
+  do mata-mata do A3 (`semifinalistas`/`classificacaoPorEliminacao`, o A3
+  não tem `tabelaFinal`). O A4 continua com `premiacao` vazio de propósito —
+  o A3 não tem `rebaixamento_proxima_divisao` cadastrado, então não há fluxo
+  nenhum tentando descer pro A4 (nada a balancear ali ainda).
 - **Copa do Brasil — 3 estaduais sem pesquisa dedicada de vaga_serie_d**
   (`paulistao_a1`, `candangao_1`, `capixaba_1`): usam a regra padrão (1
   vaga, melhor colocado sem competição nacional) em vez de critério

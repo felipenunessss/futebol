@@ -144,6 +144,24 @@ describe("criarCompeticaoIncremental — fase_suica + mata_mata (Paulistão/Gauc
     expect(eventosSuica.length).toBeGreaterThan(0);
     expect(eventosMataMata.length).toBeGreaterThan(0);
   });
+
+  // Bug real relatado pelo usuário: "fiquei em 5 e não fui pro mata-mata" (Paulistão A1, jogando no
+  // pote dos favoritos) + chaveamento incorreto no mata-mata. Verificado com fonte real (CNN Brasil/
+  // Itatiaia, regulamento do Paulistão 2026): as quartas são um chaveamento OLÍMPICO pela
+  // classificação GERAL da fase suíça (1º x último classificado, 2º x penúltimo, etc.), não um
+  // sorteio nem par fixo dentro do mesmo pote/grupo — `paresSeededPorClassificacaoGeral`.
+  it("mata-mata da fase suíça forma um chaveamento válido (todo classificado aparece exatamente 1x, em pares disjuntos) quando o nº de classificados é potência de 2", async () => {
+    const pares: [string, string][] = [];
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 12 }, () => Math.random());
+    for (let semana = 1; semana <= 12; semana++) {
+      await avancarSemana(estado, semana, () => Math.random(), undefined, {
+        aoDefinirChaveamento: (info) => pares.push(...info.pares),
+      });
+    }
+    expect(pares).toHaveLength(2); // classificam_mata_mata: 4 -> semifinal com 2 confrontos
+    const todosOsTimes = pares.flat();
+    expect(new Set(todosOsTimes).size).toBe(4); // 4 times distintos, nenhum repetido/faltando
+  });
 });
 
 describe("avancarEtapa — bye automático quando o mata-mata sobra número ímpar de sobreviventes", () => {

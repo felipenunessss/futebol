@@ -21,7 +21,12 @@
         "semifinal",
         "final"
       ],
-      "ida_e_volta": true
+      "ida_e_volta": false,
+      "etapas": [
+        { "nome": "quartas", "ida_e_volta": false },
+        { "nome": "semifinal", "ida_e_volta": false },
+        { "nome": "final", "ida_e_volta": true }
+      ]
     }
   },
   "premiacao": {

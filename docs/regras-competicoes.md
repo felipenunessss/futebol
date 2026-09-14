@@ -47,9 +47,44 @@ colocados" dele pra rebaixamento). Confirmado com dado real:
   D mantém 96, nenhum clube duplicado ou perdido, em todas as direções
   simultaneamente (A↔B, C→B, B→C, D→C, C→D).
 
+**Estaduais com 2+ divisões catalogadas** (também confirmado funcionando,
+bug relatado pelo usuário: "não estou conseguindo validar se o
+rebaixamento está funcionando corretamente nos estaduais com mais de uma
+divisão"). Cada formato precisou de um sinal diferente, generalizado em vez
+de remendado caso a caso:
+- **Paulistão A1↔A2, Mineiro Módulo I↔II**: `fase_suica`+`mata_mata` (e
+  variante com `final_estadual`) agora expõe `tabelaFinal` a partir da
+  tabela GERAL da fase suíça (1 grupo só, todos os times) — usada só pra
+  REBAIXAMENTO (a classificação pro próprio mata-mata é por pote, não pelo
+  geral, então não serve pra decidir quem avança, só quem cai).
+- **Carioca A↔A2**: `turno`+`returno`+`final_estadual` (Taça Guanabara +
+  Taça Rio) agora soma as 2 tabelas (`somarTabelas`) num `tabelaFinal`
+  único — nem o turno nem o returno isolados, nem a final (só tem os 2
+  campeões de torneio), davam uma classificação de TODOS os times.
+- **Carioca A2, Mineiro/Baiano/Pernambucano Módulo II**: `turno`+
+  `mata_mata` e `fase_grupos`+`mata_mata` com MAIS de 1 grupo continuam sem
+  `tabelaFinal` (ambíguo com mais de 1 grupo/sem tabela nenhuma pro
+  `turno`+`mata_mata`), mas `semifinalistas` deixou de exigir bater o
+  tamanho EXATO da etapa "semifinal" — virou uma lista ORDENADA por
+  eliminação (campeão, vice, eliminados da penúltima etapa, ...,
+  `simulation/incremental.ts` `classificacaoPorEliminacao`), e quem
+  consome faz `slice(0, acesso_proxima_divisao)`. Isso também generaliza o
+  caso já confirmado da Série D (`4` semifinalistas pra `4` vagas — o
+  slice de uma lista de 4 elementos pegando os 4 dá o mesmo resultado de
+  antes, sem regressão).
+- **Paulistão A1↔A2↔A3**: o Paulistão tem 4 divisões catalogadas (A1-A4), não
+  só 2 — A2 ganhou `acesso_proxima_divisao: 2` e A3 ganhou
+  `acesso_proxima_divisao: 2` (antes ausentes dos dados), casando
+  exatamente com o `rebaixamento_proxima_divisao: 2` de cada vizinho de
+  cima (A1 e A2, respectivamente) — sem isso o A1 e o A2 drenariam times a
+  cada temporada, mesma classe de bug já corrigida pra Série C/D (ver
+  acima). Resolvidos pelos primeiros colocados da fase de grupos/ordem de
+  eliminação do mata-mata (aproximação, não o critério exato de cada final
+  de acesso; ver `docs/dados-a-verificar.md`). A4 fica de fora do
+  mecanismo (sem `rebaixamento_proxima_divisao` no A3, não há fluxo
+  nenhum tentando descer pra lá ainda).
+
 **Ainda não coberto** (fica como pendência, não implementado):
-- A maioria dos estaduais (a maior parte usa `fase_suica`/`turno`+`returno`,
-  nenhum expõe `tabelaFinal`/`semifinalistas` ainda).
 - Vagas de Copa do Brasil/Série D concedidas a um estadual
   (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição
   em competições já com fases escalonadas/sorteio de grupos (a própria Série D
@@ -57,14 +92,13 @@ colocados" dele pra rebaixamento). Confirmado com dado real:
 - Título/campeão de competições sem `tabelaFinal` continua funcionando
   normalmente (não depende de `tabelaFinal`) — só a composição de times pra
   temporada seguinte é que não muda pra essas.
-
-Extensão natural pra quando alguém for aumentar a cobertura: expor
-`tabelaFinal` nas demais receitas de `incremental.ts` que já têm uma
-classificação por trás (`fase_grupos` com MAIS de 1 grupo teria uma tabela
-por grupo, não uma única — precisaria decidir o que "classificação final"
-quer dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra
-formatos multi-grupo de verdade); ou expor `semifinalistas`-like em outros
-mata-matas com etapa nomeada relevante.
+- `fase_grupos` com MAIS de 1 grupo continua sem `tabelaFinal` (uma tabela
+  por grupo, não uma única — precisaria decidir o que "classificação final"
+  quer dizer nesse caso antes de estender `calcularMudancasDeDivisao` pra
+  formatos multi-grupo de verdade); REBAIXAMENTO desses formatos (quando
+  existir) continua sem sinal nenhum (`semifinalistas`/
+  `classificacaoPorEliminacao` só cobre quem chegou ao mata-mata, não os
+  piores colocados da fase de grupos).
 
 ## Vagas de Libertadores/Sul-Americana (implementado, escopo parcial)
 

@@ -1,5 +1,5 @@
 import type { Club } from "../schemas/club.js";
-import type { EtapaMataMata, FaseSuica, FaseUnica } from "../schemas/championship.js";
+import type { EtapaMataMata, FaseSuica, FaseUnica, MataMata } from "../schemas/championship.js";
 import { construirCalendarioPadrao, janelaDeSemanasPorCompeticao, type JanelaDeSemanas } from "../data/loaders/calendario.js";
 import type { CampeonatoSimulavel } from "./engine.js";
 import {
@@ -12,7 +12,7 @@ import {
   type EventoConfrontoPontosCorridos,
   type LinhaTabela,
 } from "./season.js";
-import { gerarConfrontosFaseSuica, construirPotePorTime, selecionarClassificadosFaseSuica } from "./swiss.js";
+import { gerarConfrontosFaseSuica, construirPotePorTime, selecionarClassificadosFaseSuica, embaralhar } from "./swiss.js";
 import { dividirEmGruposPorForca, type Grupo } from "./groups.js";
 import {
   emparelharPorForca,
@@ -103,6 +103,15 @@ export interface FaseMataMata {
    * `undefined` em qualquer outro tipo de mata-mata (continua por força, como sempre).
    */
   gruposParaSorteioDaEtapaZero?: { nome: string; times: [string, string] }[];
+  /**
+   * Presente só quando esta fase nasce de uma fase suíça com `classificacao_por_pote` de exatamente
+   * 2 vagas por pote (ex: Paulistão A1: 4 potes de 4, top 2 de cada avança) — 1º e 2º colocados do
+   * MESMO pote se enfrentam na 1ª etapa do mata-mata, com o 1º mandando (regra real do formato,
+   * diferente do sorteio cruzado de `gruposParaSorteioDaEtapaZero`, que é 1º de um grupo contra 2º
+   * de OUTRO). Consumido e zerado por `avancarEtapa` na primeira etapa (usa o par direto em vez de
+   * `emparelharPorForca`); `undefined` em qualquer outro tipo de mata-mata.
+   */
+  gruposParaConfrontoDiretoDaEtapaZero?: { nome: string; times: [string, string] }[];
 }
 
 /**
@@ -175,6 +184,36 @@ function classificadosDaFaseSuica(fase: FaseRodadas, times: string[], formato: F
   return selecionarClassificadosFaseSuica(tabelaOrdenada, potePorTime, formato);
 }
 
+/**
+ * Chaveamento das quartas por PARES DE MESMO POTE — 1º x 2º colocado (na ordem geral, restrita ao
+ * pote) se enfrentam, mandante é sempre o melhor colocado do par (confirmado diretamente pelo
+ * usuário: "é o formato de 1x2 do mesmo pote que eu falei" — uma fonte pública, CNN Brasil, descreve
+ * um chaveamento olímpico cross-pote 1v8/2v7/3v6/4v5 que NÃO bate com isso; documentado como
+ * divergência em `docs/dados-a-verificar.md`, prevalece a confirmação direta do usuário).
+ * `classificados` vem em ordem de classificação geral (`classificadosDaFaseSuica`); `potePorTime`
+ * mapeia cada time ao índice do pote (`construirPotePorTime`). Requer exatamente 2 classificados por
+ * pote (senão não dá pra parear 1º/2º sem sobra) — `undefined` fora disso, mata-mata cai pro
+ * `emparelharPorForca` genérico de sempre.
+ */
+function paresPorPoteDaFaseSuica(classificados: string[], potePorTime: Map<string, number>): { nome: string; times: [string, string] }[] | undefined {
+  const classificadosPorPote = new Map<number, string[]>();
+  for (const time of classificados) {
+    const pote = potePorTime.get(time);
+    if (pote === undefined) return undefined;
+    const lista = classificadosPorPote.get(pote) ?? [];
+    lista.push(time);
+    classificadosPorPote.set(pote, lista);
+  }
+  if ([...classificadosPorPote.values()].some((lista) => lista.length !== 2)) return undefined;
+
+  const pares: { nome: string; times: [string, string] }[] = [];
+  let indice = 1;
+  for (const [primeiro, segundo] of classificadosPorPote.values()) {
+    pares.push({ nome: `Confronto ${indice++}`, times: [primeiro, segundo] });
+  }
+  return pares;
+}
+
 function criarFaseRodadas(nome: string, gruposDeTimes: string[][], idaEVolta: boolean, classificamPorGrupo: number): FaseRodadas {
   const multiplosGrupos = gruposDeTimes.length > 1;
   const grupos: GrupoDeRodadas[] = gruposDeTimes.map((times, indice) => ({
@@ -238,8 +277,24 @@ function criarFaseRodadasPorClassificacao(
   return { tipo: "rodadas", nome, grupos, classificamPorGrupo: 0, rodadaAtual: 1, totalRodadas, partidasDoJogador: [], concluida: totalRodadas === 0 };
 }
 
-function criarFaseMataMata(nome: string, etapas: EtapaMataMata[], gruposParaSorteioDaEtapaZero?: { nome: string; times: [string, string] }[]): FaseMataMata {
-  return { tipo: "mata_mata", nome, etapas, indiceAtual: 0, vivos: [], resultados: [], partidasDoJogador: [], concluida: etapas.length === 0, gruposParaSorteioDaEtapaZero };
+function criarFaseMataMata(
+  nome: string,
+  etapas: EtapaMataMata[],
+  gruposParaSorteioDaEtapaZero?: { nome: string; times: [string, string] }[],
+  gruposParaConfrontoDiretoDaEtapaZero?: { nome: string; times: [string, string] }[],
+): FaseMataMata {
+  return {
+    tipo: "mata_mata",
+    nome,
+    etapas,
+    indiceAtual: 0,
+    vivos: [],
+    resultados: [],
+    partidasDoJogador: [],
+    concluida: etapas.length === 0,
+    gruposParaSorteioDaEtapaZero,
+    gruposParaConfrontoDiretoDaEtapaZero,
+  };
 }
 
 function criarFaseRepechaje(segundosSula: string[], terceirosLibertadores: string[]): FaseRepechaje {
@@ -316,14 +371,19 @@ async function avancarEtapa(
     // potes já decidiu os pares (que já garante contagem par por construção).
     let comBye: string | undefined;
     let participantes = fase.vivos;
-    if (!fase.gruposParaSorteioDaEtapaZero && !ehUltimaEtapa && fase.vivos.length % 2 !== 0) {
+    if (!fase.gruposParaSorteioDaEtapaZero && !fase.gruposParaConfrontoDiretoDaEtapaZero && !ehUltimaEtapa && fase.vivos.length % 2 !== 0) {
       const ordenados = ordenarPorForca(fase.vivos, ratings);
       comBye = ordenados[0];
       participantes = ordenados.slice(1);
     }
 
-    const pares = fase.gruposParaSorteioDaEtapaZero ? sortearConfrontosPorPotes(fase.gruposParaSorteioDaEtapaZero, random) : emparelharPorForca(participantes, ratings);
+    const pares = fase.gruposParaSorteioDaEtapaZero
+      ? sortearConfrontosPorPotes(fase.gruposParaSorteioDaEtapaZero, random)
+      : fase.gruposParaConfrontoDiretoDaEtapaZero
+        ? fase.gruposParaConfrontoDiretoDaEtapaZero.map((grupo) => grupo.times)
+        : emparelharPorForca(participantes, ratings);
     fase.gruposParaSorteioDaEtapaZero = undefined;
+    fase.gruposParaConfrontoDiretoDaEtapaZero = undefined;
     if (ehPrimeiraEtapa) await hooks?.aoDefinirChaveamento?.({ etapaNome: etapa.nome, pares });
     const confrontos: ResultadoConfrontoMataMata[] = [];
     for (const [timeA, timeB] of pares) {
@@ -409,12 +469,12 @@ export interface ContextoDePrograma {
    */
   tabelaFinal?: LinhaTabela[];
   /**
-   * Club.id[] de quem chegou pelo menos à etapa "semifinal" de um mata-mata (2 confrontos, 4
-   * times — vencedores e perdedores, não só quem avança à final) — usado por `career/
-   * mundo-persistente.ts` como alternativa a `tabelaFinal` pra promoção quando o formato não expõe
-   * uma classificação final ordenada (`fase_grupos`+`mata_mata` com mais de 1 grupo, ex:
-   * Brasileirão Série D: "os 4 semifinalistas sobem", não uma posição em tabela). `undefined` se a
-   * competição não tiver uma etapa chamada exatamente "semifinal" — ver `passosFaseGruposEMataMata`.
+   * Club.id[] do mata-mata em ordem de quão longe cada time chegou (campeão, vice, eliminados da
+   * penúltima etapa, ...) — usado por `career/mundo-persistente.ts` como alternativa a `tabelaFinal`
+   * pra promoção quando o formato não expõe uma classificação final ordenada (`fase_grupos`+
+   * `mata_mata` com mais de 1 grupo, ex: Brasileirão Série D; `turno`+`mata_mata`, ex: Carioca A2).
+   * Quem consome faz `slice(0, acesso_proxima_divisao)` — não precisa bater o tamanho todo (ver
+   * `classificacaoPorEliminacao`). `undefined` se o mata-mata ainda não resolveu etapa nenhuma.
    */
   semifinalistas?: string[];
   [chave: string]: unknown;
@@ -477,6 +537,21 @@ function passosPontosCorridosComLiguilla(campeonato: CampeonatoSimulavel): Passo
 }
 
 /**
+ * Monta as `EtapaMataMata[]` de um mata-mata "simples" (`MataMata.fases`/`ida_e_volta`), substituindo
+ * os entrantes da etapa 0 pelos classificados calculados dinamicamente (top de uma fase de grupos/
+ * turno/fase suíça, nunca uma lista fixa no dado). Prefere `MataMata.etapas` quando presente — mais
+ * preciso, permite `ida_e_volta` diferente por etapa (ex: Paulistão A1: quartas e semifinal em jogo
+ * único, final em ida e volta — `mataMata.ida_e_volta` sozinho só suporta 1 valor pra TODAS as
+ * etapas, ver doc de `MataMata.etapas` em `schemas/championship.ts`) — cai pro par `fases`+
+ * `ida_e_volta` (mesmo valor em todas) quando `etapas` não está presente, mesmo comportamento de
+ * sempre.
+ */
+function etapasParaMataMataSimples(mataMata: MataMata, entrantesDaEtapaZero: string[]): EtapaMataMata[] {
+  const base: EtapaMataMata[] = mataMata.etapas ?? mataMata.fases.map((nome) => ({ nome, ida_e_volta: mataMata.ida_e_volta }));
+  return base.map((etapa, indice) => ({ ...etapa, entrantes: indice === 0 ? entrantesDaEtapaZero : etapa.entrantes }));
+}
+
+/**
  * `mata_mata` + `turno` (só um turno, sem returno — ex: Carioca Série A2,
  * "Taça Santos Dumont") — mesmo espírito de `passosPontosCorridosComLiguilla`,
  * só que a fase de tabela usa o bloco `turno` (`FaseUnica`, com nome
@@ -508,6 +583,11 @@ function passosTurnoEMataMata(campeonato: CampeonatoSimulavel): PassoDePrograma[
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
+        // Habilita acesso pra competições `turno`+`mata_mata` (ex: Carioca A2) — esse formato nunca
+        // expõe `tabelaFinal` (a tabela do turno só decide quem entra no mata-mata, não a
+        // classificação final) e antes também não setava `semifinalistas`, então o acesso nunca
+        // acontecia (mesmo bug documentado em `classificacaoPorEliminacao`).
+        ctx.semifinalistas = classificacaoPorEliminacao(fase as FaseMataMata);
       },
     },
   ];
@@ -522,6 +602,15 @@ function passosFaseSuicaEMataMata(campeonato: CampeonatoSimulavel, random: () =>
       criar: () => criarFaseRodadasSuica("suica", campeonato.times, suica, random),
       aoConcluir: (fase, ctx) => {
         ctx.classificados = classificadosDaFaseSuica(fase as FaseRodadas, campeonato.times, suica);
+        const potePorTime = construirPotePorTime(campeonato.times, suica.num_potes, suica.times_por_pote);
+        ctx.paresParaMataMata = paresPorPoteDaFaseSuica(ctx.classificados as string[], potePorTime);
+        // Tabela geral da fase suíça (16 times, 1 grupo só) — não é usada pra decidir quem avança ao
+        // mata-mata (isso é por pote, ver `classificadosDaFaseSuica`), mas é a classificação final
+        // válida pra REBAIXAMENTO (`career/mundo-persistente.ts` `calcularMudancasDeDivisao`), que
+        // olha o campo inteiro, não por pote — sem isso, fase_suica nunca expunha `tabelaFinal` e o
+        // rebaixamento do Paulistão A1/Mineiro Módulo I nunca acontecia (bug relatado pelo usuário:
+        // "não estou conseguindo validar se o rebaixamento está funcionando").
+        ctx.tabelaFinal = tabelaDoGrupoUnico(fase as FaseRodadas);
       },
     },
     {
@@ -529,7 +618,9 @@ function passosFaseSuicaEMataMata(campeonato: CampeonatoSimulavel, random: () =>
       criar: (ctx) =>
         criarFaseMataMata(
           "mata_mata",
-          mataMata.fases.map((nome, indice) => ({ nome, ida_e_volta: mataMata.ida_e_volta, entrantes: indice === 0 ? (ctx.classificados as string[]) : undefined })),
+          etapasParaMataMataSimples(mataMata, ctx.classificados as string[]),
+          undefined,
+          ctx.paresParaMataMata as { nome: string; times: [string, string] }[] | undefined,
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
@@ -548,6 +639,9 @@ function passosFaseSuicaMataMataEFinal(campeonato: CampeonatoSimulavel, random: 
       criar: () => criarFaseRodadasSuica("suica", campeonato.times, suica, random),
       aoConcluir: (fase, ctx) => {
         ctx.classificados = classificadosDaFaseSuica(fase as FaseRodadas, campeonato.times, suica);
+        // Ver mesmo comentário em `passosFaseSuicaEMataMata` — habilita rebaixamento pra competições
+        // fase_suica+final_estadual+mata_mata (ex: Mineiro Módulo I).
+        ctx.tabelaFinal = tabelaDoGrupoUnico(fase as FaseRodadas);
       },
     },
     {
@@ -639,14 +733,22 @@ function passosCarioca(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
       unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
       criar: () => criarFaseRodadas("taca_guanabara", [campeonato.times], turno.ida_e_volta, 1),
       aoConcluir: (fase, ctx) => {
-        ctx.campeaoTurno = tabelaDoGrupoUnico(fase as FaseRodadas)[0].clubeId;
+        const tabelaTurno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.tabelaTurno = tabelaTurno;
+        ctx.campeaoTurno = tabelaTurno[0].clubeId;
       },
     },
     {
       unidades: totalDeRodadas(campeonato.times.length, returno.ida_e_volta),
       criar: () => criarFaseRodadas("taca_rio", [campeonato.times], returno.ida_e_volta, 1),
       aoConcluir: (fase, ctx) => {
-        ctx.campeaoReturno = tabelaDoGrupoUnico(fase as FaseRodadas)[0].clubeId;
+        const tabelaReturno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.campeaoReturno = tabelaReturno[0].clubeId;
+        // Classificação final = soma Taça Guanabara + Taça Rio (nenhuma das duas isoladas nem a
+        // final — que só tem os 2 campeões de turno/returno — dá uma classificação de TODOS os
+        // times) — habilita o rebaixamento do Carioca A pro A2 (`career/mundo-persistente.ts`), que
+        // antes nunca acontecia por `passosCarioca` não expor `tabelaFinal` nenhum.
+        ctx.tabelaFinal = somarTabelas([ctx.tabelaTurno as LinhaTabela[], tabelaReturno]);
       },
     },
     {
@@ -1072,20 +1174,41 @@ function passosFaseGruposEMataMata(campeonato: CampeonatoSimulavel, ratings: Rec
         ),
       aoConcluir: (fase, ctx) => {
         ctx.campeao = (fase as FaseMataMata).vivos[0];
-        ctx.semifinalistas = semifinalistasDaFase(fase as FaseMataMata);
+        ctx.semifinalistas = classificacaoPorEliminacao(fase as FaseMataMata);
       },
     },
   ];
 }
 
-/** Club.id[] de quem jogou a etapa chamada exatamente "semifinal" (vencedores E perdedores dos 2
- * confrontos — 4 times) — `undefined` se o mata-mata não tiver uma etapa com esse nome. Usado por
- * `career/mundo-persistente.ts` como sinal alternativo de promoção quando o formato não expõe
- * `tabelaFinal` (ver `ContextoDePrograma.semifinalistas`). */
-function semifinalistasDaFase(fase: FaseMataMata): string[] | undefined {
-  const semifinal = fase.resultados.find((etapa) => etapa.nome === "semifinal");
-  if (!semifinal) return undefined;
-  return semifinal.confrontos.flatMap((confronto) => [confronto.timeA, confronto.timeB]);
+/**
+ * Club.id[] em ordem de quão longe cada time chegou nas 2 ÚLTIMAS etapas resolvidas do mata-mata —
+ * campeão primeiro, vice em seguida, depois os eliminados da penúltima etapa (`undefined` se o
+ * mata-mata não tiver nenhuma etapa resolvida ainda). Só as 2 últimas de propósito — pra reproduzir
+ * a mesma "final four" que a antiga `semifinalistasDaFase` dava pra brackets com mais rodadas antes
+ * da semifinal (ex: Série D: segunda_fase→terceira_fase→oitavas→quartas→semifinal→final — só as 2
+ * últimas etapas interessam, os eliminados de rodadas mais cedo nunca fizeram parte da "final four").
+ * Generaliza a antiga função (que exigia uma etapa chamada EXATAMENTE "semifinal" E o
+ * `acesso_proxima_divisao` cadastrado batendo com o tamanho INTEIRO dela — 4 times sempre — o que
+ * deixava de fora qualquer competição com 1 ou 2 vagas de acesso, ex: Baiano/Pernambucano/Mineiro
+ * Módulo II, todas com só 2 etapas de mata-mata e 1-2 vagas — bug relatado pelo usuário: "não estou
+ * conseguindo validar se o rebaixamento/acesso está funcionando"). Usado por `career/
+ * mundo-persistente.ts` como sinal de promoção quando o formato não expõe `tabelaFinal` — quem chama
+ * faz `slice(0, N)` pra pegar os N mais avançados, em vez de exigir bater o tamanho todo.
+ */
+function classificacaoPorEliminacao(fase: FaseMataMata): string[] | undefined {
+  if (fase.resultados.length === 0) return undefined;
+  const ultimasDuasEtapas = fase.resultados.slice(-2);
+  const ordem: string[] = [];
+  for (let indice = ultimasDuasEtapas.length - 1; indice >= 0; indice--) {
+    const etapa = ultimasDuasEtapas[indice];
+    const ehAFinal = indice === ultimasDuasEtapas.length - 1;
+    for (const confronto of etapa.confrontos) {
+      const perdedor = confronto.vencedor === confronto.timeA ? confronto.timeB : confronto.timeA;
+      if (ehAFinal) ordem.push(confronto.vencedor, perdedor);
+      else ordem.push(perdedor);
+    }
+  }
+  return ordem;
 }
 
 function passosMataMata(campeonato: CampeonatoSimulavel): PassoDePrograma[] {
@@ -1131,7 +1254,21 @@ function passosTurnoRetornoSomado(campeonato: CampeonatoSimulavel): PassoDeProgr
   ];
 }
 
+/**
+ * Embaralha `campeonato.times` (cópia local, não muta o objeto recebido) antes de montar os passos
+ * da temporada — sem isso, o pareamento de rodada 1 de todo formato baseado em `gerarConfrontosPontosCorridos`
+ * (pontos_corridos puro, turno/returno) é puramente determinístico pela ordem do arquivo de dado
+ * estático, e como essa ordem nunca muda, toda temporada simulada repetia o MESMO calendário (bug
+ * relatado pelo usuário: "a rodada 1 sempre é contra o mesmo time"). NÃO aplica quando o formato tem
+ * `fase_suica` — lá a ordem de `times` É o sorteio dos potes (pote 1 = primeiros N times, ver
+ * `swiss.ts` `dividirEmPotes`), embaralhar aqui destruiria esse sorteio; a fase suíça já tem sua
+ * própria randomização de confrontos dentro do pote fixo (`gerarConfrontosFaseSuica`). Formatos com
+ * `fase_grupos` não são afetados por essa ressalva — `dividirEmGruposPorForca` forma os grupos
+ * reordenando por `ratings`, não pela ordem de entrada.
+ */
 function construirPassos(campeonato: CampeonatoSimulavel, ratings: Record<string, number>, random: () => number): PassoDePrograma[] {
+  if (!("fase_suica" in campeonato.formato)) campeonato = { ...campeonato, times: embaralhar(campeonato.times, random) };
+
   if (campeonato.id === "carioca_a") return passosCarioca(campeonato);
   if (campeonato.id === "peru_primera") return passosPeruPrimeira(campeonato);
   // Argentina 1ª (por id — mesma combinação de blocos ambígua de Peru 1ª/Carioca): o
@@ -1201,7 +1338,7 @@ export interface CompeticaoIncremental {
   campeao?: string;
   /** Ver `ContextoDePrograma.tabelaFinal` — só populado pra formatos que suportam extração hoje. */
   tabelaFinal?: LinhaTabela[];
-  /** Ver `ContextoDePrograma.semifinalistas` — só populado quando o mata-mata tem uma etapa "semifinal". */
+  /** Ver `ContextoDePrograma.semifinalistas` — só populado depois que o mata-mata resolve pelo menos 1 etapa. */
   semifinalistas?: string[];
   /** Presente quando a competição quebrou no meio da temporada (ex: dado incompatível só detectável depois que uma fase anterior já concluiu — `criar` de um passo posterior pode lançar). A partir daí `avancarSemana` não tenta mais avançar essa competição (fica `concluida: true` sem `campeao`) — mesma tolerância a falha isolada de `engine.ts` `ResultadoCompeticaoNaTemporada.erro`, só que detectada mais tarde (aqui) em vez de na montagem inicial (`CompeticoesDaTemporada.erros`). */
   erro?: string;

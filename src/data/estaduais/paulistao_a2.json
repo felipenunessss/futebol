@@ -23,7 +23,8 @@
     }
   },
   "premiacao": {
-    "rebaixamento_proxima_divisao": 2
+    "rebaixamento_proxima_divisao": 2,
+    "acesso_proxima_divisao": 2
   },
   "classicos": [],
   "times": [

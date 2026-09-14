@@ -20,7 +20,9 @@
       "ida_e_volta": true
     }
   },
-  "premiacao": {},
+  "premiacao": {
+    "acesso_proxima_divisao": 2
+  },
   "classicos": [],
   "times": [
     "bandeirante",

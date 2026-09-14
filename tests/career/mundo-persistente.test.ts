@@ -150,6 +150,25 @@ describe("calcularMudancasDeDivisao", () => {
     expect(calcularMudancasDeDivisao([serieD, serieC])).toEqual([]);
   });
 
+  it("bug real corrigido: `semifinalistas` promove os N PRIMEIROS (ordem = quão longe cada time chegou) quando acesso_proxima_divisao é MENOR que o tamanho da lista — antes exigia bater o tamanho exato, deixando estaduais com 1-2 vagas de acesso (Baiano/Pernambucano/Mineiro Módulo II) sempre sem promoção nenhuma", () => {
+    const moduloII: CompeticaoParaMundoPersistente = {
+      id: "baiano_2",
+      chaveDeHierarquia: "estadual:BA",
+      nivel: 2,
+      premiacao: { acesso_proxima_divisao: 2 },
+      // ordem de `classificacaoPorEliminacao`: campeão, vice, eliminados da semifinal
+      semifinalistas: ["campeao", "vice", "semi_perdedor_1", "semi_perdedor_2"],
+    };
+    const moduloI: CompeticaoParaMundoPersistente = { id: "baiano_1", chaveDeHierarquia: "estadual:BA", nivel: 1, premiacao: {}, tabelaFinal: ["b1", "b2"].map(linha) };
+
+    const mudancas = calcularMudancasDeDivisao([moduloII, moduloI]);
+
+    const mudancaII = mudancas.find((m) => m.competicaoId === "baiano_2")!;
+    const mudancaI = mudancas.find((m) => m.competicaoId === "baiano_1")!;
+    expect(mudancaII.saem.sort()).toEqual(["campeao", "vice"]); // só os 2 primeiros da ordem, não os 4
+    expect(mudancaI.entram.sort()).toEqual(["campeao", "vice"]);
+  });
+
   it("bug real corrigido: rebaixamento consegue entrar numa divisão que só tem `semifinalistas` (não `tabelaFinal`) — a divisão só precisa provar que foi simulada essa temporada, não precisa ter ordem pra RECEBER times", () => {
     const serieC: CompeticaoParaMundoPersistente = {
       id: "serie_c",

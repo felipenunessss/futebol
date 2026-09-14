@@ -27,11 +27,24 @@ import type { LinhaTabela } from "../simulation/season.js";
  * de que a divisão foi simulada essa temporada (não precisa ordem pra RECEBER times, só pra decidir
  * quem SAI de uma). Sem isso, a Série D promoveria 4 semifinalistas/temporada pra C sem nunca
  * receber de volta os 4 que a C rebaixa — bug real encontrado com dado real (Série D caindo de 96
- * pra 92 times já na 1ª aplicação). **Ainda não cobre**: a maioria dos estaduais (fase_suica/
- * fase_grupos/turno-retorno não têm `tabelaFinal` ainda). Também não cobre vagas de Copa do
- * Brasil/Série D concedidas a um estadual (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) —
- * inserções cross-competição em competições já complexas (fases escalonadas, sorteio de grupos),
- * fora de escopo por ora.
+ * pra 92 times já na 1ª aplicação).
+ *
+ * **Estaduais com 2+ divisões** (Paulistão, Carioca, Mineiro, Baiano, Pernambucano) também
+ * cobertos — cada formato precisou de um ajuste pra expor sinal de classificação final:
+ * `fase_suica`+`mata_mata` (Paulistão A1, Mineiro Módulo I) expõe `tabelaFinal` da tabela geral da
+ * fase suíça (válida pra REBAIXAMENTO — a classificação pro mata-mata em si é por pote, não pelo
+ * geral, ver `simulation/incremental.ts` `classificadosDaFaseSuica`); `turno`+`returno`+
+ * `final_estadual` (Carioca A) soma as 2 tabelas (Taça Guanabara + Taça Rio) num `tabelaFinal`
+ * único; `turno`+`mata_mata` (Carioca A2) e `fase_grupos`+`mata_mata` com mais de 1 grupo (Mineiro/
+ * Baiano/Pernambucano Módulo II) usam `semifinalistas`, que deixou de exigir bater o tamanho EXATO
+ * de `acesso_proxima_divisao` (agora é uma lista ORDENADA por eliminação — `slice(0, acesso)` basta,
+ * ver `classificacaoPorEliminacao`) — antes disso nenhum desses pares trocava clube nenhum entre
+ * temporadas (bug relatado pelo usuário: "não estou conseguindo validar se o rebaixamento está
+ * funcionando" nos estaduais com 2+ divisões).
+ *
+ * **Ainda não cobre**: vagas de Copa do Brasil/Série D concedidas a um estadual
+ * (`Premiacao.vaga_copa_do_brasil`/`vaga_serie_d`) — inserções cross-competição em competições já
+ * complexas (fases escalonadas, sorteio de grupos), fora de escopo por ora.
  *
  * **Vagas de Libertadores/Sul-Americana** (`Premiacao.vaga_libertadores`/`vaga_sulamericana`) têm um
  * mecanismo PRÓPRIO nesse mesmo arquivo (`calcularMudancasContinentais`) — não é promoção/
@@ -56,12 +69,13 @@ export interface CompeticaoParaMundoPersistente {
    * `semifinalistas` esteja presente (ver campo abaixo). */
   tabelaFinal?: LinhaTabela[];
   /** Alternativa a `tabelaFinal` pra `acesso_proxima_divisao` quando o formato não tem uma
-   * classificação ordenada (`fase_grupos`+`mata_mata` com mais de 1 grupo, ex: Brasileirão Série D:
-   * "os 4 semifinalistas sobem", não uma posição em tabela — ver `simulation/incremental.ts`
-   * `semifinalistasDaFase`). Só usado quando `acesso_proxima_divisao` bate EXATAMENTE com
-   * `semifinalistas.length` (ex: 4 semifinalistas pra 4 vagas) — sem essa checagem, um número de
-   * vagas diferente do de semifinalistas reais seria ambíguo (quem dos 4 fica de fora?). NUNCA usado
-   * pra `rebaixamento_proxima_divisao` (não tem "piores colocados" num conjunto sem ordem). */
+   * classificação ordenada (`fase_grupos`+`mata_mata` com mais de 1 grupo, ex: Brasileirão Série D;
+   * `turno`+`mata_mata`, ex: Carioca A2) — Club.id[] do mata-mata em ordem de quão longe cada time
+   * chegou (campeão, vice, eliminados da penúltima etapa, ...), ver `simulation/incremental.ts`
+   * `classificacaoPorEliminacao`. Usa `slice(0, acesso_proxima_divisao)` — só precisa ter gente
+   * suficiente pra cobrir as vagas, não bater o tamanho exato. NUNCA usado pra
+   * `rebaixamento_proxima_divisao` (quem NÃO chegou ao mata-mata nem aparece aqui, não dá pra saber
+   * os "piores colocados" a partir só de quem avançou). */
   semifinalistas?: string[];
 }
 
@@ -131,10 +145,16 @@ export function calcularMudancasDeDivisao(competicoes: CompeticaoParaMundoPersis
       const acesso = competicao.premiacao.acesso_proxima_divisao ?? 0;
       const divisaoDeCima = porNivel.get(competicao.nivel - 1);
       if (acesso > 0 && divisaoRastreavel(divisaoDeCima)) {
+        // `semifinalistas` hoje é uma lista ORDENADA por quão longe cada time chegou no mata-mata
+        // (campeão, vice, eliminados da penúltima etapa, ...) — basta ter gente suficiente pra cobrir
+        // as vagas de acesso, não precisa bater o tamanho exato do jeito que era antes (essa exigência
+        // de tamanho EXATO deixava de fora qualquer competição com menos vagas de acesso do que
+        // participantes na etapa mais funda do mata-mata, ex: 1-2 vagas com um mata-mata de 4
+        // participantes na semifinal — bug relatado pelo usuário, ver `docs/regras-competicoes.md`).
         const times = temTabelaFinal
           ? competicao.tabelaFinal!.slice(0, acesso).map((linha) => linha.clubeId)
-          : competicao.semifinalistas!.length === acesso
-            ? competicao.semifinalistas!
+          : competicao.semifinalistas && competicao.semifinalistas.length >= acesso
+            ? competicao.semifinalistas.slice(0, acesso)
             : undefined;
         if (times) {
           adicionar(mudancas, competicao.id, "saem", times);

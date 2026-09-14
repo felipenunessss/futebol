@@ -3,6 +3,7 @@ import { converterChancesEmDesempenho, type FocoDeTreino } from "@motor/progress
 import { buscarArquetipo } from "@motor/schemas/player.js";
 import type { Cenario, Opcao } from "@motor/progression/scenarios.js";
 import type { LinhaTabela } from "@motor/simulation/season.js";
+import { construirPotePorTime } from "@motor/simulation/swiss.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
 import type { EstadoDeCarreira } from "@motor/career/Player.js";
@@ -64,6 +65,13 @@ export interface FaixasDeDestaqueDaTabela {
   sulamericana?: number;
   /** Bottom N é rebaixado — vem direto de `Premiacao.rebaixamento_proxima_divisao`. */
   rebaixados?: number;
+}
+
+/** Pote de cada clube + quantos avançam por pote, pra competições de fase suíça com classificação por pote (ver `potesFaseSuicaPorCampeonato`). */
+export interface InfoPotesFaseSuica {
+  potePorTime: Map<string, number>;
+  numPotes: number;
+  vagasPorPote: number;
 }
 
 function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNacional): FaixasDeDestaqueDaTabela {
@@ -458,6 +466,32 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * a sala de troféus cai pra um ícone genérico nesse caso (`TrofeuDaCompeticao`). */
   const tacaPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.taca_url])), [campeonatos]);
   const faixasPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, faixasDeDestaqueDaTabela(c)])), [campeonatos]);
+  /**
+   * Pra competições de fase suíça com classificação por pote (ex: Paulistão A1: 4 potes de 4, top 2
+   * de cada pote avança) — o motor roda a fase inteira como 1 grupo só (`simulation/incremental.ts`
+   * `classificadosDaFaseSuica`), então a tabela vinda de `tabelaPorCampeonato` é uma lista ÚNICA com
+   * todos os times, sem indicar pote nenhum. Destacar um "top N" simples nela (como
+   * `faixasDeDestaqueDaTabela` faz pras demais competições) mostra o time ERRADO como classificado —
+   * quem se classifica de verdade é o top 2 DENTRO do pote, não do geral (bug relatado pelo usuário:
+   * "fiquei em 5 e não fui pro mata-mata", jogando no pote dos favoritos — Corinthians/Palmeiras/
+   * São Paulo/Santos concorrendo só entre si por 2 vagas, independente da posição geral). Calcula o
+   * pote de cada clube (mesma lógica de `simulation/swiss.ts`, reaproveitada) pra a UI poder separar
+   * a tabela em sub-tabelas por pote e destacar o top 2 de CADA UMA.
+   */
+  const potesFaseSuicaPorCampeonato = useMemo(() => {
+    const mapa = new Map<string, InfoPotesFaseSuica>();
+    for (const c of campeonatos) {
+      const suica = c.formato.fase_suica;
+      if (suica?.classificacao_por_pote) {
+        mapa.set(c.id, {
+          potePorTime: construirPotePorTime(c.times, suica.num_potes, suica.times_por_pote),
+          numPotes: suica.num_potes,
+          vagasPorPote: suica.classificacao_por_pote.vagas_por_pote,
+        });
+      }
+    }
+    return mapa;
+  }, [campeonatos]);
 
   function pushEvento(evento: EventoDeFeedVariante): void {
     setFeed((atual) => [{ ...evento, id: `evt-${proximoId.current++}` }, ...atual]);
@@ -1154,6 +1188,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     escudoPorCampeonato,
     tacaPorCampeonato,
     faixasPorCampeonato,
+    potesFaseSuicaPorCampeonato,
     jogarTemporada,
     propostasFimDeTemporada,
     verPropostasFimDeTemporada,

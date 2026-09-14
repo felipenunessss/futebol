@@ -20,6 +20,7 @@ import {
   type EtapaDoChaveamento,
   type EventoDeFeed,
   type FaixasDeDestaqueDaTabela,
+  type InfoPotesFaseSuica,
   type JogoDaSemana,
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
@@ -163,6 +164,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
     clubePorId,
     nomePorCampeonato,
     escudoPorCampeonato,
+    potesFaseSuicaPorCampeonato,
   } = temporada;
   const nomeDaNacionalidade = NACIONALIDADES_CONMEBOL.find((n) => n.codigo === estadoAtual.jogador.nacionalidade)?.nome ?? estadoAtual.jogador.nacionalidade;
   const promptSemana = promptPendente?.tipo === "semana" ? promptPendente : undefined;
@@ -228,6 +230,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
             clubePorId={clubePorId}
             nomePorCampeonato={nomePorCampeonato}
             faixasPorCampeonato={temporada.faixasPorCampeonato}
+            potesFaseSuicaPorCampeonato={potesFaseSuicaPorCampeonato}
           />
         )}
         <PainelLateralEstatisticasEAtributos
@@ -428,6 +431,7 @@ function PainelDeCompeticoes({
   clubePorId,
   nomePorCampeonato,
   faixasPorCampeonato,
+  potesFaseSuicaPorCampeonato,
 }: {
   competicoesDoJogador: string[];
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
@@ -438,6 +442,7 @@ function PainelDeCompeticoes({
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
   faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
+  potesFaseSuicaPorCampeonato: Map<string, InfoPotesFaseSuica>;
 }) {
   const [classificacaoAberta, setClassificacaoAberta] = useState(false);
 
@@ -478,6 +483,7 @@ function PainelDeCompeticoes({
           clubePorId={clubePorId}
           nomePorCampeonato={nomePorCampeonato}
           faixasPorCampeonato={faixasPorCampeonato}
+          potesFaseSuicaPorCampeonato={potesFaseSuicaPorCampeonato}
           onFechar={() => setClassificacaoAberta(false)}
         />
       )}
@@ -498,6 +504,7 @@ function PainelClassificacao({
   clubePorId,
   nomePorCampeonato,
   faixasPorCampeonato,
+  potesFaseSuicaPorCampeonato,
   onFechar,
 }: {
   competicoesDoJogador: string[];
@@ -509,6 +516,7 @@ function PainelClassificacao({
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
   faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
+  potesFaseSuicaPorCampeonato: Map<string, InfoPotesFaseSuica>;
   onFechar: () => void;
 }) {
   const [aba, setAba] = useState<"tabela" | "chaveamento">("tabela");
@@ -545,6 +553,7 @@ function PainelClassificacao({
             const mostrarGrupo = grupo && PADRAO_NOME_DE_GRUPO.test(grupo);
             const fase = faseMataMataPorCampeonato.get(campeonatoId);
             const tabela = tabelaPorCampeonato.get(campeonatoId);
+            const potes = potesFaseSuicaPorCampeonato.get(campeonatoId);
             return (
               <div key={campeonatoId} className={`flex flex-col gap-2 ${fase?.eliminado ? "bg-red-950/30 -mx-3 px-3 py-2 rounded-lg" : ""}`}>
                 <h3 className="text-sm font-semibold text-slate-200">
@@ -555,6 +564,8 @@ function PainelClassificacao({
                   <p className={`text-sm ${fase.eliminado ? "text-red-400 font-medium" : "text-emerald-400"}`}>
                     {fase.eliminado ? `Eliminado(a) na fase: ${rotuloEtapa(fase.etapa)}` : `Fase atual: ${rotuloEtapa(fase.etapa)}`}
                   </p>
+                ) : tabela && potes ? (
+                  <TabelaPorPotes tabela={tabela} potes={potes} clubeId={clubeId} clubePorId={clubePorId} />
                 ) : tabela ? (
                   <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} faixas={faixasPorCampeonato.get(campeonatoId)} />
                 ) : (
@@ -683,6 +694,29 @@ function LegendaDeFaixas({ faixas }: { faixas: FaixasDeDestaqueDaTabela | undefi
           <span className="inline-block w-2 h-2 rounded-sm bg-red-500" /> Rebaixamento
         </span>
       )}
+    </div>
+  );
+}
+
+/**
+ * Fase suíça com classificação por pote (ver `InfoPotesFaseSuica`) — separa a tabela geral (única,
+ * como o motor simula) em 1 sub-tabela por pote, cada uma destacando o top `vagasPorPote` PRÓPRIO
+ * (não o top N do geral, que classificaria o time errado quando o pote do jogador for mais difícil
+ * que a média — pedido do usuário: "verificar o formato", "separados em 4 grupos"). A ordem relativa
+ * dentro de cada pote já vem correta ao filtrar a tabela geral (que já está ordenada por pontos).
+ */
+function TabelaPorPotes({ tabela, potes, clubeId, clubePorId }: { tabela: LinhaTabela[]; potes: InfoPotesFaseSuica; clubeId: string; clubePorId: Map<string, Club> }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: potes.numPotes }, (_, indicePote) => {
+        const tabelaDoPote = tabela.filter((linha) => potes.potePorTime.get(linha.clubeId) === indicePote);
+        return (
+          <div key={indicePote}>
+            <div className="text-xs font-medium text-slate-400 mb-1">Pote {indicePote + 1}</div>
+            <TabelaCompleta tabela={tabelaDoPote} clubeId={clubeId} clubePorId={clubePorId} faixas={{ classificados: potes.vagasPorPote }} />
+          </div>
+        );
+      })}
     </div>
   );
 }
