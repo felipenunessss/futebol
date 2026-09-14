@@ -343,10 +343,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * consultam este ref pra saber se devem represar o resultado da rodada ou revelar na hora. */
   const partidaAoVivoAtivaRef = useRef(false);
   const [animacaoDeEscolha, setAnimacaoDeEscolha] = useState<AnimacaoDeEscolhaPendente>();
-  /** Sorteio de grupos de uma competição do jogador, aguardando revelação — ver `onSorteioDeGrupos`. */
-  const [sorteioPendente, setSorteioPendente] = useState<SorteioDeGruposNaTemporada>();
-  /** Chaveamento definido da 1ª etapa de um mata-mata do jogador, aguardando revelação — ver `onChaveamentoDefinido`. */
-  const [chaveamentoPendente, setChaveamentoPendente] = useState<ChaveamentoDeMataMataNaTemporada>();
+  /** Fila de sorteios de grupos aguardando revelação — ver `onSorteioDeGrupos`. Fila (não um valor
+   * único) porque o motor não pausa pra UI consumir cada um: se o clube do jogador entra em 2+
+   * competições cuja fase de grupos começa na MESMA semana (ex: estadual + Série D), os hooks
+   * disparam um atrás do outro na mesma janela de execução, antes de qualquer render — um valor
+   * único perdia (sobrescrevia) o sorteio anterior sem o jogador nunca ver a animação dele (bug
+   * relatado: "senti falta das animações de sorteio"). Só o primeiro da fila é exibido por vez. */
+  const [filaDeSorteios, setFilaDeSorteios] = useState<SorteioDeGruposNaTemporada[]>([]);
+  const sorteioPendente = filaDeSorteios[0];
+  /** Mesma ideia de `filaDeSorteios`, pro chaveamento definido da 1ª etapa de um mata-mata — ver `onChaveamentoDefinido`. */
+  const [filaDeChaveamentos, setFilaDeChaveamentos] = useState<ChaveamentoDeMataMataNaTemporada[]>([]);
+  const chaveamentoPendente = filaDeChaveamentos[0];
   /** Confrontos da rodada atual de cada competição, acumulados conforme os hooks disparam (ver `ResultadoDaRodadaExibido`). Reseta ao detectar que uma nova rodada começou. */
   const bufferRodadaRef = useRef<Map<string, { rodada: number; confrontos: ConfrontoResultado[] }>>(new Map());
   /**
@@ -441,14 +448,16 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     if (pendente) setResultadoDaRodada(pendente);
   }
 
-  /** Fecha o painel de sorteio de grupos — chamado pelo clique do jogador, não pelo motor (que já seguiu em frente, ver `onSorteioDeGrupos`). */
+  /** Fecha o painel de sorteio de grupos — chamado pelo clique do jogador, não pelo motor (que já
+   * seguiu em frente, ver `onSorteioDeGrupos`). Só remove o 1º da fila — se houver outro represado
+   * atrás, aparece em seguida. */
   function fecharSorteioDeGrupos(): void {
-    setSorteioPendente(undefined);
+    setFilaDeSorteios((atual) => atual.slice(1));
   }
 
   /** Fecha o painel de chaveamento — mesma ideia de `fecharSorteioDeGrupos`. */
   function fecharChaveamento(): void {
-    setChaveamentoPendente(undefined);
+    setFilaDeChaveamentos((atual) => atual.slice(1));
   }
 
   /** Chamado pela própria `PainelAnimacaoDeEscolha` quando o timer da animação termina (não é clique do jogador) — só então o resultado entra de fato no feed. */
@@ -607,8 +616,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     partidaAoVivoAtivaRef.current = false;
     resultadoDaRodadaPendenteRef.current = undefined;
     setAnimacaoDeEscolha(undefined);
-    setSorteioPendente(undefined);
-    setChaveamentoPendente(undefined);
+    setFilaDeSorteios([]);
+    setFilaDeChaveamentos([]);
     // Crítico: sem isso, "simular até o final" na temporada 1 deixava `modoAutoAteSemanaRef` em 52 —
     // como `semanaAtualRef` volta pra 1 (linha abaixo) mas o alvo continuava 52, `emJanelaAutomatica()`
     // ficava verdadeiro DESDE A SEMANA 1 da temporada 2 (1 <= 52), simulando a temporada inteira sozinha
@@ -774,11 +783,13 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       onResumoDePeriodoCampeonatoSeguido: (campeonatoId, periodo, tabela) => pushEvento({ tipo: "tabela", campeonatoId, periodo, tabela }),
       onSorteioDeGrupos: (info) => {
         // motor já decidiu os grupos antes deste hook disparar — em janela automática (fast-forward)
-        // não pausa, mesmo padrão de `animacaoDeEscolha`/`resultadoDaRodada`.
-        if (!emJanelaAutomatica()) setSorteioPendente(info);
+        // não pausa, mesmo padrão de `animacaoDeEscolha`/`resultadoDaRodada`. Empilha (não sobrescreve)
+        // porque outra competição do jogador pode ter sorteado grupos na MESMA semana — ver comentário
+        // de `filaDeSorteios`.
+        if (!emJanelaAutomatica()) setFilaDeSorteios((atual) => [...atual, info]);
       },
       onChaveamentoDefinido: (info) => {
-        if (!emJanelaAutomatica()) setChaveamentoPendente(info);
+        if (!emJanelaAutomatica()) setFilaDeChaveamentos((atual) => [...atual, info]);
       },
     };
 
@@ -933,8 +944,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     // resultado da 1ª rodada, porque nada nunca mais chamava `setResultadoDaRodada` de novo (só
     // acontece fora da janela automática).
     setResultadoDaRodada(undefined);
-    setSorteioPendente(undefined);
-    setChaveamentoPendente(undefined);
+    setFilaDeSorteios([]);
+    setFilaDeChaveamentos([]);
     concluirAnimacaoDeEscolha();
     // Mesma ideia acima, pro painel de "fim de jogo" (`PartidaAoVivoEmAndamento.finalizada`) — só
     // fecha se já tiver chegado no apito final; uma partida ainda em andamento nesse exato instante
