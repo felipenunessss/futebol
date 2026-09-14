@@ -93,7 +93,8 @@
     "pais": "BR",
     "estado": "MG",
     "cidade": "Divinópolis",
-    "estadio": "Waldemar Teixeira de Faria"
+    "estadio": "Waldemar Teixeira de Faria",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudoguaranimg.png"
   },
   {
     "id": "mamore",
@@ -103,7 +104,7 @@
     "estado": "MG",
     "cidade": "Patos de Minas",
     "estadio": "Bernardo Rubinger de Queiroz",
-    "escudo_url": "https://r2.thesportsdb.com/images/media/team/badge/fecta91681104203.png"
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/d/d6/ECMamore.png"
   },
   {
     "id": "uberaba_sc",

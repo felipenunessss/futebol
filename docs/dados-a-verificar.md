@@ -262,6 +262,35 @@ achados via nome completo, ainda não passaram por essa auditoria dirigida).
 Se notar outro escudo claramente errado no jogo, documente aqui e remova só
 esse registro específico (não precisa reverter o resto).
 
+**Casos errados encontrados e corrigidos (fonte: usuário, URL da Wikipédia
+verificada manualmente antes de aplicar)**:
+- `ceara` (Ceará Sporting Club): `escudo_url` era a **bandeira do estado do
+  Ceará** (`Bandeira_do_Ceará.svg`), não o escudo do clube — erro do
+  `buscar-escudos-wikipedia.ts` pegando o artigo/imagem errada pro nome
+  ambíguo "Ceará". Corrigido pro logo oficial do clube (Wikimedia Commons,
+  `Ceará_Sporting_Club_logo.svg`).
+- `mamore` (Esporte Clube Mamoré, Patos de Minas-MG): `escudo_url` era do
+  **F.C. Libertad Gran Mamore** (clube boliviano, apelido homônimo) —
+  exatamente o risco de "apelido genérico perde pro homônimo mais famoso"
+  já documentado acima. Corrigido pro escudo real (Wikipédia PT,
+  `ECMamore.png`).
+- `guarani_paraguai` (Club Guaraní, Asunción): `escudo_url` era do
+  **Guarani Futebol Clube de Campinas** (Brasil) — mesmo tipo de erro
+  (nome "Guarani"/"Guaraní" ambíguo entre Brasil e Paraguai, o filtro de
+  país não pegou porque o TheSportsDB provavelmente cadastrou o clube
+  brasileiro sem o país certo ou o script bateu antes do filtro). Corrigido
+  pro escudo real (Wikipédia PT, `ClubGuaraní.png`).
+- `guarani_mg` (Guarani Esporte Clube, Divinópolis-MG): estava sem
+  `escudo_url` (TheSportsDB não tinha cadastrado). Preenchido com o escudo
+  real (Wikimedia Commons, `Escudoguaranimg.png`).
+
+Esses 3 primeiros casos (2 deles clubes homônimos de países/times
+diferentes, 1 confusão bandeira-do-estado×escudo-do-clube) reforçam que a
+auditoria automática por país/relevância não é suficiente — recomenda-se
+desconfiar especialmente de escudos vindos de nomes com apelido curto e
+genérico ("Guarani"/"Guaraní", "Ceará" batendo com o nome do estado, etc.)
+até serem conferidos visualmente contra uma fonte confiável.
+
 ## Taças/troféus de competição (`taca_url`)
 
 Populado por `scripts/buscar-tacas.ts` (mesma API pública TheSportsDB de
