@@ -292,13 +292,32 @@ verificada manualmente antes de aplicar)**:
   `escudo_url`. Preenchidos com os escudos reais (Wikipédia PT,
   `Escudo_do_São_Francisco_do_Acre.png` e Wikimedia Commons,
   `CAL_LINENSE_ESCUDO.png`).
+- `everton_cl` (Everton de Viña del Mar, Chile): `escudo_url` era do
+  **Everton F.C. da Inglaterra** (mesmo apelido, clube muito mais famoso) —
+  mesmo tipo de erro. Corrigido pro escudo real (Wikimedia Commons,
+  `Everton_De_Viña_Del_Mar.png`).
+- `internacional_de_bogota` (Internacional de Bogotá, Colômbia): estava sem
+  `escudo_url` — "Internacional" é genérico demais pra busca automática
+  (existe também o Sport Club Internacional de Porto Alegre cadastrado
+  aqui). Preenchido com o escudo real (Wikipédia EN,
+  `Club_Internacional_de_Bogotá_logo.svg`).
 
 Esses casos (a maioria clubes homônimos de países/times diferentes, 1
 confusão bandeira-do-estado×escudo-do-clube) reforçam que a auditoria
 automática por país/relevância não é suficiente — recomenda-se desconfiar
 especialmente de escudos vindos de nomes com apelido curto e genérico
-("Guarani"/"Guaraní", "River Plate", "Ceará" batendo com o nome do estado,
-etc.) até serem conferidos visualmente contra uma fonte confiável.
+("Guarani"/"Guaraní", "River Plate", "Everton", "Internacional", "Ceará"
+batendo com o nome do estado, etc.) até serem conferidos visualmente
+contra uma fonte confiável.
+
+**Pendência a esclarecer com o usuário**: pedido pra usar
+https://pt.wikipedia.org/wiki/Nacional_Atlético_Clube_(São_Paulo) como
+fonte do escudo de "Nacional de São Paulo" — mas esse artigo descreve um
+clube sediado na CIDADE de São Paulo, enquanto o único "Nacional"
+cadastrado no estado de SP aqui é `nacional_catanduva` (Nacional Futebol
+Clube, cidade de Catanduva, interior de SP) — cidades diferentes, não dá
+pra confirmar que é o mesmo clube sem checar com o usuário. Não apliquei
+esse escudo a `nacional_catanduva` até esclarecer.
 
 **Pendência menor, não corrigida**: o artigo da Wikipédia sobre `linense`
 usa o nome oficial "Clube Atlético Linense" (fundado 1927, apelido
@@ -313,21 +332,47 @@ departamento de futebol). Só o escudo foi atualizado.
 
 Populado por `scripts/buscar-tacas.ts` (mesma API pública TheSportsDB de
 `buscar-escudos.ts`, mas endpoint diferente — `lookupleague.php?id=`, não
-busca por nome). Cobertura atual: **só 3 competições** — Campeonato
-Brasileiro Série A/B/D. O endpoint de busca por nome
-(`search_all_leagues.php`) sob a chave de teste devolve uma amostra
-pequena e fixa por país que não inclui a maioria das competições
-conhecidas (Copa do Brasil, Série C, Libertadores, Sul-Americana, nenhum
-estadual) — só dá pra confirmar um `idLeague` manualmente contra o
-`strLeague` retornado, um por um. Os 3 ids usados (4351/4404/5079) foram
-confirmados assim, batendo o nome. Sem confirmação, não dá pra advinhar o
-id de uma competição (arriscaria pegar a taça errada) — fica como
-pendência aberta, não implementada por enquanto. Se alguém achar o
+busca por nome). Cobertura atual: **7 competições** — Campeonato Brasileiro
+Série A/B/C/D, Copa do Brasil, Copa Libertadores, Copa Sul-Americana. O
+endpoint de busca por nome (`search_all_leagues.php`) sob a chave de teste
+devolve uma amostra pequena e fixa por país que não inclui a maioria das
+competições conhecidas (estaduais, copas regionais) — só dá pra confirmar
+um `idLeague` manualmente contra o `strLeague` retornado, um por um. Os 7
+ids usados (4351/4404/4625/5079/4725/4501/4724) foram confirmados assim,
+batendo o nome, e as 7 imagens foram conferidas visualmente (fotos reais
+de taça, não ícone genérico). Sem confirmação, não dá pra advinhar o id de
+uma competição (arriscaria pegar a taça errada). Se alguém achar o
 `idLeague` certo de outra competição (por lookup manual ou outra fonte
 confiável), adicionar em `ID_LEAGUE_POR_CAMPEONATO` e reexecutar o script
 (idempotente). Competições sem `taca_url` mostram um ícone genérico de
 troféu na sala de troféus (`web/src/features/temporada/TelaDeTemporada.tsx`
 `TrofeuDaCompeticao`), nunca ficam "sem nada".
+
+**Estaduais brasileiros — busca alternativa no Wikimedia Commons (não
+aplicada ainda, aguardando validação)**: como o TheSportsDB não cobre
+nenhum estadual, `scripts/buscar-tacas-wikimedia.ts` busca fotos reais de
+taça na API pública do Wikimedia Commons (`action=query&list=search`, sem
+chave), que tem uma categoria ativa de fotos de taças de campeonatos
+estaduais brasileiros sob licença Creative Commons (ex:
+`Category:Campeonato Carioca de Futebol`). **Diferente dos outros
+scripts, este NÃO grava `taca_url` sozinho** — só lista candidatos (imagem
++ página de descrição + licença) num relatório
+(`relatorio-tacas-wikimedia.json`, gitignored) pra confirmação visual
+manual antes de qualquer gravação; o risco de imagem errada é maior aqui
+porque são fotos de objetos físicos com nome livre, não um cadastro
+curado por API (o teste com Campeonato Carioca já achou 1 falso positivo
+óbvio — "CopaRio1991.png", de um torneio diferente que também bateu no
+termo de busca "Copa Campeonato Carioca"). Teste rodado só com Campeonato
+Carioca (`npx tsx scripts/buscar-tacas-wikimedia.ts carioca_a`) — achou 7
+fotos reais da taça oficial da FERJ, uma por ano (1946 a 2012), todas do
+mesmo fotógrafo/autor (Alexandre M. B. Berwanger, CC BY-SA 4.0); a de 2012
+foi conferida visualmente (foto de museu com placa "CAMPEÃO 2012"/FERJ).
+**Pendência de decisão**: como o motor não modela taça por ano, falta
+decidir qual ano usar como "a" taça de cada estadual (ex: sempre a mais
+recente disponível no Commons) antes de rodar pra todas as competições —
+e falta o campo de schema pra guardar o link de atribuição
+(`descriptionurl` do arquivo, exigido pela licença CC) junto de
+`taca_url`, ainda não adicionado.
 
 ## Como resolver
 
