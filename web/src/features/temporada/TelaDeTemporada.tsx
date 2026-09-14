@@ -2043,6 +2043,8 @@ function ResumoDeTemporada({
   estatisticasCarreira: EstatisticasCarreira;
   onVerPropostas: () => void;
 }) {
+  const [resumoDeCampeoesAberto, setResumoDeCampeoesAberto] = useState(false);
+
   return (
     <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       <h2 className="text-xl font-semibold">Fim da temporada {resultado.resultadoTemporada.temporada}</h2>
@@ -2050,27 +2052,42 @@ function ResumoDeTemporada({
         Overall {resultado.resumoPartidas.overallAntes} → {resultado.resumoPartidas.overallDepois}
       </p>
 
-      <div className="flex flex-col gap-2">
-        {resultado.resumoPartidas.competicoes.map((c) => (
-          <div key={c.campeonatoId} className="rounded-lg bg-slate-800/60 px-3 py-2 text-sm">
-            {c.erro ? (
-              <span className="text-slate-500">
-                ✗ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: não simulada ({c.erro})
-              </span>
-            ) : (
-              <span>
-                ✓ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: campeão {nomeDoClube(clubePorId, c.campeao!)}
-                {c.partidasDoJogador > 0 && (
-                  <span className="text-slate-400">
-                    {" "}
-                    — você jogou {c.partidasDoJogador} partida(s), {c.golsDoJogador} gol(s), {c.assistenciasDoJogador} assistência(s)
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* Fechado por padrão — pedido do usuário: "o resumo dos campeões de cada temporada não
+          precisa aparecer, pode ser uma aba que fica fechada mas o player pode expandir" (a lista
+          cobre TODAS as competições do jogo, não só as do jogador — dezenas de linhas). Os títulos
+          do PRÓPRIO jogador continuam sempre visíveis, sem precisar expandir (`PainelEstatisticas`
+          "Títulos" logo abaixo). */}
+      <button
+        type="button"
+        onClick={() => setResumoDeCampeoesAberto((atual) => !atual)}
+        className="flex items-center justify-between rounded-lg bg-slate-800/60 hover:bg-slate-800 transition-colors px-3 py-2 text-sm text-slate-300"
+      >
+        <span>Campeões de todas as competições ({resultado.resumoPartidas.competicoes.length})</span>
+        <span className="text-slate-500">{resumoDeCampeoesAberto ? "▲ recolher" : "▼ expandir"}</span>
+      </button>
+      {resumoDeCampeoesAberto && (
+        <div className="flex flex-col gap-2">
+          {resultado.resumoPartidas.competicoes.map((c) => (
+            <div key={c.campeonatoId} className="rounded-lg bg-slate-800/60 px-3 py-2 text-sm">
+              {c.erro ? (
+                <span className="text-slate-500">
+                  ✗ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: não simulada ({c.erro})
+                </span>
+              ) : (
+                <span>
+                  ✓ {nomeDoCampeonato(nomePorCampeonato, c.campeonatoId)}: campeão {nomeDoClube(clubePorId, c.campeao!)}
+                  {c.partidasDoJogador > 0 && (
+                    <span className="text-slate-400">
+                      {" "}
+                      — você jogou {c.partidasDoJogador} partida(s), {c.golsDoJogador} gol(s), {c.assistenciasDoJogador} assistência(s)
+                    </span>
+                  )}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {resultado.statusAtualizado && (
         <p className="text-sm text-slate-400 border-t border-slate-800 pt-3">
