@@ -715,6 +715,35 @@ describe("jogarTemporadaSemanal", () => {
       expect(grupoDoTime.get(a2)).not.toBe(grupoDoTime.get(b2));
     }
   });
+
+  it("onConfrontoMataMataNaCompeticao dispara pra TODO confronto de TODA etapa (não só a 1ª, não só o do clube do jogador) — ver PainelClassificacao aba Chaveamento", async () => {
+    const times = ["a", "b", "c", "d", "e", "f"];
+    const campeonatos: CampeonatoSimulavel[] = [
+      {
+        id: "brasileirao_serie_a",
+        formato: { fase_grupos: { num_grupos: 2, times_por_grupo: 3, ida_e_volta: false, classificam_por_grupo: 2 }, mata_mata: { fases: ["semifinal", "final"], ida_e_volta: false } },
+        times,
+      },
+    ];
+    const clubes = times.map((id) => clube(id));
+
+    const confrontos: { campeonatoId: string; etapa: string; timeA: string; timeB: string }[] = [];
+
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatos, clubes, {
+      random: () => 0.5,
+      escolherModoDePartida: () => "rapida",
+      onConfrontoMataMataNaCompeticao: (info) => {
+        confrontos.push({ campeonatoId: info.campeonatoId, etapa: info.evento.etapa, timeA: info.evento.confronto.timeA, timeB: info.evento.confronto.timeB });
+      },
+    });
+
+    // 2 confrontos na semifinal + 1 na final = 3 no total, cobrindo AS DUAS etapas.
+    expect(confrontos).toHaveLength(3);
+    expect(confrontos.every((c) => c.campeonatoId === "brasileirao_serie_a")).toBe(true);
+    expect(new Set(confrontos.map((c) => c.etapa))).toEqual(new Set(["semifinal", "final"]));
+    // Inclui confrontos que NÃO envolvem o clube do jogador ("a") — diferente de onPartidaMataMata.
+    expect(confrontos.some((c) => c.timeA !== "a" && c.timeB !== "a")).toBe(true);
+  });
 });
 
 describe("suspensão/lesão de partida (foraDeCombate)", () => {

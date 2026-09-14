@@ -822,6 +822,18 @@ export interface OpcoesJogarTemporadaSemanal extends Omit<OpcoesJogarTemporada, 
    */
   onPartidaDaRodadaNaCompeticaoDoJogador?: (info: PartidaDoJogadorPontosCorridos) => void | Promise<void>;
   /**
+   * Chamado pra TODO confronto de mata-mata resolvido numa competição em
+   * que o clube do jogador está — ao contrário de `onPartidaMataMata`
+   * (só os confrontos do PRÓPRIO clube), este dispara pros dois lados de
+   * QUALQUER par de qualquer etapa, incluindo os que não envolvem o clube
+   * dele (chamado ALÉM de `onPartidaMataMata`, não em vez — as duas
+   * notificações acontecem pro confronto do próprio clube). Mesma ideia de
+   * `onPartidaDaRodadaNaCompeticaoDoJogador`, mas pra mata-mata: dá pra UI
+   * acumular o chaveamento INTEIRO (todas as etapas, não só a 1ª —
+   * `onChaveamentoDefinido` só cobre a primeira).
+   */
+  onConfrontoMataMataNaCompeticao?: (info: PartidaDoJogadorMataMata) => void | Promise<void>;
+  /**
    * Chamado uma vez no início da temporada — quais OUTRAS competições ativas
    * (além da(s) do próprio clube do jogador, que SEMPRE recebem resumo por
    * período — ver `onResumoDePeriodoCampeonatoSeguido` — independente desta
@@ -914,6 +926,7 @@ export async function jogarTemporadaSemanal(
     onPartidaPontosCorridos,
     onPartidaMataMata,
     onPartidaDaRodadaNaCompeticaoDoJogador,
+    onConfrontoMataMataNaCompeticao,
     aoIniciarSemana,
     escolherModoDePartida,
     decidirChanceAoVivo,
@@ -1047,6 +1060,7 @@ export async function jogarTemporadaSemanal(
         }
       },
       aoResolverConfrontoMataMata: async (evento) => {
+        await onConfrontoMataMataNaCompeticao?.({ campeonatoId, evento });
         if (evento.confronto.timeA === clubeNoInicioDaTemporada || evento.confronto.timeB === clubeNoInicioDaTemporada) {
           for (const partida of evento.confronto.partidasDoJogador ?? []) await registrarPartidaDoJogador(campeonatoId, partida);
           await onPartidaMataMata?.({ campeonatoId, evento });

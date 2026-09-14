@@ -18,6 +18,7 @@ import {
   type AnimacaoDeEscolhaPendente,
   type EscolhaDePrePartida,
   type EstatisticasCarreira,
+  type EtapaDoChaveamento,
   type EventoDeFeed,
   type FaixasDeDestaqueDaTabela,
   type JogoDaSemana,
@@ -221,6 +222,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
             competicoesDoJogador={competicoesDoJogador}
             tabelaPorCampeonato={tabelaPorCampeonato}
             faseMataMataPorCampeonato={faseMataMataPorCampeonato}
+            chaveamentoPorCampeonato={temporada.chaveamentoPorCampeonato}
             grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
             clubeId={estadoAtual.clubeAtualId}
             clubePorId={clubePorId}
@@ -415,6 +417,7 @@ function PainelDeCompeticoes({
   competicoesDoJogador,
   tabelaPorCampeonato,
   faseMataMataPorCampeonato,
+  chaveamentoPorCampeonato,
   grupoDoJogadorPorCampeonato,
   clubeId,
   clubePorId,
@@ -424,6 +427,7 @@ function PainelDeCompeticoes({
   competicoesDoJogador: string[];
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
   faseMataMataPorCampeonato: Map<string, { etapa: string; eliminado: boolean }>;
+  chaveamentoPorCampeonato: Map<string, EtapaDoChaveamento[]>;
   grupoDoJogadorPorCampeonato: Map<string, string>;
   clubeId: string;
   clubePorId: Map<string, Club>;
@@ -463,6 +467,7 @@ function PainelDeCompeticoes({
           competicoesDoJogador={competicoesDoJogador}
           tabelaPorCampeonato={tabelaPorCampeonato}
           faseMataMataPorCampeonato={faseMataMataPorCampeonato}
+          chaveamentoPorCampeonato={chaveamentoPorCampeonato}
           grupoDoJogadorPorCampeonato={grupoDoJogadorPorCampeonato}
           clubeId={clubeId}
           clubePorId={clubePorId}
@@ -482,6 +487,7 @@ function PainelClassificacao({
   competicoesDoJogador,
   tabelaPorCampeonato,
   faseMataMataPorCampeonato,
+  chaveamentoPorCampeonato,
   grupoDoJogadorPorCampeonato,
   clubeId,
   clubePorId,
@@ -492,6 +498,7 @@ function PainelClassificacao({
   competicoesDoJogador: string[];
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
   faseMataMataPorCampeonato: Map<string, { etapa: string; eliminado: boolean }>;
+  chaveamentoPorCampeonato: Map<string, EtapaDoChaveamento[]>;
   grupoDoJogadorPorCampeonato: Map<string, string>;
   clubeId: string;
   clubePorId: Map<string, Club>;
@@ -499,6 +506,9 @@ function PainelClassificacao({
   faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
   onFechar: () => void;
 }) {
+  const [aba, setAba] = useState<"tabela" | "chaveamento">("tabela");
+  const competicoesComChaveamento = competicoesDoJogador.filter((id) => (chaveamentoPorCampeonato.get(id)?.length ?? 0) > 0);
+
   return (
     <div className="fixed inset-0 z-30 bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-4 sm:p-6" onClick={onFechar}>
       <div className="mx-auto max-w-2xl mt-6 mb-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl p-6 flex flex-col gap-5 text-slate-100" onClick={(e) => e.stopPropagation()}>
@@ -508,30 +518,116 @@ function PainelClassificacao({
             Fechar
           </button>
         </div>
-        {competicoesDoJogador.map((campeonatoId) => {
-          const grupo = grupoDoJogadorPorCampeonato.get(campeonatoId);
-          const mostrarGrupo = grupo && PADRAO_NOME_DE_GRUPO.test(grupo);
-          const fase = faseMataMataPorCampeonato.get(campeonatoId);
-          const tabela = tabelaPorCampeonato.get(campeonatoId);
-          return (
-            <div key={campeonatoId} className={`flex flex-col gap-2 ${fase?.eliminado ? "bg-red-950/30 -mx-3 px-3 py-2 rounded-lg" : ""}`}>
-              <h3 className="text-sm font-semibold text-slate-200">
-                {nomeDoCampeonato(nomePorCampeonato, campeonatoId)}
-                {mostrarGrupo && <span className="text-slate-400 font-normal"> — {grupo}</span>}
-              </h3>
-              {fase ? (
-                <p className={`text-sm ${fase.eliminado ? "text-red-400 font-medium" : "text-emerald-400"}`}>
-                  {fase.eliminado ? `Eliminado(a) na fase: ${rotuloEtapa(fase.etapa)}` : `Fase atual: ${rotuloEtapa(fase.etapa)}`}
-                </p>
-              ) : tabela ? (
-                <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} faixas={faixasPorCampeonato.get(campeonatoId)} />
-              ) : (
-                <p className="text-sm text-slate-500">Aguardando dados.</p>
-              )}
+        <div className="flex gap-1 border-b border-slate-800 -mt-1">
+          <button
+            type="button"
+            onClick={() => setAba("tabela")}
+            className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${aba === "tabela" ? "border-emerald-500 text-emerald-400" : "border-transparent text-slate-400 hover:text-slate-200"}`}
+          >
+            Tabela
+          </button>
+          <button
+            type="button"
+            onClick={() => setAba("chaveamento")}
+            className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${aba === "chaveamento" ? "border-emerald-500 text-emerald-400" : "border-transparent text-slate-400 hover:text-slate-200"}`}
+          >
+            Chaveamento
+          </button>
+        </div>
+        {aba === "tabela" ? (
+          competicoesDoJogador.map((campeonatoId) => {
+            const grupo = grupoDoJogadorPorCampeonato.get(campeonatoId);
+            const mostrarGrupo = grupo && PADRAO_NOME_DE_GRUPO.test(grupo);
+            const fase = faseMataMataPorCampeonato.get(campeonatoId);
+            const tabela = tabelaPorCampeonato.get(campeonatoId);
+            return (
+              <div key={campeonatoId} className={`flex flex-col gap-2 ${fase?.eliminado ? "bg-red-950/30 -mx-3 px-3 py-2 rounded-lg" : ""}`}>
+                <h3 className="text-sm font-semibold text-slate-200">
+                  {nomeDoCampeonato(nomePorCampeonato, campeonatoId)}
+                  {mostrarGrupo && <span className="text-slate-400 font-normal"> — {grupo}</span>}
+                </h3>
+                {fase ? (
+                  <p className={`text-sm ${fase.eliminado ? "text-red-400 font-medium" : "text-emerald-400"}`}>
+                    {fase.eliminado ? `Eliminado(a) na fase: ${rotuloEtapa(fase.etapa)}` : `Fase atual: ${rotuloEtapa(fase.etapa)}`}
+                  </p>
+                ) : tabela ? (
+                  <TabelaCompleta tabela={tabela} clubeId={clubeId} clubePorId={clubePorId} faixas={faixasPorCampeonato.get(campeonatoId)} />
+                ) : (
+                  <p className="text-sm text-slate-500">Aguardando dados.</p>
+                )}
+              </div>
+            );
+          })
+        ) : competicoesComChaveamento.length === 0 ? (
+          <p className="text-sm text-slate-500">Nenhuma das suas competições chegou numa fase de mata-mata ainda.</p>
+        ) : (
+          competicoesComChaveamento.map((campeonatoId) => (
+            <div key={campeonatoId} className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold text-slate-200">{nomeDoCampeonato(nomePorCampeonato, campeonatoId)}</h3>
+              <ChaveamentoDaCompeticao etapas={chaveamentoPorCampeonato.get(campeonatoId)!} clubeId={clubeId} clubePorId={clubePorId} />
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
+    </div>
+  );
+}
+
+/** Chaveamento acumulado de UMA competição (todas as etapas já resolvidas, uma coluna por etapa,
+ * rolagem horizontal se não couber) — pedido do usuário: "aba específica pros mata-matas mostrando
+ * o chaveamento". Só mostra o que já aconteceu (etapas futuras/pendentes simplesmente não têm
+ * entrada ainda em `etapas`, ver `useTemporada.ts` `chaveamentoPorCampeonato`). */
+function ChaveamentoDaCompeticao({ etapas, clubeId, clubePorId }: { etapas: EtapaDoChaveamento[]; clubeId: string; clubePorId: Map<string, Club> }) {
+  return (
+    <div className="overflow-x-auto">
+      <div className="flex gap-3 min-w-max">
+        {etapas.map((etapa) => (
+          <div key={etapa.nome} className="flex flex-col gap-1.5 w-48 shrink-0">
+            <div className="text-xs font-medium text-slate-400">{rotuloEtapa(etapa.nome)}</div>
+            {etapa.confrontos.map((confronto, indice) => (
+              <div key={indice} className="rounded-lg bg-slate-800/60 p-2 flex flex-col gap-1 text-xs">
+                <LinhaDeTimeNoChaveamento
+                  clubePorId={clubePorId}
+                  timeId={confronto.timeA}
+                  gols={confronto.golsA}
+                  venceu={confronto.vencedor === confronto.timeA}
+                  ehDoJogador={confronto.timeA === clubeId}
+                />
+                <LinhaDeTimeNoChaveamento
+                  clubePorId={clubePorId}
+                  timeId={confronto.timeB}
+                  gols={confronto.golsB}
+                  venceu={confronto.vencedor === confronto.timeB}
+                  ehDoJogador={confronto.timeB === clubeId}
+                />
+                {confronto.decididoNosPenaltis && <div className="text-slate-500 text-[11px] text-center">nos pênaltis</div>}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LinhaDeTimeNoChaveamento({
+  clubePorId,
+  timeId,
+  gols,
+  venceu,
+  ehDoJogador,
+}: {
+  clubePorId: Map<string, Club>;
+  timeId: string;
+  gols: number;
+  venceu: boolean;
+  ehDoJogador: boolean;
+}) {
+  return (
+    <div className={`flex items-center gap-1.5 ${venceu ? "text-slate-100 font-medium" : "text-slate-500"} ${ehDoJogador ? "text-emerald-400" : ""}`}>
+      <Escudo url={escudoDoClube(clubePorId, timeId)} alt="" tamanho={14} />
+      <span className="flex-1 truncate">{nomeDoClube(clubePorId, timeId)}</span>
+      <span className="tabular-nums shrink-0">{gols}</span>
     </div>
   );
 }

@@ -2220,6 +2220,45 @@ temporada.
   exatamente em 99 — o próprio ponto do pedido). 502 testes passando,
   `npx tsc --noEmit` limpo.
 
+### 5.24. Aba de chaveamento na Classificação (implementado)
+
+Pedido: "na aba de classificação tenha uma aba específica pros mata-matas
+mostrando o chaveamento das competições que tem mata mata". Antes, uma
+competição em fase eliminatória só mostrava texto ("Fase atual: X"/
+"Eliminado(a) na fase: X") na tela de Classificação — nenhum chaveamento
+visual, e o motor só notificava a UI sobre o par da 1ª etapa
+(`onChaveamentoDefinido`) ou os confrontos do PRÓPRIO clube
+(`onPartidaMataMata`), nunca o resto do chaveamento nas etapas seguintes.
+
+- **Novo hook `onConfrontoMataMataNaCompeticao`** (`career/career-loop.ts`,
+  `OpcoesJogarTemporadaSemanal`): dispara pra TODO confronto de mata-mata
+  resolvido numa competição do próprio clube, em QUALQUER etapa —
+  independente de envolver o clube do jogador ou não (chamado ALÉM de
+  `onPartidaMataMata`, não em vez, pro confronto do próprio clube) — mesma
+  ideia de `onPartidaDaRodadaNaCompeticaoDoJogador`, mas cobrindo mata-mata
+  em vez de pontos corridos.
+- **Acumulação client-side** (`web/src/features/temporada/useTemporada.ts`,
+  `chaveamentoPorCampeonato: Map<campeonatoId, EtapaDoChaveamento[]>`):
+  cada `onConfrontoMataMataNaCompeticao` acrescenta o confronto na etapa
+  correspondente (cria a etapa se for a 1ª vez); zerado no início de cada
+  temporada, mesmo padrão de `faseMataMataPorCampeonato`.
+- **UI** (`TelaDeTemporada.tsx` `PainelClassificacao`): ganhou duas abas —
+  "Tabela" (comportamento de antes, inalterado) e "Chaveamento" (nova,
+  `ChaveamentoDaCompeticao`) — uma coluna por etapa já resolvida (rolagem
+  horizontal), confronto com escudo/nome/placar, vencedor em destaque
+  (perdedor apagado), "nos pênaltis" quando aplicável, e o clube do
+  jogador sempre destacado em esmeralda onde aparecer. Só lista
+  competições que já têm pelo menos 1 confronto de mata-mata resolvido;
+  sem nenhuma, mostra aviso "nenhuma... ainda" em vez de esconder a aba.
+- **Validado**: `tests/career/career-loop.test.ts` ganhou um teste
+  dedicado (`onConfrontoMataMataNaCompeticao dispara pra TODO confronto de
+  TODA etapa...`, com uma competição de 6 times fase_grupos→mata_mata,
+  confirmando as 2 etapas E confrontos que não envolvem o clube do
+  jogador). Confirmado ao vivo no browser com Cruzeiro seguindo Copa do
+  Brasil (bracket de 5 fases, vários confrontos de outros clubes visíveis)
+  e Mineiro Módulo I (semifinal → final, campeão destacado). 507 testes
+  passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção

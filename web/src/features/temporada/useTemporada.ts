@@ -176,6 +176,22 @@ export interface FaseMataMata {
   eliminado: boolean;
 }
 
+/** Um confronto já resolvido dentro do chaveamento acumulado (`chaveamentoPorCampeonato`) — ver `ConfrontoDoChaveamento`. */
+export interface ConfrontoDoChaveamento {
+  timeA: string;
+  timeB: string;
+  golsA: number;
+  golsB: number;
+  vencedor: string;
+  decididoNosPenaltis: boolean;
+}
+
+/** Uma etapa do chaveamento (ex: "quartas", "semifinal", "final") com todos os confrontos JÁ resolvidos dela — ver `chaveamentoPorCampeonato`. */
+export interface EtapaDoChaveamento {
+  nome: string;
+  confrontos: ConfrontoDoChaveamento[];
+}
+
 interface ConfrontoResultado {
   mandanteId: string;
   visitanteId: string;
@@ -277,6 +293,12 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   const [tabelaPorCampeonato, setTabelaPorCampeonato] = useState<Map<string, LinhaTabela[]>>(new Map());
   /** Fase mais recente conhecida de cada competição de mata-mata do jogador — alimentada por `onPartidaMataMata`. */
   const [faseMataMataPorCampeonato, setFaseMataMataPorCampeonato] = useState<Map<string, FaseMataMata>>(new Map());
+  /** Chaveamento acumulado (todas as etapas já resolvidas, todos os confrontos — não só os do
+   * próprio clube) de cada competição de mata-mata do jogador — alimentado por
+   * `onConfrontoMataMataNaCompeticao`, que dispara pra TODO confronto (diferente de
+   * `onPartidaMataMata`/`onChaveamentoDefinido`, que só cobrem o clube do jogador ou a 1ª etapa).
+   * Pedido do usuário: "aba específica pros mata-matas mostrando o chaveamento". */
+  const [chaveamentoPorCampeonato, setChaveamentoPorCampeonato] = useState<Map<string, EtapaDoChaveamento[]>>(new Map());
   /**
    * Nome do grupo do PRÓPRIO clube em cada competição do jogador (ex:
    * "Grupo B", ou o próprio nome da fase quando ela tem um grupo só) —
@@ -607,6 +629,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     // atualizações de tabela da rodada atual (parecia "jogo por rodada errado"/time duplicado).
     setTabelaPorCampeonato(new Map());
     setFaseMataMataPorCampeonato(new Map());
+    setChaveamentoPorCampeonato(new Map());
     grupoDoJogadorPorCampeonatoRef.current = new Map();
     setGrupoDoJogadorPorCampeonato(new Map());
     bufferRodadaRef.current = new Map();
@@ -729,6 +752,28 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           golsCasa: info.evento.resultado.golsCasa,
           golsFora: info.evento.resultado.golsFora,
           ehDoJogador: false,
+        });
+      },
+      onConfrontoMataMataNaCompeticao: (info) => {
+        setChaveamentoPorCampeonato((atual) => {
+          const nova = new Map(atual);
+          const etapas = [...(nova.get(info.campeonatoId) ?? [])];
+          const confronto: ConfrontoDoChaveamento = {
+            timeA: info.evento.confronto.timeA,
+            timeB: info.evento.confronto.timeB,
+            golsA: info.evento.confronto.golsA,
+            golsB: info.evento.confronto.golsB,
+            vencedor: info.evento.confronto.vencedor,
+            decididoNosPenaltis: info.evento.confronto.decididoNosPenaltis,
+          };
+          const indiceEtapa = etapas.findIndex((e) => e.nome === info.evento.etapa);
+          if (indiceEtapa === -1) {
+            etapas.push({ nome: info.evento.etapa, confrontos: [confronto] });
+          } else {
+            etapas[indiceEtapa] = { ...etapas[indiceEtapa], confrontos: [...etapas[indiceEtapa].confrontos, confronto] };
+          }
+          nova.set(info.campeonatoId, etapas);
+          return nova;
         });
       },
       onPartidaMataMata: (info) => {
@@ -1024,6 +1069,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     definirVelocidadeAoVivo,
     tabelaPorCampeonato,
     faseMataMataPorCampeonato,
+    chaveamentoPorCampeonato,
     grupoDoJogadorPorCampeonato,
     competicoesDoJogador,
     estatisticasCarreira,
