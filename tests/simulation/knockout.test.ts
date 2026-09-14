@@ -180,6 +180,24 @@ describe("resolverConfronto com participação do jogador", () => {
   });
 });
 
+describe("resolverConfronto — placar por perna (ida/volta)", () => {
+  const ratings = { a: 1600, b: 1600 };
+
+  it("ida e volta: expõe ida/volta separados, e a soma bate com o agregado", async () => {
+    const confronto = await resolverConfronto("a", "b", ratings, true, () => Math.random());
+    expect(confronto.ida).toBeDefined();
+    expect(confronto.volta).toBeDefined();
+    expect(confronto.ida!.golsA + confronto.volta!.golsA).toBe(confronto.golsA);
+    expect(confronto.ida!.golsB + confronto.volta!.golsB).toBe(confronto.golsB);
+  });
+
+  it("jogo único: ida/volta ficam ausentes", async () => {
+    const confronto = await resolverConfronto("a", "b", ratings, false, () => Math.random());
+    expect(confronto.ida).toBeUndefined();
+    expect(confronto.volta).toBeUndefined();
+  });
+});
+
 describe("simularMataMataComEtapas com participação do jogador", () => {
   const ratings = { a: 1600, b: 1600, c: 1600, d: 1600 };
   const jogador: Jogador = { id: "j1", nome: "Teste", posicao: "atacante", arquetipo_id: buscarArquetipo("finalizador").id, idade: 22, atributos: { finalizacao: 95 } };

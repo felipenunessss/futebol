@@ -2387,6 +2387,53 @@ times que participam das competições".
   Sul-Americana) atualiza corretamente com os dois novos campos. 520
   testes passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
 
+### 5.28. Ida separada da volta com pausa + calendário só semanal (implementado)
+
+Pedido do jogador: "em jogos de mata-mata que tem ida e volta, precisamos
+mudar a visualização — quero que apareça o resultado do jogo de ida e que
+mesmo simulando direto pro resultado, tenha uma pausa entre um e outro" +
+"esse quadro com os meses não deve aparecer o tempo todo, eu quero apenas um
+calendário semanal e quero que cada dia seja um quadradinho".
+
+- **Placar por perna exposto pelo motor**: `ResultadoConfrontoMataMata`
+  (`simulation/knockout.ts`) ganhou `ida`/`volta` opcionais (`{ golsA, golsB
+  }`, mesma perspectiva `timeA`/`timeB` dos campos agregados) — só
+  presentes quando `idaEVolta`. O motor já resolvia as 2 pernas de uma vez,
+  sem pausa real (`resolverConfronto` chama `resolverPartida` 2x em
+  sequência antes de emitir 1 evento só agregado, ver comentário em
+  `EventoConfrontoMataMata`) — não dava pra adicionar uma pausa de verdade
+  no meio da simulação sem reescrever o fluxo de eventos; a solução foi
+  expor os 2 placares prontos no mesmo evento e deixar a UI decidir COMO
+  revelar.
+- **Revelação em 2 passos na UI**: `PainelResultadoDaRodada`
+  (`TelaDeTemporada.tsx`) — quando o confronto tem `ida`/`volta`, mostra a
+  linha "Ida" cheia na hora, a linha "Volta" com placar "? x ?" (opacidade
+  reduzida), e só depois de `PAUSA_ENTRE_IDA_E_VOLTA_MS` (1400ms,
+  `useEffect`+`setTimeout`, mesmo padrão de `PainelSorteio`/
+  `INTERVALO_REVELACAO_GRUPO_MS`) revela a volta + o agregado + o texto de
+  eliminado/avançou. O botão "Avançar pra próxima semana" fica desabilitado
+  durante a pausa (mesmo padrão do botão "Continuar" de `PainelSorteio`).
+  Confronto de jogo único continua mostrando o resultado de uma vez, sem
+  nenhuma pausa (comportamento inalterado).
+- **Calendário só semanal**: removido o painel "Calendário da temporada"
+  (mostrava período/mês por período do calendário anual, aparecia toda
+  semana no prompt de início de semana, `PainelSemana`) — ficou só o
+  `CalendarioSemanalLateral` fixo (já existia), redesenhado como grade de 7
+  quadradinhos (`grid grid-cols-7`, 1 por dia da semana atual) em vez de
+  lista vertical — cada quadradinho mostra o dia (1 letra + número do mês)
+  e um ícone (🏋️ treino / ⚽ jogo); o resumo do jogo da semana (competição +
+  placar) foi pra uma linha própria abaixo da grade, fora dos quadradinhos
+  (não cabia o nome da competição dentro de um quadrado de ~24px).
+- **Validado**: 2 testes novos em `tests/simulation/knockout.test.ts`
+  (`ida`/`volta` presentes e batendo com o agregado quando `idaEVolta`,
+  ausentes em jogo único). Testado ao vivo no browser com uma carreira no
+  Campeonato Acreano (formato `fase_grupos` 1 grupo de 8 + `semifinal`/
+  `final` ida e volta) até a semifinal: painel mostrou "Ida: 3 x 3", pausa,
+  depois "Volta: 2 x 0" + "Agregado: 5 x 3" + "Avançou para a próxima
+  fase!"; calendário semanal confirmado como grade de quadradinhos, painel
+  mensal confirmado ausente do prompt de início de semana. 522 testes
+  passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção

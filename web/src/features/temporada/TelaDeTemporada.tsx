@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PeriodoCalendario } from "@motor/schemas/calendar.js";
 import { construirCalendarioPadrao } from "@motor/data/loaders/calendario.js";
 import type { Club } from "@motor/schemas/club.js";
 import { ATRIBUTOS_POR_POSICAO, buscarArquetipo, NACIONALIDADES_CONMEBOL, type Atributo, type Posicao } from "@motor/schemas/player.js";
@@ -375,31 +374,35 @@ function CalendarioSemanalLateral({
   const { inicio } = intervaloDeSemana(temporada, semanaAtual);
 
   return (
-    <div className="fixed top-4 left-4 z-10 w-56 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
+    <div className="fixed top-4 left-4 z-10 w-64 rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-2 text-xs backdrop-blur text-slate-100">
       <h2 className="font-semibold text-slate-400">Semana {semanaAtual}</h2>
-      <div className="flex flex-col gap-1">
+      <div className="grid grid-cols-7 gap-1">
         {ROTULOS_DIA_SEMANA.map((rotulo, indice) => {
           const data = new Date(inicio);
           data.setUTCDate(data.getUTCDate() + indice);
           const ehTreino = indice === INDICE_DIA_TREINO && temTreino;
           const ehJogo = indice === INDICE_DIA_JOGO && !!jogoDaSemana;
+          const titulo = ehJogo && jogoDaSemana ? `${nomeDoClube(clubePorId, jogoDaSemana.mandanteId)} x ${nomeDoClube(clubePorId, jogoDaSemana.visitanteId)}` : undefined;
 
           return (
-            <div key={rotulo} className={`flex items-center gap-2 rounded-lg px-2 py-1 ${ehJogo ? "bg-emerald-950/60 border border-emerald-800" : ""}`}>
-              <span className="w-14 shrink-0 text-slate-400">
-                {rotulo} {formatarData(data)}
-              </span>
-              {ehJogo && jogoDaSemana && (
-                <span className="text-emerald-400 truncate" title={`${nomeDoClube(clubePorId, jogoDaSemana.mandanteId)} x ${nomeDoClube(clubePorId, jogoDaSemana.visitanteId)}`}>
-                  ⚽ {nomeDoCampeonato(nomePorCampeonato, jogoDaSemana.campeonatoId)}
-                  {jogoDaSemana.resultado && ` (${jogoDaSemana.resultado.golsCasa}-${jogoDaSemana.resultado.golsFora})`}
-                </span>
-              )}
-              {ehTreino && !ehJogo && <span className="text-slate-500">🏋️ treino</span>}
+            <div
+              key={rotulo}
+              title={titulo}
+              className={`aspect-square rounded-lg flex flex-col items-center justify-center gap-px ${ehJogo ? "bg-emerald-950/60 border border-emerald-800" : "bg-slate-800/60 border border-slate-800"}`}
+            >
+              <span className="text-slate-500 leading-none text-[9px]">{rotulo.charAt(0)}</span>
+              <span className="text-slate-400 leading-none text-[9px] tabular-nums">{data.getUTCDate()}</span>
+              {ehJogo ? <span className="leading-none text-[11px]">⚽</span> : ehTreino ? <span className="leading-none text-[11px]">🏋️</span> : null}
             </div>
           );
         })}
       </div>
+      {jogoDaSemana && (
+        <div className="rounded-lg bg-emerald-950/60 border border-emerald-800 px-2 py-1.5 text-emerald-400 truncate">
+          ⚽ {nomeDoCampeonato(nomePorCampeonato, jogoDaSemana.campeonatoId)}
+          {jogoDaSemana.resultado && ` (${jogoDaSemana.resultado.golsCasa}-${jogoDaSemana.resultado.golsFora})`}
+        </div>
+      )}
       {!simulandoAutomaticamente && (
         <div className="flex flex-col gap-1 border-t border-slate-800 pt-2">
           <span className="text-slate-500">Simular semanas de uma vez:</span>
@@ -920,18 +923,6 @@ function PainelDePrompt({ prompt, temporada }: { prompt: PromptPendente; tempora
   );
 }
 
-const ROTULO_PERIODO: Record<string, string> = {
-  "jan-1a_quinz": "Janeiro (1ª quinzena)",
-  fev: "Fevereiro",
-  mar: "Março",
-  abr: "Abril",
-  "temporada-conmebol": "Ligas CONMEBOL (fora do Brasil)",
-};
-
-function rotuloPeriodo(periodo: string): string {
-  return ROTULO_PERIODO[periodo] ?? periodo.replaceAll("_", " ").replaceAll("-", " ");
-}
-
 /** Nomes de fase de mata-mata vêm crus dos arquivos de dado (`FaseDeMataMata.nome`, ex:
  * "segunda_fase", "quartas") — sem isso apareciam com underscore na tela ("Eliminado
  * (segunda_fase)"). Cobre os valores conhecidos usados hoje; qualquer outro cai no fallback
@@ -965,120 +956,6 @@ function rotuloEtapa(etapa: string): string {
   return comEspacos.charAt(0).toUpperCase() + comEspacos.slice(1);
 }
 
-const NOMES_DOS_MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-/** Uma linha já pronta pra exibir no calendário — periodos "curtos" (jan-1a_quinz/fev/mar/abr/
- * temporada-conmebol) viram 1 linha só, igual antes; o período longo `mai-nov` (7 meses inteiros
- * num período só, ver `data/loaders/calendario.ts`) vira 1 linha POR MÊS (pedido do usuário: "os
- * meses devem ser individuais, não agrupados") — só na exibição, sem mexer no período real usado
- * pelo motor (`pontoDeTreino`/janela de competição continuam intocados, ver
- * `expandirPeriodoLongoEmMeses`). */
-interface LinhaDoCalendario {
-  chave: string;
-  rotulo: string;
-  semanaInicio: number;
-  semanaFim: number;
-  competicoesAtivas: string[];
-  temTreino: boolean;
-}
-
-/** Só `mai-nov` é "longo" o bastante pra fazer sentido quebrar por mês — os demais períodos padrão
- * já são no máximo 1 mês (ou uma quinzena). Quebra usando a mesma conversão semana→data aproximada
- * de `intervaloDeSemana` (7 dias por semana a partir de 1º de janeiro), então cada mês pode não ter
- * exatamente 4 semanas — é só pra exibição, não muda a janela real do período. */
-function expandirPeriodoLongoEmMeses(periodo: PeriodoCalendario, temporada: number): LinhaDoCalendario[] {
-  const temTreino = periodo.pontoDeTreino !== false;
-  if (periodo.periodo !== "mai-nov") {
-    return [{ chave: periodo.periodo, rotulo: rotuloPeriodo(periodo.periodo), semanaInicio: periodo.semanaInicio, semanaFim: periodo.semanaFim, competicoesAtivas: periodo.competicoes_ativas, temTreino }];
-  }
-
-  const gruposPorMes: { mes: number; semanaInicio: number; semanaFim: number }[] = [];
-  for (let semana = periodo.semanaInicio; semana <= periodo.semanaFim; semana++) {
-    const mes = intervaloDeSemana(temporada, semana).inicio.getUTCMonth();
-    const ultimoGrupo = gruposPorMes[gruposPorMes.length - 1];
-    if (ultimoGrupo && ultimoGrupo.mes === mes) ultimoGrupo.semanaFim = semana;
-    else gruposPorMes.push({ mes, semanaInicio: semana, semanaFim: semana });
-  }
-
-  return gruposPorMes.map((grupo) => ({
-    chave: `${periodo.periodo}-${grupo.mes}`,
-    rotulo: NOMES_DOS_MESES[grupo.mes],
-    semanaInicio: grupo.semanaInicio,
-    semanaFim: grupo.semanaFim,
-    competicoesAtivas: periodo.competicoes_ativas,
-    temTreino,
-  }));
-}
-
-/**
- * Calendário da TEMPORADA (não semana a semana — o motor não tem granularidade diária/semanal
- * de "treino terça, jogo sábado", só janelas de período, ver `data/loaders/calendario.ts`) —
- * mostra em qual período cada treino/cenário acontece (`pontoDeTreino`) e em quais janelas o
- * clube do jogador tem competição ativa, com o período atual destacado.
- */
-function CalendarioDaTemporada({
-  periodos,
-  temporada,
-  semanaAtual,
-  competicoesDoJogador,
-  nomePorCampeonato,
-}: {
-  periodos: PeriodoCalendario[];
-  temporada: number;
-  semanaAtual: number;
-  competicoesDoJogador: string[];
-  nomePorCampeonato: Map<string, string>;
-}) {
-  const linhas = useMemo(() => {
-    const expandidas = periodos.flatMap((periodo) => expandirPeriodoLongoEmMeses(periodo, temporada));
-    // Uma semana de fronteira entre 2 períodos (ex: fim de `abr` e começo de `mai-nov`) pode cair no
-    // mesmo mês pela conversão semana→data aproximada (7 dias por semana, não alinhado com o
-    // calendário real) — sem isso, "Abril" aparecia 2x seguidas, cada uma com só 1 semana. Junta
-    // linhas ADJACENTES de mesmo rótulo numa só, em vez de deixar a duplicata visualmente confusa.
-    const mescladas: LinhaDoCalendario[] = [];
-    for (const linha of expandidas) {
-      const anterior = mescladas[mescladas.length - 1];
-      if (anterior && anterior.rotulo === linha.rotulo) {
-        anterior.semanaFim = linha.semanaFim;
-        anterior.temTreino = anterior.temTreino || linha.temTreino;
-        anterior.competicoesAtivas = [...new Set([...anterior.competicoesAtivas, ...linha.competicoesAtivas])];
-      } else {
-        mescladas.push({ ...linha });
-      }
-    }
-    return mescladas;
-  }, [periodos, temporada]);
-
-  return (
-    <div className="rounded-lg bg-slate-800/60 p-3">
-      <div className="text-xs font-medium text-slate-400 mb-2">Calendário da temporada</div>
-      <div className="flex flex-col gap-1.5">
-        {linhas.map((linha) => {
-          const ehPeriodoAtual = semanaAtual >= linha.semanaInicio && semanaAtual <= linha.semanaFim;
-          const competicoesDoJogadorNoPeriodo = linha.competicoesAtivas.filter((id) => competicoesDoJogador.includes(id));
-
-          return (
-            <div
-              key={linha.chave}
-              className={`flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg px-3 py-1.5 text-xs ${ehPeriodoAtual ? "bg-emerald-950/60 border border-emerald-700" : "bg-slate-900/60"}`}
-            >
-              <span className="w-40 shrink-0 text-slate-300 font-medium">{linha.rotulo}</span>
-              <span className="text-slate-500 tabular-nums shrink-0">sem. {linha.semanaInicio}-{linha.semanaFim}</span>
-              {linha.temTreino && <span title="Treino/cenário toda semana desse período">🏋️ treino</span>}
-              {competicoesDoJogadorNoPeriodo.length > 0 ? (
-                <span className="text-emerald-400">⚽ {competicoesDoJogadorNoPeriodo.map((id) => nomeDoCampeonato(nomePorCampeonato, id)).join(", ")}</span>
-              ) : (
-                <span className="text-slate-500">sem jogo do seu clube</span>
-              )}
-              {ehPeriodoAtual && <span className="text-emerald-400 font-medium ml-auto">você está aqui</span>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function PainelSemana({
   info,
   temporada,
@@ -1091,7 +968,6 @@ function PainelSemana({
   onContinuar: (pularAteProximoJogo?: boolean) => void;
 }) {
   const { inicio, fim } = intervaloDeSemana(temporada, info.semana);
-  const periodos = useMemo(() => construirCalendarioPadrao(temporada).calendario, [temporada]);
 
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-3 text-slate-100">
@@ -1103,7 +979,6 @@ function PainelSemana({
       ) : (
         <p className="text-sm text-slate-500">Seu clube não tem competição ativa no momento.</p>
       )}
-      <CalendarioDaTemporada periodos={periodos} temporada={temporada} semanaAtual={info.semana} competicoesDoJogador={info.competicoesDoJogador} nomePorCampeonato={nomePorCampeonato} />
       <div className="flex gap-2">
         <button type="button" onClick={() => onContinuar()} className="mt-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium self-start">
           Continuar
@@ -1778,6 +1653,42 @@ function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoD
   );
 }
 
+/** Pausa entre a revelação da ida e da volta — o motor já resolveu as 2 pernas de uma vez (mesmo em "simulação rápida"), isto é puro ritmo de apresentação (pedido do usuário: mostrar a ida separada da volta, com uma pausa entre elas). */
+const PAUSA_ENTRE_IDA_E_VOLTA_MS = 1400;
+
+function LinhaDeConfrontoMataMata({
+  rotulo,
+  clubePorId,
+  mandanteId,
+  visitanteId,
+  golsCasa,
+  golsFora,
+  pendente,
+}: {
+  rotulo: string;
+  clubePorId: Map<string, Club>;
+  mandanteId: string;
+  visitanteId: string;
+  golsCasa: number;
+  golsFora: number;
+  pendente?: boolean;
+}) {
+  return (
+    <div className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm transition-opacity duration-300 ${pendente ? "opacity-40 bg-slate-800/40 border-slate-800" : "bg-slate-800/60 border-slate-700"}`}>
+      <span className="text-xs font-semibold text-slate-400 w-12 shrink-0">{rotulo}</span>
+      <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+        {nomeDoClube(clubePorId, mandanteId)}
+        <Escudo url={escudoDoClube(clubePorId, mandanteId)} alt="" tamanho={16} />
+      </span>
+      <span className="px-3 font-medium tabular-nums shrink-0">{pendente ? "? x ?" : `${golsCasa} x ${golsFora}`}</span>
+      <span className="flex-1 flex items-center gap-1.5 truncate">
+        <Escudo url={escudoDoClube(clubePorId, visitanteId)} alt="" tamanho={16} />
+        {nomeDoClube(clubePorId, visitanteId)}
+      </span>
+    </div>
+  );
+}
+
 function PainelResultadoDaRodada({
   resultadoDaRodada,
   clubePorId,
@@ -1791,6 +1702,17 @@ function PainelResultadoDaRodada({
   faixasPorCampeonato: Map<string, FaixasDeDestaqueDaTabela>;
   onAvancar: () => void;
 }) {
+  const temIdaEVolta = resultadoDaRodada.tipo === "mata_mata" && !!resultadoDaRodada.ida && !!resultadoDaRodada.volta;
+  const [voltaRevelada, setVoltaRevelada] = useState(false);
+
+  useEffect(() => {
+    if (!temIdaEVolta || voltaRevelada) return;
+    const timer = setTimeout(() => setVoltaRevelada(true), PAUSA_ENTRE_IDA_E_VOLTA_MS);
+    return () => clearTimeout(timer);
+  }, [temIdaEVolta, voltaRevelada]);
+
+  const aguardandoVolta = temIdaEVolta && !voltaRevelada;
+
   return (
     <div className="rounded-2xl bg-slate-900 border border-emerald-700 shadow-xl p-6 flex flex-col gap-4 text-slate-100">
       {resultadoDaRodada.tipo === "pontos_corridos" ? (
@@ -1837,27 +1759,66 @@ function PainelResultadoDaRodada({
           <h2 className="text-lg font-semibold">
             {nomeDoCampeonato(nomePorCampeonato, resultadoDaRodada.campeonatoId)} — {rotuloEtapa(resultadoDaRodada.etapa)}, resultado
           </h2>
-          <div
-            className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
-          >
-            <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
-              {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}
-              <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)} alt="" tamanho={16} />
-            </span>
-            <span className="px-3 font-medium tabular-nums shrink-0">
-              {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
-            </span>
-            <span className="flex-1 flex items-center gap-1.5 truncate">
-              <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)} alt="" tamanho={16} />
-              {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
-            </span>
-          </div>
-          <p className={resultadoDaRodada.eliminado ? "text-red-400 text-sm font-medium" : "text-emerald-400 text-sm font-medium"}>
-            {resultadoDaRodada.eliminado ? "Eliminado(a) dessa competição." : "Avançou para a próxima fase!"}
-          </p>
+          {temIdaEVolta && resultadoDaRodada.ida && resultadoDaRodada.volta ? (
+            <div className="flex flex-col gap-1.5">
+              <LinhaDeConfrontoMataMata
+                rotulo="Ida"
+                clubePorId={clubePorId}
+                mandanteId={resultadoDaRodada.confrontoDoJogador.mandanteId}
+                visitanteId={resultadoDaRodada.confrontoDoJogador.visitanteId}
+                golsCasa={resultadoDaRodada.ida.golsCasa}
+                golsFora={resultadoDaRodada.ida.golsFora}
+              />
+              <LinhaDeConfrontoMataMata
+                rotulo="Volta"
+                clubePorId={clubePorId}
+                mandanteId={resultadoDaRodada.confrontoDoJogador.mandanteId}
+                visitanteId={resultadoDaRodada.confrontoDoJogador.visitanteId}
+                golsCasa={resultadoDaRodada.volta.golsCasa}
+                golsFora={resultadoDaRodada.volta.golsFora}
+                pendente={aguardandoVolta}
+              />
+              {voltaRevelada && (
+                <div
+                  className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm font-medium ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
+                >
+                  <span>Agregado</span>
+                  <span className="tabular-nums">
+                    {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm ${resultadoDaRodada.eliminado ? "bg-red-950/40 border-red-800" : "bg-emerald-950/60 border-emerald-800"}`}
+            >
+              <span className="flex-1 flex items-center justify-end gap-1.5 text-right truncate">
+                {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)}
+                <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.mandanteId)} alt="" tamanho={16} />
+              </span>
+              <span className="px-3 font-medium tabular-nums shrink-0">
+                {resultadoDaRodada.confrontoDoJogador.golsCasa} x {resultadoDaRodada.confrontoDoJogador.golsFora}
+              </span>
+              <span className="flex-1 flex items-center gap-1.5 truncate">
+                <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)} alt="" tamanho={16} />
+                {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
+              </span>
+            </div>
+          )}
+          {!aguardandoVolta && (
+            <p className={resultadoDaRodada.eliminado ? "text-red-400 text-sm font-medium" : "text-emerald-400 text-sm font-medium"}>
+              {resultadoDaRodada.eliminado ? "Eliminado(a) dessa competição." : "Avançou para a próxima fase!"}
+            </p>
+          )}
         </>
       )}
-      <button type="button" onClick={onAvancar} className="self-start rounded-lg bg-emerald-600 hover:bg-emerald-500 transition-colors px-4 py-2.5 font-medium text-sm">
+      <button
+        type="button"
+        onClick={onAvancar}
+        disabled={aguardandoVolta}
+        className="self-start rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors px-4 py-2.5 font-medium text-sm"
+      >
         Avançar pra próxima semana
       </button>
     </div>

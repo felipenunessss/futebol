@@ -243,7 +243,16 @@ interface ConfrontoResultado {
  */
 export type ResultadoDaRodadaExibido =
   | { tipo: "pontos_corridos"; campeonatoId: string; rodada: number; confrontos: ConfrontoResultado[]; tabela: LinhaTabela[] | undefined }
-  | { tipo: "mata_mata"; campeonatoId: string; etapa: string; confrontoDoJogador: ConfrontoResultado; eliminado: boolean };
+  | {
+      tipo: "mata_mata";
+      campeonatoId: string;
+      etapa: string;
+      confrontoDoJogador: ConfrontoResultado;
+      eliminado: boolean;
+      /** Placar de cada perna isolada, na mesma perspectiva mandante/visitante de `confrontoDoJogador` — só presente quando o confronto foi ida e volta. Pedido do usuário: mostrar a ida separada da volta, com uma pausa entre as duas, mesmo simulando direto pro resultado (`PainelResultadoDaRodada` revela em 2 passos). */
+      ida?: { golsCasa: number; golsFora: number };
+      volta?: { golsCasa: number; golsFora: number };
+    };
 
 /**
  * Cenário de carreira já resolvido (o motor já sabe o desfecho — ver
@@ -849,6 +858,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
                 ehDoJogador: true,
               },
               eliminado,
+              ida: info.evento.confronto.ida ? { golsCasa: info.evento.confronto.ida.golsA, golsFora: info.evento.confronto.ida.golsB } : undefined,
+              volta: info.evento.confronto.volta ? { golsCasa: info.evento.confronto.volta.golsA, golsFora: info.evento.confronto.volta.golsB } : undefined,
             };
         // Mesmo represamento de `onPartidaPontosCorridos` — ver comentário lá.
         if (partidaAoVivoAtivaRef.current) {

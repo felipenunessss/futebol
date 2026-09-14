@@ -26,6 +26,15 @@ export interface ResultadoConfrontoMataMata {
   decididoNosPenaltis: boolean;
   /** 1 entrada (jogo único) ou 2 (ida e volta) — só presente quando o clube do jogador estava nesse confronto. */
   partidasDoJogador?: ResultadoPartida[];
+  /**
+   * Placar de cada perna isolada (perspectiva `timeA`/`timeB`, mesma dos campos agregados acima) —
+   * só presente quando `ida_e_volta`. Pedido do usuário: mostrar o resultado da ida separado da volta
+   * na UI, mesmo simulando as duas pernas de uma vez (sem pausa real no motor) — os dados já saem
+   * daqui prontos pra a UI revelar em 2 passos (`web/src/features/temporada/TelaDeTemporada.tsx`
+   * `PainelResultadoDaRodada`), sem precisar de um evento por perna.
+   */
+  ida?: { golsA: number; golsB: number };
+  volta?: { golsA: number; golsB: number };
 }
 
 export interface ResultadoEtapaMataMata {
@@ -149,6 +158,22 @@ export async function resolverConfronto(
 
     golsA = jogo1.golsCasa + jogo2.golsFora;
     golsB = jogo1.golsFora + jogo2.golsCasa;
+
+    const base = {
+      timeA,
+      timeB,
+      golsA,
+      golsB,
+      ida: { golsA: jogo1.golsCasa, golsB: jogo1.golsFora },
+      volta: { golsA: jogo2.golsFora, golsB: jogo2.golsCasa },
+      ...(partidasDoJogador.length > 0 ? { partidasDoJogador } : {}),
+    };
+
+    if (golsA > golsB) return { ...base, vencedor: timeA, decididoNosPenaltis: false };
+    if (golsB > golsA) return { ...base, vencedor: timeB, decididoNosPenaltis: false };
+
+    const vencedorIdaVolta = random() < probabilidadeDeVencer(ratingA, ratingB) ? timeA : timeB;
+    return { ...base, vencedor: vencedorIdaVolta, decididoNosPenaltis: true };
   } else {
     const participacao = ehTimeA ? participacaoComoLado(participacaoJogador, "casa") : ehTimeB ? participacaoComoLado(participacaoJogador, "fora") : undefined;
     const jogo = await resolverPartida(gerarPerfilTime(ratingA, random), gerarPerfilTime(ratingB, random), random, participacao, { mandanteId: timeA, visitanteId: timeB });
