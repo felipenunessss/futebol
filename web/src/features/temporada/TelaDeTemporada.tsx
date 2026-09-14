@@ -256,6 +256,26 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
             depois, no mesmo tick) — ver reporte do usuário "não apareceu nenhum sorteio". */}
         {animacaoDeEscolha ? (
           <PainelAnimacaoDeEscolha animacao={animacaoDeEscolha} onConcluir={temporada.concluirAnimacaoDeEscolha} />
+        ) : partidaAoVivo ? (
+          // Precisa vir ANTES de promptSemana/sorteio/etc: o motor já segue pra `aoIniciarSemana` da
+          // PRÓXIMA semana assim que a partida ao vivo termina (não espera `confirmarFimDeJogo`), o
+          // que criava um nova prompt "semana" enquanto a tela de fim de jogo ainda não tinha sido
+          // confirmada — como esse prompt vinha DEPOIS no JSX (dentro do fragment abaixo), as duas
+          // telas ficavam empilhadas na mesma renderização e a de fim de jogo parecia ter sido pulada
+          // (só estava abaixo da dobra). Dando prioridade aqui, a tela de fim de jogo bloqueia a
+          // visualização até o clique em "Continuar" (`onConfirmarFimDeJogo`), aí sim revelando o
+          // resultado da rodada represado (se houver) e, por fim, o prompt da próxima semana.
+          <PainelPartidaAoVivo
+            partida={partidaAoVivo}
+            clubePorId={clubePorId}
+            status={estadoAtual.statusNoClube}
+            prompt={promptDaPartidaAoVivo}
+            velocidade={temporada.velocidadeAoVivo}
+            onDefinirVelocidade={temporada.definirVelocidadeAoVivo}
+            onResponderChance={temporada.responderChanceAoVivo}
+            onResponderEvento={temporada.responderEventoAoVivo}
+            onConfirmarFimDeJogo={temporada.confirmarFimDeJogo}
+          />
         ) : sorteioPendente ? (
           <PainelSorteio sorteio={sorteioPendente} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} onContinuar={temporada.fecharSorteioDeGrupos} />
         ) : chaveamentoPendente ? (
@@ -285,19 +305,6 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
                 status={estadoAtual.statusNoClube}
                 lesionado={lesionado}
                 onEscolher={temporada.responderPrePartida}
-              />
-            )}
-            {partidaAoVivo && (
-              <PainelPartidaAoVivo
-                partida={partidaAoVivo}
-                clubePorId={clubePorId}
-                status={estadoAtual.statusNoClube}
-                prompt={promptDaPartidaAoVivo}
-                velocidade={temporada.velocidadeAoVivo}
-                onDefinirVelocidade={temporada.definirVelocidadeAoVivo}
-                onResponderChance={temporada.responderChanceAoVivo}
-                onResponderEvento={temporada.responderEventoAoVivo}
-                onConfirmarFimDeJogo={temporada.confirmarFimDeJogo}
               />
             )}
             {promptDeCarreira && <PainelDePrompt prompt={promptDeCarreira} temporada={temporada} />}
