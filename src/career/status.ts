@@ -70,6 +70,24 @@ export function minutosEsperadosPorStatus(status: StatusNoClube, random: () => n
   return Math.round(min + random() * (max - min));
 }
 
+/**
+ * Titular ou reserva NAQUELA PARTIDA específica — diferente de
+ * `StatusNoClube` (a confiança do clube em você ao longo da temporada
+ * inteira, tipo "promessa"/"titular"). Pedido do usuário: "quando eu digo
+ * que é pra estar claro se eu estou jogando ou não, é pra mostrar se você é
+ * titular ou reserva naquela partida e não seu status de contrato com o
+ * time" — o motor não simula escalação de verdade (ver comentário no topo
+ * do arquivo), então isso é uma aproximação honesta em cima do que já
+ * existe: quem jogou minutos dentro da faixa de um titular (`>=
+ * FAIXA_DE_MINUTOS_POR_STATUS.titular.min`) é tratado como titular NESSA
+ * partida, senão como reserva (mesmo que o status de contrato seja
+ * "titular" — dias de descanso/rotação acontecem, e é por isso que as
+ * faixas de minuto se sobrepõem).
+ */
+export function foiTitularNaPartida(minutosJogados: number): boolean {
+  return minutosJogados >= FAIXA_DE_MINUTOS_POR_STATUS.titular.min;
+}
+
 /** Multiplicador de valor de mercado por status — mesmo overall, um titular vale mais que um reserva/promessa (mais minutagem comprovada = menos risco pro clube comprador); ídolo vale um pouco mais ainda (referência do time). */
 const MULTIPLICADOR_VALORIZACAO_POR_STATUS: Record<StatusNoClube, number> = {
   promessa: 0.7,

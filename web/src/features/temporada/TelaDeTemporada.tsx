@@ -304,7 +304,6 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
                 clubePorId={clubePorId}
                 nomePorCampeonato={nomePorCampeonato}
                 tabelaPorCampeonato={tabelaPorCampeonato}
-                status={estadoAtual.statusNoClube}
                 lesionado={lesionado}
                 onEscolher={temporada.responderPrePartida}
               />
@@ -1046,7 +1045,6 @@ function PainelPrePartida({
   clubePorId,
   nomePorCampeonato,
   tabelaPorCampeonato,
-  status,
   lesionado,
   onEscolher,
 }: {
@@ -1054,7 +1052,6 @@ function PainelPrePartida({
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
   tabelaPorCampeonato: Map<string, LinhaTabela[]>;
-  status: StatusNoClube;
   lesionado: boolean;
   onEscolher: (escolha: EscolhaDePrePartida) => void;
 }) {
@@ -1086,9 +1083,11 @@ function PainelPrePartida({
           <div className="text-xs text-slate-400">{posicaoVisitante ? `${posicaoVisitante}º colocado` : "posição ainda não disponível"}</div>
         </div>
       </div>
-      <p className="text-xs text-slate-500 text-center">
-        Você joga {contexto.lado === "casa" ? "em casa" : "fora"} — status no elenco: <span className="text-slate-300">{ROTULO_STATUS[status]}</span>
-      </p>
+      {/* Antes mostrava "status no elenco" aqui (`ROTULO_STATUS[status]`) — pedido do usuário: isso é
+          o status de CONTRATO na temporada inteira, não responde "estou jogando ou não" nessa
+          partida específica; se titular ou reserva NESSA partida só se sabe depois de simulada (ver
+          `RotuloTitular` no resultado da rodada), então não dá pra mostrar aqui de antemão. */}
+      <p className="text-xs text-slate-500 text-center">Você joga {contexto.lado === "casa" ? "em casa" : "fora"}</p>
       {lesionado && <p className="text-xs text-amber-400 text-center">⚠️ Você está jogando lesionado — cuidado com as decisões durante a partida.</p>}
       <div className="grid gap-2">
         <button type="button" onClick={() => onEscolher("rapida")} className="rounded-lg bg-slate-800 border border-slate-700 px-4 py-2.5 text-left hover:border-emerald-500 hover:bg-slate-800/70 transition-colors">
@@ -1521,7 +1520,8 @@ function EventoCard({
           {nomeDoClube(clubePorId, confronto.mandante)} {resultado.golsCasa} x {resultado.golsFora} {nomeDoClube(clubePorId, confronto.visitante)}
           {resultado.chancesJogador.length > 0 && (
             <span className="text-slate-400"> — suas chances: {resultado.chancesJogador.length} ({resultado.chancesJogador.filter((c) => c.sucesso).length} bem-sucedidas)</span>
-          )}
+          )}{" "}
+          <RotuloTitular titular={evento.info.titular} />
         </Card>
       );
     }
@@ -1536,10 +1536,18 @@ function EventoCard({
     case "partida_mata_mata": {
       const { etapa, confronto } = evento.info.evento;
       const decisao = confronto.decididoNosPenaltis ? " (nos pênaltis)" : "";
+      const titularPorPartida = evento.info.titularPorPartida ?? [];
       return (
         <Card destaque>
           [{rotuloEtapa(etapa)}] {nomeDoClube(clubePorId, confronto.timeA)} {confronto.golsA} x {confronto.golsB} {nomeDoClube(clubePorId, confronto.timeB)}
-          {decisao} — vencedor: {nomeDoClube(clubePorId, confronto.vencedor)}
+          {decisao} — vencedor: {nomeDoClube(clubePorId, confronto.vencedor)}{" "}
+          {titularPorPartida.length === 2 ? (
+            <>
+              <RotuloTitular titular={titularPorPartida[0]} /> (ida) <RotuloTitular titular={titularPorPartida[1]} /> (volta)
+            </>
+          ) : (
+            <RotuloTitular titular={titularPorPartida[0]} />
+          )}
         </Card>
       );
     }
@@ -1656,6 +1664,12 @@ function PainelAnimacaoDeEscolha({ animacao, onConcluir }: { animacao: AnimacaoD
 /** Pausa entre a revelação da ida e da volta — o motor já resolveu as 2 pernas de uma vez (mesmo em "simulação rápida"), isto é puro ritmo de apresentação (pedido do usuário: mostrar a ida separada da volta, com uma pausa entre elas). */
 const PAUSA_ENTRE_IDA_E_VOLTA_MS = 1400;
 
+/** Selo "Titular"/"Reserva" NESSA partida específica — diferente do "Status no elenco" (contrato/temporada inteira, ver `career/status.ts`). Pedido do usuário: mostrar se ele jogou como titular ou reserva naquela partida, não seu status de contrato com o clube. */
+function RotuloTitular({ titular }: { titular?: boolean }) {
+  if (titular === undefined) return null;
+  return <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${titular ? "bg-emerald-800/60 text-emerald-300" : "bg-slate-700/60 text-slate-300"}`}>{titular ? "Titular" : "Reserva"}</span>;
+}
+
 function LinhaDeConfrontoMataMata({
   rotulo,
   clubePorId,
@@ -1664,6 +1678,7 @@ function LinhaDeConfrontoMataMata({
   golsCasa,
   golsFora,
   pendente,
+  titular,
 }: {
   rotulo: string;
   clubePorId: Map<string, Club>;
@@ -1672,6 +1687,7 @@ function LinhaDeConfrontoMataMata({
   golsCasa: number;
   golsFora: number;
   pendente?: boolean;
+  titular?: boolean;
 }) {
   return (
     <div className={`flex items-center justify-between rounded-lg px-3 py-1.5 border text-sm transition-opacity duration-300 ${pendente ? "opacity-40 bg-slate-800/40 border-slate-800" : "bg-slate-800/60 border-slate-700"}`}>
@@ -1685,6 +1701,7 @@ function LinhaDeConfrontoMataMata({
         <Escudo url={escudoDoClube(clubePorId, visitanteId)} alt="" tamanho={16} />
         {nomeDoClube(clubePorId, visitanteId)}
       </span>
+      {!pendente && <RotuloTitular titular={titular} />}
     </div>
   );
 }
@@ -1737,6 +1754,7 @@ function PainelResultadoDaRodada({
                   <Escudo url={escudoDoClube(clubePorId, c.visitanteId)} alt="" tamanho={16} />
                   {nomeDoClube(clubePorId, c.visitanteId)}
                 </span>
+                {c.ehDoJogador && <RotuloTitular titular={c.titular} />}
               </div>
             ))}
           </div>
@@ -1768,6 +1786,7 @@ function PainelResultadoDaRodada({
                 visitanteId={resultadoDaRodada.confrontoDoJogador.visitanteId}
                 golsCasa={resultadoDaRodada.ida.golsCasa}
                 golsFora={resultadoDaRodada.ida.golsFora}
+                titular={resultadoDaRodada.titularIda}
               />
               <LinhaDeConfrontoMataMata
                 rotulo="Volta"
@@ -1777,6 +1796,7 @@ function PainelResultadoDaRodada({
                 golsCasa={resultadoDaRodada.volta.golsCasa}
                 golsFora={resultadoDaRodada.volta.golsFora}
                 pendente={aguardandoVolta}
+                titular={resultadoDaRodada.titularVolta}
               />
               {voltaRevelada && (
                 <div
@@ -1804,6 +1824,7 @@ function PainelResultadoDaRodada({
                 <Escudo url={escudoDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)} alt="" tamanho={16} />
                 {nomeDoClube(clubePorId, resultadoDaRodada.confrontoDoJogador.visitanteId)}
               </span>
+              <RotuloTitular titular={resultadoDaRodada.titularIda} />
             </div>
           )}
           {!aguardandoVolta && (

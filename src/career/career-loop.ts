@@ -33,7 +33,7 @@ import { calcularValorDeMercado, type PerfilDeMercado } from "../market/valuatio
 import { estaNaJanelaDeTransferencia, gerarProposta, selecionarClubesInteressados, type PropostaTransferencia, type TermosDeContrato } from "../market/transfers.js";
 import { contrapropostaPadrao, negociarTransferencia, type FatoresConfianca, type ResultadoNegociacao } from "../market/negotiation.js";
 import { precisaVender } from "./club-finances.js";
-import { evoluirStatus, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
+import { evoluirStatus, foiTitularNaPartida, minutosEsperadosPorStatus, multiplicadorDeValorizacaoPorStatus, type StatusNoClube } from "./status.js";
 import { aplicarGanhoDeTreino, assinarContrato, aplicarDesempenhoPartida, aplicarImpactoDeCenario, avancarTemporada, consumirPartidaForaDeCombate, ganharXp, investirPontos, mudarStatusNoClube, overallAtual, type EstadoDeCarreira } from "./Player.js";
 
 /**
@@ -62,11 +62,28 @@ export interface PartidaDoJogadorPontosCorridos {
    */
   grupoNome?: string;
   evento: EventoConfrontoPontosCorridos;
+  /**
+   * Titular ou reserva NESSA partida (`career/status.ts`
+   * `foiTitularNaPartida`) — diferente de `StatusNoClube` (confiança do
+   * clube na temporada inteira). Mesma ressalva de `grupoNome`: só
+   * populado pelo motor incremental semanal (`jogarTemporadaSemanal`), que
+   * é quem sabe os minutos jogados partida a partida; `jogarTemporada` em
+   * lote só calcula minutos depois que a temporada inteira já terminou,
+   * então fica `undefined` nesse caminho.
+   */
+  titular?: boolean;
 }
 
 export interface PartidaDoJogadorMataMata {
   campeonatoId: string;
   evento: EventoConfrontoMataMata;
+  /**
+   * Titular ou reserva em cada perna de `evento.confronto.partidasDoJogador`
+   * (mesma ordem, 1 entrada se jogo único, 2 se ida e volta) — ver
+   * `PartidaDoJogadorPontosCorridos.titular` pra semântica e mesma
+   * ressalva de disponibilidade (só no motor incremental semanal).
+   */
+  titularPorPartida?: boolean[];
 }
 
 export interface CenarioResolvidoNaTemporada {
@@ -959,7 +976,7 @@ export async function jogarTemporadaSemanal(
   const assistenciasPorCompeticao = new Map<string, number>();
   const partidasPorCompeticao = new Map<string, number>();
 
-  async function registrarPartidaDoJogador(campeonatoId: string, resultado: ResultadoPartida): Promise<void> {
+  async function registrarPartidaDoJogador(campeonatoId: string, resultado: ResultadoPartida): Promise<boolean> {
     const minutosDaPartida = minutosEsperadosPorStatus(estadoAtual.statusNoClube, random);
     const desempenho = converterChancesEmDesempenho(resultado.chancesJogador, minutosDaPartida, IMPORTANCIA_PADRAO);
     const ganho = aplicarDesempenhoPartida(estadoAtual, desempenho);
@@ -971,6 +988,7 @@ export async function jogarTemporadaSemanal(
     // nota de avaliação usa 90 minutos fixos — mesma razão documentada em `jogarTemporada`.
     somaDeNotas += calcularNotaPartida({ ...desempenho, minutosJogados: MINUTOS_PADRAO_PARA_NOTA_DE_AVALIACAO });
     partidasComNota++;
+    return foiTitularNaPartida(minutosDaPartida);
   }
 
   /** Aplica o `incidenteJogador` (cartão vermelho/lesão — ver `simulation/match.ts`) de uma partida
@@ -1053,8 +1071,8 @@ export async function jogarTemporadaSemanal(
     return {
       aoSimularConfrontoPontosCorridos: async (grupoNome, evento) => {
         if (evento.confronto.mandante === clubeNoInicioDaTemporada || evento.confronto.visitante === clubeNoInicioDaTemporada) {
-          await registrarPartidaDoJogador(campeonatoId, evento.resultado);
-          await onPartidaPontosCorridos?.({ campeonatoId, grupoNome, evento });
+          const titular = await registrarPartidaDoJogador(campeonatoId, evento.resultado);
+          await onPartidaPontosCorridos?.({ campeonatoId, grupoNome, evento, titular });
         } else {
           await onPartidaDaRodadaNaCompeticaoDoJogador?.({ campeonatoId, grupoNome, evento });
         }
@@ -1062,8 +1080,9 @@ export async function jogarTemporadaSemanal(
       aoResolverConfrontoMataMata: async (evento) => {
         await onConfrontoMataMataNaCompeticao?.({ campeonatoId, evento });
         if (evento.confronto.timeA === clubeNoInicioDaTemporada || evento.confronto.timeB === clubeNoInicioDaTemporada) {
-          for (const partida of evento.confronto.partidasDoJogador ?? []) await registrarPartidaDoJogador(campeonatoId, partida);
-          await onPartidaMataMata?.({ campeonatoId, evento });
+          const titularPorPartida: boolean[] = [];
+          for (const partida of evento.confronto.partidasDoJogador ?? []) titularPorPartida.push(await registrarPartidaDoJogador(campeonatoId, partida));
+          await onPartidaMataMata?.({ campeonatoId, evento, titularPorPartida });
         }
       },
       aoIniciarFase: async (fase) => {

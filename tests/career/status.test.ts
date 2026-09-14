@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   evoluirStatus,
+  foiTitularNaPartida,
   indiceDoStatus,
   minutosEsperadosPorStatus,
   multiplicadorDeValorizacaoPorStatus,
@@ -51,6 +52,19 @@ describe("minutosEsperadosPorStatus", () => {
     const baixo = minutosEsperadosPorStatus("titular", () => 0);
     const alto = minutosEsperadosPorStatus("titular", () => 1);
     expect(alto).toBeGreaterThan(baixo);
+  });
+});
+
+describe("foiTitularNaPartida", () => {
+  it("minutos dentro da faixa de titular conta como titular nessa partida", () => {
+    expect(foiTitularNaPartida(60)).toBe(true);
+    expect(foiTitularNaPartida(90)).toBe(true);
+  });
+
+  it("minutos abaixo da faixa de titular conta como reserva nessa partida", () => {
+    expect(foiTitularNaPartida(59)).toBe(false);
+    expect(foiTitularNaPartida(15)).toBe(false);
+    expect(foiTitularNaPartida(0)).toBe(false);
   });
 });
 

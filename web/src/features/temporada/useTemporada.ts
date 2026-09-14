@@ -228,6 +228,8 @@ interface ConfrontoResultado {
   golsCasa: number;
   golsFora: number;
   ehDoJogador: boolean;
+  /** Titular ou reserva NESSA partida (`career/status.ts` `foiTitularNaPartida`) — só presente quando `ehDoJogador`. */
+  titular?: boolean;
 }
 
 /**
@@ -252,6 +254,9 @@ export type ResultadoDaRodadaExibido =
       /** Placar de cada perna isolada, na mesma perspectiva mandante/visitante de `confrontoDoJogador` — só presente quando o confronto foi ida e volta. Pedido do usuário: mostrar a ida separada da volta, com uma pausa entre as duas, mesmo simulando direto pro resultado (`PainelResultadoDaRodada` revela em 2 passos). */
       ida?: { golsCasa: number; golsFora: number };
       volta?: { golsCasa: number; golsFora: number };
+      /** Titular ou reserva do jogador em cada perna — `titularIda` sempre presente quando houve partida (jogo único usa só esse), `titularVolta` só quando `volta` está presente. */
+      titularIda?: boolean;
+      titularVolta?: boolean;
     };
 
 /**
@@ -737,6 +742,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           golsCasa: resultadoDaPartida.golsCasa,
           golsFora: resultadoDaPartida.golsFora,
           ehDoJogador: true,
+          titular: info.titular,
         });
         setJogoDaSemana((atual) =>
           atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: resultadoDaPartida.golsCasa, golsFora: resultadoDaPartida.golsFora } } : atual,
@@ -860,6 +866,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
               eliminado,
               ida: info.evento.confronto.ida ? { golsCasa: info.evento.confronto.ida.golsA, golsFora: info.evento.confronto.ida.golsB } : undefined,
               volta: info.evento.confronto.volta ? { golsCasa: info.evento.confronto.volta.golsA, golsFora: info.evento.confronto.volta.golsB } : undefined,
+              titularIda: info.titularPorPartida?.[0],
+              titularVolta: info.evento.confronto.volta ? info.titularPorPartida?.[1] : undefined,
             };
         // Mesmo represamento de `onPartidaPontosCorridos` — ver comentário lá.
         if (partidaAoVivoAtivaRef.current) {

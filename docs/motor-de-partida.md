@@ -2434,6 +2434,50 @@ calendário semanal e quero que cada dia seja um quadradinho".
   mensal confirmado ausente do prompt de início de semana. 522 testes
   passando, `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
 
+### 5.29. Titular/reserva por partida, não status de contrato (implementado)
+
+Pedido do jogador: "quando eu digo que é pra estar claro se eu estou
+jogando ou não, é pra mostrar se você é titular ou reserva naquela partida
+e não seu status de contrato com o time" — a tela pré-partida mostrava
+"status no elenco: Promessa" (ou reserva/titular/ídolo), que é a confiança
+do clube em você NA TEMPORADA INTEIRA (`career/status.ts`
+`StatusNoClube`/`evoluirStatus`), não uma resposta sobre aquela partida
+específica — um jogador com status "titular" pode ser poupado num jogo
+qualquer, e um "reserva" pode entrar como titular num dia de sorte (as
+faixas de minuto já se sobrepõem de propósito, ver comentário em
+`FAIXA_DE_MINUTOS_POR_STATUS`).
+
+- **`foiTitularNaPartida` (`career/status.ts`)**: aproximação honesta em
+  cima do que já existe — o motor não simula escalação de verdade, só
+  sorteia minutos jogados por partida dentro de uma faixa por status; quem
+  jogou minutos dentro da faixa de um titular (`>=
+  FAIXA_DE_MINUTOS_POR_STATUS.titular.min`, hoje 60) é tratado como titular
+  NESSA partida, senão como reserva.
+- **Motor incremental semanal exposto pra UI**: `registrarPartidaDoJogador`
+  (`career/career-loop.ts`) agora retorna esse booleano; `PartidaDoJogadorPontosCorridos`
+  ganhou `titular?: boolean` e `PartidaDoJogadorMataMata` ganhou
+  `titularPorPartida?: boolean[]` (paralelo a `partidasDoJogador` — 1 ou 2
+  entradas). Mesma ressalva de `grupoNome`: só populado pelo motor
+  incremental semanal (`jogarTemporadaSemanal`), que sabe os minutos
+  partida a partida; `jogarTemporada` em lote só calcula minutos depois que
+  a temporada inteira terminou, fica `undefined` nesse caminho.
+- **UI**: novo selo `RotuloTitular` ("Titular"/"Reserva") na linha do
+  próprio clube no painel de resultado da rodada (pontos corridos e
+  mata-mata, com uma linha por perna quando ida e volta) e nos cards do
+  feed de eventos (`partida_propria`/`partida_mata_mata`). A tela
+  pré-partida (`PainelPrePartida`) teve a linha "status no elenco" removida
+  — como titular/reserva só se sabe depois de simulada a partida (minutos
+  ainda não existem antes disso), não dava pra mostrar ali de antemão sem
+  reintroduzir a mesma confusão; o status de contrato continua visível na
+  barra de estatísticas do topo da tela (`Stat rotulo="Status no elenco"`),
+  só não mais nesse ponto específico onde foi confundido com "vou jogar ou
+  não".
+- **Validado**: 2 testes novos em `tests/career/status.test.ts`
+  (`foiTitularNaPartida` acima/abaixo do limiar). Testado ao vivo no
+  browser: partida como reserva mostrou o selo "Reserva" tanto no painel
+  de resultado da rodada quanto no card do feed. 524 testes passando,
+  `npx tsc --noEmit`/`cd web && npx tsc -b` limpos.
+
 ## 6. Pendências / próximos passos
 
 - **Bandeiras narrativas no resto do catálogo de cenários** (seção
