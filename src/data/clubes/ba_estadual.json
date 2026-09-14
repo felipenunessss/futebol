@@ -92,7 +92,8 @@
     "pais": "BR",
     "estado": "BA",
     "cidade": "Ilhéus",
-    "estadio": "Mário Pessoa"
+    "estadio": "Mário Pessoa",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/6/6d/Barcelona-BA.png/250px-Barcelona-BA.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
   },
   {
     "id": "leonico",
@@ -130,7 +131,8 @@
     "nome_popular": "ECPP",
     "pais": "BR",
     "estado": "BA",
-    "cidade": "Vitória da Conquista"
+    "cidade": "Vitória da Conquista",
+    "escudo_url": "https://thumb.wikimedia.org/wikipedia/pt/thumb/5/5b/ECPPVitoriaDaConquista.png/250px-ECPPVitoriaDaConquista.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail"
   },
   {
     "id": "feira_fc",
@@ -176,7 +178,8 @@
     "nome_popular": "Redenção",
     "pais": "BR",
     "estado": "BA",
-    "cidade": "Salvador"
+    "cidade": "Salvador",
+    "escudo_url": "https://upload.wikimedia.org/wikipedia/pt/c/c5/Reden%C3%A7%C3%A3oFC.png?utm_source=pt.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled"
   },
   {
     "id": "ssa_fc",
