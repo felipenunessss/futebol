@@ -219,6 +219,20 @@ describe("calcularMudancasContinentais", () => {
     expect(mudancas.find((m) => m.competicaoId === "libertadores")?.entram.sort()).toEqual(["cl_novo1", "cl_novo2"]);
   });
 
+  it("deduplica clube que se qualifica por MAIS DE UMA via na mesma temporada (ex: campeão de mata-mata que também termina bem colocado na liga) — sem isso, apareceria 2x na mesma competição continental", () => {
+    // cl_novo1 se qualifica pela liga (top 1) E pela copa (campeão) — mesmo clube nos dois. Bruto
+    // teria 2 entradas de cl_novo1, mas deduplicado vira 1 só — 1 clube único contra 2 vagas atuais
+    // do país não bate mais (2 ≠ 1), então a troca é pulada (rede de segurança), não gera duplicata.
+    const liga: CompeticaoParaVagaContinental = { id: "liga_x", pais: "CL", premiacao: { vaga_libertadores: 1 }, tabelaFinal: ["cl_novo1"].map(linha) };
+    const copa: CompeticaoParaVagaContinental = { id: "copa_x", pais: "CL", premiacao: { vaga_libertadores: 1 }, campeao: "cl_novo1" };
+    const libertadores = { id: "libertadores", timesAtuais: ["cl1", "cl2"] };
+    const sulamericana = { id: "sulamericana", timesAtuais: [] };
+
+    const mudancas = calcularMudancasContinentais([liga, copa], paisPorClube, libertadores, sulamericana);
+
+    expect(mudancas.find((m) => m.competicaoId === "libertadores")).toBeUndefined();
+  });
+
   it("não gera mudança nenhuma quando não há vagas resolvidas em país nenhum", () => {
     const semVaga: CompeticaoParaVagaContinental = { id: "x", pais: "AR", premiacao: {}, tabelaFinal: [linha("ar1")] };
     const mudancas = calcularMudancasContinentais([semVaga], paisPorClube, { id: "libertadores", timesAtuais: [] }, { id: "sulamericana", timesAtuais: [] });

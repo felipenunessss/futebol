@@ -176,18 +176,28 @@ export function calcularMudancasContinentais(
     const atuaisLibertadores = libertadores.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
     const atuaisSulamericana = sulamericana.timesAtuais.filter((id) => paisPorClube.get(id) === pais);
 
-    const novosLibertadores: string[] = [];
-    const novosSulamericana: string[] = [];
+    const novosLibertadoresBruto: string[] = [];
+    const novosSulamericanaBruto: string[] = [];
     for (const competicao of competicoes) {
       const vagaLibertadores = competicao.premiacao.vaga_libertadores ?? 0;
       const vagaSulamericana = competicao.premiacao.vaga_sulamericana ?? 0;
       if (competicao.tabelaFinal) {
-        if (vagaLibertadores > 0) novosLibertadores.push(...competicao.tabelaFinal.slice(0, vagaLibertadores).map((linha) => linha.clubeId));
-        if (vagaSulamericana > 0) novosSulamericana.push(...competicao.tabelaFinal.slice(vagaLibertadores, vagaLibertadores + vagaSulamericana).map((linha) => linha.clubeId));
+        if (vagaLibertadores > 0) novosLibertadoresBruto.push(...competicao.tabelaFinal.slice(0, vagaLibertadores).map((linha) => linha.clubeId));
+        if (vagaSulamericana > 0) novosSulamericanaBruto.push(...competicao.tabelaFinal.slice(vagaLibertadores, vagaLibertadores + vagaSulamericana).map((linha) => linha.clubeId));
       } else if (competicao.campeao && vagaLibertadores === 1) {
-        novosLibertadores.push(competicao.campeao);
+        novosLibertadoresBruto.push(competicao.campeao);
       }
     }
+
+    // Um clube pode se qualificar por MAIS DE UMA via na mesma temporada (ex: campeão da Copa do
+    // Brasil que TAMBÉM termina entre os 7 primeiros do Brasileirão) — sem deduplicar, ele apareceria
+    // 2x na mesma competição continental (bug real encontrado com dado de verdade: Flamengo
+    // duplicado em Libertadores). Não tenta promover o "próximo da fila" pro lugar que sobrou (regra
+    // real faria isso, mas depende de saber a ordem de prioridade entre critérios, fora de escopo) —
+    // só deduplica; se isso fizer a contagem não bater mais com a fatia atual do país, a troca é
+    // pulada nesta rodada (mesma rede de segurança de sempre, ver comentário da função).
+    const novosLibertadores = [...new Set(novosLibertadoresBruto)];
+    const novosSulamericana = [...new Set(novosSulamericanaBruto)];
 
     if (novosLibertadores.length > 0 && novosLibertadores.length === atuaisLibertadores.length) {
       libertadoresEntram.push(...novosLibertadores);

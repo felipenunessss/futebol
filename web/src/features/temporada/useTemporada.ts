@@ -86,7 +86,16 @@ function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNac
     // Pontos corridos + mata-mata simples (sem entrada escalonada por etapa) sem contador próprio —
     // aproxima pelo tamanho do bracket (3 fases = quartas/semi/final = 8 times, etc).
     (formato.pontos_corridos && formato.mata_mata && !formato.mata_mata.etapas ? 2 ** formato.mata_mata.fases.length : undefined);
-  const acesso = premiacao.acesso_proxima_divisao ?? 0;
+  // `acesso_proxima_divisao` é um número TOTAL da competição inteira (ex: "6 vagas" espalhadas por
+  // 16 grupos da Série D) — só corresponde a "top N da tabela" quando essa tabela é a ÚNICA do
+  // campeonato (sem grupos, ou um grupo só). Numa competição com MAIS de 1 grupo, aplicar esse
+  // número por linha de cada grupo individual destacava o grupo inteiro por engano quando `acesso`
+  // era maior que `classificam_por_grupo` (bug relatado: "na Série D aparece que todos os 6 times
+  // dos grupos classificam" — grupo de 6, `acesso_proxima_divisao: 6` batendo com o tamanho do
+  // grupo inteiro, embora só 4 de fato avancem — `classificam_por_grupo`). Quem sobe de fato entre
+  // vários grupos depende de critério cross-grupo que este destaque simples não sabe expressar.
+  const numGrupos = Math.max(formato.fase_grupos?.num_grupos ?? 1, formato.fase_quadrangular?.ativa ? formato.fase_quadrangular.num_grupos : 1);
+  const acesso = numGrupos > 1 ? 0 : (premiacao.acesso_proxima_divisao ?? 0);
   const melhorFaixa = Math.max(classificadosParaFase ?? 0, acesso);
 
   return {

@@ -78,19 +78,33 @@ Sul-Americana (Chile e Bolívia, ambos `pontos_corridos` puro); mata-mata sem
 `tabelaFinal` com `vaga_libertadores === 1` → campeão leva a vaga (Copa do
 Brasil).
 
+**Brasil agora coberto** (pedido do usuário: "quero que de fato temporada a
+temporada as vagas componham os times que participam das competições", não
+só Chile/Bolívia) — `brasileirao_serie_a.json` ganhou `vaga_libertadores: 7`/
+`vaga_sulamericana: 7` (aproximação posicional, mesmo espírito de todo país
+com critério real complexo/não pesquisado — ver `docs/dados-a-verificar.md`),
+calibrados pra bater exatamente com o total de clubes brasileiros na
+composição estática 2026 (8 de Libertadores, 7 de Sul-Americana, contando a
+vaga já modelada da Copa do Brasil). Também corrigido: `vaga_libertadores`
+removida de Carioca A e Paulistão A1 — clubes NÃO se classificam pra
+Libertadores via campeonato estadual na era moderna (bug relatado pelo
+usuário, dado estava errado).
+
+**Deduplicação entre vias** (bug real encontrado com dado de verdade: o
+campeão da Copa do Brasil também terminando entre os 7 primeiros do
+Brasileirão gerava o MESMO clube 2x na lista de Libertadores) —
+`calcularMudancasContinentais` deduplica antes de comparar com o tamanho
+atual da fatia; se a deduplicação fizer a contagem não bater mais, a troca
+é pulada nessa rodada (mesma rede de segurança, não tenta promover o
+"próximo da fila" pro lugar que sobrou — fazer isso direito dependeria de
+saber a ordem de prioridade entre os critérios de cada via, fora de escopo).
+
 **Ainda não coberto** (fica como pendência, não implementado):
-- Brasil — Série A não tem `vaga_libertadores`/`vaga_sulamericana`
-  cadastrados (pendência de DADO, não de código — ver
-  `docs/dados-a-verificar.md`: "o número varia ano a ano pelo ranking CBF,
-  não é posição fixa simples"). Enquanto isso, o Brasil nunca é tocado por
-  este mecanismo (só a Copa do Brasil tem 1 vaga modelada, que sozinha nunca
-  bate com o tamanho atual da fatia brasileira — ver condição de segurança
-  acima) — a composição brasileira de Libertadores/Sul-Americana continua
-  sempre a estática do ano de referência, exatamente como antes desta
-  mudança (sem regressão, só sem cobertura ainda).
 - `vaga_sulamericana` de uma competição sem `tabelaFinal` (mata-mata) nunca é
   resolvida — não tem como saber quem é o "vice"/2º colocado num chaveamento
-  eliminatório sem uma tabela por trás.
+  eliminatório sem uma tabela por trás (por isso a Série A também assume os
+  7 de Sul-Americana por inteiro — a vaga da Copa do Brasil não conta na
+  prática).
 - Formatos `turno`+`returno`/`tabela_acumulada`/`fase_quadrangular` (a
   maioria dos outros países CONMEBOL — Argentina, Colômbia, Uruguai,
   Paraguai, Peru, Equador, Venezuela) não expõem `tabelaFinal` ainda — mesma

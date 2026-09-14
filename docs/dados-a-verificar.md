@@ -81,9 +81,22 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   2027 — fato real, mas o schema não tem campo pra "vaga em competição
   nacional a partir de estadual" fora do já existente `vaga_serie_d`
   (que é especificamente pra Série D do ano corrente).
-- **Vagas de Libertadores/Sul-Americana da Série A (Brasil)**: não
-  modeladas — o número varia ano a ano pelo ranking CBF, não é posição fixa
-  simples, e isso não foi apurado com precisão ainda.
+- **Vagas de Libertadores/Sul-Americana da Série A (Brasil)**: modeladas
+  como aproximação posicional (`vaga_libertadores: 7`, `vaga_sulamericana:
+  7`) — o critério real varia ano a ano pelo ranking CBF, não é posição fixa
+  simples, e isso não foi apurado com precisão ainda; os números escolhidos
+  só batem com o TOTAL de clubes brasileiros na composição estática 2026 de
+  Libertadores/Sul-Americana (8 e 7 respectivamente, contando a vaga da
+  Copa do Brasil), pra `career/mundo-persistente.ts` `calcularMudancasContinentais`
+  poder atualizar a fatia brasileira de verdade a partir da temporada 2 (ver
+  `docs/regras-competicoes.md`) em vez de deixá-la sempre estática.
+- **`vaga_libertadores` removida de Carioca A e Paulistão A1**: os dados
+  tinham `vaga_libertadores: 1` em cada um, o que está incorreto pra era
+  moderna do futebol brasileiro (bug relatado pelo usuário) — clubes se
+  classificam pra Libertadores via Brasileirão/Copa do Brasil, não via
+  campeonato estadual, desde que a CBF centralizou o critério (décadas
+  atrás). Removido sem substituto (os dois estaduais continuam sem vaga
+  continental nenhuma, correto).
 - **Rebaixamento da Série B (Brasil)**: mantido `4` por padrão histórico
   conhecido, mas não reconfirmado especificamente pra 2026.
 - **Copa do Brasil — 3 estaduais sem pesquisa dedicada de vaga_serie_d**
