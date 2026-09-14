@@ -301,6 +301,42 @@ verificada manualmente antes de aplicar)**:
   (existe também o Sport Club Internacional de Porto Alegre cadastrado
   aqui). Preenchido com o escudo real (Wikipédia EN,
   `Club_Internacional_de_Bogotá_logo.svg`).
+- `porto_ba` (Porto Sport Club, Porto Seguro-BA) e `porto_caruaru` (Clube
+  Atlético do Porto, Caruaru-PE): **ambos** tinham o escudo do **FC Porto
+  de Portugal** (mesmo `escudo_url` idêntico nos dois registros — sinal
+  claro de erro, um clube de verdade nunca deveria compartilhar escudo com
+  outro clube diferente). Corrigidos com os escudos reais de cada um
+  (Wikipédia PT, `Porto_SC_(Bahia)_escudo.png` e
+  `Clube_Atlético_do_Porto.png`); `cor_primaria`/`cor_secundaria` de
+  `porto_ba` também removidas (vinham da mesma fonte errada, eram as cores
+  do FC Porto).
+
+**Achado sistemático a investigar (não corrigido ainda — fora do escopo
+desta rodada, fica registrado pra próxima)**: existem **18 grupos de
+clubes com o `escudo_url` idêntico entre 2+ registros diferentes** — um
+clube de verdade não deveria nunca compartilhar escudo com outro clube
+diferente (a não ser um "time B" do mesmo clube, o que É esperado, ver
+abaixo). Rodando `python3 -c "..."` (script ad-hoc, ver histórico) sobre
+todos os `src/data/clubes/*.json`, os grupos encontrados foram:
+- **Prováveis pares clube-principal/time-B, OK**: `sport_huancayo`/
+  `sport_huancayo_b`, `monagas`/`monagas_b`, `zamora_venezuela`/`zamora_b`
+  (nomes indicam claramente ser o mesmo clube, 2ª equipe).
+- **Prováveis casos do MESMO bug de nome homônimo genérico já corrigido
+  acima, ainda NÃO verificados individualmente**: `barcelona_ilheus`/
+  `barcelona_sc` (Equador), `capital_cf`/`capital_fc_to`, `crac`/
+  `cra_aquidauana`, `libertad_paraguai`/`libertad_ec`, `santos_ap`/
+  `santos_fc_pe`/`santos` (3 clubes diferentes com o MESMO escudo — pelo
+  menos 2 estão errados, `santos` sendo o Santos FC real de Pelé),
+  `estudiantes_lp`/`estudiantes_caseros`, `colon_santa_fe`/`colon_uy`,
+  `sc_gaucho`/`passo_fundo`, `portuguesa`/`portuguesa_venezuela`,
+  `primavera`/`primavera_ac`, `sao_jose_sp`/`sao_jose_rs`,
+  `universidad_catolica_ec`/`universidad_catolica`, `paysandu_uy`/
+  `paysandu`, `deportivo_moquegua`/`universidad_central_venezuela`,
+  `confianca`/`confianca_pb`. Mesmo tratamento recomendado: buscar a fonte
+  primária (Wikipédia) de cada um e confirmar visualmente antes de
+  corrigir — não remover às cegas, pode ser que um dos dois do par esteja
+  certo e o outro errado (não necessariamente os dois errados, como no
+  caso do Porto acima).
 
 Esses casos (a maioria clubes homônimos de países/times diferentes, 1
 confusão bandeira-do-estado×escudo-do-clube) reforçam que a auditoria
