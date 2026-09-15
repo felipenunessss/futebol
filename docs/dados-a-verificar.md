@@ -74,6 +74,14 @@ dado e deste próprio arquivo, se precisar recuperar o raciocínio).
   `paresPorPoteDaFaseSuica`, ver `docs/motor-de-partida.md` seção 5.31).
   Divergência não resolvida: pode ser edição/temporada diferente da coberta
   pelas fontes, ou o jogador descrevendo de memória um regulamento antigo.
+- **Paulistão A1 — composição dos potes (1 grande por pote)**: não é fato
+  pesquisado sobre o sorteio real do campeonato — pedido explícito do
+  jogador ("os 4 grandes devem ser cabeça de chave dos grupos, um em cada").
+  `times` de `data/estaduais/paulistao_a1.json` foi reordenado pra isso, e
+  `career/paulistao-cabecas-de-chave.ts` mantém a regra entre temporadas
+  (se um grande cai pra A2, o pote dele passa pro paulista de maior rating
+  que dispute a Série A nacional entre os que sobraram — também critério
+  do jogador, não pesquisado).
 
 ## Vagas/premiação vazias ou não confirmadas
 

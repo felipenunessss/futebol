@@ -35,6 +35,7 @@ import {
   type CompeticaoParaMundoPersistente,
   type CompeticaoParaVagaContinental,
 } from "@motor/career/mundo-persistente.js";
+import { ajustarCabecasDeChaveDoPaulistaoA1 } from "@motor/career/paulistao-cabecas-de-chave.js";
 
 /** Velocidades de exibição da partida ao vivo escolhíveis pelo jogador (pedido do usuário:
  * "implementar velocidade na simulação do jogo"). ms de espera real por minuto simulado — "normal"
@@ -1011,7 +1012,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     const novaComposicaoSalva: Record<string, string[]> = {};
     for (const base of campeonatos) {
       const novosTimes = novaComposicaoMap.get(base.id);
-      if (novosTimes && !mesmoConjunto(novosTimes, base.times)) novaComposicaoSalva[base.id] = novosTimes;
+      if (!novosTimes) continue;
+      // Paulistão A1: mantém 1 cabeça de chave por pote (os 4 grandes, ou substituto de maior
+      // rating na Série A quando um deles cai) mesmo depois de rebaixamento/acesso reordenar a
+      // lista — ver `career/paulistao-cabecas-de-chave.ts`. Comparação exige ordem exata (não só
+      // `mesmoConjunto`), já que a função é idempotente sobre o mesmo conjunto de times.
+      if (base.id === "paulistao_a1") {
+        const timesAjustados = ajustarCabecasDeChaveDoPaulistaoA1(novosTimes, clubes);
+        const igualAoOriginal = timesAjustados.length === base.times.length && timesAjustados.every((id, indice) => id === base.times[indice]);
+        if (!igualAoOriginal) novaComposicaoSalva[base.id] = timesAjustados;
+        continue;
+      }
+      if (!mesmoConjunto(novosTimes, base.times)) novaComposicaoSalva[base.id] = novosTimes;
     }
 
     setEstadoAtual({ ...resultadoDaTemporada.estado, composicaoDasCompeticoes: Object.keys(novaComposicaoSalva).length > 0 ? novaComposicaoSalva : undefined });
