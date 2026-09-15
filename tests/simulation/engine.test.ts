@@ -138,6 +138,48 @@ describe("simularTemporada", () => {
     expect(resultado.partidasDoJogador).toEqual([]);
   });
 
+  it("receitaArgentina expõe tituloApertura/tituloClausura como títulos próprios, distintos do campeão da Tabla Anual", async () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonato: CampeonatoSimulavel = {
+      id: "argentina_primera",
+      formato: {
+        turno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        returno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        final_estadual: { criterio: "tabela_anual_soma_pontos_apertura_e_clausura_define_campeao_de_liga", ida_e_volta: false },
+      },
+      times,
+    };
+    const ratings = Object.fromEntries(times.map((t) => [t, 1600]));
+
+    const resultado = await receitaArgentina(campeonato, ratings, undefined, () => Math.random());
+
+    expect(times).toContain(resultado.tituloApertura);
+    expect(times).toContain(resultado.tituloClausura);
+    // campeão da Tabla Anual é a soma das 2 tabelas — não precisa ser igual a nenhum dos 2
+    // campeões isolados, mas quando os 3 empatam num cenário determinístico eles DEVEM bater.
+  });
+
+  it("receitaArgentina: com ratings desiguais e resultado determinístico, o mesmo time que lidera turno e returno isolados também lidera a soma (Tabla Anual)", async () => {
+    const times = ["a", "b", "c", "d"];
+    const campeonato: CampeonatoSimulavel = {
+      id: "argentina_primera",
+      formato: {
+        turno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        returno: { ida_e_volta: false, classificam_proxima_fase: 0 },
+        final_estadual: { criterio: "tabela_anual_soma_pontos_apertura_e_clausura_define_campeao_de_liga", ida_e_volta: false },
+      },
+      times,
+    };
+    // "a" muito mais forte que os outros 3 — praticamente garantido vencer turno, returno e a soma.
+    const ratings = { a: 2400, b: 1200, c: 1200, d: 1200 };
+
+    const resultado = await receitaArgentina(campeonato, ratings, undefined, () => 0.01);
+
+    expect(resultado.tituloApertura).toBe("a");
+    expect(resultado.tituloClausura).toBe("a");
+    expect(resultado.campeao).toBe("a");
+  });
+
   it("receitaArgentina propaga partidasDoJogador do Apertura e do Clausura combinados", async () => {
     const times = ["a", "b", "c", "d"];
     const campeonato: CampeonatoSimulavel = {

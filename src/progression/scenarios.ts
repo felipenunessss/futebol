@@ -56,6 +56,20 @@ export interface ImpactoCarreira {
    * placar 0-0").
    */
   efeitoDeGol?: "a_favor" | "contra";
+  /**
+   * `true` quando o desfecho narrado TIRA o jogador de campo AGORA mesmo (ex: substituição, pedido
+   * de saída por lesão/cansaço) — só usado pelos eventos de contexto de `progression/match-events.ts`
+   * com `janelaDePartida` (nunca pelo catálogo geral de cenários fora de campo, que não tem noção de
+   * "campo" nenhuma). Consumido só por `simulation/live-match.ts` `jogarPartidaAoVivo`, que liga no
+   * MESMO `jogadorAindaEmCampo` já usado por cartão vermelho/lesão (`IncidenteDeJogador`) — a partir
+   * daí nenhuma chance da partida (gol, assistência) pode mais ser atribuída ao jogador, mesma
+   * garantia dos dois casos que já funcionavam. Sem isso, um cenário podia narrar "você foi
+   * substituído no intervalo" e o motor continuar gerando/creditando chances pra ele no resto do
+   * jogo — bug relatado pelo usuário (mesma categoria do já corrigido pra `efeitoDeGol`, ver acima).
+   * A simulação instantânea (`simulation/match.ts` `simularPartida`) não sorteia eventos de contexto
+   * nenhum, então esse campo não se aplica lá.
+   */
+  encerraParticipacaoNaPartida?: boolean;
   /** Texto livre descrevendo o desfecho, pra mostrar ao jogador. */
   narrativa: string;
 }

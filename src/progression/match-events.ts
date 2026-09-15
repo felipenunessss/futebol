@@ -103,7 +103,9 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
       {
         id: "pedir_substituicao",
         texto: "Pedir pra sair",
-        resultados: [{ probabilidade: 1, impacto: { moral: 3, relacoesInternas: -2, narrativa: "Você sai por precaução — sensato, ainda que renda algum cochicho no vestiário." } }],
+        resultados: [
+          { probabilidade: 1, impacto: { moral: 3, relacoesInternas: -2, encerraParticipacaoNaPartida: true, narrativa: "Você sai por precaução — sensato, ainda que renda algum cochicho no vestiário." } },
+        ],
       },
     ],
   },
@@ -223,13 +225,25 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
         texto: "Se conter no limite e seguir jogando",
         resultados: [
           { probabilidade: 0.7, impacto: { moral: 5, narrativa: "O autocontrole no limite evita o pior e você segue em campo." } },
-          { probabilidade: 0.3, impacto: { moral: -12, narrativa: "O árbitro decide expulsar você mesmo com a contenção." } },
+          // Expulsão de verdade — mesmo tratamento de IncidenteDeJogador "cartao_vermelho"
+          // (simulation/match.ts): encerra a partida atual E suspende 1 partida futura
+          // (PARTIDAS_DE_SUSPENSAO_CARTAO_VERMELHO lá, espelhado aqui — cenário narrativo, não passa
+          // pelo sorteio de incidente automático, mas a consequência precisa ser a mesma).
+          {
+            probabilidade: 0.3,
+            impacto: {
+              moral: -12,
+              encerraParticipacaoNaPartida: true,
+              foraDeCombate: { motivo: "suspensao", partidasRestantes: 1 },
+              narrativa: "O árbitro decide expulsar você mesmo com a contenção.",
+            },
+          },
         ],
       },
       {
         id: "pedir_substituicao_preventiva",
         texto: "Pedir pra sair antes de piorar",
-        resultados: [{ probabilidade: 1, impacto: { relacoesInternas: 3, narrativa: "A saída preventiva é vista como madura pela comissão técnica." } }],
+        resultados: [{ probabilidade: 1, impacto: { relacoesInternas: 3, encerraParticipacaoNaPartida: true, narrativa: "A saída preventiva é vista como madura pela comissão técnica." } }],
       },
     ],
   },
@@ -243,14 +257,14 @@ export const EVENTOS_DE_PARTIDA: Cenario[] = [
         id: "cobrar_explicacao_no_vestiario",
         texto: "Cobrar uma explicação ainda no vestiário",
         resultados: [
-          { probabilidade: 0.4, impacto: { relacoesInternas: 5, narrativa: "A conversa franca esclarece o mal-entendido e fortalece a relação." } },
-          { probabilidade: 0.6, impacto: { relacoesInternas: -15, moral: -10, narrativa: "A cobrança no calor do momento gera um atrito sério com o técnico." } },
+          { probabilidade: 0.4, impacto: { relacoesInternas: 5, encerraParticipacaoNaPartida: true, narrativa: "A conversa franca esclarece o mal-entendido e fortalece a relação." } },
+          { probabilidade: 0.6, impacto: { relacoesInternas: -15, moral: -10, encerraParticipacaoNaPartida: true, narrativa: "A cobrança no calor do momento gera um atrito sério com o técnico." } },
         ],
       },
       {
         id: "engolir_e_conversar_depois",
         texto: "Engolir a decisão e conversar com calma depois",
-        resultados: [{ probabilidade: 1, impacto: { relacoesInternas: 4, moral: -3, narrativa: "A postura profissional é notada, mesmo com o desconforto do momento." } }],
+        resultados: [{ probabilidade: 1, impacto: { relacoesInternas: 4, moral: -3, encerraParticipacaoNaPartida: true, narrativa: "A postura profissional é notada, mesmo com o desconforto do momento." } }],
       },
     ],
   },

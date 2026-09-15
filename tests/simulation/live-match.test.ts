@@ -257,4 +257,66 @@ describe("jogarPartidaAoVivo", () => {
     expect(comGolContra.resultado.golsFora).toBe(semEvento.resultado.golsFora + 1);
     expect(comGolContra.resultado.golsCasa).toBe(semEvento.resultado.golsCasa);
   });
+
+  describe("ImpactoCarreira.encerraParticipacaoNaPartida", () => {
+    /** Mulberry32 — PRNG seedado determinístico, mesmo padrão usado em outros testes do motor. */
+    function criarRandomSeedado(seed: number): () => number {
+      let estado = seed;
+      return () => {
+        estado |= 0;
+        estado = (estado + 0x6d2b79f5) | 0;
+        let t = Math.imul(estado ^ (estado >>> 15), 1 | estado);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    const jogador: Jogador = {
+      id: "j1",
+      nome: "Teste",
+      posicao: "atacante",
+      arquetipo_id: buscarArquetipo("finalizador").id,
+      idade: 22,
+      atributos: { finalizacao: 60, cabeceio: 60, drible: 60, visao_de_jogo: 60, desarme: 60 },
+    };
+    const participacao: ParticipacaoJogador = { lado: "casa", jogador, estiloTecnico: "equilibrado" };
+
+    const cenarioDeSubstituicao = EVENTOS_DE_PARTIDA.find((c) => c.id === "tirado_no_intervalo")!;
+    const opcaoQueEncerraParticipacao = cenarioDeSubstituicao.opcoes.find((o) => o.id === "engolir_e_conversar_depois")!;
+
+    it("o catálogo real marca 'tirado_no_intervalo'/'engolir_e_conversar_depois' com encerraParticipacaoNaPartida", () => {
+      expect(opcaoQueEncerraParticipacao.resultados[0].impacto.encerraParticipacaoNaPartida).toBe(true);
+    });
+
+    it("bug real corrigido: depois de um cenário com encerraParticipacaoNaPartida, nenhuma chance_jogador nem novo evento_de_contexto acontece pro resto da partida (mesma garantia de cartão vermelho/lesão)", async () => {
+      let algumaVezDisparou = false;
+
+      for (let seed = 0; seed < 60; seed++) {
+        const timeline: EventoAoVivo[] = [];
+        await jogarPartidaAoVivo(perfilSimetrico, perfilSimetrico, criarRandomSeedado(seed), participacao, {
+          msPorMinuto: 0,
+          maxEventosDeContexto: 8, // alto de propósito — garante que pelo menos 1 slot de evento seja sorteado em boa parte dos seeds
+          decidirEventoDeContexto: () => opcaoQueEncerraParticipacao,
+          onEvento: (evento) => {
+            timeline.push(evento);
+          },
+        });
+
+        const indiceDaSaida = timeline.findIndex((e) => e.tipo === "evento_de_contexto" && e.escolha.resultado.impacto.encerraParticipacaoNaPartida);
+        if (indiceDaSaida === -1) continue; // esse seed não sorteou o slot de evento — não prova nada, pula
+        algumaVezDisparou = true;
+
+        const minutoDaSaida = timeline[indiceDaSaida].minuto;
+        const eventosDepois = timeline.slice(indiceDaSaida + 1).filter((e) => e.tipo !== "apito_final");
+
+        for (const evento of eventosDepois) {
+          expect(evento.minuto).toBeGreaterThanOrEqual(minutoDaSaida); // linha do tempo, garantia básica
+          expect(evento.tipo).not.toBe("chance_jogador"); // nenhum gol/chance dele depois de sair
+          expect(evento.tipo).not.toBe("evento_de_contexto"); // nenhum novo cenário narrado com ele em campo
+        }
+      }
+
+      expect(algumaVezDisparou).toBe(true); // sanity check — o teste provou algo em pelo menos 1 dos 60 seeds
+    });
+  });
 });

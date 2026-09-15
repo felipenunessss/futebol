@@ -391,6 +391,23 @@ describe("criarCompeticaoIncremental — Tabla Anual (Argentina 1ª divisão, po
     expect(estado.concluida).toBe(true);
     expect(times).toContain(estado.campeao);
   });
+
+  it("bug real corrigido: expõe tituloApertura/tituloClausura como títulos próprios (pedido do usuário: taça própria pra cada um dos 3, não só a Tabla Anual)", async () => {
+    const estado = criarCompeticaoIncremental(campeonato, ratings, undefined, { semanaInicio: 1, semanaFim: 10 }, () => Math.random());
+    for (let semana = 1; semana <= 10; semana++) await avancarSemana(estado, semana, () => Math.random());
+    expect(estado.concluida).toBe(true);
+    expect(times).toContain(estado.tituloApertura);
+    expect(times).toContain(estado.tituloClausura);
+  });
+
+  it("time muito mais forte lidera turno, returno e a soma — tituloApertura/tituloClausura/campeao todos batem", async () => {
+    const ratingsDesiguais = { a: 2400, b: 1200, c: 1200, d: 1200, e: 1200, f: 1200 };
+    const estado = criarCompeticaoIncremental(campeonato, ratingsDesiguais, undefined, { semanaInicio: 1, semanaFim: 10 }, () => 0.01);
+    for (let semana = 1; semana <= 10; semana++) await avancarSemana(estado, semana, () => 0.01);
+    expect(estado.tituloApertura).toBe("a");
+    expect(estado.tituloClausura).toBe("a");
+    expect(estado.campeao).toBe("a");
+  });
 });
 
 describe("criarCompeticaoIncremental — 2 zonas + final direta + Reduzido (Argentina 2ª divisão, por id)", () => {

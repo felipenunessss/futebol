@@ -74,6 +74,15 @@ export interface EventosSimulacaoTemporada {
 
 export interface ResultadoCampeonatoSimples {
   campeao: string;
+  /**
+   * Campeão do Apertura/Clausura como título PRÓPRIO, distinto do `campeao` da Tabla Anual — só
+   * populado por `receitaArgentina` (pedido do usuário: taça própria pra cada um dos 3, já que o
+   * jogador forneceu imagem local pras 3). Nome deliberadamente diferente de `ctx.campeaoApertura`/
+   * `campeaoClausura` (usados internamente por Uruguai/Peru/Colômbia/Venezuela só como classificação
+   * pro playoff, não como título de verdade) pra não confundir os dois conceitos.
+   */
+  tituloApertura?: string;
+  tituloClausura?: string;
   /** Uma entrada por partida do clube do jogador nessa competição (todas as fases/etapas), se ele participou. */
   partidasDoJogador: ResultadoPartida[];
   /**
@@ -955,7 +964,12 @@ export async function receitaArgentina(
 
   const partidasDoJogador = [...(apertura.partidasDoJogador ?? []), ...(clausura.partidasDoJogador ?? [])].map((p) => p.resultado);
 
-  return { campeao: tabelaAnual[0].clubeId, partidasDoJogador };
+  return {
+    campeao: tabelaAnual[0].clubeId,
+    tituloApertura: apertura.tabela[0].clubeId,
+    tituloClausura: clausura.tabela[0].clubeId,
+    partidasDoJogador,
+  };
 }
 
 /**

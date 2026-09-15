@@ -1112,7 +1112,14 @@ export async function jogarTemporadaSemanal(
     }
     resultadoCompeticoes.push({
       campeonatoId,
-      resultado: { campeao: est.campeao ?? "", partidasDoJogador: est.partidasDoJogador, tabelaFinal: est.tabelaFinal, semifinalistas: est.semifinalistas },
+      resultado: {
+        campeao: est.campeao ?? "",
+        tituloApertura: est.tituloApertura,
+        tituloClausura: est.tituloClausura,
+        partidasDoJogador: est.partidasDoJogador,
+        tabelaFinal: est.tabelaFinal,
+        semifinalistas: est.semifinalistas,
+      },
     });
     resumoCompeticoes.push({
       campeonatoId,

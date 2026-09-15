@@ -21,6 +21,7 @@ import {
   type EventoDeFeed,
   type FaixasDeDestaqueDaTabela,
   type InfoPotesFaseSuica,
+  type InfoTacasDaCompeticao,
   type JogoDaSemana,
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
@@ -814,7 +815,7 @@ function PainelEstatisticas({
 }: {
   estatisticas: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
-  tacaPorCampeonato: Map<string, string | undefined>;
+  tacaPorCampeonato: Map<string, InfoTacasDaCompeticao>;
   /** 4 (padrão) pro uso mais largo (fim de temporada); 2 pra caber na lateral estreita sempre visível. */
   colunas?: 2 | 4;
 }) {
@@ -832,14 +833,20 @@ function PainelEstatisticas({
           <p className="text-xs text-slate-500">Nenhum título ainda.</p>
         ) : (
           <ul className="flex flex-col gap-1.5">
-            {estatisticas.titulos.map((t, indice) => (
-              <li key={indice} className="flex items-center gap-2 text-xs text-slate-300">
-                <TrofeuDaCompeticao url={tacaPorCampeonato.get(t.campeonatoId)} />
-                <span>
-                  {nomeDoCampeonato(nomePorCampeonato, t.campeonatoId)} — {t.temporada}
-                </span>
-              </li>
-            ))}
+            {estatisticas.titulos.map((t, indice) => {
+              const tacas = tacaPorCampeonato.get(t.campeonatoId);
+              const url = t.subtitulo === "apertura" ? tacas?.apertura : t.subtitulo === "clausura" ? tacas?.clausura : tacas?.principal;
+              const rotuloSubtitulo = t.subtitulo === "apertura" ? "Apertura — " : t.subtitulo === "clausura" ? "Clausura — " : "";
+              return (
+                <li key={indice} className="flex items-center gap-2 text-xs text-slate-300">
+                  <TrofeuDaCompeticao url={url} />
+                  <span>
+                    {rotuloSubtitulo}
+                    {nomeDoCampeonato(nomePorCampeonato, t.campeonatoId)} — {t.temporada}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
@@ -847,10 +854,11 @@ function PainelEstatisticas({
   );
 }
 
-/** Imagem real da taça quando a competição tem (`taca_url`, ver `scripts/buscar-tacas.ts` — só as
- * mais conhecidas) — senão um ícone genérico de troféu (SVG embutido, não busca nada externo), pra
- * sala de troféus sempre mostrar alguma coisa em vez de um emoji plano. Pedido do usuário: "importe
- * as taças dos campeonatos pra que elas apareçam na sala de troféus". */
+/** Imagem real da taça quando a competição tem (`taca_url`/`taca_apertura_url`/`taca_clausura_url`,
+ * externa ou local em `web/public/trofeus/` — ver `docs/dados-a-verificar.md`) — senão um ícone
+ * genérico de troféu (SVG embutido, não busca nada externo), pra sala de troféus sempre mostrar
+ * alguma coisa em vez de um emoji plano. Pedido do usuário: "importe as taças dos campeonatos pra
+ * que elas apareçam na sala de troféus". */
 function TrofeuDaCompeticao({ url }: { url: string | undefined }) {
   if (url) return <img src={url} alt="" className="w-6 h-6 object-contain shrink-0" />;
   return (
@@ -899,7 +907,7 @@ function PainelLateralEstatisticasEAtributos({
 }: {
   estatisticasCarreira: EstatisticasCarreira;
   nomePorCampeonato: Map<string, string>;
-  tacaPorCampeonato: Map<string, string | undefined>;
+  tacaPorCampeonato: Map<string, InfoTacasDaCompeticao>;
   atributos: Partial<Record<Atributo, number>>;
   atributosDaPosicao: Atributo[];
 }) {
@@ -2031,7 +2039,7 @@ function ResumoDeTemporada({
   resultado: NonNullable<ReturnType<typeof useTemporada>["resultado"]>;
   clubePorId: Map<string, Club>;
   nomePorCampeonato: Map<string, string>;
-  tacaPorCampeonato: Map<string, string | undefined>;
+  tacaPorCampeonato: Map<string, InfoTacasDaCompeticao>;
   estatisticasCarreira: EstatisticasCarreira;
   onVerPropostas: () => void;
 }) {

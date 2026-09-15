@@ -4,9 +4,6 @@
   "pais": "AR",
   "nivel": 1,
   "ano_referencia": 2026,
-  "midia": {
-    "trofeu": "argentina apertura.svg"
-  },
   "formato": {
     "turno": {
       "nome": "Torneo Apertura",
@@ -30,6 +27,9 @@
     "vaga_sulamericana_criterio": "6 melhores da Tabela Anual que não tenham vaga de Libertadores",
     "rebaixamento_proxima_divisao": 2
   },
+  "taca_url": "/trofeus/tabla-anual-argentina.svg",
+  "taca_apertura_url": "/trofeus/apertura-argentina.svg",
+  "taca_clausura_url": "/trofeus/clausura-argentina.svg",
   "classicos": [
     { "time_a": "river_plate", "time_b": "boca_juniors", "nome": "Superclásico", "peso_midia": 5 },
     { "time_a": "racing_club", "time_b": "independiente", "nome": "Clásico de Avellaneda", "peso_midia": 5 }

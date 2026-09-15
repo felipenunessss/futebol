@@ -73,6 +73,13 @@ export interface InfoPotesFaseSuica {
   vagasPorPote: number;
 }
 
+/** URL(s) de taça de uma competição — `apertura`/`clausura` só presentes pra competições `turno`+`returno` somadas (ver `tacaPorCampeonato`, `TituloDeCarreira.subtitulo`). */
+export interface InfoTacasDaCompeticao {
+  principal: string | undefined;
+  apertura: string | undefined;
+  clausura: string | undefined;
+}
+
 function faixasDeDestaqueDaTabela(campeonato: CampeonatoEstadual | CampeonatoNacional): FaixasDeDestaqueDaTabela {
   const { formato, premiacao } = campeonato;
   const rebaixados = premiacao.rebaixamento_proxima_divisao;
@@ -305,6 +312,10 @@ export interface TituloDeCarreira {
   campeonatoId: string;
   temporada: number;
   clubeId: string;
+  /** Presente só pra títulos de Apertura/Clausura (turno+returno somados, ex: Argentina) — distinto
+   * do título "principal" (Tabla Anual/campeão geral), que fica sem `subtitulo`. Ver `career-loop.ts`
+   * `ResultadoCampeonatoSimples.tituloApertura`/`tituloClausura`. */
+  subtitulo?: "apertura" | "clausura";
 }
 
 /** Totais acumulados ao longo de toda a carreira (não só a temporada atual) — somado a cada `jogarTemporada()` que termina. Puramente client-side, o motor não guarda isso (ver docs/motor-de-partida.md). */
@@ -457,10 +468,21 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Nome de exibição (ex: "Campeonato Brasileiro Série C") por id (ex: "brasileirao_serie_c") — pra UI nunca mostrar o id bruto com "_". */
   const nomePorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.nome])), [campeonatos]);
   const escudoPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.escudo_url])), [campeonatos]);
-  /** URL da imagem da TAÇA (distinta do escudo) por campeonatoId — ver `schemas/national-championship.ts`
-   * `taca_url`. A maioria não tem (só as competições mais conhecidas, ver `scripts/buscar-tacas.ts`) —
-   * a sala de troféus cai pra um ícone genérico nesse caso (`TrofeuDaCompeticao`). */
-  const tacaPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, c.taca_url])), [campeonatos]);
+  /** URL(s) da imagem da TAÇA (distinta do escudo) por campeonatoId — ver `schemas/national-championship.ts`
+   * `taca_url`/`taca_apertura_url`/`taca_clausura_url`. A maioria só tem `principal` (ou nada — a
+   * sala de troféus cai pra um ícone genérico nesse caso, `TrofeuDaCompeticao`); `apertura`/`clausura`
+   * só existem pra competições `turno`+`returno` somadas (Argentina, Paraguai — `CampeonatoEstadual`
+   * nunca tem esses 2 campos, daí o `"taca_apertura_url" in c`). */
+  const tacaPorCampeonato = useMemo(
+    () =>
+      new Map(
+        campeonatos.map((c) => [
+          c.id,
+          { principal: c.taca_url, apertura: "taca_apertura_url" in c ? c.taca_apertura_url : undefined, clausura: "taca_clausura_url" in c ? c.taca_clausura_url : undefined },
+        ]),
+      ),
+    [campeonatos],
+  );
   const faixasPorCampeonato = useMemo(() => new Map(campeonatos.map((c) => [c.id, faixasDeDestaqueDaTabela(c)])), [campeonatos]);
   /**
    * Pra competições de fase suíça com classificação por pote (ex: Paulistão A1: 4 potes de 4, top 2
@@ -966,9 +988,17 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     setFase("resumo");
 
     const clubeDaTemporada = resultadoDaTemporada.estado.clubeAtualId;
-    const novosTitulos: TituloDeCarreira[] = resultadoDaTemporada.resultadoTemporada.competicoes
-      .filter((c) => c.resultado?.campeao === clubeDaTemporada)
-      .map((c) => ({ campeonatoId: c.campeonatoId, temporada: resultadoDaTemporada.resultadoTemporada.temporada, clubeId: clubeDaTemporada }));
+    const temporadaDoTitulo = resultadoDaTemporada.resultadoTemporada.temporada;
+    // Cada competição pode render até 3 títulos na MESMA temporada pro mesmo clube (Argentina/
+    // Paraguai: Apertura + Clausura + Tabla Anual, ver `simulation/engine.ts`
+    // `ResultadoCampeonatoSimples.tituloApertura`/`tituloClausura`) — por isso `flatMap`, não `map`.
+    const novosTitulos: TituloDeCarreira[] = resultadoDaTemporada.resultadoTemporada.competicoes.flatMap((c) => {
+      const titulos: TituloDeCarreira[] = [];
+      if (c.resultado?.campeao === clubeDaTemporada) titulos.push({ campeonatoId: c.campeonatoId, temporada: temporadaDoTitulo, clubeId: clubeDaTemporada });
+      if (c.resultado?.tituloApertura === clubeDaTemporada) titulos.push({ campeonatoId: c.campeonatoId, temporada: temporadaDoTitulo, clubeId: clubeDaTemporada, subtitulo: "apertura" });
+      if (c.resultado?.tituloClausura === clubeDaTemporada) titulos.push({ campeonatoId: c.campeonatoId, temporada: temporadaDoTitulo, clubeId: clubeDaTemporada, subtitulo: "clausura" });
+      return titulos;
+    });
     // partidas/gols/assistências já foram somados partida a partida (`onPartidaPontosCorridos`/
     // `onPartidaMataMata`, ver comentário lá) — aqui só soma o que só faz sentido fechar no fim da
     // temporada (temporadas jogadas, títulos conquistados).

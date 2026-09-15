@@ -466,6 +466,44 @@ e falta o campo de schema pra guardar o link de atribuição
 (`descriptionurl` do arquivo, exigido pela licença CC) junto de
 `taca_url`, ainda não adicionado.
 
+**Imagens locais curadas pelo usuário (`src/data/trofeus/`)** — primeira
+vez que `taca_url` aponta pra um arquivo local em vez de URL externa.
+Convenção nova: o SVG fonte vive em `src/data/trofeus/<nome>.svg` (site
+de referência do jogador), uma CÓPIA vai pra `web/public/trofeus/<slug>.svg`
+(Vite só serve estático a partir de `public/`, não alcança `src/data/`
+fora de `web/`), e `taca_url` recebe o caminho relativo à raiz do site
+(`/trofeus/<slug>.svg`) — diferente da convenção de sempre (URL externa
+completa), mas consumido do mesmo jeito (`<img src>` em
+`TrofeuDaCompeticao`, `TelaDeTemporada.tsx`). **Se o SVG fonte em
+`src/data/trofeus/` mudar, a cópia em `web/public/trofeus/` precisa ser
+atualizada manualmente — não há sincronização automática.** Substituíram
+os `taca_url` do TheSportsDB (`scripts/buscar-tacas.ts`) de Copa do
+Brasil/Libertadores/Sul-Americana/Série A-D — as 7 competições que já
+tinham taça também têm arquivo local correspondente agora.
+
+**Argentina — 3 taças, não 1** (`argentina_primera.json`): o jogador forneceu
+imagem própria pro Apertura, pro Clausura E pra Tabla Anual (3 arquivos,
+não só 1) — pedido explícito: "uma taça pra cada". Como o motor só premiava
+UM campeão por competição (`ctx.campeao`, a Tabla Anual — Apertura/Clausura
+eram só tabelas intermediárias somadas, nunca títulos de verdade),
+`simulation/engine.ts` `receitaArgentina`/`simulation/incremental.ts`
+`passosTurnoRetornoSomado` ganharam `tituloApertura`/`tituloClausura` como
+títulos PRÓPRIOS (líder de cada meio-turno isolado), gravados em
+`CampeonatoNacional.taca_apertura_url`/`taca_clausura_url` (`taca_url`
+continua sendo só a Tabla Anual) e em `TituloDeCarreira.subtitulo` na sala
+de troféus. Como `passosTurnoRetornoSomado` também é usado por Paraguai
+(mesmo formato `turno`+`returno` somado, sem `final_estadual`), o Paraguai
+também passou a ter Apertura/Clausura como títulos reais — correto pra lá
+também (mesmo mecanismo real), só que sem taça própria cadastrada ainda
+(cai no ícone genérico).
+
+**Ainda sem uso**: `src/data/trofeus/copa argentina.svg` e `supercopa.svg`
+— Copa Argentina e Supercopa não são competições modeladas nos dados hoje
+(nenhum arquivo de campeonato correspondente); decisão do usuário foi
+deixar essas 2 imagens sem `taca_url` associado por enquanto, até essas
+competições serem modeladas (fora do escopo de só mapear troféu pra
+campeonato existente).
+
 ## Como resolver
 
 Cada item acima deveria ser confirmado contra a fonte primária (site da

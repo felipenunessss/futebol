@@ -460,6 +460,9 @@ function ordenarPorForca(times: string[], ratings: Record<string, number>): stri
 
 export interface ContextoDePrograma {
   campeao?: string;
+  /** Ver `simulation/engine.ts` `ResultadoCampeonatoSimples.tituloApertura`/`tituloClausura` — só setado por `passosTurnoRetornoSomado` (Argentina). Nome deliberadamente diferente do `campeaoApertura`/`campeaoClausura` usado internamente por outros países (Uruguai/Peru/Colômbia/Venezuela) só pra seleção de playoff, não como título de verdade. */
+  tituloApertura?: string;
+  tituloClausura?: string;
   /**
    * Classificação final da competição, quando o formato permite uma (por enquanto só
    * `pontos_corridos` sem mata-mata — ver `passosPontosCorridos`) — usado por `career/
@@ -1240,14 +1243,20 @@ function passosTurnoRetornoSomado(campeonato: CampeonatoSimulavel): PassoDeProgr
       unidades: totalDeRodadas(campeonato.times.length, turno.ida_e_volta),
       criar: () => criarFaseRodadas("turno", [campeonato.times], turno.ida_e_volta, 1),
       aoConcluir: (fase, ctx) => {
-        ctx.tabelaTurno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        const tabelaTurno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.tabelaTurno = tabelaTurno;
+        // Título PRÓPRIO do Apertura (líder do turno isolado) — real em vários países que usam
+        // esse formato (Argentina, Paraguai), distinto da Tabla Anual decidida no passo seguinte.
+        ctx.tituloApertura = tabelaTurno[0].clubeId;
       },
     },
     {
       unidades: totalDeRodadas(campeonato.times.length, returno.ida_e_volta),
       criar: () => criarFaseRodadas("returno", [campeonato.times], returno.ida_e_volta, 1),
       aoConcluir: (fase, ctx) => {
-        const tabelaSomada = somarTabelas([ctx.tabelaTurno as LinhaTabela[], tabelaDoGrupoUnico(fase as FaseRodadas)]);
+        const tabelaReturno = tabelaDoGrupoUnico(fase as FaseRodadas);
+        ctx.tituloClausura = tabelaReturno[0].clubeId;
+        const tabelaSomada = somarTabelas([ctx.tabelaTurno as LinhaTabela[], tabelaReturno]);
         ctx.campeao = tabelaSomada[0].clubeId;
       },
     },
@@ -1336,6 +1345,9 @@ export interface CompeticaoIncremental {
   contexto: ContextoDePrograma;
   concluida: boolean;
   campeao?: string;
+  /** Ver `ContextoDePrograma.tituloApertura`/`tituloClausura`. */
+  tituloApertura?: string;
+  tituloClausura?: string;
   /** Ver `ContextoDePrograma.tabelaFinal` — só populado pra formatos que suportam extração hoje. */
   tabelaFinal?: LinhaTabela[];
   /** Ver `ContextoDePrograma.semifinalistas` — só populado depois que o mata-mata resolve pelo menos 1 etapa. */
@@ -1431,6 +1443,8 @@ export async function avancarSemana(
         if (estado.indicePasso >= estado.passos.length) {
           estado.concluida = true;
           estado.campeao = estado.contexto.campeao as string;
+          estado.tituloApertura = estado.contexto.tituloApertura as string | undefined;
+          estado.tituloClausura = estado.contexto.tituloClausura as string | undefined;
           estado.tabelaFinal = estado.contexto.tabelaFinal;
           estado.semifinalistas = estado.contexto.semifinalistas;
         }

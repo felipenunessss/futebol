@@ -216,9 +216,10 @@ export async function jogarPartidaAoVivo(
   const chancesJogador: ChanceJogador[] = [];
   const impactosDeContexto: ImpactoCarreira[] = [];
   let incidenteJogador: IncidenteDeJogador | undefined;
-  // Vira `false` assim que um incidente que encerra a participação (cartão vermelho/lesão) acontece —
-  // a partir daí, as chances que cairiam pro jogador voltam a ser resolvidas de forma anônima, como se
-  // fosse qualquer outro clube (ele já saiu de campo).
+  // Vira `false` assim que um incidente que encerra a participação (cartão vermelho/lesão) OU um
+  // cenário de contexto com `ImpactoCarreira.encerraParticipacaoNaPartida` (substituição, pedido de
+  // saída) acontece — a partir daí, as chances que cairiam pro jogador voltam a ser resolvidas de
+  // forma anônima, como se fosse qualquer outro clube (ele já saiu de campo).
   let jogadorAindaEmCampo = true;
   // Usado só pra elegibilidade de cenários que reagem a um gol já marcado nesta partida (ver
   // `Cenario.requerGolDoJogadorAntes`) — mesmo critério de "sucesso conta como gol" já usado pra
@@ -239,6 +240,10 @@ export async function jogarPartidaAoVivo(
     minutoAnterior = slot.minuto;
 
     if (slot.tipo === "evento") {
+      // Já saiu de campo (incidente ou cenário anterior) — todo o catálogo de eventos de contexto é
+      // narrado em 1ª pessoa como se o jogador estivesse ativo (provocação da torcida NELE, pênalti
+      // pra ELE cobrar, cãibra DELE) — não faz sentido nenhum desses acontecer com ele no banco.
+      if (!jogadorAindaEmCampo) continue;
       const cenario = sortearCenario(cenariosElegiveis(slot.minuto, jogadorMarcouGolNestaPartida), random);
       const opcaoEscolhida = decidirEventoDeContexto ? await decidirEventoDeContexto(cenario) : cenario.opcoes[0];
       const escolha = resolverEscolha(opcaoEscolhida, random);
@@ -251,6 +256,11 @@ export async function jogarPartidaAoVivo(
         if (ladoQueMarcou === "casa") golsCasa++;
         else golsFora++;
       }
+      // Mesma garantia de `incidenteEncerraParticipacao` (cartão vermelho/lesão) — um cenário de
+      // contexto também pode tirar o jogador de campo (substituição, pedido de saída), e a partir
+      // daqui nenhuma chance da partida pode mais ser atribuída a ele. Ver doc de
+      // `ImpactoCarreira.encerraParticipacaoNaPartida`.
+      if (escolha.resultado.impacto.encerraParticipacaoNaPartida) jogadorAindaEmCampo = false;
       await onEvento?.({ tipo: "evento_de_contexto", minuto: slot.minuto, cenario, escolha });
       continue;
     }
