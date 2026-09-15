@@ -19,53 +19,48 @@ const CLASSES_POR_FAIXA: Record<FaixaDeOvr, string> = {
 
 /**
  * Painel "Histórico de temporadas" (estilo Copero.net) — lista rolável com uma linha por
- * temporada da carreira, cabeçalho de colunas fixo no topo. Puramente apresentacional: todos os
- * números já vêm prontos do motor via `useTemporada` (`RegistroDeTemporada`), sem cálculo aqui.
+ * temporada da carreira, cabeçalho de colunas fixo no topo. Sempre visível na tela (pedido do
+ * usuário: "queria a lista sempre visível, não atrás de um clique" — mesmo espírito de `Feed`,
+ * que também fica sempre visível), não um modal — renderizado direto no fluxo principal da tela
+ * de temporada. Puramente apresentacional: todos os números já vêm prontos do motor via
+ * `useTemporada` (`RegistroDeTemporada`), sem cálculo aqui.
  */
-export function HistoricoDeTemporadas({ registros, onFechar }: { registros: RegistroDeTemporada[]; onFechar: () => void }) {
+export function HistoricoDeTemporadas({ registros }: { registros: RegistroDeTemporada[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ao abrir, rola até a temporada mais recente — registros vêm em ordem cronológica, então é o
-  // fim da lista. Roda de novo toda vez que o painel monta (montagem condicional, não CSS
-  // escondida) — pedido do usuário: "ao carregar a tela, rolar automaticamente até a temporada
-  // mais recente/atual".
+  // Ao carregar a tela, rola até a temporada mais recente — registros vêm em ordem cronológica,
+  // então é o fim da lista (pedido do usuário: "ao carregar a tela, rolar automaticamente até a
+  // temporada mais recente/atual"). Corre de novo sempre que uma nova temporada é adicionada, pra
+  // acompanhar o jogador conforme a carreira avança sem precisar rolar manualmente.
   useEffect(() => {
     containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight });
-  }, []);
+  }, [registros.length]);
 
   return (
-    <div className="fixed inset-0 z-30 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6" onClick={onFechar}>
-      <div
-        className="mx-auto w-full max-w-2xl max-h-[85vh] rounded-2xl bg-slate-900 border border-slate-800 shadow-xl flex flex-col text-slate-100"
-        onClick={(evento) => evento.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 shrink-0">
-          <h2 className="text-lg font-semibold">Histórico de temporadas</h2>
-          <button type="button" onClick={onFechar} className="text-sm text-slate-400 hover:text-slate-200 transition-colors">
-            Fechar
-          </button>
-        </div>
-
-        {registros.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-500">Nenhuma temporada concluída ainda.</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-[3rem_1fr_3.5rem_2.5rem_2.5rem_3rem] gap-2 px-5 py-2 text-xs font-medium text-slate-400 border-b border-slate-800 shrink-0">
-              <span>Idade</span>
-              <span>Clube</span>
-              <span className="text-right">OVR</span>
-              <span className="text-right">J</span>
-              <span className="text-right">G</span>
-              <span className="text-right">A</span>
-            </div>
-            <div ref={containerRef} className="overflow-y-auto">
-              {registros.map((registro) => (
-                <LinhaDeTemporada key={registro.temporada} registro={registro} />
-              ))}
-            </div>
-          </>
-        )}
+    <div className="rounded-2xl bg-slate-900/95 border border-slate-800 shadow-xl flex flex-col text-slate-100 backdrop-blur">
+      <div className="px-5 py-4 border-b border-slate-800 shrink-0">
+        <h2 className="text-lg font-semibold">Histórico de temporadas</h2>
       </div>
+
+      {registros.length === 0 ? (
+        <p className="px-5 py-6 text-sm text-slate-500">Nenhuma temporada concluída ainda.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-[3rem_1fr_3.5rem_2.5rem_2.5rem_3rem] gap-2 px-5 py-2 text-xs font-medium text-slate-400 border-b border-slate-800 shrink-0">
+            <span>Idade</span>
+            <span>Clube</span>
+            <span className="text-right">OVR</span>
+            <span className="text-right">J</span>
+            <span className="text-right">G</span>
+            <span className="text-right">A</span>
+          </div>
+          <div ref={containerRef} className="max-h-80 overflow-y-auto">
+            {registros.map((registro) => (
+              <LinhaDeTemporada key={registro.temporada} registro={registro} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

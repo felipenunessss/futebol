@@ -25,7 +25,6 @@ import {
   type JogoDaSemana,
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
-  type RegistroDeTemporada,
   type ResultadoDaRodadaExibido,
   type VelocidadeAoVivo,
 } from "./useTemporada.js";
@@ -232,7 +231,6 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         )}
         <PainelLateralEstatisticasEAtributos
           estatisticasCarreira={estatisticasCarreira}
-          historicoDeTemporadas={historicoDeTemporadas}
           nomePorCampeonato={nomePorCampeonato}
           tacaPorCampeonato={temporada.tacaPorCampeonato}
           atributos={estadoAtual.jogador.atributos}
@@ -333,6 +331,10 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         {/* O feed fica sempre visível (durante a temporada E depois do resumo) — é aqui que os
             placares das suas partidas aparecem conforme a temporada avança. */}
         <Feed eventos={feed} clubePorId={clubePorId} nomePorCampeonato={nomePorCampeonato} faixasPorCampeonato={temporada.faixasPorCampeonato} />
+
+        {/* Sempre visível, mesmo espírito do Feed acima (pedido do usuário: "queria a lista sempre
+            visível, não atrás de um clique") — não é um modal/toggle. */}
+        <HistoricoDeTemporadas registros={historicoDeTemporadas} />
       </div>
     </div>
   );
@@ -904,40 +906,28 @@ function ListaCompactaDeAtributos({ atributos, atributosDaPosicao }: { atributos
  * de atributos e as estatísticas fique escondido") — antes era um toggle escondido no cabeçalho. */
 function PainelLateralEstatisticasEAtributos({
   estatisticasCarreira,
-  historicoDeTemporadas,
   nomePorCampeonato,
   tacaPorCampeonato,
   atributos,
   atributosDaPosicao,
 }: {
   estatisticasCarreira: EstatisticasCarreira;
-  historicoDeTemporadas: RegistroDeTemporada[];
   nomePorCampeonato: Map<string, string>;
   tacaPorCampeonato: Map<string, InfoTacasDaCompeticao>;
   atributos: Partial<Record<Atributo, number>>;
   atributosDaPosicao: Atributo[];
 }) {
-  const [historicoAberto, setHistoricoAberto] = useState(false);
-
   return (
-    <>
-      <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
-        <div>
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <h2 className="font-semibold text-slate-400">Estatísticas da carreira</h2>
-            <button type="button" onClick={() => setHistoricoAberto(true)} className="shrink-0 text-emerald-400 hover:text-emerald-300 transition-colors">
-              Histórico
-            </button>
-          </div>
-          <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} colunas={2} />
-        </div>
-        <div className="border-t border-slate-800 pt-2">
-          <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
-          <ListaCompactaDeAtributos atributos={atributos} atributosDaPosicao={atributosDaPosicao} />
-        </div>
+    <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
+      <div>
+        <h2 className="font-semibold text-slate-400 mb-2">Estatísticas da carreira</h2>
+        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} colunas={2} />
       </div>
-      {historicoAberto && <HistoricoDeTemporadas registros={historicoDeTemporadas} onFechar={() => setHistoricoAberto(false)} />}
-    </>
+      <div className="border-t border-slate-800 pt-2">
+        <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
+        <ListaCompactaDeAtributos atributos={atributos} atributosDaPosicao={atributosDaPosicao} />
+      </div>
+    </div>
   );
 }
 
