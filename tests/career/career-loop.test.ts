@@ -816,6 +816,47 @@ describe("suspensão/lesão de partida (foraDeCombate)", () => {
 
     expect(numerosDePartida.length).toBe(6);
   });
+
+  it("partida em que o jogador estava fora de combate não conta como jogo no resumo da temporada", async () => {
+    const times = ["a", "b", "c", "d"];
+    const resultado = await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      // Força cartão vermelho toda vez que o jogador de fato joga (ver teste acima) — então ao
+      // menos 1 das 6 rodadas do campeonato de teste acontece com ele suspenso.
+      random: () => 0.999,
+      msPorMinutoAoVivo: 0,
+      escolherModoDePartida: () => "ao_vivo",
+    });
+
+    const totalDeJogos = resultado.resumoPartidas.competicoes.reduce((soma, c) => soma + c.partidasDoJogador, 0);
+    // Sem o gate de entrouEmCampo, seriam exatamente 6 (1 por rodada, contando até a partida em
+    // que ele estava suspenso) — com o gate, ao menos 1 rodada não conta.
+    expect(totalDeJogos).toBeLessThan(6);
+  });
+
+  it("propaga entrouEmCampo=false pro callback público quando o jogador estava fora de combate, true quando não", async () => {
+    const times = ["a", "b", "c", "d"];
+    const flagsComSuspensao: (boolean | undefined)[] = [];
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.999,
+      msPorMinutoAoVivo: 0,
+      escolherModoDePartida: () => "ao_vivo",
+      onPartidaPontosCorridos: (info) => {
+        flagsComSuspensao.push(info.entrouEmCampo);
+      },
+    });
+    expect(flagsComSuspensao).toContain(false);
+
+    const flagsSemIncidente: (boolean | undefined)[] = [];
+    await jogarTemporadaSemanal(estadoDeTeste(), campeonatoDeTeste(times), times.map((id) => clube(id)), {
+      random: () => 0.5,
+      msPorMinutoAoVivo: 0,
+      escolherModoDePartida: () => "ao_vivo",
+      onPartidaPontosCorridos: (info) => {
+        flagsSemIncidente.push(info.entrouEmCampo);
+      },
+    });
+    expect(flagsSemIncidente.every((flag) => flag === true)).toBe(true);
+  });
 });
 
 describe("jogarCarreira", () => {

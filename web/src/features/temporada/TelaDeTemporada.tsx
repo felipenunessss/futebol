@@ -25,9 +25,11 @@ import {
   type JogoDaSemana,
   type PartidaAoVivoEmAndamento,
   type PromptPendente,
+  type RegistroDeTemporada,
   type ResultadoDaRodadaExibido,
   type VelocidadeAoVivo,
 } from "./useTemporada.js";
+import { HistoricoDeTemporadas } from "./HistoricoDeTemporadas.js";
 import { Escudo } from "../../components/Escudo.js";
 import { corDeTextoContrastante } from "../../lib/contraste.js";
 import { extrairCorDominante } from "../../lib/corDoEscudo.js";
@@ -154,6 +156,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
     grupoDoJogadorPorCampeonato,
     competicoesDoJogador,
     estatisticasCarreira,
+    historicoDeTemporadas,
     resultado,
     clubePorId,
     nomePorCampeonato,
@@ -229,6 +232,7 @@ export function TelaDeTemporada({ estadoInicial }: { estadoInicial: EstadoDeCarr
         )}
         <PainelLateralEstatisticasEAtributos
           estatisticasCarreira={estatisticasCarreira}
+          historicoDeTemporadas={historicoDeTemporadas}
           nomePorCampeonato={nomePorCampeonato}
           tacaPorCampeonato={temporada.tacaPorCampeonato}
           atributos={estadoAtual.jogador.atributos}
@@ -900,28 +904,40 @@ function ListaCompactaDeAtributos({ atributos, atributosDaPosicao }: { atributos
  * de atributos e as estatísticas fique escondido") — antes era um toggle escondido no cabeçalho. */
 function PainelLateralEstatisticasEAtributos({
   estatisticasCarreira,
+  historicoDeTemporadas,
   nomePorCampeonato,
   tacaPorCampeonato,
   atributos,
   atributosDaPosicao,
 }: {
   estatisticasCarreira: EstatisticasCarreira;
+  historicoDeTemporadas: RegistroDeTemporada[];
   nomePorCampeonato: Map<string, string>;
   tacaPorCampeonato: Map<string, InfoTacasDaCompeticao>;
   atributos: Partial<Record<Atributo, number>>;
   atributosDaPosicao: Atributo[];
 }) {
+  const [historicoAberto, setHistoricoAberto] = useState(false);
+
   return (
-    <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
-      <div>
-        <h2 className="font-semibold text-slate-400 mb-2">Estatísticas da carreira</h2>
-        <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} colunas={2} />
+    <>
+      <div className="rounded-xl bg-slate-900/95 border border-slate-800 shadow-xl p-3 flex flex-col gap-3 text-xs backdrop-blur text-slate-100">
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h2 className="font-semibold text-slate-400">Estatísticas da carreira</h2>
+            <button type="button" onClick={() => setHistoricoAberto(true)} className="shrink-0 text-emerald-400 hover:text-emerald-300 transition-colors">
+              Histórico
+            </button>
+          </div>
+          <PainelEstatisticas estatisticas={estatisticasCarreira} nomePorCampeonato={nomePorCampeonato} tacaPorCampeonato={tacaPorCampeonato} colunas={2} />
+        </div>
+        <div className="border-t border-slate-800 pt-2">
+          <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
+          <ListaCompactaDeAtributos atributos={atributos} atributosDaPosicao={atributosDaPosicao} />
+        </div>
       </div>
-      <div className="border-t border-slate-800 pt-2">
-        <h2 className="font-semibold text-slate-400 mb-2">Atributos</h2>
-        <ListaCompactaDeAtributos atributos={atributos} atributosDaPosicao={atributosDaPosicao} />
-      </div>
-    </div>
+      {historicoAberto && <HistoricoDeTemporadas registros={historicoDeTemporadas} onFechar={() => setHistoricoAberto(false)} />}
+    </>
   );
 }
 
@@ -2177,7 +2193,12 @@ function CardDePropostaFimDeTemporada({
       <div className="flex items-center gap-2 min-w-0">
         <Escudo url={escudoDoClube(clubePorId, proposta.clubeOfertanteId)} alt={titulo} tamanho={22} />
         <div className="min-w-0">
-          <div className="font-medium truncate">{titulo}</div>
+          <div className="font-medium truncate flex items-center gap-1.5">
+            {titulo}
+            {proposta.tipoDeVinculo === "emprestimo" && (
+              <span className="shrink-0 rounded bg-sky-900/60 border border-sky-700 text-sky-300 text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wide">Empréstimo</span>
+            )}
+          </div>
           <div className="text-xs text-slate-400">
             {ROTULO_STATUS[proposta.statusOferecido]} · R${formatarMoeda(termos.salarioMensal)}/mês + R${formatarMoeda(termos.luvas)} luvas · {termos.anos} anos
           </div>

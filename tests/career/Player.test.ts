@@ -10,6 +10,7 @@ import {
   investirPontos,
   mudarStatusNoClube,
   overallAtual,
+  retornarDeEmprestimo,
   transferirParaClube,
   type EstadoDeCarreira,
 } from "../../src/career/Player.js";
@@ -416,5 +417,40 @@ describe("mudarStatusNoClube", () => {
     expect(depois.statusNoClube).toBe("titular");
     expect(depois.clubeAtualId).toBe(estado.clubeAtualId);
     expect(depois.contratoAtual).toBe(estado.contratoAtual);
+  });
+});
+
+describe("retornarDeEmprestimo", () => {
+  it("com contrato de empréstimo ativo, devolve o jogador pro clube de origem sem contrato", () => {
+    const estado = estadoBase();
+    const contrato: Contrato = {
+      clubeId: "flamengo",
+      salarioMensal: 10_000,
+      luvas: 0,
+      clausulaRescisao: 500_000,
+      anos: 1,
+      temporadaAssinatura: 2027,
+      tipoDeVinculo: "emprestimo",
+      clubeDeOrigemId: "corinthians",
+    };
+    const emprestado = assinarContrato(estado, contrato, "titular");
+
+    const depois = retornarDeEmprestimo(emprestado);
+
+    expect(depois.clubeAtualId).toBe("corinthians");
+    expect(depois.contratoAtual).toBeUndefined();
+  });
+
+  it("sem contrato ativo, devolve o mesmo estado sem mudança", () => {
+    const estado = estadoBase();
+    expect(retornarDeEmprestimo(estado)).toBe(estado);
+  });
+
+  it("com contrato permanente (não empréstimo), devolve o mesmo estado sem mudança", () => {
+    const estado = estadoBase();
+    const contrato: Contrato = { clubeId: "flamengo", salarioMensal: 10_000, luvas: 30_000, clausulaRescisao: 500_000, anos: 3, temporadaAssinatura: 2027 };
+    const comContrato = assinarContrato(estado, contrato, "titular");
+
+    expect(retornarDeEmprestimo(comContrato)).toBe(comContrato);
   });
 });

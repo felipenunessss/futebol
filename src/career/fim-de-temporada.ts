@@ -24,6 +24,8 @@ export interface PropostasDeFimDeTemporada {
 }
 
 const MAX_PROPOSTAS_EXTERNAS = 3;
+/** Chance de uma proposta EXTERNA (nunca a renovação do próprio clube) vir como empréstimo em vez de transferência definitiva. Estimativa de design. */
+const PROBABILIDADE_DE_PROPOSTA_DE_EMPRESTIMO = 0.3;
 
 /**
  * Gera as propostas de fim de temporada — chamado 1x, depois do resumo da
@@ -43,7 +45,10 @@ export function gerarPropostasDeFimDeTemporada(estado: EstadoDeCarreira, clubes:
   const valorDeMercado = calcularValorDeMercado(perfil);
 
   const interessados = selecionarClubesInteressados(clubes, estado.clubeAtualId, perfil, { random }).slice(0, MAX_PROPOSTAS_EXTERNAS);
-  const propostas = interessados.map((clube) => gerarProposta(clube, valorDeMercado, estado.statusNoClube, estado.jogador.idade, ratingClubeAtual, random));
+  const propostas = interessados.map((clube) => {
+    const tipoDeVinculo = random() < PROBABILIDADE_DE_PROPOSTA_DE_EMPRESTIMO ? "emprestimo" : "permanente";
+    return gerarProposta(clube, valorDeMercado, estado.statusNoClube, estado.jogador.idade, ratingClubeAtual, random, tipoDeVinculo);
+  });
 
   // Renovação: mesma fórmula de proposta, só que o "clube ofertante" é o próprio clube atual — sem
   // salto de rating (`ratingClubeAtual` nos dois lados), então o status oferecido reflete continuar
@@ -70,6 +75,7 @@ export function aplicarEscolhaDeFimDeTemporada(estado: EstadoDeCarreira, propost
   const proposta = escolha.tipo === "renovar" ? propostas.renovacao : propostas.propostas.find((p) => p.clubeOfertanteId === escolha.clubeOfertanteId);
   if (!proposta) return estado;
 
+  const ehEmprestimo = proposta.tipoDeVinculo === "emprestimo";
   return assinarContrato(
     estado,
     {
@@ -79,6 +85,8 @@ export function aplicarEscolhaDeFimDeTemporada(estado: EstadoDeCarreira, propost
       clausulaRescisao: proposta.propostaInicial.salarioMensal * 12 * (proposta.propostaInicial.anos + 1),
       anos: proposta.propostaInicial.anos,
       temporadaAssinatura: estado.temporada,
+      tipoDeVinculo: proposta.tipoDeVinculo,
+      clubeDeOrigemId: ehEmprestimo ? estado.clubeAtualId : undefined,
     },
     proposta.statusOferecido,
   );

@@ -351,6 +351,21 @@ export function assinarContrato(estado: EstadoDeCarreira, contrato: Contrato, st
   return { ...estado, clubeAtualId: contrato.clubeId, contratoAtual: contrato, statusNoClube };
 }
 
+/**
+ * Fim de um empréstimo de 1 temporada (`Contrato.tipoDeVinculo === "emprestimo"`)
+ * — devolve o jogador pro clube dono (`clubeDeOrigemId`), sem contrato (mesma
+ * semântica de "movido sem negociação" de `transferirParaClube`); o clube de
+ * origem então entra na tela de fim de temporada como clube atual normalmente,
+ * podendo oferecer renovação. Chamar sempre antes de gerar as propostas de fim
+ * de temporada (`career/fim-de-temporada.ts`). Sem empréstimo ativo, devolve
+ * `estado` sem mudança (mesma referência).
+ */
+export function retornarDeEmprestimo(estado: EstadoDeCarreira): EstadoDeCarreira {
+  const contrato = estado.contratoAtual;
+  if (!contrato || contrato.tipoDeVinculo !== "emprestimo" || !contrato.clubeDeOrigemId) return estado;
+  return { ...estado, clubeAtualId: contrato.clubeDeOrigemId, contratoAtual: undefined };
+}
+
 /** Atualiza só o status no elenco do clube atual (ex: revisão de fim de temporada, `career/status.ts` `evoluirStatus`) — não mexe em clube/contrato. */
 export function mudarStatusNoClube(estado: EstadoDeCarreira, statusNoClube: StatusNoClube): EstadoDeCarreira {
   return { ...estado, statusNoClube };

@@ -43,6 +43,29 @@ describe("gerarPropostasDeFimDeTemporada", () => {
     const propostas = gerarPropostasDeFimDeTemporada(estadoDeTeste(), clubes, () => 0.5);
     expect(propostas.renovacao).toBeUndefined();
   });
+
+  it("com random abaixo do limiar de empréstimo, propostas externas vêm como empréstimo (anos=1, luvas=0) — renovação nunca", () => {
+    const clubes = [clube("a", 1600, "baixa"), clube("b", 1800, "muito_alta"), clube("c", 1600, "baixa"), clube("d", 1600, "baixa")];
+    const propostas = gerarPropostasDeFimDeTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, clubes, () => 0.1);
+
+    expect(propostas.propostas.length).toBeGreaterThan(0);
+    for (const p of propostas.propostas) {
+      expect(p.tipoDeVinculo).toBe("emprestimo");
+      expect(p.propostaInicial.anos).toBe(1);
+      expect(p.propostaInicial.luvas).toBe(0);
+    }
+    expect(propostas.renovacao!.tipoDeVinculo).toBe("permanente");
+  });
+
+  it("com random acima do limiar de empréstimo, todas as propostas externas vêm como permanente", () => {
+    const clubes = [clube("a", 1600, "baixa"), clube("b", 1800, "muito_alta"), clube("c", 1600, "baixa"), clube("d", 1600, "baixa")];
+    const propostas = gerarPropostasDeFimDeTemporada({ ...estadoDeTeste(), statusNoClube: "titular" }, clubes, () => 0.9);
+
+    expect(propostas.propostas.length).toBeGreaterThan(0);
+    for (const p of propostas.propostas) {
+      expect(p.tipoDeVinculo).toBe("permanente");
+    }
+  });
 });
 
 describe("aplicarEscolhaDeFimDeTemporada", () => {
@@ -90,5 +113,19 @@ describe("aplicarEscolhaDeFimDeTemporada", () => {
     const depois = aplicarEscolhaDeFimDeTemporada(estado, propostas, { tipo: "transferir", clubeOfertanteId: "clube_inexistente" });
 
     expect(depois).toBe(estado);
+  });
+
+  it("'transferir' aceitando uma proposta de empréstimo seta tipoDeVinculo e clubeDeOrigemId no contrato", () => {
+    const clubes = [clube("a", 1600, "baixa"), clube("b", 1800, "muito_alta"), clube("c", 1600, "baixa"), clube("d", 1600, "baixa")];
+    const estado = { ...estadoDeTeste(), statusNoClube: "titular" as const };
+    const propostas = gerarPropostasDeFimDeTemporada(estado, clubes, () => 0.1); // abaixo do limiar — vira empréstimo
+    const alvo = propostas.propostas[0];
+    expect(alvo.tipoDeVinculo).toBe("emprestimo");
+
+    const depois = aplicarEscolhaDeFimDeTemporada(estado, propostas, { tipo: "transferir", clubeOfertanteId: alvo.clubeOfertanteId });
+
+    expect(depois.clubeAtualId).toBe(alvo.clubeOfertanteId);
+    expect(depois.contratoAtual?.tipoDeVinculo).toBe("emprestimo");
+    expect(depois.contratoAtual?.clubeDeOrigemId).toBe("a");
   });
 });

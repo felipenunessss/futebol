@@ -52,6 +52,8 @@ export interface PropostaTransferencia {
   propostaInicial: TermosDeContrato;
   /** Status que o clube ofertante propõe pro jogador no elenco dele (`career/status.ts` `statusOferecido`) — não é negociável (a negociação só mexe em salário/luvas/anos, ver `market/negotiation.ts`). */
   statusOferecido: StatusNoClube;
+  /** `"permanente"` (padrão) ou `"emprestimo"` — ver `gerarProposta`. */
+  tipoDeVinculo: "permanente" | "emprestimo";
 }
 
 const MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL = 24;
@@ -78,6 +80,14 @@ const SALARIO_MENSAL_MINIMO = 800;
  * forte" nesse cálculo, então cai naturalmente pro piso permitido pra
  * idade (`statusMinimoPorIdade`) sem precisar de um caminho especial pra
  * isso. Estimativa de design.
+ *
+ * `tipoDeVinculo` (padrão `"permanente"`, comportamento de sempre): quando
+ * `"emprestimo"`, força `anos = 1` e `luvas = 0` (empréstimo não tem luvas,
+ * dura sempre 1 temporada — ver `career/fim-de-temporada.ts` e
+ * `career/Player.ts` `retornarDeEmprestimo`) em vez dos valores sorteados —
+ * as mesmas chamadas de `random()` acontecem de qualquer forma, então
+ * chamadas existentes (sem esse argumento) não mudam de resultado nem de
+ * sequência de sorteio.
  */
 export function gerarProposta(
   clube: Club,
@@ -86,6 +96,7 @@ export function gerarProposta(
   idadeJogador: number,
   ratingClubeAtual: number,
   random: () => number = Math.random,
+  tipoDeVinculo: "permanente" | "emprestimo" = "permanente",
 ): PropostaTransferencia {
   const tetoMensal = tetoSalarialMensal(clube);
   const salarioReferencia = Math.min(tetoMensal, Math.round(valorDeMercado / MESES_DE_VALOR_DE_MERCADO_COMO_REFERENCIA_SALARIAL));
@@ -101,7 +112,13 @@ export function gerarProposta(
     faseDaEquipe: random() * 2 - 1,
   });
 
-  return { clubeOfertanteId: clube.id, propostaInicial: { salarioMensal, luvas, anos }, statusOferecido: status };
+  const ehEmprestimo = tipoDeVinculo === "emprestimo";
+  return {
+    clubeOfertanteId: clube.id,
+    propostaInicial: { salarioMensal, luvas: ehEmprestimo ? 0 : luvas, anos: ehEmprestimo ? 1 : anos },
+    statusOferecido: status,
+    tipoDeVinculo,
+  };
 }
 
 export interface OpcoesSelecaoDeInteressados {

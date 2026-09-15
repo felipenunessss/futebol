@@ -6,7 +6,7 @@ import type { LinhaTabela } from "@motor/simulation/season.js";
 import { construirPotePorTime } from "@motor/simulation/swiss.js";
 import type { SubtipoChance } from "@motor/simulation/tactics.js";
 import type { ContextoDecisaoChance, EventoAoVivo, ResultadoDecisaoChance } from "@motor/simulation/live-match.js";
-import type { EstadoDeCarreira } from "@motor/career/Player.js";
+import { retornarDeEmprestimo, type EstadoDeCarreira } from "@motor/career/Player.js";
 import {
   jogarTemporadaSemanal,
   type AlocacaoDePontos,
@@ -329,6 +329,28 @@ export interface EstatisticasCarreira {
 
 const ESTATISTICAS_INICIAIS: EstatisticasCarreira = { temporadas: 0, partidas: 0, gols: 0, assistencias: 0, titulos: [] };
 
+/** Um snapshot por temporada da carreira — base do painel "Histórico de temporadas" (estilo Copero). Tudo aqui já vem agregado pelo motor (`resultadoDaTemporada.resumoPartidas`) ou é derivável sem cálculo (comparação de clube com a temporada anterior) — a interface só exibe, não recalcula nada. */
+export interface RegistroDeTemporada {
+  temporada: number;
+  /** Idade do jogador DURANTE essa temporada — não a que ele já está no início da próxima (`avancarTemporada` já rodou quando esse registro é montado). */
+  idade: number;
+  clube: { id: string; nome: string; escudoUrl?: string };
+  /** Overall ao final da temporada (`resumoPartidas.overallDepois`). */
+  ovr: number;
+  jogos: number;
+  gols: number;
+  assistencias: number;
+  /** Troféus conquistados especificamente nesta temporada (pode ser mais de um, ver `TituloDeCarreira.subtitulo`). */
+  titulos: TituloDeCarreira[];
+  /** Presente só na temporada em que o clube mudou em relação à anterior. */
+  transferencia?: {
+    tipo: "definitiva" | "emprestimo" | "volta_emprestimo";
+    clubeAnteriorId: string;
+    /** Só presente quando `tipo === "emprestimo"` — o clube dono do vínculo permanente. */
+    clubeDeOrigemId?: string;
+  };
+}
+
 /** Mesmas janelas da CLI (`ULTIMA_SEMANA_DA_TEMPORADA = 52`, metade = 26). */
 const ULTIMA_SEMANA_DA_TEMPORADA = 52;
 
@@ -386,6 +408,8 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
   /** Ids das competições do próprio clube — capturado do 1º `aoIniciarSemana` da temporada (o conjunto não muda semana a semana). */
   const [competicoesDoJogador, setCompeticoesDoJogador] = useState<string[]>([]);
   const [estatisticasCarreira, setEstatisticasCarreira] = useState<EstatisticasCarreira>(ESTATISTICAS_INICIAIS);
+  /** Histórico temporada-a-temporada da carreira (painel "Histórico de temporadas", estilo Copero) — em ordem cronológica, populado 1x por temporada no mesmo ponto de `novosTitulos`/`setEstatisticasCarreira` abaixo. */
+  const [historicoDeTemporadas, setHistoricoDeTemporadas] = useState<RegistroDeTemporada[]>([]);
   const proximoId = useRef(0);
   const jaIniciouPrimeiraTemporada = useRef(false);
   /**
@@ -792,14 +816,18 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
         );
         // Estatísticas da carreira atualizam partida a partida, não só de uma vez no fim da
         // temporada (pedido do usuário: "os jogos devem atualizar as estatísticas conforme
-        // acontecem, não quero que os números da temporada apareçam direto").
-        const desempenhoDaPartida = converterChancesEmDesempenho(resultadoDaPartida.chancesJogador, 0, 1);
-        setEstatisticasCarreira((atual) => ({
-          ...atual,
-          partidas: atual.partidas + 1,
-          gols: atual.gols + desempenhoDaPartida.gols,
-          assistencias: atual.assistencias + desempenhoDaPartida.assistencias,
-        }));
+        // acontecem, não quero que os números da temporada apareçam direto"). `entrouEmCampo`
+        // vem `false` quando o clube jogou mas o jogador estava de fora (suspensão/lesão) —
+        // essa partida não conta como jogo/gol/assistência dele.
+        if (info.entrouEmCampo ?? true) {
+          const desempenhoDaPartida = converterChancesEmDesempenho(resultadoDaPartida.chancesJogador, 0, 1);
+          setEstatisticasCarreira((atual) => ({
+            ...atual,
+            partidas: atual.partidas + 1,
+            gols: atual.gols + desempenhoDaPartida.gols,
+            assistencias: atual.assistencias + desempenhoDaPartida.assistencias,
+          }));
+        }
         const resultadoParaExibir: ResultadoDaRodadaExibido | undefined = emJanelaAutomatica()
           ? undefined
           : {
@@ -877,19 +905,21 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
           atual && atual.campeonatoId === info.campeonatoId ? { ...atual, resultado: { golsCasa: info.evento.confronto.golsA, golsFora: info.evento.confronto.golsB } } : atual,
         );
         // Mesma atualização incremental de `onPartidaPontosCorridos` — 1 ou 2 partidas (ida e
-        // volta) por confronto de mata-mata.
+        // volta) por confronto de mata-mata. Filtra pelas pernas em que o jogador realmente
+        // entrou em campo (mesma ressalva de `entrouEmCampo` em `onPartidaPontosCorridos`).
         const partidasDoJogadorNestaEtapa = info.evento.confronto.partidasDoJogador ?? [];
-        if (partidasDoJogadorNestaEtapa.length > 0) {
+        const partidasRealmenteJogadas = partidasDoJogadorNestaEtapa.filter((_, indice) => info.entrouEmCampoPorPartida?.[indice] ?? true);
+        if (partidasRealmenteJogadas.length > 0) {
           let golsDaEtapa = 0;
           let assistenciasDaEtapa = 0;
-          for (const partida of partidasDoJogadorNestaEtapa) {
+          for (const partida of partidasRealmenteJogadas) {
             const desempenho = converterChancesEmDesempenho(partida.chancesJogador, 0, 1);
             golsDaEtapa += desempenho.gols;
             assistenciasDaEtapa += desempenho.assistencias;
           }
           setEstatisticasCarreira((atual) => ({
             ...atual,
-            partidas: atual.partidas + partidasDoJogadorNestaEtapa.length,
+            partidas: atual.partidas + partidasRealmenteJogadas.length,
             gols: atual.gols + golsDaEtapa,
             assistencias: atual.assistencias + assistenciasDaEtapa,
           }));
@@ -1007,6 +1037,43 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
       temporadas: atual.temporadas + 1,
       titulos: [...atual.titulos, ...novosTitulos],
     }));
+
+    // Snapshot da temporada pro painel "Histórico de temporadas" (estilo Copero) — jogos/gols/
+    // assistências/OVR vêm prontos do motor (`resumoPartidas`, já filtrado por `entrouEmCampo`),
+    // a interface só soma e compara com o registro anterior (não recalcula nada de novo).
+    const clubeDaTemporadaInfo = clubePorId.get(clubeDaTemporada);
+    const jogosNaTemporada = resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.partidasDoJogador, 0);
+    const golsNaTemporada = resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.golsDoJogador, 0);
+    const assistenciasNaTemporada = resultadoDaTemporada.resumoPartidas.competicoes.reduce((soma, c) => soma + c.assistenciasDoJogador, 0);
+    const contratoAtual = resultadoDaTemporada.estado.contratoAtual;
+
+    setHistoricoDeTemporadas((atual) => {
+      const anterior = atual[atual.length - 1];
+      let transferencia: RegistroDeTemporada["transferencia"];
+      if (anterior && anterior.clube.id !== clubeDaTemporada) {
+        if (contratoAtual?.tipoDeVinculo === "emprestimo" && contratoAtual.clubeDeOrigemId) {
+          transferencia = { tipo: "emprestimo", clubeAnteriorId: anterior.clube.id, clubeDeOrigemId: contratoAtual.clubeDeOrigemId };
+        } else if (anterior.transferencia?.tipo === "emprestimo" && anterior.transferencia.clubeDeOrigemId === clubeDaTemporada) {
+          transferencia = { tipo: "volta_emprestimo", clubeAnteriorId: anterior.clube.id };
+        } else {
+          transferencia = { tipo: "definitiva", clubeAnteriorId: anterior.clube.id };
+        }
+      }
+      const novoRegistro: RegistroDeTemporada = {
+        temporada: temporadaDoTitulo,
+        // `avancarTemporada` já rodou pra próxima temporada nesse ponto — a idade durante a
+        // temporada que acabou é a atual menos 1.
+        idade: resultadoDaTemporada.estado.jogador.idade - 1,
+        clube: { id: clubeDaTemporada, nome: clubeDaTemporadaInfo?.nome ?? clubeDaTemporada, escudoUrl: clubeDaTemporadaInfo?.escudo_url },
+        ovr: resultadoDaTemporada.resumoPartidas.overallDepois,
+        jogos: jogosNaTemporada,
+        gols: golsNaTemporada,
+        assistencias: assistenciasNaTemporada,
+        titulos: novosTitulos,
+        transferencia,
+      };
+      return [...atual, novoRegistro];
+    });
   }
 
   // A 1ª temporada começa sozinha assim que a tela monta — mesmo espírito do
@@ -1167,7 +1234,12 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
    * (`fase: "propostas"`), sem ainda iniciar a próxima temporada (isso só acontece depois que o
    * jogador responder, ver `responderFimDeTemporada`). */
   function verPropostasFimDeTemporada(): void {
-    setPropostasFimDeTemporada(gerarPropostasDeFimDeTemporada(estadoAtual, clubes));
+    // Se o jogador estava emprestado, volta pro clube dono ANTES de gerar as propostas — é o
+    // clube de origem que oferece renovação/vê propostas de transferência daqui pra frente,
+    // não quem tinha o empréstimo (`career/Player.ts` `retornarDeEmprestimo`).
+    const estadoParaPropostas = retornarDeEmprestimo(estadoAtual);
+    if (estadoParaPropostas !== estadoAtual) setEstadoAtual(estadoParaPropostas);
+    setPropostasFimDeTemporada(gerarPropostasDeFimDeTemporada(estadoParaPropostas, clubes));
     setFase("propostas");
   }
 
@@ -1195,6 +1267,7 @@ export function useTemporada(estadoInicial: EstadoDeCarreira) {
     grupoDoJogadorPorCampeonato,
     competicoesDoJogador,
     estatisticasCarreira,
+    historicoDeTemporadas,
     resultado,
     clubePorId,
     nomePorCampeonato,
